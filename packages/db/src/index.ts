@@ -1,5 +1,5 @@
-import { env } from "@finance-tool-poc/env/server";
 import { neon } from "@neondatabase/serverless";
+import { env } from "@pengana/env/server";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";

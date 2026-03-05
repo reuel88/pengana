@@ -1,4 +1,4 @@
-import { env } from "@finance-tool-poc/env/native";
+import { env } from "@pengana/env/native";
 import { Platform } from "react-native";
 
 /**

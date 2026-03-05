@@ -1,5 +1,5 @@
 {
-	"name": "finance-tool-poc",
+	"name": "pengana",
 	"private": true,
 	"workspaces": [
 		"apps/*",
@@ -13,22 +13,22 @@
 		"dev:native": "turbo -F native dev",
 		"dev:web": "turbo -F web dev",
 		"dev:server": "turbo -F server dev",
-		"db:push": "turbo -F @finance-tool-poc/db db:push",
-		"db:studio": "turbo -F @finance-tool-poc/db db:studio",
-		"db:generate": "turbo -F @finance-tool-poc/db db:generate",
-		"db:migrate": "turbo -F @finance-tool-poc/db db:migrate",
+		"db:push": "turbo -F @pengana/db db:push",
+		"db:studio": "turbo -F @pengana/db db:studio",
+		"db:generate": "turbo -F @pengana/db db:generate",
+		"db:migrate": "turbo -F @pengana/db db:migrate",
 		"test": "turbo test",
 		"check": "biome check --write .",
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@finance-tool-poc/env": "workspace:*",
+		"@pengana/env": "workspace:*",
 		"dotenv": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.0",
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"@types/node": "catalog:",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.1.2",

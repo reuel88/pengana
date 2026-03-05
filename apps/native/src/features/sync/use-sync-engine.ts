@@ -1,11 +1,11 @@
-import { env } from "@finance-tool-poc/env/native";
+import { env } from "@pengana/env/native";
 import type {
 	SyncEvent,
 	SyncInput,
 	SyncOutput,
 	UploadEvent,
-} from "@finance-tool-poc/sync-engine";
-import { SyncEngine, UploadQueue } from "@finance-tool-poc/sync-engine";
+} from "@pengana/sync-engine";
+import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 import { randomUUID } from "expo-crypto";
 import * as Network from "expo-network";
 import { useCallback, useEffect, useRef, useState } from "react";

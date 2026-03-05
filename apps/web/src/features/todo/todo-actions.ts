@@ -4,4 +4,4 @@ export {
 	deleteTodo,
 	resolveConflict,
 	toggleTodo,
-} from "@finance-tool-poc/todo-client";
+} from "@pengana/todo-client";

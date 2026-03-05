@@ -1,4 +1,4 @@
-import type { UploadItem } from "@finance-tool-poc/sync-engine";
+import type { UploadItem } from "@pengana/sync-engine";
 
 import Dexie, { type EntityTable } from "dexie";
 

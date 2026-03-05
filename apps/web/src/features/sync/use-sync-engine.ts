@@ -1,9 +1,5 @@
-import type {
-	SyncEvent,
-	SyncInput,
-	SyncOutput,
-} from "@finance-tool-poc/sync-engine";
-import { SyncEngine } from "@finance-tool-poc/sync-engine";
+import type { SyncEvent, SyncInput, SyncOutput } from "@pengana/sync-engine";
+import { SyncEngine } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { createDexieSyncAdapter } from "@/entities/todo";

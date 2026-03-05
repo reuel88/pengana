@@ -9,7 +9,7 @@ You are an expert code readability reviewer with deep expertise in clean code pr
 
 ## Project Context
 
-This is a **TypeScript monorepo** (Turborepo + pnpm) called `finance-tool-poc` with the following structure:
+This is a **TypeScript monorepo** (Turborepo + pnpm) called `pengana` with the following structure:
 
 ```
 apps/

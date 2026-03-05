@@ -1,5 +1,5 @@
 {
-	"name": "@finance-tool-poc/auth",
+	"name": "@pengana/auth",
 	"type": "module",
 	"exports": {
 		".": {
@@ -12,8 +12,8 @@
 	"scripts": {},
 	"dependencies": {
 		"@better-auth/expo": "catalog:",
-		"@finance-tool-poc/db": "workspace:*",
-		"@finance-tool-poc/env": "workspace:*",
+		"@pengana/db": "workspace:*",
+		"@pengana/env": "workspace:*",
 		"@polar-sh/better-auth": "catalog:",
 		"@polar-sh/sdk": "^0.42.2",
 		"better-auth": "catalog:",
@@ -21,7 +21,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"typescript": "catalog:"
 	}
 }

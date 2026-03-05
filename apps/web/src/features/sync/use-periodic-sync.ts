@@ -1,4 +1,4 @@
-import type { SyncEngine } from "@finance-tool-poc/sync-engine";
+import type { SyncEngine } from "@pengana/sync-engine";
 
 import { useEffect, useRef } from "react";
 

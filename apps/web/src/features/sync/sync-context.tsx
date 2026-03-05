@@ -1,4 +1,4 @@
-import type { SyncEvent, UploadEvent } from "@finance-tool-poc/sync-engine";
+import type { SyncEvent, UploadEvent } from "@pengana/sync-engine";
 
 import { createContext, use } from "react";
 

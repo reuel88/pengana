@@ -1,11 +1,8 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { findTodoById } from "@finance-tool-poc/db/todo-queries";
-import {
-	ALLOWED_MIME_TYPES,
-	MAX_FILE_SIZE_BYTES,
-} from "@finance-tool-poc/sync-engine";
 import { ORPCError } from "@orpc/server";
+import { findTodoById } from "@pengana/db/todo-queries";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { protectedProcedure } from "../index";

@@ -1,11 +1,11 @@
-import { env } from "@finance-tool-poc/env/web";
+import { env } from "@pengana/env/web";
 import type {
 	SyncEvent,
 	SyncInput,
 	SyncOutput,
 	UploadEvent,
-} from "@finance-tool-poc/sync-engine";
-import { SyncEngine, UploadQueue } from "@finance-tool-poc/sync-engine";
+} from "@pengana/sync-engine";
+import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 
 import { createDexieSyncAdapter } from "@/entities/todo";
 import {

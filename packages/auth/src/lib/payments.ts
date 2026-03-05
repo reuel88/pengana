@@ -1,4 +1,4 @@
-import { env } from "@finance-tool-poc/env/server";
+import { env } from "@pengana/env/server";
 import { Polar } from "@polar-sh/sdk";
 
 export const polarClient = new Polar({

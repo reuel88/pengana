@@ -16,11 +16,11 @@
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.0.0",
-		"@finance-tool-poc/api": "workspace:*",
-		"@finance-tool-poc/auth": "workspace:*",
-		"@finance-tool-poc/env": "workspace:*",
-		"@finance-tool-poc/sync-engine": "workspace:*",
-		"@finance-tool-poc/todo-client": "workspace:*",
+		"@pengana/api": "workspace:*",
+		"@pengana/auth": "workspace:*",
+		"@pengana/env": "workspace:*",
+		"@pengana/sync-engine": "workspace:*",
+		"@pengana/todo-client": "workspace:*",
 		"dexie": "^4.0.11",
 		"dexie-react-hooks": "^1.1.7",
 		"@hookform/resolvers": "^5.1.1",
@@ -48,7 +48,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"@tanstack/react-query-devtools": "^5.91.1",
 		"@tanstack/react-router-devtools": "^1.141.1",
 		"@tanstack/router-plugin": "^1.141.1",

@@ -1,5 +1,5 @@
 {
-	"name": "@finance-tool-poc/env",
+	"name": "@pengana/env",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -14,7 +14,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	}

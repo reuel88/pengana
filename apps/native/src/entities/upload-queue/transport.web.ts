@@ -1,7 +1,4 @@
-import type {
-	AllowedMimeType,
-	UploadTransport,
-} from "@finance-tool-poc/sync-engine";
+import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
 
 import { client } from "@/utils/orpc";
 

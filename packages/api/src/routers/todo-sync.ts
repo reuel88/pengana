@@ -3,8 +3,8 @@ import {
 	getTodosUpdatedSince,
 	insertTodo,
 	updateTodo,
-} from "@finance-tool-poc/db/todo-queries";
-import type { SyncInput } from "@finance-tool-poc/sync-engine";
+} from "@pengana/db/todo-queries";
+import type { SyncInput } from "@pengana/sync-engine";
 
 export async function handleSync(
 	input: SyncInput,

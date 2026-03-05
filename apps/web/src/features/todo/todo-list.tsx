@@ -1,7 +1,4 @@
-import {
-	isAllowedMimeType,
-	MAX_FILE_SIZE_BYTES,
-} from "@finance-tool-poc/sync-engine";
+import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import { useRef } from "react";
 import { toast } from "sonner";
 

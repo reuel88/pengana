@@ -1,4 +1,4 @@
-import { env } from "@finance-tool-poc/env/web";
+import { env } from "@pengana/env/web";
 import { polarClient } from "@polar-sh/better-auth";
 import { redirect } from "@tanstack/react-router";
 import { createAuthClient } from "better-auth/react";

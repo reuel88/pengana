@@ -1,5 +1,5 @@
 {
-	"name": "@finance-tool-poc/sync-engine",
+	"name": "@pengana/sync-engine",
 	"type": "module",
 	"exports": {
 		".": {
@@ -16,7 +16,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

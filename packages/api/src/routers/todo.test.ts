@@ -1,7 +1,7 @@
-import type { TodoRow } from "@finance-tool-poc/db/todo-queries";
+import type { TodoRow } from "@pengana/db/todo-queries";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@finance-tool-poc/db/todo-queries", () => ({
+vi.mock("@pengana/db/todo-queries", () => ({
 	findTodoById: vi.fn(),
 	getTodosUpdatedSince: vi.fn().mockResolvedValue([]),
 	insertTodo: vi.fn().mockResolvedValue(undefined),
@@ -13,7 +13,7 @@ import {
 	getTodosUpdatedSince,
 	insertTodo,
 	updateTodo,
-} from "@finance-tool-poc/db/todo-queries";
+} from "@pengana/db/todo-queries";
 import { handleSync } from "./todo-sync";
 
 function makeChange(overrides: Record<string, unknown> = {}) {

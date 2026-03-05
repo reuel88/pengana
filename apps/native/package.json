@@ -14,10 +14,10 @@
 	"dependencies": {
 		"@better-auth/expo": "catalog:",
 		"@expo/vector-icons": "^15.0.2",
-		"@finance-tool-poc/api": "workspace:*",
-		"@finance-tool-poc/env": "workspace:*",
-		"@finance-tool-poc/sync-engine": "workspace:*",
-		"@finance-tool-poc/todo-client": "workspace:*",
+		"@pengana/api": "workspace:*",
+		"@pengana/env": "workspace:*",
+		"@pengana/sync-engine": "workspace:*",
+		"@pengana/todo-client": "workspace:*",
 		"@orpc/client": "catalog:",
 		"@orpc/tanstack-query": "catalog:",
 		"@react-navigation/bottom-tabs": "^7.2.0",
@@ -59,7 +59,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.26.10",
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"@types/react": "~19.2.10",
 		"babel-plugin-inline-import": "^3.0.0",
 		"drizzle-kit": "^0.31.9",

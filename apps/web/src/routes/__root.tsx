@@ -24,11 +24,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
 		meta: [
 			{
-				title: "finance-tool-poc",
+				title: "pengana",
 			},
 			{
 				name: "description",
-				content: "finance-tool-poc is a web application",
+				content: "pengana is a web application",
 			},
 		],
 		links: [

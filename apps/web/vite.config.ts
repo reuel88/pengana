@@ -13,9 +13,9 @@ export default defineConfig({
 		VitePWA({
 			registerType: "autoUpdate",
 			manifest: {
-				name: "finance-tool-poc",
-				short_name: "finance-tool-poc",
-				description: "finance-tool-poc - PWA Application",
+				name: "pengana",
+				short_name: "pengana",
+				description: "pengana - PWA Application",
 				theme_color: "#0c0c0c",
 			},
 			pwaAssets: { disabled: false, config: true },

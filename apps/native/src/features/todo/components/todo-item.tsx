@@ -1,5 +1,5 @@
-import type { Todo } from "@finance-tool-poc/sync-engine";
-import { isAllowedMimeType } from "@finance-tool-poc/sync-engine";
+import type { Todo } from "@pengana/sync-engine";
+import { isAllowedMimeType } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import {

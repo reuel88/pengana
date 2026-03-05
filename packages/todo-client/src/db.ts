@@ -1,4 +1,4 @@
-import type { Todo, UploadStatus } from "@finance-tool-poc/sync-engine";
+import type { Todo, UploadStatus } from "@pengana/sync-engine";
 
 import Dexie, { type EntityTable } from "dexie";
 

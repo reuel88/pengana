@@ -1,90 +1,82 @@
-# finance-tool-poc
+# Pengana
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, ORPC, and more.
+A full-stack TypeScript application with web, server, mobile (React Native), browser extension, and desktop (Tauri) platforms.
 
-## Features
+## Tech Stack
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **React Native** - Build mobile apps using React
-- **Expo** - Tools for React Native development
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Hono** - Lightweight, performant server framework
-- **oRPC** - End-to-end type-safe APIs with OpenAPI integration
-- **Node.js** - Runtime environment
+- **TypeScript** - Full type safety across all platforms
+- **TanStack Router** - File-based routing with type safety (web)
+- **React Native + Expo** - Mobile app
+- **TailwindCSS** - Utility-first CSS
+- **shadcn/ui** - UI components
+- **Hono** - Server framework
+- **oRPC** - End-to-end type-safe APIs
 - **Drizzle** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
+- **PostgreSQL** - Database
+- **Better-Auth** - Authentication
+- **Polar** - Payments
+- **WXT** - Browser extension framework
+- **Tauri** - Desktop app
+- **Turborepo** - Monorepo build system
 - **Biome** - Linting and formatting
-- **Husky** - Git hooks for code quality
-- **PWA** - Progressive Web App support
-- **Tauri** - Build native desktop applications
-- **Turborepo** - Optimized monorepo build system
 
 ## Getting Started
-
-First, install the dependencies:
 
 ```bash
 pnpm install
 ```
 
-## Database Setup
+### Database Setup
 
-This project uses PostgreSQL with Drizzle ORM.
-
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
-
-3. Apply the schema to your database:
+1. Set up a PostgreSQL database.
+2. Copy `apps/server/.env.example` to `apps/server/.env` and fill in your values.
+3. Push the schema:
 
 ```bash
 pnpm run db:push
 ```
 
-Then, run the development server:
+### Development
 
 ```bash
 pnpm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-Use the Expo Go app to run the mobile application.
-The API is running at [http://localhost:3000](http://localhost:3000).
-
-## Git Hooks and Formatting
-
-- Initialize hooks: `pnpm run prepare`
-- Format and lint fix: `pnpm run check`
+- Web: [http://localhost:3001](http://localhost:3001)
+- API: [http://localhost:3000](http://localhost:3000)
+- Native: Use Expo Go
 
 ## Project Structure
 
 ```
-finance-tool-poc/
+pengana/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
-│   ├── native/      # Mobile application (React Native, Expo)
-│   └── server/      # Backend API (Hono, ORPC)
+│   ├── web/         # Web app (React + TanStack Router + PWA + Tauri desktop)
+│   ├── native/      # Mobile app (React Native + Expo)
+│   ├── server/      # Backend API (Hono + oRPC)
+│   └── extension/   # Browser extension (WXT)
 ├── packages/
-│   ├── api/         # API layer / business logic
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   ├── api/          # API routes & business logic
+│   ├── auth/         # Authentication (Better-Auth + Polar)
+│   ├── db/           # Database schema & queries (Drizzle + PostgreSQL)
+│   ├── env/          # Environment config
+│   ├── config/       # Shared config (TypeScript, Biome)
+│   ├── sync-engine/  # Offline-first sync engine
+│   └── todo-client/  # Shared client-side logic
 ```
 
 ## Available Scripts
 
-- `pnpm run dev`: Start all applications in development mode
-- `pnpm run build`: Build all applications
-- `pnpm run dev:web`: Start only the web application
-- `pnpm run dev:server`: Start only the server
-- `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run dev:native`: Start the React Native/Expo development server
-- `pnpm run db:push`: Push schema changes to database
-- `pnpm run db:generate`: Generate database client/types
-- `pnpm run db:migrate`: Run database migrations
-- `pnpm run db:studio`: Open database studio UI
-- `pnpm run check`: Run Biome formatting and linting
-- `cd apps/web && pnpm run generate-pwa-assets`: Generate PWA assets
-- `cd apps/web && pnpm run desktop:dev`: Start Tauri desktop app in development
-- `cd apps/web && pnpm run desktop:build`: Build Tauri desktop app
+- `pnpm run dev` - Start all apps in development mode
+- `pnpm run build` - Build all apps
+- `pnpm run dev:web` - Start web app only
+- `pnpm run dev:server` - Start server only
+- `pnpm run dev:native` - Start Expo dev server
+- `pnpm run check-types` - TypeScript type checking
+- `pnpm run db:push` - Push schema to database
+- `pnpm run db:generate` - Generate database types
+- `pnpm run db:migrate` - Run migrations
+- `pnpm run db:studio` - Open Drizzle Studio
+- `pnpm run check` - Run Biome formatting and linting
+- `cd apps/web && pnpm run desktop:dev` - Start Tauri desktop app
+- `cd apps/web && pnpm run desktop:build` - Build Tauri desktop app

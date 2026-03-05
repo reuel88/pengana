@@ -1,4 +1,4 @@
-import type { SyncAdapter, Todo } from "@finance-tool-poc/sync-engine";
+import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 
 import { todoDb } from "./db";
 

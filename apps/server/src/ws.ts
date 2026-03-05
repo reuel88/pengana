@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
-import { auth } from "@finance-tool-poc/auth";
 import type { ServerType } from "@hono/node-server";
+import { auth } from "@pengana/auth";
 import { WebSocket, WebSocketServer } from "ws";
 
 const PING_INTERVAL_MS = 30_000;

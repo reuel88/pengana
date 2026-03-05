@@ -1,4 +1,4 @@
-import { auth } from "@finance-tool-poc/auth";
+import { auth } from "@pengana/auth";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {

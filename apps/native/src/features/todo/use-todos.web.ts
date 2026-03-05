@@ -1,4 +1,4 @@
-import type { Todo } from "@finance-tool-poc/sync-engine";
+import type { Todo } from "@pengana/sync-engine";
 import { useLiveQuery } from "dexie-react-hooks";
 
 import { todoDb } from "@/entities/todo";

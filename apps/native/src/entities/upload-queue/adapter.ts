@@ -1,4 +1,4 @@
-import type { UploadAdapter, UploadItem } from "@finance-tool-poc/sync-engine";
+import type { UploadAdapter, UploadItem } from "@pengana/sync-engine";
 
 import { asc, eq } from "drizzle-orm";
 

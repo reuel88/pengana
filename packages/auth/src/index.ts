@@ -1,11 +1,10 @@
 import { expo } from "@better-auth/expo";
-import { db } from "@finance-tool-poc/db";
-import * as schema from "@finance-tool-poc/db/schema/auth";
-import { env } from "@finance-tool-poc/env/server";
-// import { polar, checkout, portal } from "@polar-sh/better-auth";
+import { db } from "@pengana/db";
+import * as schema from "@pengana/db/schema/auth";
+import { env } from "@pengana/env/server";
+// import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-
 // import { polarClient } from "./lib/payments";
 
 export const auth = betterAuth({
@@ -16,7 +15,7 @@ export const auth = betterAuth({
 	}),
 	trustedOrigins: [
 		...env.CORS_ORIGIN.split(",").map((o) => o.trim()),
-		"finance-tool-poc://",
+		"pengana://",
 		...(env.NODE_ENV === "development"
 			? [
 					"exp://",
@@ -39,22 +38,22 @@ export const auth = betterAuth({
 	},
 	plugins: [
 		// polar({
-		//   client: polarClient,
-		//   createCustomerOnSignUp: true,
-		//   enableCustomerPortal: true,
-		//   use: [
-		//     checkout({
-		//       products: [
-		//         {
-		//           productId: "your-product-id",
-		//           slug: "pro",
-		//         },
-		//       ],
-		//       successUrl: env.POLAR_SUCCESS_URL,
-		//       authenticatedUsersOnly: true,
-		//     }),
-		//     portal(),
-		//   ],
+		// 	client: polarClient,
+		// 	createCustomerOnSignUp: true,
+		// 	enableCustomerPortal: true,
+		// 	use: [
+		// 		checkout({
+		// 			products: [
+		// 				{
+		// 					productId: "your-product-id",
+		// 					slug: "pro",
+		// 				},
+		// 			],
+		// 			successUrl: env.POLAR_SUCCESS_URL,
+		// 			authenticatedUsersOnly: true,
+		// 		}),
+		// 		portal(),
+		// 	],
 		// }),
 		expo(),
 	],

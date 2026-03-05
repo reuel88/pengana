@@ -1,7 +1,3 @@
-import { createContext } from "@finance-tool-poc/api/context";
-import { appRouter } from "@finance-tool-poc/api/routers/index";
-import { auth } from "@finance-tool-poc/auth";
-import { env } from "@finance-tool-poc/env/server";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
@@ -9,6 +5,10 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
+import { createContext } from "@pengana/api/context";
+import { appRouter } from "@pengana/api/routers/index";
+import { auth } from "@pengana/auth";
+import { env } from "@pengana/env/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";

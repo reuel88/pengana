@@ -1,5 +1,5 @@
-import { updateTodoForUser } from "@finance-tool-poc/db/todo-queries";
-import { syncInputSchema } from "@finance-tool-poc/sync-engine";
+import { updateTodoForUser } from "@pengana/db/todo-queries";
+import { syncInputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { protectedProcedure } from "../index";

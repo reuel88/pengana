@@ -1,5 +1,5 @@
-import type { SyncEngine, UploadEvent } from "@finance-tool-poc/sync-engine";
-import { UploadQueue } from "@finance-tool-poc/sync-engine";
+import type { SyncEngine, UploadEvent } from "@pengana/sync-engine";
+import { UploadQueue } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {

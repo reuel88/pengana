@@ -1,11 +1,11 @@
 {
 	"expo": {
-		"name": "finance-tool-poc",
-		"slug": "finance-tool-poc",
+		"name": "pengana",
+		"slug": "pengana",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
-		"scheme": "finance-tool-poc",
+		"scheme": "pengana",
 		"userInterfaceStyle": "automatic",
 		"ios": {
 			"supportsTablet": true
@@ -18,7 +18,7 @@
 				"monochromeImage": "./assets/images/android-icon-monochrome.png"
 			},
 			"predictiveBackGestureEnabled": false,
-			"package": "com.anonymous.mybettertapp"
+			"package": "com.pengana.app"
 		},
 		"web": {
 			"output": "static",

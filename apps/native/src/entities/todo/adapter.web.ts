@@ -1,1 +1,1 @@
-export { createDexieSyncAdapter } from "@finance-tool-poc/todo-client";
+export { createDexieSyncAdapter } from "@pengana/todo-client";

@@ -1,5 +1,5 @@
-export type { FileDataRecord } from "@finance-tool-poc/todo-client";
+export type { FileDataRecord } from "@pengana/todo-client";
 export {
 	UploadQueueDatabase,
 	uploadQueueDb,
-} from "@finance-tool-poc/todo-client";
+} from "@pengana/todo-client";

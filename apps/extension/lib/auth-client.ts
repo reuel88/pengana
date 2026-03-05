@@ -1,4 +1,4 @@
-import { env } from "@finance-tool-poc/env/web";
+import { env } from "@pengana/env/web";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({

@@ -1,4 +1,4 @@
-import type { SyncEvent, UploadEvent } from "@finance-tool-poc/sync-engine";
+import type { SyncEvent, UploadEvent } from "@pengana/sync-engine";
 
 // Messages from popup → background
 export type BackgroundMessage =

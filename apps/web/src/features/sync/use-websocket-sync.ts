@@ -1,5 +1,5 @@
-import { env } from "@finance-tool-poc/env/web";
-import type { SyncEngine } from "@finance-tool-poc/sync-engine";
+import { env } from "@pengana/env/web";
+import type { SyncEngine } from "@pengana/sync-engine";
 import { useEffect, useRef } from "react";
 
 function getWsUrl() {

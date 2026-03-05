@@ -1,5 +1,5 @@
 {
-	"name": "@finance-tool-poc/api",
+	"name": "@pengana/api",
 	"type": "module",
 	"exports": {
 		".": {
@@ -13,10 +13,10 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"@finance-tool-poc/auth": "workspace:*",
-		"@finance-tool-poc/db": "workspace:*",
-		"@finance-tool-poc/env": "workspace:*",
-		"@finance-tool-poc/sync-engine": "workspace:*",
+		"@pengana/auth": "workspace:*",
+		"@pengana/db": "workspace:*",
+		"@pengana/env": "workspace:*",
+		"@pengana/sync-engine": "workspace:*",
 		"@orpc/client": "catalog:",
 		"@orpc/openapi": "catalog:",
 		"@orpc/server": "catalog:",
@@ -25,7 +25,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"hono": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"

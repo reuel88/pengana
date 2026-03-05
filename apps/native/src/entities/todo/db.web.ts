@@ -1,1 +1,1 @@
-export { todoDb } from "@finance-tool-poc/todo-client";
+export { todoDb } from "@pengana/todo-client";

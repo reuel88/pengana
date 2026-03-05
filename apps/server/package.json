@@ -10,10 +10,10 @@
 		"start": "node dist/index.mjs"
 	},
 	"dependencies": {
-		"@finance-tool-poc/api": "workspace:*",
-		"@finance-tool-poc/auth": "workspace:*",
-		"@finance-tool-poc/db": "workspace:*",
-		"@finance-tool-poc/env": "workspace:*",
+		"@pengana/api": "workspace:*",
+		"@pengana/auth": "workspace:*",
+		"@pengana/db": "workspace:*",
+		"@pengana/env": "workspace:*",
 		"@hono/node-server": "^1.14.4",
 		"@orpc/openapi": "catalog:",
 		"@orpc/server": "catalog:",
@@ -25,7 +25,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"@types/node": "catalog:",
 		"@types/ws": "^8.18.0",
 		"tsdown": "^0.16.5",

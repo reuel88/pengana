@@ -1,5 +1,5 @@
 {
-	"name": "@finance-tool-poc/db",
+	"name": "@pengana/db",
 	"type": "module",
 	"exports": {
 		".": {
@@ -19,14 +19,14 @@
 		"db:migrate": "drizzle-kit migrate"
 	},
 	"dependencies": {
-		"@finance-tool-poc/env": "workspace:*",
+		"@pengana/env": "workspace:*",
 		"@neondatabase/serverless": "^1.0.2",
 		"dotenv": "catalog:",
 		"drizzle-orm": "^0.45.1",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@finance-tool-poc/config": "workspace:*",
+		"@pengana/config": "workspace:*",
 		"drizzle-kit": "^0.31.8",
 		"typescript": "catalog:"
 	}

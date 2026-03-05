@@ -3,8 +3,8 @@ import type {
 	SyncInput,
 	SyncOutput,
 	UploadEvent,
-} from "@finance-tool-poc/sync-engine";
-import { SyncEngine, UploadQueue } from "@finance-tool-poc/sync-engine";
+} from "@pengana/sync-engine";
+import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { createSyncAdapter } from "@/entities/todo";

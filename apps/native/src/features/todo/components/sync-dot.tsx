@@ -1,4 +1,4 @@
-import type { Todo } from "@finance-tool-poc/sync-engine";
+import type { Todo } from "@pengana/sync-engine";
 import { StyleSheet, View } from "react-native";
 
 import { SYNC_STATUS_COLORS, SYNC_STATUS_LABELS } from "@/lib/design-tokens";
