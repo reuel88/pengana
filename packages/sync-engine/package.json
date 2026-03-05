@@ -1,0 +1,23 @@
+{
+	"name": "@finance-tool-poc/sync-engine",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@finance-tool-poc/config": "workspace:*",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

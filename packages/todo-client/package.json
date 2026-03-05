@@ -1,0 +1,21 @@
+{
+	"name": "@finance-tool-poc/todo-client",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@finance-tool-poc/sync-engine": "workspace:*",
+		"dexie": "^4.0.11"
+	},
+	"devDependencies": {
+		"@finance-tool-poc/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

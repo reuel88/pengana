@@ -1,0 +1,44 @@
+{
+	"name": "finance-tool-poc",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"type": "module",
+	"scripts": {
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:native": "turbo -F native dev",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F @finance-tool-poc/db db:push",
+		"db:studio": "turbo -F @finance-tool-poc/db db:studio",
+		"db:generate": "turbo -F @finance-tool-poc/db db:generate",
+		"db:migrate": "turbo -F @finance-tool-poc/db db:migrate",
+		"test": "turbo test",
+		"check": "biome check --write .",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@finance-tool-poc/env": "workspace:*",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.0",
+		"@finance-tool-poc/config": "workspace:*",
+		"@types/node": "catalog:",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.1.2",
+		"turbo": "^2.8.12",
+		"typescript": "catalog:"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+			"biome check --write ."
+		]
+	},
+	"packageManager": "pnpm@10.30.3"
+}
