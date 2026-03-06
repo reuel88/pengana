@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { useState } from "react";
 import {
 	StyleSheet,
@@ -16,6 +17,7 @@ export function TodoInput({ userId }: { userId: string }) {
 	const [submitting, setSubmitting] = useState(false);
 	const { syncAfterWrite } = useSync();
 	const { theme, colorScheme } = useTheme();
+	const { t } = useTranslation();
 
 	const handleSubmit = async () => {
 		const trimmed = title.trim();
@@ -36,7 +38,7 @@ export function TodoInput({ userId }: { userId: string }) {
 			<TextInput
 				value={title}
 				onChangeText={setTitle}
-				placeholder="Add a new todo..."
+				placeholder={t("todos:addPlaceholder")}
 				placeholderTextColor={colorScheme === "dark" ? "#666" : "#999"}
 				onSubmitEditing={handleSubmit}
 				returnKeyType="done"
@@ -60,7 +62,7 @@ export function TodoInput({ userId }: { userId: string }) {
 					},
 				]}
 			>
-				<Text style={styles.buttonText}>Add</Text>
+				<Text style={styles.buttonText}>{t("todos:addButton")}</Text>
 			</TouchableOpacity>
 		</View>
 	);

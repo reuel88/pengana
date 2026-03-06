@@ -1,13 +1,22 @@
+import { useTranslation } from "@pengana/i18n";
 import type { Todo } from "@pengana/sync-engine";
 import { StyleSheet, View } from "react-native";
 
-import { SYNC_STATUS_COLORS, SYNC_STATUS_LABELS } from "@/lib/design-tokens";
+import { SYNC_STATUS_COLORS } from "@/lib/design-tokens";
 
 export function SyncDot({ status }: { status: Todo["syncStatus"] }) {
+	const { t } = useTranslation("todos");
+
+	const labels = {
+		synced: t("sync.synced"),
+		pending: t("sync.pending"),
+		conflict: t("sync.conflict"),
+	};
+
 	return (
 		<View
 			style={[styles.syncDot, { backgroundColor: SYNC_STATUS_COLORS[status] }]}
-			accessibilityLabel={SYNC_STATUS_LABELS[status]}
+			accessibilityLabel={labels[status]}
 		/>
 	);
 }

@@ -2,6 +2,7 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { AppRouterClient } from "@pengana/api/routers/index";
+import { i18next } from "@pengana/i18n";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { Platform } from "react-native";
 
@@ -28,9 +29,10 @@ export const link = new RPCLink({
 					}),
 	headers() {
 		if (Platform.OS === "web") {
-			return {};
+			return { "Accept-Language": i18next.language };
 		}
 		const headers = new Map<string, string>();
+		headers.set("Accept-Language", i18next.language);
 		const cookies = authClient.getCookie();
 		if (cookies) {
 			headers.set("Cookie", cookies);

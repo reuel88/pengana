@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "Falha ao alternar tarefa",
+	"failedToDeleteTodo": "Falha ao excluir tarefa",
+	"failedToResolveConflict": "Falha ao resolver conflito",
+	"invalidFileType": "Apenas imagens JPEG, PNG, HEIC e PDFs sao permitidos.",
+	"fileTooLarge": "O arquivo excede o tamanho maximo de 10MB.",
+	"failedToAttachFile": "Falha ao anexar arquivo",
+	"failedToAddTodo": "Falha ao adicionar tarefa",
+	"failedToSignIn": "Falha ao entrar",
+	"failedToSignUp": "Falha ao cadastrar",
+	"failedToStoreFile": "Falha ao armazenar arquivo. O armazenamento pode estar cheio.",
+	"todoNotFound": "Tarefa não encontrada",
+	"unauthorized": "Não autorizado"
+}

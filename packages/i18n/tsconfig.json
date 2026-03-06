@@ -1,0 +1,9 @@
+{
+	"extends": "@pengana/config/tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"lib": ["ESNext", "DOM"],
+		"resolveJsonModule": true
+	},
+	"include": ["src"]
+}

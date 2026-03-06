@@ -1,0 +1,10 @@
+{
+	"title": "Панель управления",
+	"welcome": "Добро пожаловать, {{name}}",
+	"planPro": "Тариф: Pro",
+	"planFree": "Тариф: Бесплатный",
+	"manageSubscription": "Управление подпиской",
+	"upgradeToPro": "Перейти на Pro",
+	"paymentSuccessful": "Оплата прошла успешно!",
+	"checkoutId": "ID заказа: {{id}}"
+}

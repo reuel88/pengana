@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import type { Todo } from "@pengana/sync-engine";
 import { isAllowedMimeType } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
@@ -32,15 +33,13 @@ export interface TodoItemRow extends Todo {
 	attachmentStatus?: "queued" | "uploading" | "uploaded" | "failed" | null;
 }
 
-const INVALID_FILE_MESSAGE =
-	"Only JPEG, PNG, HEIC images and PDFs are allowed.";
-
 async function pickAsset(
 	picker: () => Promise<{
 		canceled: boolean;
 		assets: { uri: string; mimeType?: string | null }[] | null;
 	}>,
 	defaultMimeType: string,
+	invalidMessage: string,
 ): Promise<{ uri: string; mimeType: string } | null> {
 	const result = await picker();
 	if (result.canceled || !result.assets || result.assets.length === 0)
@@ -48,7 +47,7 @@ async function pickAsset(
 	const asset = result.assets[0];
 	const mimeType = asset.mimeType ?? defaultMimeType;
 	if (!isAllowedMimeType(mimeType)) {
-		Alert.alert("Invalid file", INVALID_FILE_MESSAGE);
+		Alert.alert("Invalid file", invalidMessage);
 		return null;
 	}
 	return { uri: asset.uri, mimeType };
@@ -57,13 +56,14 @@ async function pickAsset(
 export function TodoItem({ todo }: { todo: TodoItemRow }) {
 	const { syncAfterWrite, enqueueUpload } = useSync();
 	const { theme } = useTheme();
+	const { t } = useTranslation();
 
 	const handleToggle = async () => {
 		try {
 			await toggleTodo(todo.id);
 			syncAfterWrite();
 		} catch {
-			Alert.alert("Error", "Could not toggle todo.");
+			Alert.alert("Error", t("errors:failedToToggleTodo"));
 		}
 	};
 
@@ -82,6 +82,8 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 		enqueueUpload(todo.id, uri, mimeType);
 	};
 
+	const invalidFileMessage = t("errors:invalidFileType");
+
 	const pickFromCamera = async () => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
 		if (!permission.granted) return;
@@ -93,6 +95,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 						quality: 0.8,
 					}),
 				"image/jpeg",
+				invalidFileMessage,
 			);
 			if (asset) await attachAsset(asset.uri, asset.mimeType);
 		} catch {
@@ -111,6 +114,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 					quality: 0.8,
 				}),
 			"image/jpeg",
+			invalidFileMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};
@@ -123,6 +127,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 					copyToCacheDirectory: true,
 				}),
 			"application/pdf",
+			invalidFileMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};
@@ -146,7 +151,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 				},
 			);
 		} else {
-			Alert.alert("Attach File", "Choose an option", [
+			Alert.alert(t("todos:actions.attach"), "Choose an option", [
 				{ text: "Take Photo", onPress: pickFromCamera },
 				{ text: "Choose from Library", onPress: pickFromLibrary },
 				{ text: "Choose PDF", onPress: pickPdf },
@@ -184,7 +189,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 						onPress={() => handleResolve("local")}
 					>
 						<Text style={[styles.smallButtonText, { color: theme.text }]}>
-							Keep Local
+							{t("todos:actions.keepLocal")}
 						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -192,7 +197,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 						onPress={() => handleResolve("server")}
 					>
 						<Text style={[styles.smallButtonText, { color: theme.text }]}>
-							Use Server
+							{t("todos:actions.useServer")}
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -200,17 +205,17 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
 				<TouchableOpacity onPress={handleAttach} style={styles.attachButton}>
 					<Text style={[styles.attachText, { color: theme.primary }]}>
-						Attach
+						{t("todos:actions.attach")}
 					</Text>
 				</TouchableOpacity>
 			)}
 			{todo.attachmentStatus === "failed" && (
 				<TouchableOpacity onPress={handleAttach} style={styles.attachButton}>
-					<Text style={styles.retryText}>Retry</Text>
+					<Text style={styles.retryText}>{t("todos:actions.retry")}</Text>
 				</TouchableOpacity>
 			)}
 			<TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-				<Text style={styles.deleteText}>Delete</Text>
+				<Text style={styles.deleteText}>{t("todos:actions.delete")}</Text>
 			</TouchableOpacity>
 		</View>
 	);

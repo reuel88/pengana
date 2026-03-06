@@ -9,8 +9,11 @@ import { createContext } from "@pengana/api/context";
 import { appRouter } from "@pengana/api/routers/index";
 import { auth } from "@pengana/auth";
 import { env } from "@pengana/env/server";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
+import { initServerI18n } from "@pengana/i18n/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { languageDetector } from "hono/language";
 import { logger } from "hono/logger";
 
 import { notifyUser, setupWebSocket } from "./ws";
@@ -23,8 +26,17 @@ app.use(
 	cors({
 		origin: env.CORS_ORIGIN.split(",").map((o) => o.trim()),
 		allowMethods: ["GET", "POST", "OPTIONS"],
-		allowHeaders: ["Content-Type", "Authorization"],
+		allowHeaders: ["Content-Type", "Authorization", "Accept-Language"],
 		credentials: true,
+	}),
+);
+
+app.use(
+	languageDetector({
+		supportedLanguages: [...SUPPORTED_LOCALES],
+		fallbackLanguage: DEFAULT_LOCALE,
+		order: ["header"],
+		caches: false,
 	}),
 );
 
@@ -76,6 +88,8 @@ app.get("/", (c) => {
 });
 
 app.use("/uploads/*", serveStatic({ root: "./" }));
+
+await initServerI18n();
 
 const server = serve(
 	{

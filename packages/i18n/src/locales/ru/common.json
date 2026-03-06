@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "Главная",
+		"dashboard": "Панель управления",
+		"todos": "Задачи",
+		"explore": "Обзор",
+		"tabs": "Вкладки"
+	},
+	"theme": {
+		"toggle": "Переключить тему",
+		"light": "Светлая",
+		"dark": "Тёмная",
+		"system": "Системная"
+	},
+	"user": {
+		"signIn": "Войти",
+		"signOut": "Выйти",
+		"myAccount": "Мой аккаунт"
+	},
+	"status": {
+		"loading": "Загрузка...",
+		"checking": "Проверка...",
+		"connected": "Подключено",
+		"disconnected": "Отключено",
+		"checkingConnection": "Проверка соединения...",
+		"connectedToApi": "Подключено к API",
+		"apiDisconnected": "API отключён"
+	},
+	"apiStatus": "Статус API",
+	"systemStatus": "Состояние системы",
+	"orpcBackend": "ORPC Бэкенд",
+	"privateData": "Личные данные",
+	"modal": "Модальное окно",
+	"submitting": "Отправка...",
+	"loginPrompt": "Пожалуйста, сначала войдите в веб-приложение."
+}

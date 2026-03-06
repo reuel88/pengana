@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import { Button } from "@pengana/ui/components/button";
 import { Checkbox } from "@pengana/ui/components/checkbox";
@@ -18,6 +19,8 @@ import {
 // SyncDot and AttachmentIndicator are intentionally duplicated across web and extension.
 // They're ~20 lines each, tightly coupled to each app's cn() utility and Tailwind config.
 function SyncDot({ status }: { status: WebTodo["syncStatus"] }) {
+	const { t } = useTranslation("todos");
+
 	const colors = {
 		synced: "bg-green-500",
 		pending: "bg-yellow-500",
@@ -25,9 +28,9 @@ function SyncDot({ status }: { status: WebTodo["syncStatus"] }) {
 	};
 
 	const labels = {
-		synced: "Synced",
-		pending: "Pending sync",
-		conflict: "Conflict",
+		synced: t("sync.synced"),
+		pending: t("sync.pending"),
+		conflict: t("sync.conflict"),
 	};
 
 	return (
@@ -45,22 +48,29 @@ function AttachmentIndicator({
 	status: WebTodo["attachmentStatus"];
 	attachmentUrl: string | null;
 }) {
+	const { t } = useTranslation("todos");
+
 	if (attachmentUrl && (!status || status === "uploaded")) {
 		return (
-			<span className="text-green-500 text-xs" title="File attached">
-				attached
+			<span
+				className="text-green-500 text-xs"
+				title={t("attachment.fileAttached")}
+			>
+				{t("attachment.attached")}
 			</span>
 		);
 	}
 	if (status === "queued" || status === "uploading") {
 		return (
 			<span className="animate-pulse text-muted-foreground text-xs">
-				uploading...
+				{t("attachment.uploading")}
 			</span>
 		);
 	}
 	if (status === "failed") {
-		return <span className="text-red-500 text-xs">failed</span>;
+		return (
+			<span className="text-red-500 text-xs">{t("attachment.failed")}</span>
+		);
 	}
 	return null;
 }
@@ -68,13 +78,14 @@ function AttachmentIndicator({
 function TodoItem({ todo }: { todo: WebTodo }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { t } = useTranslation();
 
 	const handleToggle = async () => {
 		try {
 			await toggleTodo(todo.id);
 			triggerSync();
 		} catch {
-			toast.error("Failed to toggle todo");
+			toast.error(t("errors:failedToToggleTodo"));
 		}
 	};
 
@@ -83,7 +94,7 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 			await deleteTodo(todo.id);
 			triggerSync();
 		} catch {
-			toast.error("Failed to delete todo");
+			toast.error(t("errors:failedToDeleteTodo"));
 		}
 	};
 
@@ -92,7 +103,7 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 			await resolveConflict(todo.id, resolution);
 			triggerSync();
 		} catch {
-			toast.error("Failed to resolve conflict");
+			toast.error(t("errors:failedToResolveConflict"));
 		}
 	};
 
@@ -108,12 +119,12 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 		e.target.value = "";
 
 		if (!isAllowedMimeType(file.type)) {
-			toast.error("Only JPEG, PNG, HEIC images and PDFs are allowed.");
+			toast.error(t("errors:invalidFileType"));
 			return;
 		}
 
 		if (file.size > MAX_FILE_SIZE_BYTES) {
-			toast.error("File exceeds maximum size of 10MB.");
+			toast.error(t("errors:fileTooLarge"));
 			return;
 		}
 
@@ -123,7 +134,7 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 			await attachFile(todo.id, blobUrl);
 			enqueueUpload(todo.id, blobUrl, file.type);
 		} catch {
-			toast.error("Failed to attach file");
+			toast.error(t("errors:failedToAttachFile"));
 		}
 	};
 
@@ -157,39 +168,41 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 						variant="outline"
 						onClick={() => handleResolve("local")}
 					>
-						Keep Local
+						{t("todos:actions.keepLocal")}
 					</Button>
 					<Button
 						size="xs"
 						variant="outline"
 						onClick={() => handleResolve("server")}
 					>
-						Use Server
+						{t("todos:actions.useServer")}
 					</Button>
 				</div>
 			)}
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
 				<Button size="xs" variant="outline" onClick={handleAttach}>
-					Attach
+					{t("todos:actions.attach")}
 				</Button>
 			)}
 			{todo.attachmentStatus === "failed" && (
 				<Button size="xs" variant="outline" onClick={handleAttach}>
-					Retry
+					{t("todos:actions.retry")}
 				</Button>
 			)}
 			<Button size="xs" variant="ghost" onClick={handleDelete}>
-				Delete
+				{t("todos:actions.delete")}
 			</Button>
 		</div>
 	);
 }
 
 export function TodoList({ todos }: { todos: WebTodo[] }) {
+	const { t } = useTranslation("todos");
+
 	if (todos.length === 0) {
 		return (
 			<p className="py-4 text-center text-muted-foreground text-sm">
-				No todos yet
+				{t("empty")}
 			</p>
 		);
 	}

@@ -1,0 +1,10 @@
+{
+	"title": "대시보드",
+	"welcome": "환영합니다 {{name}}",
+	"planPro": "플랜: Pro",
+	"planFree": "플랜: Free",
+	"manageSubscription": "구독 관리",
+	"upgradeToPro": "Pro로 업그레이드",
+	"paymentSuccessful": "결제 완료!",
+	"checkoutId": "결제 ID: {{id}}"
+}

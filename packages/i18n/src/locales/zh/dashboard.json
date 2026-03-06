@@ -1,0 +1,10 @@
+{
+	"title": "仪表盘",
+	"welcome": "欢迎 {{name}}",
+	"planPro": "套餐：Pro",
+	"planFree": "套餐：免费",
+	"manageSubscription": "管理订阅",
+	"upgradeToPro": "升级到 Pro",
+	"paymentSuccessful": "支付成功！",
+	"checkoutId": "结账 ID：{{id}}"
+}

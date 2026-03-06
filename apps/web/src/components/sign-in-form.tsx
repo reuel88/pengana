@@ -1,7 +1,8 @@
+import { useTranslation } from "@pengana/i18n";
+import { makeSignInSchema } from "@pengana/i18n/zod";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -14,6 +15,7 @@ export function SignInForm({
 	onSwitchToSignUp: () => void;
 }) {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	const form = useForm({
 		defaultValues: {
@@ -31,7 +33,7 @@ export function SignInForm({
 						navigate({
 							to: "/dashboard",
 						});
-						toast.success("Sign in successful");
+						toast.success(t("auth:signIn.success"));
 					},
 					onError: (error) => {
 						toast.error(error.error.message || error.error.statusText);
@@ -40,18 +42,15 @@ export function SignInForm({
 			);
 		},
 		validators: {
-			onSubmit: z.object({
-				email: z.email("Invalid email address"),
-				password: z.string().min(8, "Password must be at least 8 characters"),
-			}),
+			onSubmit: makeSignInSchema(t),
 		},
 	});
 
 	return (
 		<AuthFormShell
-			title="Welcome Back"
-			submitLabel="Sign In"
-			switchLabel="Need an account? Sign Up"
+			title={t("auth:signIn.title")}
+			submitLabel={t("auth:signIn.submit")}
+			switchLabel={t("auth:signIn.switchToSignUp")}
 			onSwitch={onSwitchToSignUp}
 			onSubmit={() => form.handleSubmit()}
 			form={form}
@@ -59,7 +58,11 @@ export function SignInForm({
 			<div>
 				<form.Field name="email">
 					{(field) => (
-						<AuthFormField field={field} label="Email" type="email" />
+						<AuthFormField
+							field={field}
+							label={t("auth:fields.email")}
+							type="email"
+						/>
 					)}
 				</form.Field>
 			</div>
@@ -67,7 +70,11 @@ export function SignInForm({
 			<div>
 				<form.Field name="password">
 					{(field) => (
-						<AuthFormField field={field} label="Password" type="password" />
+						<AuthFormField
+							field={field}
+							label={t("auth:fields.password")}
+							type="password"
+						/>
 					)}
 				</form.Field>
 			</div>

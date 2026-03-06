@@ -1,9 +1,11 @@
+import { useTranslation } from "@pengana/i18n";
 import { cn } from "@/lib/utils";
 
 import { useSync } from "./sync-context";
 
 export function ConnectivityBanner() {
 	const { isOnline, isSyncing } = useSync();
+	const { t } = useTranslation("sync");
 
 	return (
 		<div
@@ -14,11 +16,7 @@ export function ConnectivityBanner() {
 					: "bg-red-500/10 text-red-600 dark:text-red-400",
 			)}
 		>
-			{isOnline
-				? isSyncing
-					? "Syncing..."
-					: "Online"
-				: "Offline - changes saved locally"}
+			{isOnline ? (isSyncing ? t("syncing") : t("online")) : t("offline")}
 		</div>
 	);
 }

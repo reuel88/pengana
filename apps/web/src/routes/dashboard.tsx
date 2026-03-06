@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
 	const { session, customerState } = Route.useRouteContext();
+	const { t } = useTranslation("dashboard");
 
 	const privateData = useQuery(orpc.privateData.queryOptions());
 
@@ -22,17 +24,17 @@ function DashboardPage() {
 		(customerState?.activeSubscriptions?.length ?? 0) > 0;
 	return (
 		<div>
-			<h1>Dashboard</h1>
-			<p>Welcome {session.data.user.name}</p>
+			<h1>{t("title")}</h1>
+			<p>{t("welcome", { name: session.data.user.name })}</p>
 			<p>API: {privateData.data?.message}</p>
-			<p>Plan: {hasProSubscription ? "Pro" : "Free"}</p>
+			<p>{hasProSubscription ? t("planPro") : t("planFree")}</p>
 			{hasProSubscription ? (
 				<Button
 					onClick={() => {
 						authClient.customer.portal().catch(console.error);
 					}}
 				>
-					Manage Subscription
+					{t("manageSubscription")}
 				</Button>
 			) : (
 				<Button
@@ -40,7 +42,7 @@ function DashboardPage() {
 						authClient.checkout({ slug: "pro" }).catch(console.error);
 					}}
 				>
-					Upgrade to Pro
+					{t("upgradeToPro")}
 				</Button>
 			)}
 		</div>

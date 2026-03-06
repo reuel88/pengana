@@ -1,3 +1,5 @@
+import { useTranslation } from "@pengana/i18n";
+import { makeNativeSignUpSchema } from "@pengana/i18n/zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import {
@@ -8,33 +10,16 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 import { getErrorMessage } from "@/utils/form-helpers";
 import { queryClient } from "@/utils/orpc";
 
-const signUpSchema = z.object({
-	name: z
-		.string()
-		.trim()
-		.min(1, "Name is required")
-		.min(2, "Name must be at least 2 characters"),
-	email: z
-		.string()
-		.trim()
-		.min(1, "Email is required")
-		.email("Enter a valid email address"),
-	password: z
-		.string()
-		.min(1, "Password is required")
-		.min(8, "Use at least 8 characters"),
-});
-
 function SignUp() {
 	const { theme } = useTheme();
 	const [error, setError] = useState<string | null>(null);
+	const { t } = useTranslation();
 
 	const form = useForm({
 		defaultValues: {
@@ -43,7 +28,7 @@ function SignUp() {
 			password: "",
 		},
 		validators: {
-			onSubmit: signUpSchema,
+			onSubmit: makeNativeSignUpSchema(t),
 		},
 		onSubmit: async ({ value, formApi }) => {
 			await authClient.signUp.email(
@@ -54,7 +39,7 @@ function SignUp() {
 				},
 				{
 					onError(error) {
-						setError(error.error?.message || "Failed to sign up");
+						setError(error.error?.message || t("errors:failedToSignUp"));
 					},
 					onSuccess() {
 						setError(null);
@@ -73,7 +58,9 @@ function SignUp() {
 				{ backgroundColor: theme.card, borderColor: theme.border },
 			]}
 		>
-			<Text style={[styles.title, { color: theme.text }]}>Create Account</Text>
+			<Text style={[styles.title, { color: theme.text }]}>
+				{t("auth:signUp.title")}
+			</Text>
 
 			<form.Subscribe
 				selector={(state) => ({
@@ -112,7 +99,7 @@ function SignUp() {
 												backgroundColor: theme.background,
 											},
 										]}
-										placeholder="Name"
+										placeholder={t("auth:fields.name")}
 										placeholderTextColor={theme.text}
 										value={field.state.value}
 										onBlur={field.handleBlur}
@@ -137,7 +124,7 @@ function SignUp() {
 												backgroundColor: theme.background,
 											},
 										]}
-										placeholder="Email"
+										placeholder={t("auth:fields.email")}
 										placeholderTextColor={theme.text}
 										value={field.state.value}
 										onBlur={field.handleBlur}
@@ -164,7 +151,7 @@ function SignUp() {
 												backgroundColor: theme.background,
 											},
 										]}
-										placeholder="Password"
+										placeholder={t("auth:fields.password")}
 										placeholderTextColor={theme.text}
 										value={field.state.value}
 										onBlur={field.handleBlur}
@@ -194,7 +181,9 @@ function SignUp() {
 								{isSubmitting ? (
 									<ActivityIndicator size="small" color="#ffffff" />
 								) : (
-									<Text style={styles.buttonText}>Sign Up</Text>
+									<Text style={styles.buttonText}>
+										{t("auth:signUp.submit")}
+									</Text>
 								)}
 							</TouchableOpacity>
 						</>

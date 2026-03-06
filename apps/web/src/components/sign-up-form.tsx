@@ -1,7 +1,8 @@
+import { useTranslation } from "@pengana/i18n";
+import { makeSignUpSchema } from "@pengana/i18n/zod";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -14,6 +15,7 @@ export function SignUpForm({
 	onSwitchToSignIn: () => void;
 }) {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	const form = useForm({
 		defaultValues: {
@@ -33,7 +35,7 @@ export function SignUpForm({
 						navigate({
 							to: "/dashboard",
 						});
-						toast.success("Sign up successful");
+						toast.success(t("auth:signUp.success"));
 					},
 					onError: (error) => {
 						toast.error(error.error.message || error.error.statusText);
@@ -42,33 +44,35 @@ export function SignUpForm({
 			);
 		},
 		validators: {
-			onSubmit: z.object({
-				name: z.string().min(2, "Name must be at least 2 characters"),
-				email: z.email("Invalid email address"),
-				password: z.string().min(8, "Password must be at least 8 characters"),
-			}),
+			onSubmit: makeSignUpSchema(t),
 		},
 	});
 
 	return (
 		<AuthFormShell
-			title="Create Account"
-			submitLabel="Sign Up"
-			switchLabel="Already have an account? Sign In"
+			title={t("auth:signUp.title")}
+			submitLabel={t("auth:signUp.submit")}
+			switchLabel={t("auth:signUp.switchToSignIn")}
 			onSwitch={onSwitchToSignIn}
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>
 			<div>
 				<form.Field name="name">
-					{(field) => <AuthFormField field={field} label="Name" />}
+					{(field) => (
+						<AuthFormField field={field} label={t("auth:fields.name")} />
+					)}
 				</form.Field>
 			</div>
 
 			<div>
 				<form.Field name="email">
 					{(field) => (
-						<AuthFormField field={field} label="Email" type="email" />
+						<AuthFormField
+							field={field}
+							label={t("auth:fields.email")}
+							type="email"
+						/>
 					)}
 				</form.Field>
 			</div>
@@ -76,7 +80,11 @@ export function SignUpForm({
 			<div>
 				<form.Field name="password">
 					{(field) => (
-						<AuthFormField field={field} label="Password" type="password" />
+						<AuthFormField
+							field={field}
+							label={t("auth:fields.password")}
+							type="password"
+						/>
 					)}
 				</form.Field>
 			</div>

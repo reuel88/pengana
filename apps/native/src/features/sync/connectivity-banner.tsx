@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useColorScheme } from "@/lib/use-color-scheme";
@@ -7,6 +8,7 @@ import { useSync } from "./sync-context";
 export function ConnectivityBanner() {
 	const { isOnline, isSyncing } = useSync();
 	const { colorScheme } = useColorScheme();
+	const { t } = useTranslation("sync");
 
 	const backgroundColor = isOnline
 		? "rgba(34, 197, 94, 0.1)"
@@ -22,11 +24,7 @@ export function ConnectivityBanner() {
 	return (
 		<View style={[styles.banner, { backgroundColor }]}>
 			<Text style={[styles.text, { color: textColor }]}>
-				{isOnline
-					? isSyncing
-						? "Syncing..."
-						: "Online"
-					: "Offline - changes saved locally"}
+				{isOnline ? (isSyncing ? t("syncing") : t("online")) : t("offline")}
 			</Text>
 		</View>
 	);

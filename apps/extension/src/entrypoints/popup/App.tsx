@@ -1,13 +1,15 @@
+import { useTranslation } from "@pengana/i18n";
 import { authClient } from "@/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
 function App() {
 	const { data: session, isPending } = authClient.useSession();
+	const { t } = useTranslation();
 
 	if (isPending) {
 		return (
 			<div className="flex items-center justify-center p-8">
-				<p className="text-muted-foreground text-sm">Loading...</p>
+				<p className="text-muted-foreground text-sm">{t("status.loading")}</p>
 			</div>
 		);
 	}
@@ -15,9 +17,7 @@ function App() {
 	if (!session) {
 		return (
 			<div className="flex items-center justify-center p-8">
-				<p className="text-muted-foreground text-sm">
-					Please log in at the web app first.
-				</p>
+				<p className="text-muted-foreground text-sm">{t("loginPrompt")}</p>
 			</div>
 		);
 	}

@@ -1,0 +1,24 @@
+{
+	"title": "Todos",
+	"addPlaceholder": "Add a new todo...",
+	"addButton": "Add",
+	"empty": "No todos yet",
+	"sync": {
+		"synced": "Synced",
+		"pending": "Pending sync",
+		"conflict": "Conflict"
+	},
+	"attachment": {
+		"attached": "attached",
+		"uploading": "uploading...",
+		"failed": "failed",
+		"fileAttached": "File attached"
+	},
+	"actions": {
+		"keepLocal": "Keep Local",
+		"useServer": "Use Server",
+		"attach": "Attach",
+		"retry": "Retry",
+		"delete": "Delete"
+	}
+}

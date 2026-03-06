@@ -1,4 +1,5 @@
 import { auth } from "@pengana/auth";
+import { getServerT } from "@pengana/i18n/server";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {
@@ -9,8 +10,11 @@ export async function createContext({ context }: CreateContextOptions) {
 	const session = await auth.api.getSession({
 		headers: context.req.raw.headers,
 	});
+	const locale = (context.get("language") as string) ?? "en-US";
 	return {
 		session,
+		locale,
+		t: getServerT(locale),
 	};
 }
 

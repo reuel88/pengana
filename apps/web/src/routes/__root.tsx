@@ -1,3 +1,6 @@
+import { useTranslation } from "@pengana/i18n";
+import type { SupportedLocale } from "@pengana/i18n/config";
+import { getDirection } from "@pengana/i18n/rtl";
 import { Toaster } from "@pengana/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -7,6 +10,7 @@ import {
 	Outlet,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import type { orpc } from "@/utils/orpc";
@@ -40,6 +44,24 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootComponent() {
+	const { i18n } = useTranslation();
+
+	useEffect(() => {
+		const locale = i18n.language as SupportedLocale;
+		document.documentElement.lang = locale;
+		document.documentElement.dir = getDirection(locale);
+
+		const handleLanguageChanged = (lng: string) => {
+			document.documentElement.lang = lng;
+			document.documentElement.dir = getDirection(lng as SupportedLocale);
+		};
+
+		i18n.on("languageChanged", handleLanguageChanged);
+		return () => {
+			i18n.off("languageChanged", handleLanguageChanged);
+		};
+	}, [i18n]);
+
 	return (
 		<>
 			<HeadContent />

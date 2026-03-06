@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "切换待办事项状态失败",
+	"failedToDeleteTodo": "删除待办事项失败",
+	"failedToResolveConflict": "解决冲突失败",
+	"invalidFileType": "仅允许 JPEG、PNG、HEIC 图片和 PDF 文件。",
+	"fileTooLarge": "文件超过最大限制 10MB。",
+	"failedToAttachFile": "附加文件失败",
+	"failedToAddTodo": "添加待办事项失败",
+	"failedToSignIn": "登录失败",
+	"failedToSignUp": "注册失败",
+	"failedToStoreFile": "存储文件失败。存储空间可能已满。",
+	"todoNotFound": "待办事项未找到",
+	"unauthorized": "未授权"
+}

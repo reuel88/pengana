@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { useQuery } from "@tanstack/react-query";
 import {
 	ScrollView,
@@ -22,6 +23,7 @@ export default function Home() {
 	const isConnected = healthCheck?.data === "OK";
 	const isLoading = healthCheck?.isLoading;
 	const { data: session } = authClient.useSession();
+	const { t } = useTranslation();
 
 	return (
 		<Container>
@@ -40,7 +42,7 @@ export default function Home() {
 						>
 							<View style={styles.userHeader}>
 								<Text style={[styles.userText, { color: theme.text }]}>
-									Welcome,{" "}
+									{t("dashboard:welcome", { name: "" })}
 									<Text style={styles.userName}>{session.user.name}</Text>
 								</Text>
 							</View>
@@ -59,7 +61,7 @@ export default function Home() {
 									queryClient.invalidateQueries();
 								}}
 							>
-								<Text style={styles.signOutText}>Sign Out</Text>
+								<Text style={styles.signOutText}>{t("user.signOut")}</Text>
 							</TouchableOpacity>
 						</View>
 					) : null}
@@ -71,7 +73,7 @@ export default function Home() {
 						]}
 					>
 						<Text style={[styles.cardTitle, { color: theme.text }]}>
-							System Status
+							{t("systemStatus")}
 						</Text>
 						<View style={styles.statusRow}>
 							<View
@@ -86,7 +88,7 @@ export default function Home() {
 							/>
 							<View style={styles.statusContent}>
 								<Text style={[styles.statusTitle, { color: theme.text }]}>
-									ORPC Backend
+									{t("orpcBackend")}
 								</Text>
 								<Text
 									style={[
@@ -95,10 +97,10 @@ export default function Home() {
 									]}
 								>
 									{isLoading
-										? "Checking connection..."
+										? t("status.checkingConnection")
 										: isConnected
-											? "Connected to API"
-											: "API Disconnected"}
+											? t("status.connectedToApi")
+											: t("status.apiDisconnected")}
 								</Text>
 							</View>
 						</View>
@@ -111,7 +113,7 @@ export default function Home() {
 						]}
 					>
 						<Text style={[styles.cardTitle, { color: theme.text }]}>
-							Private Data
+							{t("privateData")}
 						</Text>
 						{privateData && (
 							<Text

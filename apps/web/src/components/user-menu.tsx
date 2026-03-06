@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 
 import {
@@ -16,6 +17,7 @@ import { authClient } from "@/lib/auth-client";
 export function UserMenu() {
 	const navigate = useNavigate();
 	const { data: session, isPending } = authClient.useSession();
+	const { t } = useTranslation();
 
 	if (isPending) {
 		return <Skeleton className="h-9 w-24" />;
@@ -24,7 +26,7 @@ export function UserMenu() {
 	if (!session) {
 		return (
 			<Link to="/login">
-				<Button variant="outline">Sign In</Button>
+				<Button variant="outline">{t("user.signIn")}</Button>
 			</Link>
 		);
 	}
@@ -46,11 +48,11 @@ export function UserMenu() {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="bg-card">
 				<DropdownMenuGroup>
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
+					<DropdownMenuLabel>{t("user.myAccount")}</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem>{session.user.email}</DropdownMenuItem>
 					<DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-						Sign Out
+						{t("user.signOut")}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>

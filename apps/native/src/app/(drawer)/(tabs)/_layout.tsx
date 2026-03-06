@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Tabs } from "expo-router";
 
 import { TabBarIcon } from "@/components/tabbar-icon";
@@ -7,6 +8,7 @@ import { useColorScheme } from "@/lib/use-color-scheme";
 export default function TabLayout() {
 	const { isDarkColorScheme } = useColorScheme();
 	const theme = isDarkColorScheme ? NAV_THEME.dark : NAV_THEME.light;
+	const { t } = useTranslation();
 
 	return (
 		<Tabs
@@ -23,14 +25,14 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "Home",
+					title: t("nav.home"),
 					tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="two"
 				options={{
-					title: "Explore",
+					title: t("nav.explore"),
 					tabBarIcon: ({ color }) => (
 						<TabBarIcon name="compass" color={color} />
 					),

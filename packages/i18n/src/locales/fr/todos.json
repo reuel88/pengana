@@ -1,0 +1,24 @@
+{
+	"title": "Tâches",
+	"addPlaceholder": "Ajouter une nouvelle tâche...",
+	"addButton": "Ajouter",
+	"empty": "Aucune tâche pour le moment",
+	"sync": {
+		"synced": "Synchronisé",
+		"pending": "Synchronisation en attente",
+		"conflict": "Conflit"
+	},
+	"attachment": {
+		"attached": "joint",
+		"uploading": "envoi en cours...",
+		"failed": "échoué",
+		"fileAttached": "Fichier joint"
+	},
+	"actions": {
+		"keepLocal": "Garder la version locale",
+		"useServer": "Utiliser la version serveur",
+		"attach": "Joindre",
+		"retry": "Réessayer",
+		"delete": "Supprimer"
+	}
+}

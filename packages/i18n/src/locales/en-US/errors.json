@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "Failed to toggle todo",
+	"failedToDeleteTodo": "Failed to delete todo",
+	"failedToResolveConflict": "Failed to resolve conflict",
+	"invalidFileType": "Only JPEG, PNG, HEIC images and PDFs are allowed.",
+	"fileTooLarge": "File exceeds maximum size of 10MB.",
+	"failedToAttachFile": "Failed to attach file",
+	"failedToAddTodo": "Failed to add todo",
+	"failedToSignIn": "Failed to sign in",
+	"failedToSignUp": "Failed to sign up",
+	"failedToStoreFile": "Failed to store file. Storage may be full.",
+	"todoNotFound": "Todo not found",
+	"unauthorized": "Unauthorized"
+}

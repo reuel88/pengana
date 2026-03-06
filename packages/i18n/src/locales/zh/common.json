@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "首页",
+		"dashboard": "仪表盘",
+		"todos": "待办事项",
+		"explore": "探索",
+		"tabs": "标签页"
+	},
+	"theme": {
+		"toggle": "切换主题",
+		"light": "浅色",
+		"dark": "深色",
+		"system": "跟随系统"
+	},
+	"user": {
+		"signIn": "登录",
+		"signOut": "退出登录",
+		"myAccount": "我的账户"
+	},
+	"status": {
+		"loading": "加载中...",
+		"checking": "检查中...",
+		"connected": "已连接",
+		"disconnected": "已断开",
+		"checkingConnection": "正在检查连接...",
+		"connectedToApi": "已连接到 API",
+		"apiDisconnected": "API 已断开"
+	},
+	"apiStatus": "API 状态",
+	"systemStatus": "系统状态",
+	"orpcBackend": "ORPC 后端",
+	"privateData": "私有数据",
+	"modal": "弹窗",
+	"submitting": "提交中...",
+	"loginPrompt": "请先在网页应用中登录。"
+}

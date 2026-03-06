@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
@@ -12,11 +13,12 @@ export const Route = createFileRoute("/success")({
 
 function SuccessPage() {
 	const { checkout_id } = Route.useSearch();
+	const { t } = useTranslation("dashboard");
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			<h1>Payment Successful!</h1>
-			<p>Checkout ID: {checkout_id}</p>
+			<h1>{t("paymentSuccessful")}</h1>
+			<p>{t("checkoutId", { id: checkout_id })}</p>
 		</div>
 	);
 }

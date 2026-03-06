@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "Tahanan",
+		"dashboard": "Dashboard",
+		"todos": "Mga Gawain",
+		"explore": "Galugarin",
+		"tabs": "Mga Tab"
+	},
+	"theme": {
+		"toggle": "Palitan ang tema",
+		"light": "Maliwanag",
+		"dark": "Madilim",
+		"system": "Sistema"
+	},
+	"user": {
+		"signIn": "Mag-sign In",
+		"signOut": "Mag-sign Out",
+		"myAccount": "Aking Account"
+	},
+	"status": {
+		"loading": "Naglo-load...",
+		"checking": "Sinusuri...",
+		"connected": "Nakakonekta",
+		"disconnected": "Hindi Nakakonekta",
+		"checkingConnection": "Sinusuri ang koneksyon...",
+		"connectedToApi": "Nakakonekta sa API",
+		"apiDisconnected": "Hindi Nakakonekta ang API"
+	},
+	"apiStatus": "Katayuan ng API",
+	"systemStatus": "Katayuan ng Sistema",
+	"orpcBackend": "ORPC Backend",
+	"privateData": "Pribadong Data",
+	"modal": "Modal",
+	"submitting": "Isinusumite...",
+	"loginPrompt": "Mangyaring mag-log in muna sa web app."
+}

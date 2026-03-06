@@ -33,7 +33,7 @@ export const uploadRouter = {
 			const todo = await findTodoById(input.todoId);
 			if (!todo || todo.userId !== userId) {
 				throw new ORPCError("NOT_FOUND", {
-					message: "Todo not found",
+					message: context.t("todoNotFound"),
 				});
 			}
 
@@ -41,7 +41,7 @@ export const uploadRouter = {
 
 			if (buffer.byteLength > MAX_FILE_SIZE_BYTES) {
 				throw new ORPCError("BAD_REQUEST", {
-					message: "File exceeds maximum size of 10MB",
+					message: context.t("fileTooLarge"),
 				});
 			}
 

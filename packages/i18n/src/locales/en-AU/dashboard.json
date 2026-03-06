@@ -1,0 +1,10 @@
+{
+	"title": "Dashboard",
+	"welcome": "Welcome {{name}}",
+	"planPro": "Plan: Pro",
+	"planFree": "Plan: Free",
+	"manageSubscription": "Manage Subscription",
+	"upgradeToPro": "Upgrade to Pro",
+	"paymentSuccessful": "Payment Successful!",
+	"checkoutId": "Checkout ID: {{id}}"
+}

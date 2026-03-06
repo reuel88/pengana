@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/lib/theme";
@@ -9,11 +10,12 @@ export type { TodoItemRow };
 
 export function TodoList({ todos }: { todos: TodoItemRow[] }) {
 	const { theme } = useTheme();
+	const { t } = useTranslation("todos");
 
 	if (todos.length === 0) {
 		return (
 			<Text style={[styles.emptyText, { color: theme.text, opacity: 0.5 }]}>
-				No todos yet
+				{t("empty")}
 			</Text>
 		);
 	}

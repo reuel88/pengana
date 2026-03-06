@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "Error al cambiar la tarea",
+	"failedToDeleteTodo": "Error al eliminar la tarea",
+	"failedToResolveConflict": "Error al resolver el conflicto",
+	"invalidFileType": "Solo se permiten imagenes JPEG, PNG, HEIC y PDFs.",
+	"fileTooLarge": "El archivo excede el tamano maximo de 10MB.",
+	"failedToAttachFile": "Error al adjuntar el archivo",
+	"failedToAddTodo": "Error al agregar la tarea",
+	"failedToSignIn": "Error al iniciar sesion",
+	"failedToSignUp": "Error al registrarse",
+	"failedToStoreFile": "Error al guardar el archivo. El almacenamiento puede estar lleno.",
+	"todoNotFound": "Tarea no encontrada",
+	"unauthorized": "No autorizado"
+}

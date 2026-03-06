@@ -1,0 +1,24 @@
+{
+	"title": "待办事项",
+	"addPlaceholder": "添加新的待办事项...",
+	"addButton": "添加",
+	"empty": "暂无待办事项",
+	"sync": {
+		"synced": "已同步",
+		"pending": "等待同步",
+		"conflict": "冲突"
+	},
+	"attachment": {
+		"attached": "已附加",
+		"uploading": "上传中...",
+		"failed": "失败",
+		"fileAttached": "文件已附加"
+	},
+	"actions": {
+		"keepLocal": "保留本地",
+		"useServer": "使用服务器",
+		"attach": "附加文件",
+		"retry": "重试",
+		"delete": "删除"
+	}
+}

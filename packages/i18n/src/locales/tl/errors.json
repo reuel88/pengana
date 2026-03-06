@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "Nabigong i-toggle ang gawain",
+	"failedToDeleteTodo": "Nabigong tanggalin ang gawain",
+	"failedToResolveConflict": "Nabigong resolbahin ang salungatan",
+	"invalidFileType": "Tanging JPEG, PNG, HEIC na mga larawan at PDF lamang ang pinapayagan.",
+	"fileTooLarge": "Lumampas ang file sa maximum na laki na 10MB.",
+	"failedToAttachFile": "Nabigong ilakip ang file",
+	"failedToAddTodo": "Nabigong idagdag ang gawain",
+	"failedToSignIn": "Nabigong mag-sign in",
+	"failedToSignUp": "Nabigong mag-sign up",
+	"failedToStoreFile": "Nabigong i-store ang file. Maaaring puno na ang storage.",
+	"todoNotFound": "Hindi nahanap ang gawain",
+	"unauthorized": "Hindi awtorisado"
+}

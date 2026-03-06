@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { useState } from "react";
@@ -10,6 +11,7 @@ export function TodoInput({ userId }: { userId: string }) {
 	const [title, setTitle] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const { triggerSync } = useSync();
+	const { t } = useTranslation();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -22,7 +24,7 @@ export function TodoInput({ userId }: { userId: string }) {
 			setTitle("");
 			triggerSync();
 		} catch {
-			toast.error("Failed to add todo");
+			toast.error(t("errors:failedToAddTodo"));
 		} finally {
 			setSubmitting(false);
 		}
@@ -33,11 +35,11 @@ export function TodoInput({ userId }: { userId: string }) {
 			<Input
 				value={title}
 				onChange={(e) => setTitle(e.target.value)}
-				placeholder="Add a new todo..."
+				placeholder={t("todos:addPlaceholder")}
 				className="flex-1"
 			/>
 			<Button type="submit" disabled={!title.trim() || submitting}>
-				Add
+				{t("todos:addButton")}
 			</Button>
 		</form>
 	);

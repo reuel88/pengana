@@ -1,3 +1,5 @@
+import { useTranslation } from "@pengana/i18n";
+import { makeNativeSignInSchema } from "@pengana/i18n/zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import {
@@ -8,28 +10,16 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 import { getErrorMessage } from "@/utils/form-helpers";
 import { queryClient } from "@/utils/orpc";
 
-const signInSchema = z.object({
-	email: z
-		.string()
-		.trim()
-		.min(1, "Email is required")
-		.email("Enter a valid email address"),
-	password: z
-		.string()
-		.min(1, "Password is required")
-		.min(8, "Use at least 8 characters"),
-});
-
 function SignIn() {
 	const { theme } = useTheme();
 	const [error, setError] = useState<string | null>(null);
+	const { t } = useTranslation();
 
 	const form = useForm({
 		defaultValues: {
@@ -37,7 +27,7 @@ function SignIn() {
 			password: "",
 		},
 		validators: {
-			onSubmit: signInSchema,
+			onSubmit: makeNativeSignInSchema(t),
 		},
 		onSubmit: async ({ value, formApi }) => {
 			await authClient.signIn.email(
@@ -47,7 +37,7 @@ function SignIn() {
 				},
 				{
 					onError(error) {
-						setError(error.error?.message || "Failed to sign in");
+						setError(error.error?.message || t("errors:failedToSignIn"));
 					},
 					onSuccess() {
 						setError(null);
@@ -66,7 +56,9 @@ function SignIn() {
 				{ backgroundColor: theme.card, borderColor: theme.border },
 			]}
 		>
-			<Text style={[styles.title, { color: theme.text }]}>Sign In</Text>
+			<Text style={[styles.title, { color: theme.text }]}>
+				{t("auth:signIn.submit")}
+			</Text>
 
 			<form.Subscribe
 				selector={(state) => ({
@@ -105,7 +97,7 @@ function SignIn() {
 												backgroundColor: theme.background,
 											},
 										]}
-										placeholder="Email"
+										placeholder={t("auth:fields.email")}
 										placeholderTextColor={theme.text}
 										value={field.state.value}
 										onBlur={field.handleBlur}
@@ -132,7 +124,7 @@ function SignIn() {
 												backgroundColor: theme.background,
 											},
 										]}
-										placeholder="Password"
+										placeholder={t("auth:fields.password")}
 										placeholderTextColor={theme.text}
 										value={field.state.value}
 										onBlur={field.handleBlur}
@@ -162,7 +154,9 @@ function SignIn() {
 								{isSubmitting ? (
 									<ActivityIndicator size="small" color="#ffffff" />
 								) : (
-									<Text style={styles.buttonText}>Sign In</Text>
+									<Text style={styles.buttonText}>
+										{t("auth:signIn.submit")}
+									</Text>
 								)}
 							</TouchableOpacity>
 						</>

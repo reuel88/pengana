@@ -1,0 +1,24 @@
+{
+	"title": "할 일",
+	"addPlaceholder": "새로운 할 일 추가...",
+	"addButton": "추가",
+	"empty": "할 일이 없습니다",
+	"sync": {
+		"synced": "동기화됨",
+		"pending": "동기화 대기 중",
+		"conflict": "충돌"
+	},
+	"attachment": {
+		"attached": "첨부됨",
+		"uploading": "업로드 중...",
+		"failed": "실패",
+		"fileAttached": "파일 첨부됨"
+	},
+	"actions": {
+		"keepLocal": "로컬 유지",
+		"useServer": "서버 사용",
+		"attach": "첨부",
+		"retry": "재시도",
+		"delete": "삭제"
+	}
+}

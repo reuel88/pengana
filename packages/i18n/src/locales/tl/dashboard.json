@@ -1,0 +1,10 @@
+{
+	"title": "Dashboard",
+	"welcome": "Maligayang pagdating {{name}}",
+	"planPro": "Plano: Pro",
+	"planFree": "Plano: Libre",
+	"manageSubscription": "Pamahalaan ang Subscription",
+	"upgradeToPro": "Mag-upgrade sa Pro",
+	"paymentSuccessful": "Matagumpay ang Pagbabayad!",
+	"checkoutId": "Checkout ID: {{id}}"
+}

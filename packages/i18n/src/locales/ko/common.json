@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "홈",
+		"dashboard": "대시보드",
+		"todos": "할 일",
+		"explore": "탐색",
+		"tabs": "탭"
+	},
+	"theme": {
+		"toggle": "테마 전환",
+		"light": "라이트",
+		"dark": "다크",
+		"system": "시스템"
+	},
+	"user": {
+		"signIn": "로그인",
+		"signOut": "로그아웃",
+		"myAccount": "내 계정"
+	},
+	"status": {
+		"loading": "로딩 중...",
+		"checking": "확인 중...",
+		"connected": "연결됨",
+		"disconnected": "연결 끊김",
+		"checkingConnection": "연결 확인 중...",
+		"connectedToApi": "API 연결됨",
+		"apiDisconnected": "API 연결 끊김"
+	},
+	"apiStatus": "API 상태",
+	"systemStatus": "시스템 상태",
+	"orpcBackend": "ORPC 백엔드",
+	"privateData": "비공개 데이터",
+	"modal": "모달",
+	"submitting": "제출 중...",
+	"loginPrompt": "먼저 웹 앱에서 로그인해 주세요."
+}

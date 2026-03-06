@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "Accueil",
+		"dashboard": "Tableau de bord",
+		"todos": "Tâches",
+		"explore": "Explorer",
+		"tabs": "Onglets"
+	},
+	"theme": {
+		"toggle": "Changer le thème",
+		"light": "Clair",
+		"dark": "Sombre",
+		"system": "Système"
+	},
+	"user": {
+		"signIn": "Se connecter",
+		"signOut": "Se déconnecter",
+		"myAccount": "Mon compte"
+	},
+	"status": {
+		"loading": "Chargement...",
+		"checking": "Vérification...",
+		"connected": "Connecté",
+		"disconnected": "Déconnecté",
+		"checkingConnection": "Vérification de la connexion...",
+		"connectedToApi": "Connecté à l'API",
+		"apiDisconnected": "API déconnectée"
+	},
+	"apiStatus": "État de l'API",
+	"systemStatus": "État du système",
+	"orpcBackend": "Backend ORPC",
+	"privateData": "Données privées",
+	"modal": "Fenêtre modale",
+	"submitting": "Envoi en cours...",
+	"loginPrompt": "Veuillez d'abord vous connecter via l'application web."
+}

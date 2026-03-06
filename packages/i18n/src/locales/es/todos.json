@@ -1,0 +1,24 @@
+{
+	"title": "Tareas",
+	"addPlaceholder": "Agregar una nueva tarea...",
+	"addButton": "Agregar",
+	"empty": "No hay tareas aun",
+	"sync": {
+		"synced": "Sincronizado",
+		"pending": "Sincronizacion pendiente",
+		"conflict": "Conflicto"
+	},
+	"attachment": {
+		"attached": "adjunto",
+		"uploading": "subiendo...",
+		"failed": "fallido",
+		"fileAttached": "Archivo adjunto"
+	},
+	"actions": {
+		"keepLocal": "Mantener local",
+		"useServer": "Usar servidor",
+		"attach": "Adjuntar",
+		"retry": "Reintentar",
+		"delete": "Eliminar"
+	}
+}

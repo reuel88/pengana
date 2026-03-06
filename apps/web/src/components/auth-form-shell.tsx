@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import type { ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -27,6 +28,7 @@ export function AuthFormShell({
 	children,
 }: AuthFormShellProps) {
 	const { isPending } = authClient.useSession();
+	const { t } = useTranslation();
 
 	if (isPending) {
 		return <Loader />;
@@ -53,7 +55,7 @@ export function AuthFormShell({
 							className="w-full"
 							disabled={!state.canSubmit || state.isSubmitting}
 						>
-							{state.isSubmitting ? "Submitting..." : submitLabel}
+							{state.isSubmitting ? t("submitting") : submitLabel}
 						</Button>
 					)}
 				</form.Subscribe>

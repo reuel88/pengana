@@ -1,0 +1,24 @@
+{
+	"title": "Mga Gawain",
+	"addPlaceholder": "Magdagdag ng bagong gawain...",
+	"addButton": "Idagdag",
+	"empty": "Wala pang mga gawain",
+	"sync": {
+		"synced": "Naka-sync",
+		"pending": "Naghihintay na i-sync",
+		"conflict": "Salungatan"
+	},
+	"attachment": {
+		"attached": "nakalakip",
+		"uploading": "ina-upload...",
+		"failed": "nabigo",
+		"fileAttached": "Nakalakip ang file"
+	},
+	"actions": {
+		"keepLocal": "Panatilihin ang Lokal",
+		"useServer": "Gamitin ang Server",
+		"attach": "Ilakip",
+		"retry": "Subukan Muli",
+		"delete": "Tanggalin"
+	}
+}

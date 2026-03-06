@@ -1,0 +1,36 @@
+{
+	"nav": {
+		"home": "Inicio",
+		"dashboard": "Panel",
+		"todos": "Tareas",
+		"explore": "Explorar",
+		"tabs": "Pestanas"
+	},
+	"theme": {
+		"toggle": "Cambiar tema",
+		"light": "Claro",
+		"dark": "Oscuro",
+		"system": "Sistema"
+	},
+	"user": {
+		"signIn": "Iniciar sesion",
+		"signOut": "Cerrar sesion",
+		"myAccount": "Mi cuenta"
+	},
+	"status": {
+		"loading": "Cargando...",
+		"checking": "Verificando...",
+		"connected": "Conectado",
+		"disconnected": "Desconectado",
+		"checkingConnection": "Verificando conexion...",
+		"connectedToApi": "Conectado a la API",
+		"apiDisconnected": "API desconectada"
+	},
+	"apiStatus": "Estado de la API",
+	"systemStatus": "Estado del sistema",
+	"orpcBackend": "Backend ORPC",
+	"privateData": "Datos privados",
+	"modal": "Modal",
+	"submitting": "Enviando...",
+	"loginPrompt": "Inicie sesion en la aplicacion web primero."
+}

@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@pengana/api": "workspace:*",
 		"@pengana/auth": "workspace:*",
+		"@pengana/i18n": "workspace:*",
 		"@pengana/db": "workspace:*",
 		"@pengana/env": "workspace:*",
 		"@hono/node-server": "^1.14.4",

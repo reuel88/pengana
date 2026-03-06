@@ -1,0 +1,10 @@
+{
+	"title": "Tableau de bord",
+	"welcome": "Bienvenue {{name}}",
+	"planPro": "Forfait : Pro",
+	"planFree": "Forfait : Gratuit",
+	"manageSubscription": "Gérer l'abonnement",
+	"upgradeToPro": "Passer au forfait Pro",
+	"paymentSuccessful": "Paiement réussi !",
+	"checkoutId": "ID de commande : {{id}}"
+}

@@ -1,0 +1,10 @@
+{
+	"title": "Painel",
+	"welcome": "Bem-vindo {{name}}",
+	"planPro": "Plano: Pro",
+	"planFree": "Plano: Gratuito",
+	"manageSubscription": "Gerenciar Assinatura",
+	"upgradeToPro": "Assinar o Pro",
+	"paymentSuccessful": "Pagamento Realizado!",
+	"checkoutId": "ID do Pedido: {{id}}"
+}

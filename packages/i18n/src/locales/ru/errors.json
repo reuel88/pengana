@@ -1,0 +1,14 @@
+{
+	"failedToToggleTodo": "Не удалось переключить задачу",
+	"failedToDeleteTodo": "Не удалось удалить задачу",
+	"failedToResolveConflict": "Не удалось разрешить конфликт",
+	"invalidFileType": "Допускаются только изображения JPEG, PNG, HEIC и файлы PDF.",
+	"fileTooLarge": "Файл превышает максимальный размер 10 МБ.",
+	"failedToAttachFile": "Не удалось прикрепить файл",
+	"failedToAddTodo": "Не удалось добавить задачу",
+	"failedToSignIn": "Не удалось войти",
+	"failedToSignUp": "Не удалось зарегистрироваться",
+	"failedToStoreFile": "Не удалось сохранить файл. Возможно, хранилище заполнено.",
+	"todoNotFound": "Задача не найдена",
+	"unauthorized": "Не авторизован"
+}
