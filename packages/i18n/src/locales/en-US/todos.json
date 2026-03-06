@@ -12,13 +12,21 @@
 		"attached": "attached",
 		"uploading": "uploading...",
 		"failed": "failed",
-		"fileAttached": "File attached"
+		"fileAttached": "File attached",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Keep Local",
 		"useServer": "Use Server",
 		"attach": "Attach",
 		"retry": "Retry",
-		"delete": "Delete"
+		"delete": "Delete",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

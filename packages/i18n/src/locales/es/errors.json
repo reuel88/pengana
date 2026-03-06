@@ -10,5 +10,6 @@
 	"failedToSignUp": "Error al registrarse",
 	"failedToStoreFile": "Error al guardar el archivo. El almacenamiento puede estar lleno.",
 	"todoNotFound": "Tarea no encontrada",
-	"unauthorized": "No autorizado"
+	"unauthorized": "No autorizado",
+	"paymentError": "Algo salió mal con el pago. Por favor, inténtelo de nuevo."
 }

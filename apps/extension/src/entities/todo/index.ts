@@ -1,2 +1,6 @@
-export { createDexieSyncAdapter } from "./adapter";
-export { todoDb } from "./db";
+export type { WebTodo } from "@pengana/todo-client";
+export {
+	createDexieSyncAdapter,
+	TodoDatabase,
+	todoDb,
+} from "@pengana/todo-client";

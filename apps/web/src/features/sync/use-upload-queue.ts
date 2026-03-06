@@ -7,6 +7,8 @@ import {
 	createWebUploadTransport,
 } from "@/entities/upload-queue";
 
+import { useStableSyncRef } from "./use-stable-sync-ref";
+
 export function useUploadQueue(
 	userId: string | undefined,
 	isOnline: boolean,
@@ -16,11 +18,7 @@ export function useUploadQueue(
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadEvents, setUploadEvents] = useState<UploadEvent[]>([]);
 
-	// stable syncRef to call latest engine.sync
-	const syncRef = useRef<() => void>(() => {});
-	syncRef.current = () => {
-		engineRef.current?.sync();
-	};
+	const syncRef = useStableSyncRef(engineRef);
 
 	useEffect(() => {
 		if (!userId) return;

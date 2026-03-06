@@ -32,5 +32,11 @@
 	"privateData": "私有数据",
 	"modal": "弹窗",
 	"submitting": "提交中...",
-	"loginPrompt": "请先在网页应用中登录。"
+	"loginPrompt": "请先在网页应用中登录。",
+	"notFound": {
+		"title": "Oops!",
+		"heading": "Page Not Found",
+		"description": "Sorry, the page you're looking for doesn't exist.",
+		"goHome": "Go to Home"
+	}
 }

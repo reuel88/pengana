@@ -8,6 +8,7 @@ import {
 	View,
 } from "react-native";
 import { useSync } from "@/features/sync/sync-context";
+import { PLACEHOLDER_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
 import { addTodo } from "./todo-actions";
@@ -39,7 +40,11 @@ export function TodoInput({ userId }: { userId: string }) {
 				value={title}
 				onChangeText={setTitle}
 				placeholder={t("todos:addPlaceholder")}
-				placeholderTextColor={colorScheme === "dark" ? "#666" : "#999"}
+				placeholderTextColor={
+					colorScheme === "dark"
+						? PLACEHOLDER_COLORS.dark
+						: PLACEHOLDER_COLORS.light
+				}
 				onSubmitEditing={handleSubmit}
 				returnKeyType="done"
 				style={[

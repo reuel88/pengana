@@ -12,13 +12,21 @@
 		"attached": "已附加",
 		"uploading": "上传中...",
 		"failed": "失败",
-		"fileAttached": "文件已附加"
+		"fileAttached": "文件已附加",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "保留本地",
 		"useServer": "使用服务器",
 		"attach": "附加文件",
 		"retry": "重试",
-		"delete": "删除"
+		"delete": "删除",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

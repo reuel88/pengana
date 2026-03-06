@@ -12,13 +12,21 @@
 		"attached": "joint",
 		"uploading": "envoi en cours...",
 		"failed": "échoué",
-		"fileAttached": "Fichier joint"
+		"fileAttached": "Fichier joint",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Garder la version locale",
 		"useServer": "Utiliser la version serveur",
 		"attach": "Joindre",
 		"retry": "Réessayer",
-		"delete": "Supprimer"
+		"delete": "Supprimer",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

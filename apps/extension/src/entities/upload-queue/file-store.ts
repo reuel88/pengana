@@ -1,4 +1,4 @@
-import { uploadQueueDb } from "./db";
+import { uploadQueueDb } from "@pengana/todo-client";
 
 export async function storeFileForUpload(
 	todoId: string,

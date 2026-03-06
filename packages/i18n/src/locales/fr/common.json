@@ -32,5 +32,11 @@
 	"privateData": "Données privées",
 	"modal": "Fenêtre modale",
 	"submitting": "Envoi en cours...",
-	"loginPrompt": "Veuillez d'abord vous connecter via l'application web."
+	"loginPrompt": "Veuillez d'abord vous connecter via l'application web.",
+	"notFound": {
+		"title": "Oops!",
+		"heading": "Page Not Found",
+		"description": "Sorry, the page you're looking for doesn't exist.",
+		"goHome": "Go to Home"
+	}
 }

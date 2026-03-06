@@ -10,5 +10,6 @@
 	"failedToSignUp": "Nabigong mag-sign up",
 	"failedToStoreFile": "Nabigong i-store ang file. Maaaring puno na ang storage.",
 	"todoNotFound": "Hindi nahanap ang gawain",
-	"unauthorized": "Hindi awtorisado"
+	"unauthorized": "Hindi awtorisado",
+	"paymentError": "May problema sa pagbabayad. Pakisubukan muli."
 }

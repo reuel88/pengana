@@ -13,5 +13,6 @@ export async function requireAuth() {
 	if (!session.data) {
 		throw redirect({ to: "/login" });
 	}
+	// Spread narrows `data` from `Session | null` to `Session` after the null check above
 	return { session: { ...session, data: session.data } };
 }

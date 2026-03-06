@@ -2,12 +2,10 @@ import { useTranslation } from "@pengana/i18n";
 import { Tabs } from "expo-router";
 
 import { TabBarIcon } from "@/components/tabbar-icon";
-import { NAV_THEME } from "@/lib/constants";
-import { useColorScheme } from "@/lib/use-color-scheme";
+import { useTheme } from "@/lib/theme";
 
 export default function TabLayout() {
-	const { isDarkColorScheme } = useColorScheme();
-	const theme = isDarkColorScheme ? NAV_THEME.dark : NAV_THEME.light;
+	const { theme } = useTheme();
 	const { t } = useTranslation();
 
 	return (

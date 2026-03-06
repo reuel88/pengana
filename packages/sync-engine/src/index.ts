@@ -1,8 +1,10 @@
 export type { AllowedMimeType } from "./allowed-mime-types";
 export {
 	ALLOWED_MIME_TYPES,
+	INDEXEDDB_URI_PREFIX,
 	isAllowedMimeType,
 	MAX_FILE_SIZE_BYTES,
+	MIME_TO_EXT,
 } from "./allowed-mime-types";
 export { SyncEngine } from "./engine";
 export type { EventEmitter } from "./event-emitter";

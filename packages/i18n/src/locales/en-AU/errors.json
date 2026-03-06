@@ -10,5 +10,6 @@
 	"failedToSignUp": "Failed to sign up",
 	"failedToStoreFile": "Failed to store file. Storage may be full.",
 	"todoNotFound": "Todo not found",
-	"unauthorized": "Unauthorised"
+	"unauthorized": "Unauthorised",
+	"paymentError": "Something went wrong with payment. Please try again."
 }

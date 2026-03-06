@@ -32,5 +32,11 @@
 	"privateData": "Private Data",
 	"modal": "Modal",
 	"submitting": "Submitting...",
-	"loginPrompt": "Please log in at the web app first."
+	"loginPrompt": "Please log in at the web app first.",
+	"notFound": {
+		"title": "Oops!",
+		"heading": "Page Not Found",
+		"description": "Sorry, the page you're looking for doesn't exist.",
+		"goHome": "Go to Home"
+	}
 }

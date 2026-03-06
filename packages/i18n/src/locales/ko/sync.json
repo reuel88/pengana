@@ -1,5 +1,22 @@
 {
 	"syncing": "동기화 중...",
 	"online": "온라인",
-	"offline": "오프라인 - 변경사항이 로컬에 저장됨"
+	"offline": "오프라인 - 변경사항이 로컬에 저장됨",
+	"devtools": {
+		"title": "Sync Devtools",
+		"status": "Status:",
+		"statusOnline": "Online",
+		"statusOffline": "Offline",
+		"syncing": "(syncing)",
+		"goOnline": "Go Online",
+		"simulateOffline": "Simulate Offline",
+		"manualSync": "Manual Sync",
+		"forceConflict": "Force Conflict",
+		"forceConflictLabel": "Force conflict on specific todo ID:",
+		"forceConflictPlaceholder": "Leave empty for first todo",
+		"syncLog": "Sync Log",
+		"events": "events",
+		"noEvents": "No sync events yet",
+		"chooseOption": "Choose an option"
+	}
 }

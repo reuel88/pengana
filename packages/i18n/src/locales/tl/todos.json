@@ -12,13 +12,21 @@
 		"attached": "nakalakip",
 		"uploading": "ina-upload...",
 		"failed": "nabigo",
-		"fileAttached": "Nakalakip ang file"
+		"fileAttached": "Nakalakip ang file",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Panatilihin ang Lokal",
 		"useServer": "Gamitin ang Server",
 		"attach": "Ilakip",
 		"retry": "Subukan Muli",
-		"delete": "Tanggalin"
+		"delete": "Tanggalin",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

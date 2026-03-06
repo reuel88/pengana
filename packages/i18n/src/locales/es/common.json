@@ -32,5 +32,11 @@
 	"privateData": "Datos privados",
 	"modal": "Modal",
 	"submitting": "Enviando...",
-	"loginPrompt": "Inicie sesion en la aplicacion web primero."
+	"loginPrompt": "Inicie sesion en la aplicacion web primero.",
+	"notFound": {
+		"title": "Oops!",
+		"heading": "Page Not Found",
+		"description": "Sorry, the page you're looking for doesn't exist.",
+		"goHome": "Go to Home"
+	}
 }

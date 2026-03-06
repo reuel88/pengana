@@ -8,11 +8,9 @@ export default function TodosScreen() {
 	const { data: session } = authClient.useSession();
 	const userId = session?.user?.id;
 
-	if (!session) {
+	if (!session || !userId) {
 		return <Redirect href="/" />;
 	}
-
-	if (!userId) return null;
 
 	return (
 		<Container>

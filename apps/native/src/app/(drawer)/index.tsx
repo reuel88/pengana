@@ -115,7 +115,7 @@ export default function Home() {
 						<Text style={[styles.cardTitle, { color: theme.text }]}>
 							{t("privateData")}
 						</Text>
-						{privateData && (
+						{privateData.data && (
 							<Text
 								style={[
 									styles.privateDataText,

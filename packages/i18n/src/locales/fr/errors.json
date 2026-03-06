@@ -10,5 +10,6 @@
 	"failedToSignUp": "Échec de l'inscription",
 	"failedToStoreFile": "Impossible de stocker le fichier. Le stockage est peut-être plein.",
 	"todoNotFound": "Tâche non trouvée",
-	"unauthorized": "Non autorisé"
+	"unauthorized": "Non autorisé",
+	"paymentError": "Une erreur est survenue lors du paiement. Veuillez réessayer."
 }

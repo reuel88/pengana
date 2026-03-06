@@ -78,7 +78,7 @@ function AttachmentIndicator({
 function TodoItem({ todo }: { todo: WebTodo }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { t } = useTranslation();
+	const { t } = useTranslation("todos");
 
 	const handleToggle = async () => {
 		try {
@@ -168,29 +168,29 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 						variant="outline"
 						onClick={() => handleResolve("local")}
 					>
-						{t("todos:actions.keepLocal")}
+						{t("actions.keepLocal")}
 					</Button>
 					<Button
 						size="xs"
 						variant="outline"
 						onClick={() => handleResolve("server")}
 					>
-						{t("todos:actions.useServer")}
+						{t("actions.useServer")}
 					</Button>
 				</div>
 			)}
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
 				<Button size="xs" variant="outline" onClick={handleAttach}>
-					{t("todos:actions.attach")}
+					{t("actions.attach")}
 				</Button>
 			)}
 			{todo.attachmentStatus === "failed" && (
 				<Button size="xs" variant="outline" onClick={handleAttach}>
-					{t("todos:actions.retry")}
+					{t("actions.retry")}
 				</Button>
 			)}
 			<Button size="xs" variant="ghost" onClick={handleDelete}>
-				{t("todos:actions.delete")}
+				{t("actions.delete")}
 			</Button>
 		</div>
 	);

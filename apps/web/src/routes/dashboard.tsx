@@ -2,6 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { authClient, requireAuth } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 
@@ -31,7 +32,9 @@ function DashboardPage() {
 			{hasProSubscription ? (
 				<Button
 					onClick={() => {
-						authClient.customer.portal().catch(console.error);
+						authClient.customer
+							.portal()
+							.catch(() => toast.error(t("errors:paymentError")));
 					}}
 				>
 					{t("manageSubscription")}
@@ -39,7 +42,9 @@ function DashboardPage() {
 			) : (
 				<Button
 					onClick={() => {
-						authClient.checkout({ slug: "pro" }).catch(console.error);
+						authClient
+							.checkout({ slug: "pro" })
+							.catch(() => toast.error(t("errors:paymentError")));
 					}}
 				>
 					{t("upgradeToPro")}

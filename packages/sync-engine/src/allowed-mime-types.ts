@@ -14,3 +14,12 @@ export function isAllowedMimeType(
 ): mimeType is AllowedMimeType {
 	return (ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType);
 }
+
+export const MIME_TO_EXT: Record<string, string> = {
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/heic": "heic",
+	"application/pdf": "pdf",
+};
+
+export const INDEXEDDB_URI_PREFIX = "indexeddb://";

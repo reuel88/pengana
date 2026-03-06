@@ -12,13 +12,21 @@
 		"attached": "anexado",
 		"uploading": "enviando...",
 		"failed": "falhou",
-		"fileAttached": "Arquivo anexado"
+		"fileAttached": "Arquivo anexado",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Manter Local",
 		"useServer": "Usar Servidor",
 		"attach": "Anexar",
 		"retry": "Tentar Novamente",
-		"delete": "Excluir"
+		"delete": "Excluir",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

@@ -2,19 +2,16 @@ import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ORPCError } from "@orpc/server";
 import { findTodoById } from "@pengana/db/todo-queries";
-import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
+import {
+	ALLOWED_MIME_TYPES,
+	MAX_FILE_SIZE_BYTES,
+	MIME_TO_EXT,
+} from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
-
-const MIME_TO_EXT: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/heic": "heic",
-	"application/pdf": "pdf",
-};
 
 export const uploadRouter = {
 	upload: protectedProcedure

@@ -1,9 +1,13 @@
 import { useTranslation } from "@pengana/i18n";
-import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
+import {
+	INDEXEDDB_URI_PREFIX,
+	isAllowedMimeType,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync-engine";
 import { Button } from "@pengana/ui/components/button";
 import { Checkbox } from "@pengana/ui/components/checkbox";
 import { useRef, useState } from "react";
-import type { WebTodo } from "@/entities/todo/db";
+import type { WebTodo } from "@/entities/todo";
 import { storeFileForUpload } from "@/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
 import { cn } from "@/lib/utils";
@@ -15,7 +19,61 @@ import {
 	toggleTodo,
 } from "./todo-actions";
 
-const INDEXEDDB_URI_PREFIX = "indexeddb://";
+function validateFile(file: File, t: (key: string) => string): string | null {
+	if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
+	if (file.size > MAX_FILE_SIZE_BYTES) return t("errors:fileTooLarge");
+	return null;
+}
+
+function TodoItemActions({
+	todo,
+	onResolve,
+	onAttach,
+	onDelete,
+}: {
+	todo: WebTodo;
+	onResolve: (resolution: "local" | "server") => void;
+	onAttach: () => void;
+	onDelete: () => void;
+}) {
+	const { t } = useTranslation();
+
+	return (
+		<>
+			{todo.syncStatus === "conflict" && (
+				<div className="flex gap-1">
+					<Button
+						size="xs"
+						variant="outline"
+						onClick={() => onResolve("local")}
+					>
+						{t("todos:actions.keepLocal")}
+					</Button>
+					<Button
+						size="xs"
+						variant="outline"
+						onClick={() => onResolve("server")}
+					>
+						{t("todos:actions.useServer")}
+					</Button>
+				</div>
+			)}
+			{!todo.attachmentUrl && !todo.attachmentStatus && (
+				<Button size="xs" variant="outline" onClick={onAttach}>
+					{t("todos:actions.attach")}
+				</Button>
+			)}
+			{todo.attachmentStatus === "failed" && (
+				<Button size="xs" variant="outline" onClick={onAttach}>
+					{t("todos:actions.retry")}
+				</Button>
+			)}
+			<Button size="xs" variant="ghost" onClick={onDelete}>
+				{t("todos:actions.delete")}
+			</Button>
+		</>
+	);
+}
 
 // SyncDot and AttachmentIndicator are intentionally duplicated across web and extension.
 // They're ~20 lines each, tightly coupled to each app's cn() utility and Tailwind config.
@@ -80,32 +138,36 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [fileError, setFileError] = useState<string | null>(null);
+	const [actionError, setActionError] = useState<string | null>(null);
 	const { t } = useTranslation();
 
 	const handleToggle = async () => {
 		try {
+			setActionError(null);
 			await toggleTodo(todo.id);
 			triggerSync();
-		} catch (err) {
-			console.error("Failed to toggle todo", err);
+		} catch {
+			setActionError(t("errors:failedToToggleTodo"));
 		}
 	};
 
 	const handleDelete = async () => {
 		try {
+			setActionError(null);
 			await deleteTodo(todo.id);
 			triggerSync();
-		} catch (err) {
-			console.error("Failed to delete todo", err);
+		} catch {
+			setActionError(t("errors:failedToDeleteTodo"));
 		}
 	};
 
 	const handleResolve = async (resolution: "local" | "server") => {
 		try {
+			setActionError(null);
 			await resolveConflict(todo.id, resolution);
 			triggerSync();
-		} catch (err) {
-			console.error("Failed to resolve conflict", err);
+		} catch {
+			setActionError(t("errors:failedToResolveConflict"));
 		}
 	};
 
@@ -121,13 +183,9 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 		e.target.value = "";
 		setFileError(null);
 
-		if (!isAllowedMimeType(file.type)) {
-			setFileError(t("errors:invalidFileType"));
-			return;
-		}
-
-		if (file.size > MAX_FILE_SIZE_BYTES) {
-			setFileError(t("errors:fileTooLarge"));
+		const validationError = validateFile(file, t);
+		if (validationError) {
+			setFileError(validationError);
 			return;
 		}
 
@@ -165,40 +223,17 @@ function TodoItem({ todo }: { todo: WebTodo }) {
 					status={todo.attachmentStatus}
 					attachmentUrl={todo.attachmentUrl}
 				/>
-				{todo.syncStatus === "conflict" && (
-					<div className="flex gap-1">
-						<Button
-							size="xs"
-							variant="outline"
-							onClick={() => handleResolve("local")}
-						>
-							{t("todos:actions.keepLocal")}
-						</Button>
-						<Button
-							size="xs"
-							variant="outline"
-							onClick={() => handleResolve("server")}
-						>
-							{t("todos:actions.useServer")}
-						</Button>
-					</div>
-				)}
-				{!todo.attachmentUrl && !todo.attachmentStatus && (
-					<Button size="xs" variant="outline" onClick={handleAttach}>
-						{t("todos:actions.attach")}
-					</Button>
-				)}
-				{todo.attachmentStatus === "failed" && (
-					<Button size="xs" variant="outline" onClick={handleAttach}>
-						{t("todos:actions.retry")}
-					</Button>
-				)}
-				<Button size="xs" variant="ghost" onClick={handleDelete}>
-					{t("todos:actions.delete")}
-				</Button>
+				<TodoItemActions
+					todo={todo}
+					onResolve={handleResolve}
+					onAttach={handleAttach}
+					onDelete={handleDelete}
+				/>
 			</div>
-			{fileError && (
-				<p className="px-3 pb-2 text-red-500 text-xs">{fileError}</p>
+			{(fileError || actionError) && (
+				<p className="px-3 pb-2 text-red-500 text-xs">
+					{fileError ?? actionError}
+				</p>
 			)}
 		</div>
 	);

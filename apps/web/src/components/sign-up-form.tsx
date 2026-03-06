@@ -57,37 +57,31 @@ export function SignUpForm({
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>
-			<div>
-				<form.Field name="name">
-					{(field) => (
-						<AuthFormField field={field} label={t("auth:fields.name")} />
-					)}
-				</form.Field>
-			</div>
+			<form.Field name="name">
+				{(field) => (
+					<AuthFormField field={field} label={t("auth:fields.name")} />
+				)}
+			</form.Field>
 
-			<div>
-				<form.Field name="email">
-					{(field) => (
-						<AuthFormField
-							field={field}
-							label={t("auth:fields.email")}
-							type="email"
-						/>
-					)}
-				</form.Field>
-			</div>
+			<form.Field name="email">
+				{(field) => (
+					<AuthFormField
+						field={field}
+						label={t("auth:fields.email")}
+						type="email"
+					/>
+				)}
+			</form.Field>
 
-			<div>
-				<form.Field name="password">
-					{(field) => (
-						<AuthFormField
-							field={field}
-							label={t("auth:fields.password")}
-							type="password"
-						/>
-					)}
-				</form.Field>
-			</div>
+			<form.Field name="password">
+				{(field) => (
+					<AuthFormField
+						field={field}
+						label={t("auth:fields.password")}
+						type="password"
+					/>
+				)}
+			</form.Field>
 		</AuthFormShell>
 	);
 }

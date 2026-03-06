@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
@@ -11,10 +12,11 @@ import { useTheme } from "@/lib/theme";
 function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(userId);
 	const { theme } = useTheme();
+	const { t } = useTranslation("todos");
 
 	return (
 		<View style={styles.content}>
-			<Text style={[styles.title, { color: theme.text }]}>Todos</Text>
+			<Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
 			<ConnectivityBanner />
 			<TodoInput userId={userId} />
 			<TodoList todos={todos} />

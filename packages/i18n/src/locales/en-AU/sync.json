@@ -1,5 +1,22 @@
 {
 	"syncing": "Syncing...",
 	"online": "Online",
-	"offline": "Offline - changes saved locally"
+	"offline": "Offline - changes saved locally",
+	"devtools": {
+		"title": "Sync Devtools",
+		"status": "Status:",
+		"statusOnline": "Online",
+		"statusOffline": "Offline",
+		"syncing": "(syncing)",
+		"goOnline": "Go Online",
+		"simulateOffline": "Simulate Offline",
+		"manualSync": "Manual Sync",
+		"forceConflict": "Force Conflict",
+		"forceConflictLabel": "Force conflict on specific todo ID:",
+		"forceConflictPlaceholder": "Leave empty for first todo",
+		"syncLog": "Sync Log",
+		"events": "events",
+		"noEvents": "No sync events yet",
+		"chooseOption": "Choose an option"
+	}
 }

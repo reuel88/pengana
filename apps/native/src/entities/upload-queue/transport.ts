@@ -1,15 +1,9 @@
 import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
+import { MIME_TO_EXT } from "@pengana/sync-engine";
 
 import { File } from "expo-file-system";
 
 import { client } from "@/utils/orpc";
-
-const MIME_TO_EXT: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/heic": "heic",
-	"application/pdf": "pdf",
-};
 
 export function createNativeUploadTransport(): UploadTransport {
 	return {

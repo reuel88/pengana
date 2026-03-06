@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { Link, Stack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -6,21 +7,22 @@ import { useTheme } from "@/lib/theme";
 
 export default function NotFoundScreen() {
 	const { theme } = useTheme();
+	const { t } = useTranslation();
 
 	return (
 		<>
-			<Stack.Screen options={{ title: "Oops!" }} />
+			<Stack.Screen options={{ title: t("notFound.title") }} />
 			<Container>
 				<View style={styles.container}>
 					<View style={styles.content}>
 						<Text style={styles.emoji}>🤔</Text>
 						<Text style={[styles.title, { color: theme.text }]}>
-							Page Not Found
+							{t("notFound.heading")}
 						</Text>
 						<Text
 							style={[styles.subtitle, { color: theme.text, opacity: 0.7 }]}
 						>
-							Sorry, the page you're looking for doesn't exist.
+							{t("notFound.description")}
 						</Text>
 						<Link href="/" asChild>
 							<Text
@@ -32,7 +34,7 @@ export default function NotFoundScreen() {
 									},
 								]}
 							>
-								Go to Home
+								{t("notFound.goHome")}
 							</Text>
 						</Link>
 					</View>

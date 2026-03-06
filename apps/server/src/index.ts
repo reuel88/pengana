@@ -16,7 +16,7 @@ import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import { logger } from "hono/logger";
 
-import { notifyUser, setupWebSocket } from "./ws";
+import { setupWebSocket } from "./ws";
 
 const app = new Hono();
 
@@ -42,8 +42,8 @@ app.use(
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-const handleError = (error: unknown) => {
-	console.error(error);
+const logUnhandledError = (error: unknown) => {
+	console.error("[orpc] unhandled error:", error);
 };
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
@@ -52,19 +52,22 @@ export const apiHandler = new OpenAPIHandler(appRouter, {
 			schemaConverters: [new ZodToJsonSchemaConverter()],
 		}),
 	],
-	interceptors: [onError(handleError)],
+	interceptors: [onError(logUnhandledError)],
 });
 
 export const rpcHandler = new RPCHandler(appRouter, {
-	interceptors: [onError(handleError)],
+	interceptors: [onError(logUnhandledError)],
 });
+
+const ws = { notifyUser: (_userId: string) => {} };
 
 app.use("/*", async (c, next) => {
 	const appContext = await createContext({ context: c });
+	const fullContext = { ...appContext, notifyUser: ws.notifyUser };
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",
-		context: { ...appContext, notifyUser },
+		context: fullContext,
 	});
 
 	if (rpcResult.matched) {
@@ -73,7 +76,7 @@ app.use("/*", async (c, next) => {
 
 	const apiResult = await apiHandler.handle(c.req.raw, {
 		prefix: "/api-reference",
-		context: appContext,
+		context: fullContext,
 	});
 
 	if (apiResult.matched) {
@@ -94,7 +97,7 @@ await initServerI18n();
 const server = serve(
 	{
 		fetch: app.fetch,
-		port: 3000,
+		port: env.PORT,
 		hostname: "0.0.0.0",
 	},
 	(info) => {
@@ -102,4 +105,4 @@ const server = serve(
 	},
 );
 
-setupWebSocket(server);
+ws.notifyUser = setupWebSocket(server).notifyUser;

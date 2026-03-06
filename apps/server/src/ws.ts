@@ -1,17 +1,15 @@
 import type { IncomingMessage } from "node:http";
 import type { ServerType } from "@hono/node-server";
+import type { WsMessage } from "@pengana/api/ws-types";
 import { auth } from "@pengana/auth";
 import { WebSocket, WebSocketServer } from "ws";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
 
-const connections = new Map<string, Set<WebSocket>>();
-
-let wss: WebSocketServer;
-
 export function setupWebSocket(server: ServerType) {
-	wss = new WebSocketServer({ noServer: true });
+	const connections = new Map<string, Set<WebSocket>>();
+	const wss = new WebSocketServer({ noServer: true });
 
 	server.on("upgrade", async (req, socket, head) => {
 		const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
@@ -34,7 +32,40 @@ export function setupWebSocket(server: ServerType) {
 		});
 	});
 
-	wss.on("connection", handleConnection);
+	wss.on(
+		"connection",
+		(ws: WebSocket, _req: IncomingMessage, userId: string) => {
+			const userSockets = connections.get(userId) ?? new Set<WebSocket>();
+			connections.set(userId, userSockets);
+
+			if (userSockets.size >= MAX_CONNECTIONS_PER_USER) {
+				console.log(
+					`[ws] rejected connection for user ${userId} (max connections reached)`,
+				);
+				ws.close(1013, "Too many connections");
+				return;
+			}
+
+			userSockets.add(ws);
+			console.log(
+				`[ws] connection accepted for user ${userId} (${userSockets.size} total)`,
+			);
+
+			ws.on("close", () => {
+				userSockets.delete(ws);
+				console.log(
+					`[ws] connection closed for user ${userId} (${userSockets.size} remaining)`,
+				);
+				if (userSockets.size === 0) {
+					connections.delete(userId);
+				}
+			});
+
+			ws.on("error", () => {
+				ws.close();
+			});
+		},
+	);
 
 	const pingInterval = setInterval(() => {
 		for (const sockets of connections.values()) {
@@ -49,42 +80,29 @@ export function setupWebSocket(server: ServerType) {
 	wss.on("close", () => {
 		clearInterval(pingInterval);
 	});
-}
 
-function handleConnection(
-	ws: WebSocket,
-	_req: IncomingMessage,
-	userId: string,
-) {
-	const userSockets = connections.get(userId) ?? new Set<WebSocket>();
-	connections.set(userId, userSockets);
+	function notifyUser(userId: string) {
+		const sockets = connections.get(userId);
+		if (!sockets) {
+			console.log(`[ws] notifyUser(${userId}): no connections found`);
+			return;
+		}
 
-	if (userSockets.size >= MAX_CONNECTIONS_PER_USER) {
+		const payload: WsMessage = { type: "sync-notify" };
+		const message = JSON.stringify(payload);
+		let sentCount = 0;
+		for (const ws of sockets) {
+			if (ws.readyState === WebSocket.OPEN) {
+				ws.send(message);
+				sentCount++;
+			}
+		}
 		console.log(
-			`[ws] rejected connection for user ${userId} (max connections reached)`,
+			`[ws] notifyUser(${userId}): sent to ${sentCount}/${sockets.size} sockets`,
 		);
-		ws.close(1013, "Too many connections");
-		return;
 	}
 
-	userSockets.add(ws);
-	console.log(
-		`[ws] connection accepted for user ${userId} (${userSockets.size} total)`,
-	);
-
-	ws.on("close", () => {
-		userSockets.delete(ws);
-		console.log(
-			`[ws] connection closed for user ${userId} (${userSockets.size} remaining)`,
-		);
-		if (userSockets.size === 0) {
-			connections.delete(userId);
-		}
-	});
-
-	ws.on("error", () => {
-		ws.close();
-	});
+	return { notifyUser };
 }
 
 async function authenticateRequest(
@@ -110,27 +128,5 @@ async function authenticateRequest(
 		return session?.user?.id ?? null;
 	} catch {
 		return null;
-	}
-}
-
-export function notifyUser(userId: string) {
-	const sockets = connections.get(userId);
-	if (!sockets) {
-		console.log(`[ws] notifyUser(${userId}): no connections found`);
-		return;
-	}
-
-	const openCount = [...sockets].filter(
-		(ws) => ws.readyState === WebSocket.OPEN,
-	).length;
-	console.log(
-		`[ws] notifyUser(${userId}): sending to ${openCount}/${sockets.size} sockets`,
-	);
-
-	const message = JSON.stringify({ type: "sync-notify" });
-	for (const ws of sockets) {
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(message);
-		}
 	}
 }

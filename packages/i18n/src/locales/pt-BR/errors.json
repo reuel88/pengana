@@ -10,5 +10,6 @@
 	"failedToSignUp": "Falha ao cadastrar",
 	"failedToStoreFile": "Falha ao armazenar arquivo. O armazenamento pode estar cheio.",
 	"todoNotFound": "Tarefa não encontrada",
-	"unauthorized": "Não autorizado"
+	"unauthorized": "Não autorizado",
+	"paymentError": "Algo deu errado com o pagamento. Por favor, tente novamente."
 }

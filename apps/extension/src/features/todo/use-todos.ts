@@ -10,7 +10,10 @@ export function useTodos(userId: string) {
 		[],
 	);
 
-	const activeTodos = useMemo(() => todos.filter((t) => !t.deleted), [todos]);
+	const activeTodos = useMemo(
+		() => todos.filter((todo) => !todo.deleted),
+		[todos],
+	);
 
 	return { todos: activeTodos };
 }

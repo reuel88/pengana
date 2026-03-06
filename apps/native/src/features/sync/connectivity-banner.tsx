@@ -1,25 +1,26 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useColorScheme } from "@/lib/use-color-scheme";
+import { BANNER_COLORS } from "@/lib/design-tokens";
+import { useTheme } from "@/lib/theme";
 
 import { useSync } from "./sync-context";
 
 export function ConnectivityBanner() {
 	const { isOnline, isSyncing } = useSync();
-	const { colorScheme } = useColorScheme();
+	const { colorScheme } = useTheme();
 	const { t } = useTranslation("sync");
 
 	const backgroundColor = isOnline
-		? "rgba(34, 197, 94, 0.1)"
-		: "rgba(239, 68, 68, 0.1)";
+		? BANNER_COLORS.onlineBg
+		: BANNER_COLORS.offlineBg;
 	const textColor = isOnline
 		? colorScheme === "dark"
-			? "#4ade80"
-			: "#16a34a"
+			? BANNER_COLORS.onlineTextDark
+			: BANNER_COLORS.onlineTextLight
 		: colorScheme === "dark"
-			? "#f87171"
-			: "#dc2626";
+			? BANNER_COLORS.offlineTextDark
+			: BANNER_COLORS.offlineTextLight;
 
 	return (
 		<View style={[styles.banner, { backgroundColor }]}>

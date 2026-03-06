@@ -14,8 +14,6 @@ import {
 import { useRouterState } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
 
-const displayNames = new Intl.DisplayNames(["en"], { type: "language" });
-
 function getLocaleLabel(locale: SupportedLocale): string {
 	const nativeNames = new Intl.DisplayNames([locale], { type: "language" });
 	return nativeNames.of(locale) ?? locale;

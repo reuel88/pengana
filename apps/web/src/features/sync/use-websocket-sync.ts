@@ -1,6 +1,8 @@
 import { env } from "@pengana/env/web";
 import type { SyncEngine } from "@pengana/sync-engine";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+
+import { useStableSyncRef } from "./use-stable-sync-ref";
 
 function getWsUrl() {
 	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
@@ -11,10 +13,7 @@ export function useWebSocketSync(
 	isOnline: boolean,
 	engineRef: React.RefObject<SyncEngine | null>,
 ) {
-	const syncRef = useRef<() => void>(() => {});
-	syncRef.current = () => {
-		engineRef.current?.sync();
-	};
+	const syncRef = useStableSyncRef(engineRef);
 
 	useEffect(() => {
 		if (!userId || !isOnline) return;

@@ -11,7 +11,7 @@ export function TodoInput({ userId }: { userId: string }) {
 	const [title, setTitle] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const { triggerSync } = useSync();
-	const { t } = useTranslation();
+	const { t } = useTranslation("todos");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -35,11 +35,11 @@ export function TodoInput({ userId }: { userId: string }) {
 			<Input
 				value={title}
 				onChange={(e) => setTitle(e.target.value)}
-				placeholder={t("todos:addPlaceholder")}
+				placeholder={t("addPlaceholder")}
 				className="flex-1"
 			/>
 			<Button type="submit" disabled={!title.trim() || submitting}>
-				{t("todos:addButton")}
+				{t("addButton")}
 			</Button>
 		</form>
 	);

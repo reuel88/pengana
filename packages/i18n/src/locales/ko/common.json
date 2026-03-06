@@ -32,5 +32,11 @@
 	"privateData": "비공개 데이터",
 	"modal": "모달",
 	"submitting": "제출 중...",
-	"loginPrompt": "먼저 웹 앱에서 로그인해 주세요."
+	"loginPrompt": "먼저 웹 앱에서 로그인해 주세요.",
+	"notFound": {
+		"title": "Oops!",
+		"heading": "Page Not Found",
+		"description": "Sorry, the page you're looking for doesn't exist.",
+		"goHome": "Go to Home"
+	}
 }

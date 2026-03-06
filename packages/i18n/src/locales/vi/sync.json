@@ -1,5 +1,22 @@
 {
 	"syncing": "\u0110ang \u0111\u1ed3ng b\u1ed9...",
 	"online": "Tr\u1ef1c tuy\u1ebfn",
-	"offline": "Ngo\u1ea1i tuy\u1ebfn - thay \u0111\u1ed5i \u0111\u01b0\u1ee3c l\u01b0u c\u1ee5c b\u1ed9"
+	"offline": "Ngo\u1ea1i tuy\u1ebfn - thay \u0111\u1ed5i \u0111\u01b0\u1ee3c l\u01b0u c\u1ee5c b\u1ed9",
+	"devtools": {
+		"title": "Sync Devtools",
+		"status": "Status:",
+		"statusOnline": "Online",
+		"statusOffline": "Offline",
+		"syncing": "(syncing)",
+		"goOnline": "Go Online",
+		"simulateOffline": "Simulate Offline",
+		"manualSync": "Manual Sync",
+		"forceConflict": "Force Conflict",
+		"forceConflictLabel": "Force conflict on specific todo ID:",
+		"forceConflictPlaceholder": "Leave empty for first todo",
+		"syncLog": "Sync Log",
+		"events": "events",
+		"noEvents": "No sync events yet",
+		"chooseOption": "Choose an option"
+	}
 }

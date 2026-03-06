@@ -2,6 +2,8 @@ import type { SyncEngine } from "@pengana/sync-engine";
 
 import { useEffect, useRef } from "react";
 
+import { useStableSyncRef } from "./use-stable-sync-ref";
+
 const SYNC_INTERVAL_MS = 5 * 60_000;
 
 export function usePeriodicSync(
@@ -9,13 +11,7 @@ export function usePeriodicSync(
 	engineRef: React.RefObject<SyncEngine | null>,
 ) {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	// Stable ref that always calls the latest engineRef.current?.sync
-	const syncRef = useRef<() => void>(() => {});
-
-	// update the syncRef on each render so it always calls the latest engine
-	syncRef.current = () => {
-		engineRef.current?.sync();
-	};
+	const syncRef = useStableSyncRef(engineRef);
 
 	useEffect(() => {
 		if (intervalRef.current) {

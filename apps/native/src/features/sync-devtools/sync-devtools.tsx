@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { useState } from "react";
 import {
 	ScrollView,
@@ -10,7 +11,7 @@ import {
 
 import { db, todos } from "@/entities/todo";
 import { useSync } from "@/features/sync/sync-context";
-import { STATUS_COLORS } from "@/lib/design-tokens";
+import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { client } from "@/utils/orpc";
 
@@ -26,6 +27,7 @@ export function SyncDevtools() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
 	const { theme, colorScheme } = useTheme();
+	const { t } = useTranslation("sync");
 
 	const handleForceConflict = async () => {
 		const trimmed = forceConflictId.trim();
@@ -46,7 +48,7 @@ export function SyncDevtools() {
 				style={[styles.header, { backgroundColor: theme.card }]}
 			>
 				<Text style={[styles.headerText, { color: theme.text }]}>
-					Sync Devtools
+					{t("devtools.title")}
 				</Text>
 				<Text style={[styles.headerText, { color: theme.text }]}>
 					{isOpen ? "\u25B2" : "\u25BC"}
@@ -56,8 +58,11 @@ export function SyncDevtools() {
 			{isOpen && (
 				<View style={styles.content}>
 					<Text style={[styles.statusText, { color: theme.text }]}>
-						Status: {isOnline ? "Online" : "Offline"}{" "}
-						{isSyncing ? "(syncing)" : ""}
+						{t("devtools.status")}{" "}
+						{isOnline
+							? t("devtools.statusOnline")
+							: t("devtools.statusOffline")}{" "}
+						{isSyncing ? t("devtools.syncing") : ""}
 					</Text>
 
 					<View style={styles.buttonRow}>
@@ -66,7 +71,9 @@ export function SyncDevtools() {
 							onPress={() => setSimulateOffline(!simulateOffline)}
 						>
 							<Text style={[styles.devButtonText, { color: theme.text }]}>
-								{simulateOffline ? "Go Online" : "Simulate Offline"}
+								{simulateOffline
+									? t("devtools.goOnline")
+									: t("devtools.simulateOffline")}
 							</Text>
 						</TouchableOpacity>
 
@@ -80,7 +87,7 @@ export function SyncDevtools() {
 							disabled={!isOnline}
 						>
 							<Text style={[styles.devButtonText, { color: theme.text }]}>
-								Manual Sync
+								{t("devtools.manualSync")}
 							</Text>
 						</TouchableOpacity>
 
@@ -94,20 +101,24 @@ export function SyncDevtools() {
 							disabled={!isOnline}
 						>
 							<Text style={[styles.devButtonText, { color: theme.text }]}>
-								Force Conflict
+								{t("devtools.forceConflict")}
 							</Text>
 						</TouchableOpacity>
 					</View>
 
 					<View>
 						<Text style={[styles.label, { color: theme.text }]}>
-							Force conflict on specific todo ID:
+							{t("devtools.forceConflictLabel")}
 						</Text>
 						<TextInput
 							value={forceConflictId}
 							onChangeText={setForceConflictId}
-							placeholder="Leave empty for first todo"
-							placeholderTextColor={colorScheme === "dark" ? "#666" : "#999"}
+							placeholder={t("devtools.forceConflictPlaceholder")}
+							placeholderTextColor={
+								colorScheme === "dark"
+									? PLACEHOLDER_COLORS.dark
+									: PLACEHOLDER_COLORS.light
+							}
 							style={[
 								styles.textInput,
 								{
@@ -120,7 +131,7 @@ export function SyncDevtools() {
 
 					<View>
 						<Text style={[styles.label, { color: theme.text }]}>
-							Sync Log ({events.length} events)
+							{t("devtools.syncLog")} ({events.length} {t("devtools.events")})
 						</Text>
 						<ScrollView
 							style={[styles.logContainer, { borderColor: theme.border }]}
@@ -129,7 +140,7 @@ export function SyncDevtools() {
 								<Text
 									style={[styles.logText, { opacity: 0.5, color: theme.text }]}
 								>
-									No sync events yet
+									{t("devtools.noEvents")}
 								</Text>
 							)}
 							{[...events].reverse().map((event) => (

@@ -20,7 +20,7 @@ function getLocaleLabel(locale: SupportedLocale): string {
 export function LanguageSwitcher() {
 	const { i18n } = useTranslation();
 
-	const handleChange = async (locale: SupportedLocale) => {
+	const handleChange = (locale: SupportedLocale) => {
 		localStorage.setItem("locale", locale);
 		window.location.reload();
 	};

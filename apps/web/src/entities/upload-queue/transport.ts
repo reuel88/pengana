@@ -1,15 +1,9 @@
 import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
+import { MIME_TO_EXT } from "@pengana/sync-engine";
 
 import { client } from "@/utils/orpc";
 
 import { getFileForUpload, removeFileForUpload } from "./file-store";
-
-const MIME_TO_EXT: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/heic": "heic",
-	"application/pdf": "pdf",
-};
 
 function readFileAsBase64(file: File): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -18,6 +12,10 @@ function readFileAsBase64(file: File): Promise<string> {
 			const result = reader.result as string;
 			// Strip the "data:...;base64," prefix
 			const base64 = result.split(",")[1];
+			if (!base64) {
+				reject(new Error("Failed to extract base64 data from file"));
+				return;
+			}
 			resolve(base64);
 		};
 		reader.onerror = () => reject(reader.error);

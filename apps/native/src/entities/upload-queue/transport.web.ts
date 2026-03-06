@@ -1,15 +1,9 @@
 import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
+import { MIME_TO_EXT } from "@pengana/sync-engine";
 
 import { client } from "@/utils/orpc";
 
 import { getFileForUpload, removeFileForUpload } from "./file-store.web";
-
-const MIME_TO_EXT: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/heic": "heic",
-	"application/pdf": "pdf",
-};
 
 function readFileAsBase64(file: File): Promise<string> {
 	return new Promise((resolve, reject) => {

@@ -12,13 +12,21 @@
 		"attached": "\u0111\u00e3 \u0111\u00ednh k\u00e8m",
 		"uploading": "\u0111ang t\u1ea3i l\u00ean...",
 		"failed": "th\u1ea5t b\u1ea1i",
-		"fileAttached": "\u0110\u00e3 \u0111\u00ednh k\u00e8m t\u1ec7p"
+		"fileAttached": "\u0110\u00e3 \u0111\u00ednh k\u00e8m t\u1ec7p",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Gi\u1eef b\u1ea3n c\u1ee5c b\u1ed9",
 		"useServer": "D\u00f9ng b\u1ea3n m\u00e1y ch\u1ee7",
 		"attach": "\u0110\u00ednh k\u00e8m",
 		"retry": "Th\u1eed l\u1ea1i",
-		"delete": "X\u00f3a"
+		"delete": "X\u00f3a",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

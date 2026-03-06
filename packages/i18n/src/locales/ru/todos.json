@@ -12,13 +12,21 @@
 		"attached": "прикреплено",
 		"uploading": "загрузка...",
 		"failed": "ошибка",
-		"fileAttached": "Файл прикреплён"
+		"fileAttached": "Файл прикреплён",
+		"invalidFile": "Invalid file",
+		"cameraUnavailable": "Camera unavailable",
+		"cameraNotAvailable": "Camera is not available on this device."
 	},
 	"actions": {
 		"keepLocal": "Оставить локальную",
 		"useServer": "Использовать серверную",
 		"attach": "Прикрепить",
 		"retry": "Повторить",
-		"delete": "Удалить"
+		"delete": "Удалить",
+		"takePhoto": "Take Photo",
+		"chooseFromLibrary": "Choose from Library",
+		"choosePdf": "Choose PDF",
+		"cancel": "Cancel",
+		"chooseOption": "Choose an option"
 	}
 }

@@ -5,6 +5,20 @@ export const STATUS_COLORS = {
 	connected: "#10b981",
 } as const;
 
+export const BANNER_COLORS = {
+	onlineBg: "rgba(34, 197, 94, 0.1)",
+	offlineBg: "rgba(239, 68, 68, 0.1)",
+	onlineTextLight: "#16a34a",
+	onlineTextDark: "#4ade80",
+	offlineTextLight: "#dc2626",
+	offlineTextDark: "#f87171",
+} as const;
+
+export const PLACEHOLDER_COLORS = {
+	light: "#999",
+	dark: "#666",
+} as const;
+
 export const SYNC_STATUS_COLORS = {
 	synced: STATUS_COLORS.success,
 	pending: STATUS_COLORS.warning,

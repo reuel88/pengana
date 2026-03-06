@@ -1,12 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import type { Todo } from "@pengana/sync-engine";
-import { isAllowedMimeType } from "@pengana/sync-engine";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
 import {
-	ActionSheetIOS,
 	Alert,
-	Platform,
 	StyleSheet,
 	Switch,
 	Text,
@@ -17,13 +12,8 @@ import {
 import { useSync } from "@/features/sync/sync-context";
 import { STATUS_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
-
-import {
-	attachFile,
-	deleteTodo,
-	resolveConflict,
-	toggleTodo,
-} from "../todo-actions";
+import { useFilePicker } from "../hooks/use-file-picker";
+import { deleteTodo, resolveConflict, toggleTodo } from "../todo-actions";
 
 import { AttachmentIndicator } from "./attachment-indicator";
 import { SyncDot } from "./sync-dot";
@@ -33,30 +23,11 @@ export interface TodoItemRow extends Todo {
 	attachmentStatus?: "queued" | "uploading" | "uploaded" | "failed" | null;
 }
 
-async function pickAsset(
-	picker: () => Promise<{
-		canceled: boolean;
-		assets: { uri: string; mimeType?: string | null }[] | null;
-	}>,
-	defaultMimeType: string,
-	invalidMessage: string,
-): Promise<{ uri: string; mimeType: string } | null> {
-	const result = await picker();
-	if (result.canceled || !result.assets || result.assets.length === 0)
-		return null;
-	const asset = result.assets[0];
-	const mimeType = asset.mimeType ?? defaultMimeType;
-	if (!isAllowedMimeType(mimeType)) {
-		Alert.alert("Invalid file", invalidMessage);
-		return null;
-	}
-	return { uri: asset.uri, mimeType };
-}
-
 export function TodoItem({ todo }: { todo: TodoItemRow }) {
-	const { syncAfterWrite, enqueueUpload } = useSync();
+	const { syncAfterWrite } = useSync();
 	const { theme } = useTheme();
 	const { t } = useTranslation();
+	const { showPicker } = useFilePicker(todo.id);
 
 	const handleToggle = async () => {
 		try {
@@ -75,89 +46,6 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 	const handleResolve = async (resolution: "local" | "server") => {
 		await resolveConflict(todo.id, resolution);
 		syncAfterWrite();
-	};
-
-	const attachAsset = async (uri: string, mimeType: string) => {
-		await attachFile(todo.id, uri);
-		enqueueUpload(todo.id, uri, mimeType);
-	};
-
-	const invalidFileMessage = t("errors:invalidFileType");
-
-	const pickFromCamera = async () => {
-		const permission = await ImagePicker.requestCameraPermissionsAsync();
-		if (!permission.granted) return;
-		try {
-			const asset = await pickAsset(
-				() =>
-					ImagePicker.launchCameraAsync({
-						mediaTypes: ["images"],
-						quality: 0.8,
-					}),
-				"image/jpeg",
-				invalidFileMessage,
-			);
-			if (asset) await attachAsset(asset.uri, asset.mimeType);
-		} catch {
-			Alert.alert(
-				"Camera unavailable",
-				"Camera is not available on this device.",
-			);
-		}
-	};
-
-	const pickFromLibrary = async () => {
-		const asset = await pickAsset(
-			() =>
-				ImagePicker.launchImageLibraryAsync({
-					mediaTypes: ["images"],
-					quality: 0.8,
-				}),
-			"image/jpeg",
-			invalidFileMessage,
-		);
-		if (asset) await attachAsset(asset.uri, asset.mimeType);
-	};
-
-	const pickPdf = async () => {
-		const asset = await pickAsset(
-			() =>
-				DocumentPicker.getDocumentAsync({
-					type: ["application/pdf"],
-					copyToCacheDirectory: true,
-				}),
-			"application/pdf",
-			invalidFileMessage,
-		);
-		if (asset) await attachAsset(asset.uri, asset.mimeType);
-	};
-
-	const handleAttach = () => {
-		const options = [
-			"Take Photo",
-			"Choose from Library",
-			"Choose PDF",
-			"Cancel",
-		];
-		const cancelButtonIndex = 3;
-
-		if (Platform.OS === "ios") {
-			ActionSheetIOS.showActionSheetWithOptions(
-				{ options, cancelButtonIndex },
-				(buttonIndex) => {
-					if (buttonIndex === 0) pickFromCamera();
-					else if (buttonIndex === 1) pickFromLibrary();
-					else if (buttonIndex === 2) pickPdf();
-				},
-			);
-		} else {
-			Alert.alert(t("todos:actions.attach"), "Choose an option", [
-				{ text: "Take Photo", onPress: pickFromCamera },
-				{ text: "Choose from Library", onPress: pickFromLibrary },
-				{ text: "Choose PDF", onPress: pickPdf },
-				{ text: "Cancel", style: "cancel" },
-			]);
-		}
 	};
 
 	return (
@@ -203,14 +91,14 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 				</View>
 			)}
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
-				<TouchableOpacity onPress={handleAttach} style={styles.attachButton}>
+				<TouchableOpacity onPress={showPicker} style={styles.attachButton}>
 					<Text style={[styles.attachText, { color: theme.primary }]}>
 						{t("todos:actions.attach")}
 					</Text>
 				</TouchableOpacity>
 			)}
 			{todo.attachmentStatus === "failed" && (
-				<TouchableOpacity onPress={handleAttach} style={styles.attachButton}>
+				<TouchableOpacity onPress={showPicker} style={styles.attachButton}>
 					<Text style={styles.retryText}>{t("todos:actions.retry")}</Text>
 				</TouchableOpacity>
 			)}

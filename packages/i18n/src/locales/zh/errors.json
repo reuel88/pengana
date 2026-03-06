@@ -10,5 +10,6 @@
 	"failedToSignUp": "注册失败",
 	"failedToStoreFile": "存储文件失败。存储空间可能已满。",
 	"todoNotFound": "待办事项未找到",
-	"unauthorized": "未授权"
+	"unauthorized": "未授权",
+	"paymentError": "支付出现问题，请重试。"
 }
