@@ -1,6 +1,5 @@
+import { Button } from "@pengana/ui/components/button";
 import { useState } from "react";
-
-import { Button } from "@/components/ui/button";
 import { todoDb } from "@/entities/todo";
 import { useSync } from "@/features/sync/sync-context";
 import { cn } from "@/lib/utils";

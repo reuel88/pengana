@@ -5,15 +5,8 @@
 		{
 			"idx": 0,
 			"version": "7",
-			"when": 1772611735916,
-			"tag": "0000_big_gauntlet",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1772663131537,
-			"tag": "0001_late_imperial_guard",
+			"when": 1772774915710,
+			"tag": "0000_sticky_robbie_robertson",
 			"breakpoints": true
 		}
 	]

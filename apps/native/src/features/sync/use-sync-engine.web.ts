@@ -19,7 +19,7 @@ import { client } from "@/utils/orpc";
 const SYNC_INTERVAL_MS = 5 * 60_000;
 
 function getWsUrl() {
-	return getServerUrl().replace(/^http/, "ws") + "/ws";
+	return `${getServerUrl().replace(/^http/, "ws")}/ws`;
 }
 
 export function useSyncEngine(userId: string | undefined) {

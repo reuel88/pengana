@@ -23,7 +23,7 @@ import { client } from "@/utils/orpc";
 const SYNC_INTERVAL_MS = 5 * 60_000;
 
 function getWsUrl() {
-	const base = env.EXPO_PUBLIC_SERVER_URL.replace(/^http/, "ws") + "/ws";
+	const base = `${env.EXPO_PUBLIC_SERVER_URL.replace(/^http/, "ws")}/ws`;
 
 	if (Platform.OS !== "web") {
 		const cookies = authClient.getCookie();

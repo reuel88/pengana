@@ -1,5 +1,5 @@
 {
-	"id": "15dedd96-e904-4bff-b7c5-6b70569fcae9",
+	"id": "b2438ab3-bb01-4e5b-a97f-7a7bbb5ff25b",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -376,6 +376,12 @@
 					"primaryKey": false,
 					"notNull": true,
 					"default": false
+				},
+				"attachment_url": {
+					"name": "attachment_url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
 				},
 				"updated_at": {
 					"name": "updated_at",

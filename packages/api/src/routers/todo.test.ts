@@ -122,7 +122,7 @@ describe("handleSync", () => {
 			"test-user",
 		);
 
-		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]![1];
+		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[1];
 		expect(calledDate.getTime()).toBe(
 			new Date("2025-06-01T00:00:10.000Z").getTime() - 5000,
 		);
@@ -131,7 +131,7 @@ describe("handleSync", () => {
 	it("returns all changes when lastSyncedAt is null", async () => {
 		await handleSync({ changes: [], lastSyncedAt: null }, "test-user");
 
-		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]![1];
+		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[1];
 		expect(calledDate.getTime()).toBe(0);
 	});
 

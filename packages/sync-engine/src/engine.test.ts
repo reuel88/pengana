@@ -111,7 +111,7 @@ describe("SyncEngine", () => {
 
 		await engine.sync();
 
-		const syncedItems = vi.mocked(adapter.markAsSynced).mock.calls[0]![0];
+		const syncedItems = vi.mocked(adapter.markAsSynced).mock.calls[0]?.[0];
 		expect(syncedItems).toHaveLength(2);
 		expect(syncedItems.map((t: Todo) => t.id)).toEqual(["a", "c"]);
 	});

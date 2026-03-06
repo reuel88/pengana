@@ -5,7 +5,7 @@
 	"tsx": true,
 	"tailwind": {
 		"config": "",
-		"css": "src/index.css",
+		"css": "src/styles/globals.css",
 		"baseColor": "neutral",
 		"cssVariables": true,
 		"prefix": ""
@@ -16,7 +16,7 @@
 		"utils": "@pengana/ui/lib/utils",
 		"ui": "@pengana/ui/components",
 		"lib": "@pengana/ui/lib",
-		"hooks": "@/hooks"
+		"hooks": "@pengana/ui/hooks"
 	},
 	"menuColor": "default",
 	"menuAccent": "subtle",

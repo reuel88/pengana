@@ -1,7 +1,6 @@
+import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-
-import { Button } from "@/components/ui/button";
 import { authClient, requireAuth } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 

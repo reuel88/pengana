@@ -1,9 +1,7 @@
+import { Button } from "@pengana/ui/components/button";
 import type { ReactNode } from "react";
-
 import { authClient } from "@/lib/auth-client";
-
 import { Loader } from "./loader";
-import { Button } from "./ui/button";
 
 interface FormSubscribeProps {
 	children: (state: { canSubmit: boolean; isSubmitting: boolean }) => ReactNode;

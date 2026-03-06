@@ -1,7 +1,6 @@
+import { Input } from "@pengana/ui/components/input";
+import { Label } from "@pengana/ui/components/label";
 import type { AnyFieldApi } from "@tanstack/react-form";
-
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 
 export function AuthFormField({
 	field,

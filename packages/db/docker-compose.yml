@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres
+    container_name: pengana-postgres
+    environment:
+      POSTGRES_DB: pengana
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pengana_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pengana_postgres_data:

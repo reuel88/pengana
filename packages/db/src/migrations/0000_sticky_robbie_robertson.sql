@@ -51,6 +51,7 @@ CREATE TABLE "todo" (
 	"title" text NOT NULL,
 	"completed" boolean DEFAULT false NOT NULL,
 	"deleted" boolean DEFAULT false NOT NULL,
+	"attachment_url" text,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"user_id" text NOT NULL
 );

@@ -1,9 +1,7 @@
 import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
-
+import { Button } from "@pengana/ui/components/button";
+import { Checkbox } from "@pengana/ui/components/checkbox";
 import { useRef, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { WebTodo } from "@/entities/todo/db";
 import { storeFileForUpload } from "@/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
