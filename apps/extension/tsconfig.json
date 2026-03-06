@@ -4,8 +4,8 @@
 		"allowImportingTsExtensions": true,
 		"jsx": "react-jsx",
 		"paths": {
-			"@": ["."],
-			"@/*": ["./*"],
+			"@": ["./src"],
+			"@/*": ["./src/*"],
 			"@pengana/ui/*": ["../../packages/ui/src/*"]
 		}
 	}
