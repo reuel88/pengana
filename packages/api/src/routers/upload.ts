@@ -1,6 +1,5 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ORPCError } from "@orpc/server";
 import { findTodoById } from "@pengana/db/todo-queries";
 import {
 	ALLOWED_MIME_TYPES,
@@ -9,12 +8,18 @@ import {
 } from "@pengana/sync-engine";
 import { z } from "zod";
 
-import { protectedProcedure } from "../index";
+import { apiError } from "../errors";
+import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
 
 export const uploadRouter = {
 	upload: protectedProcedure
+		.route({
+			method: "POST",
+			path: "/upload",
+			summary: "Upload a file attachment",
+		})
 		.input(
 			z.object({
 				todoId: z.string(),
@@ -24,22 +29,19 @@ export const uploadRouter = {
 				idempotencyKey: z.string().uuid(),
 			}),
 		)
+		.output(envelopeOutput(z.object({ attachmentUrl: z.string() })))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
 
 			const todo = await findTodoById(input.todoId);
 			if (!todo || todo.userId !== userId) {
-				throw new ORPCError("NOT_FOUND", {
-					message: context.t("todoNotFound"),
-				});
+				throw apiError("NOT_FOUND", context.t("todoNotFound"));
 			}
 
 			const buffer = Buffer.from(input.data, "base64");
 
 			if (buffer.byteLength > MAX_FILE_SIZE_BYTES) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: context.t("fileTooLarge"),
-				});
+				throw apiError("BAD_REQUEST", context.t("fileTooLarge"));
 			}
 
 			await mkdir(UPLOADS_DIR, { recursive: true });
@@ -50,17 +52,17 @@ export const uploadRouter = {
 
 			try {
 				await access(filepath);
-				return {
+				return envelope({
 					attachmentUrl: `/uploads/${filename}`,
-				};
+				});
 			} catch {
 				// File doesn't exist, proceed with writing
 			}
 
 			await writeFile(filepath, buffer);
 
-			return {
+			return envelope({
 				attachmentUrl: `/uploads/${filename}`,
-			};
+			});
 		}),
 };

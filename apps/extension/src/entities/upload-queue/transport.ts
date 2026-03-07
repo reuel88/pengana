@@ -32,7 +32,7 @@ export function createWebUploadTransport(): UploadTransport {
 
 			await removeFileForUpload(input.todoId);
 
-			return result;
+			return result.data;
 		},
 	};
 }

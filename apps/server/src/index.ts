@@ -91,7 +91,22 @@ app.use("/*", async (c, next) => {
 	});
 
 	if (apiResult.matched) {
-		return c.newResponse(apiResult.response.body, apiResult.response);
+		const original = apiResult.response;
+		const contentType = original.headers.get("content-type") ?? "";
+
+		if (contentType.includes("application/json") && original.status >= 400) {
+			const body = (await original.json()) as Record<string, unknown>;
+			const envelope = {
+				success: false,
+				error: {
+					code: body.code ?? "INTERNAL_SERVER_ERROR",
+					message: body.message ?? "Unknown error",
+				},
+			};
+			return c.json(envelope, original.status as never);
+		}
+
+		return c.newResponse(original.body, original);
 	}
 
 	await next();

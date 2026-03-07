@@ -47,7 +47,7 @@ export function createWebUploadTransport(): UploadTransport {
 			removeFileForUpload(input.todoId);
 			URL.revokeObjectURL(input.fileUri);
 
-			return result;
+			return result.data;
 		},
 	};
 }

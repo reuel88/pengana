@@ -20,7 +20,7 @@ export default function Home() {
 	const { theme } = useTheme();
 	const healthCheck = useQuery(orpc.healthCheck.queryOptions());
 	const privateData = useQuery(orpc.privateData.queryOptions());
-	const isConnected = healthCheck?.data === "OK";
+	const isConnected = healthCheck?.data?.data === "OK";
 	const isLoading = healthCheck?.isLoading;
 	const { data: session } = authClient.useSession();
 	const { t } = useTranslation();
@@ -115,14 +115,14 @@ export default function Home() {
 						<Text style={[styles.cardTitle, { color: theme.text }]}>
 							{t("privateData")}
 						</Text>
-						{privateData.data && (
+						{privateData.data?.data && (
 							<Text
 								style={[
 									styles.privateDataText,
 									{ color: theme.text, opacity: 0.7 },
 								]}
 							>
-								{privateData.data?.message}
+								{privateData.data?.data?.message}
 							</Text>
 						)}
 					</View>

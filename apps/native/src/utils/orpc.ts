@@ -4,7 +4,7 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { AppRouterClient } from "@pengana/api/routers/index";
 import { i18next } from "@pengana/i18n";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 
 import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";
@@ -12,7 +12,7 @@ import { getServerUrl } from "@/lib/server-url";
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
 		onError: (error) => {
-			console.log(error);
+			Alert.alert("Error", error.message);
 		},
 	}),
 });

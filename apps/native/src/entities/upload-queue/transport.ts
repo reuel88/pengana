@@ -26,7 +26,7 @@ export function createNativeUploadTransport(): UploadTransport {
 				idempotencyKey: input.idempotencyKey,
 			});
 
-			return result;
+			return result.data;
 		},
 	};
 }

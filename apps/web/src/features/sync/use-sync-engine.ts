@@ -24,7 +24,7 @@ export function useSyncEngine(userId: string | undefined) {
 
 		const transport = {
 			async sync(input: SyncInput): Promise<SyncOutput> {
-				return client.todo.sync(input);
+				return (await client.todo.sync(input)).data;
 			},
 		};
 
