@@ -17,7 +17,7 @@ function MembersPage() {
 	const { data: activeOrg, isPending } = useActiveOrg();
 	const { data: session } = authClient.useSession();
 	const { isAdmin } = useOrgRole();
-	const { invalidateActiveOrg } = useInvalidateOrg();
+	const { invalidateActiveOrg, invalidateAll } = useInvalidateOrg();
 
 	if (isPending) {
 		return <p>{t("common:status.loading")}</p>;
@@ -68,16 +68,21 @@ function MembersPage() {
 	};
 
 	const handleLeave = async () => {
+		if (!currentUserId) {
+			toast.error(t("members.error"));
+			return;
+		}
 		if (!confirm(t("members.leaveConfirm"))) return;
 		try {
 			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail: currentUserId ?? "",
+				memberIdOrEmail: currentUserId,
 			});
 			if (error) {
 				toast.error(error.message || t("members.error"));
 				return;
 			}
 			toast.success(t("members.leaveSuccess"));
+			await invalidateAll();
 			navigate({ to: "/dashboard" });
 		} catch {
 			toast.error(t("members.error"));
