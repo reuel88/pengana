@@ -7,7 +7,7 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createContext } from "@pengana/api/context";
 import { appRouter } from "@pengana/api/routers/index";
-import { auth } from "@pengana/auth";
+import { auth, setNotifyUser } from "@pengana/auth";
 import { env } from "@pengana/env/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
 import { initServerI18n } from "@pengana/i18n/server";
@@ -137,3 +137,4 @@ const server = serve(
 );
 
 ws.notifyUser = setupWebSocket(server).notifyUser;
+setNotifyUser(ws.notifyUser);

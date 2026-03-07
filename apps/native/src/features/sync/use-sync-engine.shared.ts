@@ -20,6 +20,7 @@ const SYNC_INTERVAL_MS = 5 * 60_000;
 export interface SyncEnginePlatformDeps {
 	getWsUrl: () => string;
 	generateUUID: () => string;
+	onSyncNotify?: () => void;
 }
 
 export function useSyncEngineCore(
@@ -141,6 +142,7 @@ export function useSyncEngineCore(
 					const data = JSON.parse(event.data as string);
 					if (data.type === "sync-notify") {
 						engineRef.current?.sync();
+						deps.onSyncNotify?.();
 					}
 				} catch {
 					// ignore malformed messages

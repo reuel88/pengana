@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as OrgRouteRouteImport } from './routes/org/route'
@@ -33,6 +34,11 @@ const TodosRoute = TodosRouteImport.update({
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/org': typeof OrgRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/invitation/$invitationId': typeof InvitationInvitationIdRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/org': typeof OrgRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/dashboard'
     | '/login'
+    | '/onboarding'
     | '/success'
     | '/todos'
     | '/org/teams'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
+    | '/onboarding'
     | '/success'
     | '/todos'
     | '/invitation/$invitationId'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/dashboard'
     | '/login'
+    | '/onboarding'
     | '/success'
     | '/todos'
     | '/org/teams'
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   OrgRouteRoute: typeof OrgRouteRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   SuccessRoute: typeof SuccessRoute
   TodosRoute: typeof TodosRoute
   InvitationInvitationIdRoute: typeof InvitationInvitationIdRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/success'
       fullPath: '/success'
       preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -364,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgRouteRoute: OrgRouteRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   SuccessRoute: SuccessRoute,
   TodosRoute: TodosRoute,
   InvitationInvitationIdRoute: InvitationInvitationIdRoute,

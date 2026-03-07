@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { Link } from "@tanstack/react-router";
-
+import { NotificationCenter } from "@/features/notifications/notification-center";
 import { LanguageSwitcher } from "./language-switcher";
 import { ModeToggle } from "./mode-toggle";
 import { OrgSwitcher } from "./org-switcher";
@@ -31,6 +31,7 @@ export function Header() {
 				<div className="flex items-center gap-2">
 					<LanguageSwitcher />
 					<ModeToggle />
+					<NotificationCenter />
 					<UserMenu />
 				</div>
 			</div>

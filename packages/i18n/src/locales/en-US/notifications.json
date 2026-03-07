@@ -1,0 +1,12 @@
+{
+	"title": "Notifications",
+	"empty": "No new notifications",
+	"accept": "Accept",
+	"reject": "Reject",
+	"accepted": "Invitation accepted",
+	"rejected": "Invitation rejected",
+	"error": "Something went wrong",
+	"markAllRead": "Mark all as read",
+	"invitations": "Invitations",
+	"notifications": "Notifications"
+}

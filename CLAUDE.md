@@ -45,3 +45,19 @@ This is handled automatically by the envelope middleware in `packages/api/src/in
 
 - Use hooks from `apps/web/src/hooks/use-org-queries.ts` instead of better-auth's React hooks (`useActiveOrganization`, `useActiveMember`, etc.)
 - After mutations, invalidate relevant queries via `useInvalidateOrg()`
+
+# User Lifecycle State Management
+
+## Current: Standalone Onboarding Machine
+- xState machine at `apps/web/src/machines/onboarding-machine.ts` manages onboarding flow
+- Route guard `requireAuthAndOrg()` in `apps/web/src/lib/auth-client.ts` redirects org-less users to `/onboarding`
+- Shared data fetching in `apps/web/src/lib/user-lifecycle.ts` — single source for lifecycle checks
+- Onboarding components in `apps/web/src/components/onboarding/`
+
+## Future: Long-Lived User Actor
+When a **second lifecycle gate** is added (email verification, KYC, payment setup), migrate to a user actor:
+- Create `apps/web/src/machines/user-actor.ts` — top-level states: `initializing → onboarding → active → suspended`
+- Embed the existing onboarding machine as a sub-state of the actor
+- Provide via React context from `__root.tsx`
+- Replace `requireAuthAndOrg()` route guards with synchronous `userActor.matches("active")` checks
+- `fetchUserLifecycleData()` becomes the actor's initialization logic

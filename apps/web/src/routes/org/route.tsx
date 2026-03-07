@@ -1,12 +1,12 @@
 import { useTranslation } from "@pengana/i18n";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
-import { requireAuth } from "@/lib/auth-client";
+import { requireAuthAndOrg } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/org")({
 	component: OrgLayout,
 	beforeLoad: async () => {
-		const { session } = await requireAuth();
+		const { session } = await requireAuthAndOrg();
 		return { session };
 	},
 });

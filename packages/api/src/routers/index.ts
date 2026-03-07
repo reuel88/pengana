@@ -7,6 +7,7 @@ import {
 	protectedProcedure,
 	publicProcedure,
 } from "../index";
+import { notificationRouter } from "./notification";
 import { todoRouter } from "./todo";
 import { uploadRouter } from "./upload";
 
@@ -42,6 +43,7 @@ export const appRouter = {
 				user: context.session?.user,
 			});
 		}),
+	notification: notificationRouter,
 	todo: todoRouter,
 	upload: uploadRouter,
 };

@@ -33,7 +33,7 @@ export function SignUpForm({
 				{
 					onSuccess: () => {
 						navigate({
-							to: "/dashboard",
+							to: "/onboarding",
 						});
 						toast.success(t("auth:signUp.success"));
 					},
