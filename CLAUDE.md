@@ -33,3 +33,15 @@ This is handled automatically by the envelope middleware in `packages/api/src/in
 | `FORBIDDEN` | 403 | Authenticated but not permitted |
 | `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |
 | `TOO_MANY_REQUESTS` | 429 | Rate limit exceeded (returned by rate-limit middleware) |
+
+# Logging
+
+- LogTape (`@logtape/logtape`) is used for structured logging in the server app
+- Logger module: `apps/server/src/logger.ts`
+- Use `getLogger(["app", "<slice>"])` — never `console.log` directly in server code
+- `initLogger()` must be called once at app entry before any routes
+
+# Organization Data Fetching
+
+- Use hooks from `apps/web/src/hooks/use-org-queries.ts` instead of better-auth's React hooks (`useActiveOrganization`, `useActiveMember`, etc.)
+- After mutations, invalidate relevant queries via `useInvalidateOrg()`

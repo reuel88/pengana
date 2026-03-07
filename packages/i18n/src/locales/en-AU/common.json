@@ -1,4 +1,38 @@
 {
+	"nav": {
+		"home": "Home",
+		"dashboard": "Dashboard",
+		"todos": "Todos",
+		"explore": "Explore",
+		"tabs": "Tabs"
+	},
+	"theme": {
+		"toggle": "Toggle theme",
+		"light": "Light",
+		"dark": "Dark",
+		"system": "System"
+	},
+	"user": {
+		"signIn": "Sign In",
+		"signOut": "Sign Out",
+		"myAccount": "My Account"
+	},
+	"status": {
+		"loading": "Loading...",
+		"checking": "Checking...",
+		"connected": "Connected",
+		"disconnected": "Disconnected",
+		"checkingConnection": "Checking connection...",
+		"connectedToApi": "Connected to API",
+		"apiDisconnected": "API Disconnected"
+	},
+	"apiStatus": "API Status",
+	"systemStatus": "System Status",
+	"orpcBackend": "ORPC Backend",
+	"privateData": "Private Data",
+	"modal": "Modal",
+	"submitting": "Submitting...",
+	"loginPrompt": "Please log in at the web app first.",
 	"notFound": {
 		"title": "Oops!",
 		"heading": "Page Not Found",

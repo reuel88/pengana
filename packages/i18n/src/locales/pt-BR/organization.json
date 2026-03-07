@@ -1,0 +1,109 @@
+{
+	"title": "Organização",
+	"switcher": {
+		"label": "Organizações",
+		"create": "Criar organização",
+		"noOrgs": "Nenhuma organização ainda",
+		"switchTo": "Mudar para {{name}}"
+	},
+	"create": {
+		"title": "Criar organização",
+		"name": "Nome da organização",
+		"slug": "Slug",
+		"logo": "URL do logo",
+		"namePlaceholder": "Minha organização",
+		"slugPlaceholder": "minha-org",
+		"logoPlaceholder": "https://example.com/logo.png",
+		"submit": "Criar",
+		"success": "Organização criada",
+		"error": "Falha ao criar organização"
+	},
+	"settings": {
+		"title": "Configurações",
+		"update": "Atualizar organização",
+		"delete": "Excluir organização",
+		"deleteConfirm": "Tem certeza? Esta ação não pode ser desfeita.",
+		"updateSuccess": "Organização atualizada",
+		"deleteSuccess": "Organização excluída",
+		"error": "Falha ao atualizar organização"
+	},
+	"members": {
+		"title": "Membros",
+		"role": "Função",
+		"remove": "Remover",
+		"leave": "Sair da organização",
+		"leaveConfirm": "Tem certeza de que deseja sair desta organização?",
+		"updateRole": "Atualizar função",
+		"removeConfirm": "Tem certeza de que deseja remover este membro?",
+		"removeSuccess": "Membro removido",
+		"leaveSuccess": "Saiu da organização",
+		"updateRoleSuccess": "Função atualizada",
+		"error": "Falha ao gerenciar membro",
+		"noMembers": "Nenhum membro"
+	},
+	"invitations": {
+		"title": "Convites",
+		"invite": "Convidar membro",
+		"email": "Endereço de e-mail",
+		"emailPlaceholder": "usuario@exemplo.com",
+		"role": "Função",
+		"send": "Enviar convite",
+		"cancel": "Cancelar convite",
+		"pending": "Convites pendentes",
+		"myInvitations": "Meus convites",
+		"accept": "Aceitar",
+		"reject": "Recusar",
+		"sendSuccess": "Convite enviado",
+		"cancelSuccess": "Convite cancelado",
+		"acceptSuccess": "Convite aceito",
+		"rejectSuccess": "Convite recusado",
+		"error": "Falha ao gerenciar convite",
+		"noPending": "Nenhum convite pendente",
+		"noInvitations": "Nenhum convite",
+		"expired": "Expirado",
+		"status": {
+			"pending": "Pendente",
+			"accepted": "Aceito",
+			"rejected": "Recusado",
+			"cancelled": "Cancelado"
+		}
+	},
+	"teams": {
+		"title": "Equipes",
+		"create": "Criar equipe",
+		"name": "Nome da equipe",
+		"namePlaceholder": "Engenharia",
+		"delete": "Excluir equipe",
+		"deleteConfirm": "Tem certeza de que deseja excluir esta equipe?",
+		"addMember": "Adicionar membro",
+		"removeMember": "Remover membro",
+		"createSuccess": "Equipe criada",
+		"deleteSuccess": "Equipe excluída",
+		"addMemberSuccess": "Membro adicionado à equipe",
+		"removeMemberSuccess": "Membro removido da equipe",
+		"error": "Falha ao gerenciar equipe",
+		"noTeams": "Nenhuma equipe ainda",
+		"noMembers": "Nenhum membro na equipe",
+		"updateName": "Atualizar nome da equipe",
+		"updateNameSuccess": "Nome da equipe atualizado"
+	},
+	"roles": {
+		"title": "Funções",
+		"owner": "Proprietário",
+		"admin": "Administrador",
+		"member": "Membro",
+		"description": "As funções definem o que os membros podem fazer dentro da organização.",
+		"permissions": "Permissões",
+		"ownerDescription": "Controle total sobre a organização.",
+		"adminDescription": "Pode gerenciar membros, convites e equipes.",
+		"memberDescription": "Pode visualizar os dados da organização."
+	},
+	"nav": {
+		"settings": "Configurações",
+		"members": "Membros",
+		"invitations": "Convites",
+		"teams": "Equipes",
+		"roles": "Funções"
+	},
+	"noActiveOrg": "Nenhuma organização ativa. Selecione ou crie uma para começar."
+}

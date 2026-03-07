@@ -22,6 +22,28 @@ export default defineConfig({
 			devOptions: { enabled: true },
 		}),
 	],
+	build: {
+		chunkSizeWarningLimit: 600,
+		rollupOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes("node_modules") || id.includes(".pnpm")) {
+						if (id.includes("react-dom")) return "react-dom";
+						if (id.match(/\/react\//)) return "react";
+						if (id.includes("@tanstack") && id.includes("react-router"))
+							return "router";
+						if (id.includes("@tanstack") && id.includes("react-query"))
+							return "query";
+						if (id.includes("i18next")) return "i18n";
+						if (id.includes("lucide-react")) return "icons";
+						if (id.includes("@radix-ui")) return "radix";
+						if (id.includes("better-auth") || id.includes("@better-auth"))
+							return "auth";
+					}
+				},
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),

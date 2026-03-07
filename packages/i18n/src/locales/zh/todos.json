@@ -13,9 +13,9 @@
 		"uploading": "上传中...",
 		"failed": "失败",
 		"fileAttached": "文件已附加",
-		"invalidFile": "Invalid file",
-		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"invalidFile": "无效文件",
+		"cameraUnavailable": "相机不可用",
+		"cameraNotAvailable": "此设备上无法使用相机。"
 	},
 	"actions": {
 		"keepLocal": "保留本地",
@@ -23,10 +23,10 @@
 		"attach": "附加文件",
 		"retry": "重试",
 		"delete": "删除",
-		"takePhoto": "Take Photo",
-		"chooseFromLibrary": "Choose from Library",
-		"choosePdf": "Choose PDF",
-		"cancel": "Cancel",
-		"chooseOption": "Choose an option"
+		"takePhoto": "拍照",
+		"chooseFromLibrary": "从相册选择",
+		"choosePdf": "选择 PDF",
+		"cancel": "取消",
+		"chooseOption": "选择一个选项"
 	}
 }

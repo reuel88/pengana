@@ -1,0 +1,109 @@
+{
+	"title": "Organisation",
+	"switcher": {
+		"label": "Organisations",
+		"create": "Create Organisation",
+		"noOrgs": "No organisations yet",
+		"switchTo": "Switch to {{name}}"
+	},
+	"create": {
+		"title": "Create Organisation",
+		"name": "Organisation Name",
+		"slug": "Slug",
+		"logo": "Logo URL",
+		"namePlaceholder": "My Organisation",
+		"slugPlaceholder": "my-org",
+		"logoPlaceholder": "https://example.com/logo.png",
+		"submit": "Create",
+		"success": "Organisation created",
+		"error": "Failed to create organisation"
+	},
+	"settings": {
+		"title": "Settings",
+		"update": "Update Organisation",
+		"delete": "Delete Organisation",
+		"deleteConfirm": "Are you sure? This action cannot be undone.",
+		"updateSuccess": "Organisation updated",
+		"deleteSuccess": "Organisation deleted",
+		"error": "Failed to update organisation"
+	},
+	"members": {
+		"title": "Members",
+		"role": "Role",
+		"remove": "Remove",
+		"leave": "Leave Organisation",
+		"leaveConfirm": "Are you sure you want to leave this organisation?",
+		"updateRole": "Update Role",
+		"removeConfirm": "Are you sure you want to remove this member?",
+		"removeSuccess": "Member removed",
+		"leaveSuccess": "Left organisation",
+		"updateRoleSuccess": "Role updated",
+		"error": "Failed to manage member",
+		"noMembers": "No members"
+	},
+	"invitations": {
+		"title": "Invitations",
+		"invite": "Invite Member",
+		"email": "Email Address",
+		"emailPlaceholder": "user@example.com",
+		"role": "Role",
+		"send": "Send Invitation",
+		"cancel": "Cancel Invitation",
+		"pending": "Pending Invitations",
+		"myInvitations": "My Invitations",
+		"accept": "Accept",
+		"reject": "Reject",
+		"sendSuccess": "Invitation sent",
+		"cancelSuccess": "Invitation cancelled",
+		"acceptSuccess": "Invitation accepted",
+		"rejectSuccess": "Invitation rejected",
+		"error": "Failed to manage invitation",
+		"noPending": "No pending invitations",
+		"noInvitations": "No invitations",
+		"expired": "Expired",
+		"status": {
+			"pending": "Pending",
+			"accepted": "Accepted",
+			"rejected": "Rejected",
+			"cancelled": "Cancelled"
+		}
+	},
+	"teams": {
+		"title": "Teams",
+		"create": "Create Team",
+		"name": "Team Name",
+		"namePlaceholder": "Engineering",
+		"delete": "Delete Team",
+		"deleteConfirm": "Are you sure you want to delete this team?",
+		"addMember": "Add Member",
+		"removeMember": "Remove Member",
+		"createSuccess": "Team created",
+		"deleteSuccess": "Team deleted",
+		"addMemberSuccess": "Member added to team",
+		"removeMemberSuccess": "Member removed from team",
+		"error": "Failed to manage team",
+		"noTeams": "No teams yet",
+		"noMembers": "No team members",
+		"updateName": "Update Team Name",
+		"updateNameSuccess": "Team name updated"
+	},
+	"roles": {
+		"title": "Roles",
+		"owner": "Owner",
+		"admin": "Admin",
+		"member": "Member",
+		"description": "Roles define what members can do within the organisation.",
+		"permissions": "Permissions",
+		"ownerDescription": "Full control over the organisation.",
+		"adminDescription": "Can manage members, invitations, and teams.",
+		"memberDescription": "Can view organisation data."
+	},
+	"nav": {
+		"settings": "Settings",
+		"members": "Members",
+		"invitations": "Invitations",
+		"teams": "Teams",
+		"roles": "Roles"
+	},
+	"noActiveOrg": "No active organisation. Select or create one to get started."
+}

@@ -1,0 +1,109 @@
+{
+	"title": "Tổ chức",
+	"switcher": {
+		"label": "Tổ chức",
+		"create": "Tạo tổ chức",
+		"noOrgs": "Chưa có tổ chức nào",
+		"switchTo": "Chuyển sang {{name}}"
+	},
+	"create": {
+		"title": "Tạo tổ chức",
+		"name": "Tên tổ chức",
+		"slug": "Slug",
+		"logo": "URL logo",
+		"namePlaceholder": "Tổ chức của tôi",
+		"slugPlaceholder": "to-chuc-cua-toi",
+		"logoPlaceholder": "https://example.com/logo.png",
+		"submit": "Tạo",
+		"success": "Đã tạo tổ chức",
+		"error": "Không thể tạo tổ chức"
+	},
+	"settings": {
+		"title": "Cài đặt",
+		"update": "Cập nhật tổ chức",
+		"delete": "Xóa tổ chức",
+		"deleteConfirm": "Bạn có chắc không? Hành động này không thể hoàn tác.",
+		"updateSuccess": "Đã cập nhật tổ chức",
+		"deleteSuccess": "Đã xóa tổ chức",
+		"error": "Không thể cập nhật tổ chức"
+	},
+	"members": {
+		"title": "Thành viên",
+		"role": "Vai trò",
+		"remove": "Xóa",
+		"leave": "Rời tổ chức",
+		"leaveConfirm": "Bạn có chắc muốn rời tổ chức này không?",
+		"updateRole": "Cập nhật vai trò",
+		"removeConfirm": "Bạn có chắc muốn xóa thành viên này không?",
+		"removeSuccess": "Đã xóa thành viên",
+		"leaveSuccess": "Đã rời tổ chức",
+		"updateRoleSuccess": "Đã cập nhật vai trò",
+		"error": "Không thể quản lý thành viên",
+		"noMembers": "Không có thành viên"
+	},
+	"invitations": {
+		"title": "Lời mời",
+		"invite": "Mời thành viên",
+		"email": "Địa chỉ email",
+		"emailPlaceholder": "user@example.com",
+		"role": "Vai trò",
+		"send": "Gửi lời mời",
+		"cancel": "Hủy lời mời",
+		"pending": "Lời mời đang chờ",
+		"myInvitations": "Lời mời của tôi",
+		"accept": "Chấp nhận",
+		"reject": "Từ chối",
+		"sendSuccess": "Đã gửi lời mời",
+		"cancelSuccess": "Đã hủy lời mời",
+		"acceptSuccess": "Đã chấp nhận lời mời",
+		"rejectSuccess": "Đã từ chối lời mời",
+		"error": "Không thể quản lý lời mời",
+		"noPending": "Không có lời mời đang chờ",
+		"noInvitations": "Không có lời mời",
+		"expired": "Đã hết hạn",
+		"status": {
+			"pending": "Đang chờ",
+			"accepted": "Đã chấp nhận",
+			"rejected": "Đã từ chối",
+			"cancelled": "Đã hủy"
+		}
+	},
+	"teams": {
+		"title": "Nhóm",
+		"create": "Tạo nhóm",
+		"name": "Tên nhóm",
+		"namePlaceholder": "Kỹ thuật",
+		"delete": "Xóa nhóm",
+		"deleteConfirm": "Bạn có chắc muốn xóa nhóm này không?",
+		"addMember": "Thêm thành viên",
+		"removeMember": "Xóa thành viên",
+		"createSuccess": "Đã tạo nhóm",
+		"deleteSuccess": "Đã xóa nhóm",
+		"addMemberSuccess": "Đã thêm thành viên vào nhóm",
+		"removeMemberSuccess": "Đã xóa thành viên khỏi nhóm",
+		"error": "Không thể quản lý nhóm",
+		"noTeams": "Chưa có nhóm nào",
+		"noMembers": "Không có thành viên trong nhóm",
+		"updateName": "Cập nhật tên nhóm",
+		"updateNameSuccess": "Đã cập nhật tên nhóm"
+	},
+	"roles": {
+		"title": "Vai trò",
+		"owner": "Chủ sở hữu",
+		"admin": "Quản trị viên",
+		"member": "Thành viên",
+		"description": "Vai trò xác định những gì thành viên có thể làm trong tổ chức.",
+		"permissions": "Quyền hạn",
+		"ownerDescription": "Toàn quyền kiểm soát tổ chức.",
+		"adminDescription": "Có thể quản lý thành viên, lời mời và nhóm.",
+		"memberDescription": "Có thể xem dữ liệu tổ chức."
+	},
+	"nav": {
+		"settings": "Cài đặt",
+		"members": "Thành viên",
+		"invitations": "Lời mời",
+		"teams": "Nhóm",
+		"roles": "Vai trò"
+	},
+	"noActiveOrg": "Không có tổ chức đang hoạt động. Chọn hoặc tạo một tổ chức để bắt đầu."
+}

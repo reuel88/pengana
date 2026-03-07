@@ -1,0 +1,109 @@
+{
+	"title": "Organisasyon",
+	"switcher": {
+		"label": "Mga Organisasyon",
+		"create": "Lumikha ng Organisasyon",
+		"noOrgs": "Wala pang mga organisasyon",
+		"switchTo": "Lumipat sa {{name}}"
+	},
+	"create": {
+		"title": "Lumikha ng Organisasyon",
+		"name": "Pangalan ng Organisasyon",
+		"slug": "Slug",
+		"logo": "URL ng Logo",
+		"namePlaceholder": "Aking Organisasyon",
+		"slugPlaceholder": "aking-org",
+		"logoPlaceholder": "https://example.com/logo.png",
+		"submit": "Lumikha",
+		"success": "Nalikha ang organisasyon",
+		"error": "Hindi nalikha ang organisasyon"
+	},
+	"settings": {
+		"title": "Mga Setting",
+		"update": "I-update ang Organisasyon",
+		"delete": "Burahin ang Organisasyon",
+		"deleteConfirm": "Sigurado ka ba? Hindi na ito mababawi.",
+		"updateSuccess": "Na-update ang organisasyon",
+		"deleteSuccess": "Nabura ang organisasyon",
+		"error": "Hindi na-update ang organisasyon"
+	},
+	"members": {
+		"title": "Mga Miyembro",
+		"role": "Tungkulin",
+		"remove": "Alisin",
+		"leave": "Umalis sa Organisasyon",
+		"leaveConfirm": "Sigurado ka bang gusto mong umalis sa organisasyong ito?",
+		"updateRole": "I-update ang Tungkulin",
+		"removeConfirm": "Sigurado ka bang gusto mong alisin ang miyembrong ito?",
+		"removeSuccess": "Naalis ang miyembro",
+		"leaveSuccess": "Umalis sa organisasyon",
+		"updateRoleSuccess": "Na-update ang tungkulin",
+		"error": "Hindi napamahalaan ang miyembro",
+		"noMembers": "Walang mga miyembro"
+	},
+	"invitations": {
+		"title": "Mga Imbitasyon",
+		"invite": "Mag-imbita ng Miyembro",
+		"email": "Email Address",
+		"emailPlaceholder": "user@example.com",
+		"role": "Tungkulin",
+		"send": "Ipadala ang Imbitasyon",
+		"cancel": "Kanselahin ang Imbitasyon",
+		"pending": "Mga Nakabinbing Imbitasyon",
+		"myInvitations": "Aking mga Imbitasyon",
+		"accept": "Tanggapin",
+		"reject": "Tanggihan",
+		"sendSuccess": "Naipadala ang imbitasyon",
+		"cancelSuccess": "Nakansela ang imbitasyon",
+		"acceptSuccess": "Natanggap ang imbitasyon",
+		"rejectSuccess": "Natanggihan ang imbitasyon",
+		"error": "Hindi napamahalaan ang imbitasyon",
+		"noPending": "Walang nakabinbing imbitasyon",
+		"noInvitations": "Walang mga imbitasyon",
+		"expired": "Nag-expire na",
+		"status": {
+			"pending": "Nakabinbin",
+			"accepted": "Natanggap",
+			"rejected": "Natanggihan",
+			"cancelled": "Nakansela"
+		}
+	},
+	"teams": {
+		"title": "Mga Koponan",
+		"create": "Lumikha ng Koponan",
+		"name": "Pangalan ng Koponan",
+		"namePlaceholder": "Engineering",
+		"delete": "Burahin ang Koponan",
+		"deleteConfirm": "Sigurado ka bang gusto mong burahin ang koponang ito?",
+		"addMember": "Magdagdag ng Miyembro",
+		"removeMember": "Alisin ang Miyembro",
+		"createSuccess": "Nalikha ang koponan",
+		"deleteSuccess": "Nabura ang koponan",
+		"addMemberSuccess": "Naidagdag ang miyembro sa koponan",
+		"removeMemberSuccess": "Naalis ang miyembro sa koponan",
+		"error": "Hindi napamahalaan ang koponan",
+		"noTeams": "Wala pang mga koponan",
+		"noMembers": "Walang mga miyembro sa koponan",
+		"updateName": "I-update ang Pangalan ng Koponan",
+		"updateNameSuccess": "Na-update ang pangalan ng koponan"
+	},
+	"roles": {
+		"title": "Mga Tungkulin",
+		"owner": "May-ari",
+		"admin": "Tagapangasiwa",
+		"member": "Miyembro",
+		"description": "Tinutukoy ng mga tungkulin kung ano ang magagawa ng mga miyembro sa loob ng organisasyon.",
+		"permissions": "Mga Pahintulot",
+		"ownerDescription": "Ganap na kontrol sa organisasyon.",
+		"adminDescription": "Maaaring pamahalaan ang mga miyembro, imbitasyon, at koponan.",
+		"memberDescription": "Maaaring tingnan ang datos ng organisasyon."
+	},
+	"nav": {
+		"settings": "Mga Setting",
+		"members": "Mga Miyembro",
+		"invitations": "Mga Imbitasyon",
+		"teams": "Mga Koponan",
+		"roles": "Mga Tungkulin"
+	},
+	"noActiveOrg": "Walang aktibong organisasyon. Pumili o lumikha ng isa para magsimula."
+}

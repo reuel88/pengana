@@ -34,9 +34,9 @@
 	"submitting": "提交中...",
 	"loginPrompt": "请先在网页应用中登录。",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "哎呀！",
+		"heading": "页面未找到",
+		"description": "抱歉，您要查找的页面不存在。",
+		"goHome": "返回首页"
 	}
 }

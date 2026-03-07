@@ -34,9 +34,9 @@
 	"submitting": "Enviando...",
 	"loginPrompt": "Inicie sesion en la aplicacion web primero.",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "¡Ups!",
+		"heading": "Página no encontrada",
+		"description": "Lo sentimos, la página que buscas no existe.",
+		"goHome": "Ir al inicio"
 	}
 }

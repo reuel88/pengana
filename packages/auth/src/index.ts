@@ -5,6 +5,7 @@ import { env } from "@pengana/env/server";
 // import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { organization } from "better-auth/plugins";
 // import { polarClient } from "./lib/payments";
 
 export const auth = betterAuth({
@@ -55,6 +56,7 @@ export const auth = betterAuth({
 		// 		portal(),
 		// 	],
 		// }),
+		organization({ teams: { enabled: true } }),
 		expo(),
 	],
 });

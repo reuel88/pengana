@@ -34,9 +34,9 @@
 	"submitting": "\u0110ang g\u1eedi...",
 	"loginPrompt": "Vui l\u00f2ng \u0111\u0103ng nh\u1eadp t\u1ea1i \u1ee9ng d\u1ee5ng web tr\u01b0\u1edbc.",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "Ôi!",
+		"heading": "Không tìm thấy trang",
+		"description": "Xin lỗi, trang bạn đang tìm không tồn tại.",
+		"goHome": "Về trang chủ"
 	}
 }
