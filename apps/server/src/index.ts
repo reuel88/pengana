@@ -16,6 +16,12 @@ import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import { logger } from "hono/logger";
 
+import {
+	authLimiter,
+	globalLimiter,
+	syncLimiter,
+	uploadLimiter,
+} from "./rate-limit";
 import { setupWebSocket } from "./ws";
 
 const app = new Hono();
@@ -39,6 +45,11 @@ app.use(
 		caches: false,
 	}),
 );
+
+app.use("/*", globalLimiter);
+app.use("/api/auth/*", authLimiter);
+app.use("/rpc/upload.*", uploadLimiter);
+app.use("/rpc/todo.*", syncLimiter);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
