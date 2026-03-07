@@ -42,6 +42,7 @@ export default function InvitationsScreen() {
 			.then(({ data }) => {
 				if (data) setMyInvitations(data as UserInvitation[]);
 			})
+			.catch(() => {})
 			.finally(() => setMyInvitationsLoading(false));
 	}, []);
 
@@ -95,6 +96,8 @@ export default function InvitationsScreen() {
 							invitationId,
 						});
 						if (error) Alert.alert(t("invitations.error"), error.message);
+					} catch {
+						Alert.alert(t("invitations.error"));
 					} finally {
 						setPendingIds((prev) => {
 							const next = new Set(prev);
@@ -120,6 +123,8 @@ export default function InvitationsScreen() {
 			}
 			Alert.alert(t("invitations.acceptSuccess"));
 			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
+		} catch {
+			Alert.alert(t("invitations.error"));
 		} finally {
 			setPendingIds((prev) => {
 				const next = new Set(prev);
@@ -142,6 +147,8 @@ export default function InvitationsScreen() {
 			}
 			Alert.alert(t("invitations.rejectSuccess"));
 			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
+		} catch {
+			Alert.alert(t("invitations.error"));
 		} finally {
 			setPendingIds((prev) => {
 				const next = new Set(prev);
@@ -231,7 +238,8 @@ export default function InvitationsScreen() {
 										<Text
 											style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}
 										>
-											{inv.role} - {t(`invitations.status.${inv.status}`)}
+											{t(`roles.${inv.role}`)} -{" "}
+											{t(`invitations.status.${inv.status}`)}
 										</Text>
 									</View>
 									{isAdmin && inv.status === "pending" && (
@@ -282,7 +290,7 @@ export default function InvitationsScreen() {
 									{inv.organizationName}
 								</Text>
 								<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-									{inv.role}
+									{t(`roles.${inv.role}`)}
 								</Text>
 							</View>
 							<View style={styles.actionRow}>

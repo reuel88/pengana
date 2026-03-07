@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Miembros",
+		"name": "Nombre",
+		"email": "Correo electrónico",
 		"role": "Rol",
 		"remove": "Eliminar",
 		"leave": "Abandonar organización",
@@ -62,13 +64,17 @@
 		"error": "Error al gestionar la invitación",
 		"noPending": "No hay invitaciones pendientes",
 		"noInvitations": "No hay invitaciones",
-		"expired": "Expirada",
+		"statusHeader": "Estado",
 		"status": {
 			"pending": "Pendiente",
 			"accepted": "Aceptada",
 			"rejected": "Rechazada",
-			"cancelled": "Cancelada"
-		}
+			"cancelled": "Cancelada",
+			"canceled": "Cancelada",
+			"expired": "Expirada"
+		},
+		"invitedAs": "Has sido invitado a unirte a {{org}} como {{role}}.",
+		"invitedBy": "Invitado por: {{email}}"
 	},
 	"teams": {
 		"title": "Equipos",

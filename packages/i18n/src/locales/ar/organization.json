@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "الأعضاء",
+		"name": "الاسم",
+		"email": "البريد الإلكتروني",
 		"role": "الدور",
 		"remove": "إزالة",
 		"leave": "مغادرة المنظمة",
@@ -62,13 +64,17 @@
 		"error": "فشل في إدارة الدعوة",
 		"noPending": "لا توجد دعوات معلقة",
 		"noInvitations": "لا توجد دعوات",
-		"expired": "منتهية الصلاحية",
+		"statusHeader": "الحالة",
 		"status": {
 			"pending": "معلقة",
 			"accepted": "مقبولة",
 			"rejected": "مرفوضة",
-			"cancelled": "ملغاة"
-		}
+			"cancelled": "ملغاة",
+			"canceled": "ملغاة",
+			"expired": "منتهية الصلاحية"
+		},
+		"invitedAs": "لقد تمت دعوتك للانضمام إلى {{org}} بصفة {{role}}.",
+		"invitedBy": "دعوة من: {{email}}"
 	},
 	"teams": {
 		"title": "الفرق",

@@ -129,8 +129,9 @@ function InvitationsPage() {
 					<h2 className="font-medium text-sm">{t("invitations.invite")}</h2>
 					<form onSubmit={handleInvite} className="flex flex-col gap-3">
 						<div className="flex flex-col gap-1">
-							<Label>{t("invitations.email")}</Label>
+							<Label htmlFor="invite-email">{t("invitations.email")}</Label>
 							<Input
+								id="invite-email"
 								type="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
@@ -139,8 +140,9 @@ function InvitationsPage() {
 							/>
 						</div>
 						<div className="flex flex-col gap-1">
-							<Label>{t("invitations.role")}</Label>
+							<Label htmlFor="invite-role">{t("invitations.role")}</Label>
 							<select
+								id="invite-role"
 								value={role}
 								onChange={(e) => setRole(e.target.value as "member" | "admin")}
 								className="h-8 rounded-none border border-input bg-transparent px-2.5 text-xs"
@@ -168,7 +170,7 @@ function InvitationsPage() {
 							<tr className="border-b text-left text-muted-foreground">
 								<th className="pb-2">{t("invitations.email")}</th>
 								<th className="pb-2">{t("invitations.role")}</th>
-								<th className="pb-2">Status</th>
+								<th className="pb-2">{t("invitations.statusHeader")}</th>
 								<th className="pb-2" />
 							</tr>
 						</thead>

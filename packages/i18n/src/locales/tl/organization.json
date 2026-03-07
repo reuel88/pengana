@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Mga Miyembro",
+		"name": "Pangalan",
+		"email": "Email",
 		"role": "Tungkulin",
 		"remove": "Alisin",
 		"leave": "Umalis sa Organisasyon",
@@ -62,13 +64,17 @@
 		"error": "Hindi napamahalaan ang imbitasyon",
 		"noPending": "Walang nakabinbing imbitasyon",
 		"noInvitations": "Walang mga imbitasyon",
-		"expired": "Nag-expire na",
+		"statusHeader": "Katayuan",
 		"status": {
 			"pending": "Nakabinbin",
 			"accepted": "Natanggap",
 			"rejected": "Natanggihan",
-			"cancelled": "Nakansela"
-		}
+			"cancelled": "Nakansela",
+			"canceled": "Nakansela",
+			"expired": "Nag-expire na"
+		},
+		"invitedAs": "Inimbitahan kang sumali sa {{org}} bilang {{role}}.",
+		"invitedBy": "Inimbitahan ni: {{email}}"
 	},
 	"teams": {
 		"title": "Mga Koponan",

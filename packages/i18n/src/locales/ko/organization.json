@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "멤버",
+		"name": "이름",
+		"email": "이메일",
 		"role": "역할",
 		"remove": "제거",
 		"leave": "조직 탈퇴",
@@ -62,13 +64,17 @@
 		"error": "초대 관리에 실패했습니다",
 		"noPending": "대기 중인 초대가 없습니다",
 		"noInvitations": "초대가 없습니다",
-		"expired": "만료됨",
+		"statusHeader": "상태",
 		"status": {
 			"pending": "대기 중",
 			"accepted": "수락됨",
 			"rejected": "거절됨",
-			"cancelled": "취소됨"
-		}
+			"cancelled": "취소됨",
+			"canceled": "취소됨",
+			"expired": "만료됨"
+		},
+		"invitedAs": "{{org}}에 {{role}}(으)로 초대되었습니다.",
+		"invitedBy": "초대한 사람: {{email}}"
 	},
 	"teams": {
 		"title": "팀",

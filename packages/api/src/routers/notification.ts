@@ -16,7 +16,7 @@ const notificationSchema = z.object({
 	type: z.string(),
 	body: z.string(),
 	read: z.boolean(),
-	metadata: z.string().nullable(),
+	metadata: z.record(z.unknown()).nullable(),
 	createdAt: z.date(),
 });
 
@@ -98,10 +98,10 @@ export const notificationRouter = {
 				userId: row.inviterId,
 				type: "invitation_accepted",
 				body: `${accepterName} accepted your invitation to ${row.orgName}`,
-				metadata: JSON.stringify({
+				metadata: {
 					invitationId: input.invitationId,
 					orgName: row.orgName,
-				}),
+				},
 			});
 
 			context.notifyUser?.(row.inviterId);

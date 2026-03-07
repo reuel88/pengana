@@ -31,7 +31,7 @@ export async function insertNotification(values: {
 	userId: string;
 	type: string;
 	body: string;
-	metadata?: string | null;
+	metadata?: Record<string, unknown> | null;
 }) {
 	await db.insert(notification).values(values);
 }
@@ -72,7 +72,7 @@ export async function findNotificationByTypeAndInvitation(
 			and(
 				eq(notification.userId, userId),
 				eq(notification.type, "invitation_accepted"),
-				sql`${notification.metadata}::jsonb->>'invitationId' = ${invitationId}`,
+				sql`${notification.metadata}->>'invitationId' = ${invitationId}`,
 			),
 		)
 		.limit(1);

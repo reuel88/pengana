@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "成员",
+		"name": "姓名",
+		"email": "电子邮箱",
 		"role": "角色",
 		"remove": "移除",
 		"leave": "离开组织",
@@ -62,13 +64,17 @@
 		"error": "管理邀请失败",
 		"noPending": "没有待处理的邀请",
 		"noInvitations": "暂无邀请",
-		"expired": "已过期",
+		"statusHeader": "状态",
 		"status": {
 			"pending": "待处理",
 			"accepted": "已接受",
 			"rejected": "已拒绝",
-			"cancelled": "已取消"
-		}
+			"cancelled": "已取消",
+			"canceled": "已取消",
+			"expired": "已过期"
+		},
+		"invitedAs": "您已被邀请以{{role}}身份加入{{org}}。",
+		"invitedBy": "邀请人：{{email}}"
 	},
 	"teams": {
 		"title": "团队",

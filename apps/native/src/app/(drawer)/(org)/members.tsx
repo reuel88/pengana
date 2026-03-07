@@ -121,7 +121,7 @@ export default function MembersScreen() {
 								{member.user.email}
 							</Text>
 							<Text style={{ color: theme.primary, fontSize: 12 }}>
-								{member.role}
+								{t(`roles.${member.role}`)}
 							</Text>
 						</View>
 						{isAdmin &&

@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Members",
+		"name": "Name",
+		"email": "Email",
 		"role": "Role",
 		"remove": "Remove",
 		"leave": "Leave Organisation",
@@ -62,13 +64,17 @@
 		"error": "Failed to manage invitation",
 		"noPending": "No pending invitations",
 		"noInvitations": "No invitations",
-		"expired": "Expired",
+		"statusHeader": "Status",
 		"status": {
 			"pending": "Pending",
 			"accepted": "Accepted",
 			"rejected": "Rejected",
-			"cancelled": "Cancelled"
-		}
+			"cancelled": "Cancelled",
+			"canceled": "Cancelled",
+			"expired": "Expired"
+		},
+		"invitedAs": "You have been invited to join {{org}} as {{role}}.",
+		"invitedBy": "Invited by: {{email}}"
 	},
 	"teams": {
 		"title": "Teams",

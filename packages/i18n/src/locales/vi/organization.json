@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Thành viên",
+		"name": "Tên",
+		"email": "Email",
 		"role": "Vai trò",
 		"remove": "Xóa",
 		"leave": "Rời tổ chức",
@@ -62,13 +64,17 @@
 		"error": "Không thể quản lý lời mời",
 		"noPending": "Không có lời mời đang chờ",
 		"noInvitations": "Không có lời mời",
-		"expired": "Đã hết hạn",
+		"statusHeader": "Trạng thái",
 		"status": {
 			"pending": "Đang chờ",
 			"accepted": "Đã chấp nhận",
 			"rejected": "Đã từ chối",
-			"cancelled": "Đã hủy"
-		}
+			"cancelled": "Đã hủy",
+			"canceled": "Đã hủy",
+			"expired": "Đã hết hạn"
+		},
+		"invitedAs": "Bạn đã được mời tham gia {{org}} với vai trò {{role}}.",
+		"invitedBy": "Được mời bởi: {{email}}"
 	},
 	"teams": {
 		"title": "Nhóm",

@@ -17,7 +17,8 @@ function MembersPage() {
 	const { data: activeOrg, isPending } = useActiveOrg();
 	const { data: session } = authClient.useSession();
 	const { isAdmin } = useOrgRole();
-	const { invalidateActiveOrg, invalidateAll } = useInvalidateOrg();
+	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
+		useInvalidateOrg();
 
 	if (isPending) {
 		return <p>{t("common:status.loading")}</p>;
@@ -32,7 +33,7 @@ function MembersPage() {
 
 	const handleUpdateRole = async (
 		memberId: string,
-		role: "member" | "admin" | "owner",
+		role: "member" | "admin",
 	) => {
 		try {
 			const { error } = await authClient.organization.updateMemberRole({
@@ -44,7 +45,7 @@ function MembersPage() {
 				return;
 			}
 			toast.success(t("members.updateRoleSuccess"));
-			await invalidateActiveOrg();
+			await Promise.all([invalidateActiveOrg(), invalidateActiveMember()]);
 		} catch {
 			toast.error(t("members.error"));
 		}
@@ -106,8 +107,8 @@ function MembersPage() {
 				<table className="w-full text-xs">
 					<thead>
 						<tr className="border-b text-left text-muted-foreground">
-							<th className="pb-2">Name</th>
-							<th className="pb-2">Email</th>
+							<th className="pb-2">{t("members.name")}</th>
+							<th className="pb-2">{t("members.email")}</th>
 							<th className="pb-2">{t("members.role")}</th>
 							<th className="pb-2" />
 						</tr>
@@ -118,28 +119,29 @@ function MembersPage() {
 								<td className="py-2">{member.user.name}</td>
 								<td className="py-2">{member.user.email}</td>
 								<td className="py-2">
-									{isAdmin ? (
+									{member.role === "owner" ? (
+										<span className="text-xs">{t("roles.owner")}</span>
+									) : isAdmin ? (
 										<select
 											value={member.role}
 											onChange={(e) =>
 												handleUpdateRole(
 													member.id,
-													e.target.value as "member" | "admin" | "owner",
+													e.target.value as "member" | "admin",
 												)
 											}
 											className="bg-transparent text-xs"
-											disabled={member.role === "owner"}
 										>
-											<option value="owner">{t("roles.owner")}</option>
 											<option value="admin">{t("roles.admin")}</option>
 											<option value="member">{t("roles.member")}</option>
 										</select>
 									) : (
-										<span className="text-xs">{member.role}</span>
+										<span className="text-xs">{t(`roles.${member.role}`)}</span>
 									)}
 								</td>
 								<td className="py-2 text-right">
 									{isAdmin &&
+										currentUserId &&
 										member.userId !== currentUserId &&
 										member.role !== "owner" && (
 											<Button

@@ -36,6 +36,13 @@
 			"when": 1772897066104,
 			"tag": "0004_giant_lifeguard",
 			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1772925090810,
+			"tag": "0005_parched_doctor_spectrum",
+			"breakpoints": true
 		}
 	]
 }

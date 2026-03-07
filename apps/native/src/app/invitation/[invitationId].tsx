@@ -30,6 +30,7 @@ export default function InvitationScreen() {
 			.then(({ data }) => {
 				if (data) setInvitation(data);
 			})
+			.catch(() => {})
 			.finally(() => setLoading(false));
 	}, [invitationId]);
 
@@ -114,11 +115,10 @@ export default function InvitationScreen() {
 						{t("invitations.title")}
 					</Text>
 					<Text style={{ color: theme.text, marginTop: 8 }}>
-						You have been invited to join{" "}
-						<Text style={{ fontWeight: "bold" }}>
-							{invitation.organizationName}
-						</Text>{" "}
-						as <Text style={{ fontWeight: "bold" }}>{invitation.role}</Text>.
+						{t("invitations.invitedAs", {
+							org: invitation.organizationName,
+							role: t(`roles.${invitation.role}`),
+						})}
 					</Text>
 					<Text
 						style={{
@@ -128,7 +128,7 @@ export default function InvitationScreen() {
 							fontSize: 12,
 						}}
 					>
-						Invited by: {invitation.inviterEmail}
+						{t("invitations.invitedBy", { email: invitation.inviterEmail })}
 					</Text>
 
 					{isPending ? (

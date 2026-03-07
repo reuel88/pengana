@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Membres",
+		"name": "Nom",
+		"email": "E-mail",
 		"role": "Rôle",
 		"remove": "Retirer",
 		"leave": "Quitter l'organisation",
@@ -62,13 +64,17 @@
 		"error": "Échec de la gestion de l'invitation",
 		"noPending": "Aucune invitation en attente",
 		"noInvitations": "Aucune invitation",
-		"expired": "Expirée",
+		"statusHeader": "Statut",
 		"status": {
 			"pending": "En attente",
 			"accepted": "Acceptée",
 			"rejected": "Refusée",
-			"cancelled": "Annulée"
-		}
+			"cancelled": "Annulée",
+			"canceled": "Annulée",
+			"expired": "Expirée"
+		},
+		"invitedAs": "Vous avez été invité à rejoindre {{org}} en tant que {{role}}.",
+		"invitedBy": "Invité par : {{email}}"
 	},
 	"teams": {
 		"title": "Équipes",

@@ -31,6 +31,8 @@
 	},
 	"members": {
 		"title": "Membros",
+		"name": "Nome",
+		"email": "E-mail",
 		"role": "Função",
 		"remove": "Remover",
 		"leave": "Sair da organização",
@@ -62,13 +64,17 @@
 		"error": "Falha ao gerenciar convite",
 		"noPending": "Nenhum convite pendente",
 		"noInvitations": "Nenhum convite",
-		"expired": "Expirado",
+		"statusHeader": "Status",
 		"status": {
 			"pending": "Pendente",
 			"accepted": "Aceito",
 			"rejected": "Recusado",
-			"cancelled": "Cancelado"
-		}
+			"cancelled": "Cancelado",
+			"canceled": "Cancelado",
+			"expired": "Expirado"
+		},
+		"invitedAs": "Você foi convidado a participar de {{org}} como {{role}}.",
+		"invitedBy": "Convidado por: {{email}}"
 	},
 	"teams": {
 		"title": "Equipes",

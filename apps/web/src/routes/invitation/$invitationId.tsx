@@ -42,6 +42,7 @@ function InvitationPage() {
 			.then(({ data }) => {
 				if (data) setInvitation(data);
 			})
+			.catch(() => {})
 			.finally(() => setLoading(false));
 	}, [invitationId]);
 
