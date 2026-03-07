@@ -69,7 +69,7 @@ export default function MembersScreen() {
 				style: "destructive",
 				onPress: async () => {
 					const { error } = await authClient.organization.removeMember({
-						memberIdOrEmail: currentUserId!,
+						memberIdOrEmail: currentUserId ?? "",
 					});
 					if (error) {
 						Alert.alert(t("members.error"), error.message);

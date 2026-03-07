@@ -30,5 +30,5 @@ export function usePeriodicSync(
 				clearInterval(intervalRef.current);
 			}
 		};
-	}, [isOnline]);
+	}, [isOnline, syncRef.current]);
 }

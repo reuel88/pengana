@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	Alert,
 	FlatList,
@@ -38,7 +38,7 @@ export default function TeamDetailScreen() {
 	const [newName, setNewName] = useState("");
 	const [savingName, setSavingName] = useState(false);
 
-	const loadData = () => {
+	const loadData = useCallback(() => {
 		if (!teamId) return;
 		const promises = [
 			authClient.organization.listTeams().then(({ data }) => {
@@ -54,12 +54,12 @@ export default function TeamDetailScreen() {
 				}),
 		];
 		Promise.all(promises).finally(() => setLoading(false));
-	};
+	}, [teamId]);
 
 	useEffect(() => {
 		if (!activeOrg || !teamId) return;
 		loadData();
-	}, [activeOrg, teamId]);
+	}, [activeOrg, teamId, loadData]);
 
 	if (loading) {
 		return (
@@ -89,7 +89,7 @@ export default function TeamDetailScreen() {
 			return;
 		}
 		const { error } = await authClient.organization.addTeamMember({
-			teamId: teamId!,
+			teamId: teamId ?? "",
 			userId: member.userId,
 		});
 		if (error) {
@@ -98,7 +98,7 @@ export default function TeamDetailScreen() {
 		}
 		setMemberEmail("");
 		authClient.organization
-			.listTeamMembers({ query: { teamId: teamId! } })
+			.listTeamMembers({ query: { teamId: teamId ?? "" } })
 			.then(({ data }) => {
 				if (data) setTeamMembers(data);
 			});
@@ -112,7 +112,7 @@ export default function TeamDetailScreen() {
 				style: "destructive",
 				onPress: async () => {
 					const { error } = await authClient.organization.removeTeamMember({
-						teamId: teamId!,
+						teamId: teamId ?? "",
 						userId,
 					});
 					if (error) {
@@ -120,7 +120,7 @@ export default function TeamDetailScreen() {
 						return;
 					}
 					authClient.organization
-						.listTeamMembers({ query: { teamId: teamId! } })
+						.listTeamMembers({ query: { teamId: teamId ?? "" } })
 						.then(({ data }) => {
 							if (data) setTeamMembers(data);
 						});
@@ -137,7 +137,7 @@ export default function TeamDetailScreen() {
 				style: "destructive",
 				onPress: async () => {
 					const { error } = await authClient.organization.removeTeam({
-						teamId: teamId!,
+						teamId: teamId ?? "",
 					});
 					if (error) {
 						Alert.alert(t("teams.error"), error.message);
@@ -153,7 +153,7 @@ export default function TeamDetailScreen() {
 		setSavingName(true);
 		try {
 			const { error } = await authClient.organization.updateTeam({
-				teamId: teamId!,
+				teamId: teamId ?? "",
 				data: { name: newName },
 			});
 			if (error) {

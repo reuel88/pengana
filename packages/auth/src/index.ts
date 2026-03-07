@@ -67,18 +67,18 @@ export const auth = betterAuth({
 		organization({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
 			organizationHooks: {
-				afterCreateInvitation: async (invitation) => {
-					const user = await findUserByEmail(invitation.email);
+				afterCreateInvitation: async (data) => {
+					const user = await findUserByEmail(data.invitation.email);
 					if (user) _notifyUser(user.id);
 				},
-				afterAcceptInvitation: async (invitation) => {
-					_notifyUser(invitation.inviterId);
+				afterAcceptInvitation: async (data) => {
+					_notifyUser(data.invitation.inviterId);
 				},
-				afterRejectInvitation: async (invitation) => {
-					_notifyUser(invitation.inviterId);
+				afterRejectInvitation: async (data) => {
+					_notifyUser(data.invitation.inviterId);
 				},
-				afterCancelInvitation: async (invitation) => {
-					const user = await findUserByEmail(invitation.email);
+				afterCancelInvitation: async (data) => {
+					const user = await findUserByEmail(data.invitation.email);
 					if (user) _notifyUser(user.id);
 				},
 			},

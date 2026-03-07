@@ -80,5 +80,5 @@ export function useWebSocketSync(
 			if (reconnectTimeout) clearTimeout(reconnectTimeout);
 			ws?.close();
 		};
-	}, [userId, isOnline]);
+	}, [userId, isOnline, syncRef.current]);
 }

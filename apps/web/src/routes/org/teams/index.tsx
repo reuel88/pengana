@@ -47,7 +47,7 @@ function TeamsIndexPage() {
 		e.preventDefault();
 		setLoading(true);
 		try {
-			const { data, error } = await authClient.organization.createTeam({
+			const { error } = await authClient.organization.createTeam({
 				name: teamName,
 				organizationId: activeOrg.id,
 			});

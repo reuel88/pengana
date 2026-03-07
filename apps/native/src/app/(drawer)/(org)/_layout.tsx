@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
 import { DrawerToggleButton } from "@react-navigation/drawer";
 import { Redirect, Stack } from "expo-router";

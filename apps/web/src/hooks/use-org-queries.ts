@@ -52,7 +52,7 @@ export function useTeams(orgId: string | undefined) {
 		queryKey: orgQueryKeys.teams(orgId),
 		queryFn: async () => {
 			const { data } = await authClient.organization.listTeams({
-				query: { organizationId: orgId! },
+				query: { organizationId: orgId ?? "" },
 			});
 			return data;
 		},

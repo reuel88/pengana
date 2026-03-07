@@ -71,7 +71,7 @@ function MembersPage() {
 		if (!confirm(t("members.leaveConfirm"))) return;
 		try {
 			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail: currentUserId!,
+				memberIdOrEmail: currentUserId ?? "",
 			});
 			if (error) {
 				toast.error(error.message || t("members.error"));

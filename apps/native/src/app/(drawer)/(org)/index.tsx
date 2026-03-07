@@ -57,7 +57,7 @@ export default function OrgIndexScreen() {
 												backgroundColor: theme.card,
 											},
 										]}
-										onPress={() => router.push(route as any)}
+										onPress={() => router.push(route as never)}
 									>
 										<Text style={{ color: theme.text }}>{label}</Text>
 									</TouchableOpacity>

@@ -149,7 +149,7 @@ export default function InvitationsScreen() {
 									{
 										borderColor: theme.border,
 										backgroundColor:
-											role === "member" ? theme.primary + "30" : "transparent",
+											role === "member" ? `${theme.primary}30` : "transparent",
 									},
 								]}
 								onPress={() => setRole("member")}
@@ -162,7 +162,7 @@ export default function InvitationsScreen() {
 									{
 										borderColor: theme.border,
 										backgroundColor:
-											role === "admin" ? theme.primary + "30" : "transparent",
+											role === "admin" ? `${theme.primary}30` : "transparent",
 									},
 								]}
 								onPress={() => setRole("admin")}

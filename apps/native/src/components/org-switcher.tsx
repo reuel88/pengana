@@ -141,7 +141,7 @@ export function OrgSwitcher() {
 												styles.orgItem,
 												{ borderColor: theme.border },
 												activeOrg?.id === org.id && {
-													backgroundColor: theme.primary + "20",
+													backgroundColor: `${theme.primary}20`,
 												},
 											]}
 											onPress={() => handleSwitch(org.id)}
