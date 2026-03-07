@@ -125,7 +125,7 @@ export function OrgSwitcher() {
 								</TouchableOpacity>
 								<TouchableOpacity onPress={() => setShowCreate(false)}>
 									<Text style={[styles.linkText, { color: theme.primary }]}>
-										Back
+										{t("switcher.back")}
 									</Text>
 								</TouchableOpacity>
 							</View>
@@ -174,7 +174,7 @@ export function OrgSwitcher() {
 								setShowCreate(false);
 							}}
 						>
-							<Text style={{ color: theme.text }}>Close</Text>
+							<Text style={{ color: theme.text }}>{t("switcher.close")}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>

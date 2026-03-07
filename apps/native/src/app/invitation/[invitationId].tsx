@@ -12,7 +12,7 @@ export default function InvitationScreen() {
 	const { t } = useTranslation("organization");
 	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
 	const router = useRouter();
-	const { data: session } = authClient.useSession();
+	const { data: session, isPending: sessionPending } = authClient.useSession();
 	const [invitation, setInvitation] = useState<{
 		id: string;
 		organizationName: string;
@@ -32,6 +32,10 @@ export default function InvitationScreen() {
 			})
 			.finally(() => setLoading(false));
 	}, [invitationId]);
+
+	if (sessionPending) {
+		return null;
+	}
 
 	if (!session) {
 		return <Redirect href="/" />;

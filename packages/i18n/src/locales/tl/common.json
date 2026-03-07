@@ -38,5 +38,9 @@
 		"heading": "Hindi Nahanap ang Pahina",
 		"description": "Paumanhin, ang pahina na hinahanap mo ay hindi umiiral.",
 		"goHome": "Pumunta sa Home"
+	},
+	"confirm": {
+		"yes": "Oo",
+		"no": "Hindi"
 	}
 }

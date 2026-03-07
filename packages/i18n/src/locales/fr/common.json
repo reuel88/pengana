@@ -38,5 +38,9 @@
 		"heading": "Page introuvable",
 		"description": "Désolé, la page que vous recherchez n'existe pas.",
 		"goHome": "Retour à l'accueil"
+	},
+	"confirm": {
+		"yes": "Oui",
+		"no": "Non"
 	}
 }

@@ -38,5 +38,9 @@
 		"heading": "Página não encontrada",
 		"description": "Desculpe, a página que você procura não existe.",
 		"goHome": "Ir para o início"
+	},
+	"confirm": {
+		"yes": "Sim",
+		"no": "Não"
 	}
 }

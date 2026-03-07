@@ -4,7 +4,9 @@
 		"label": "조직",
 		"create": "조직 만들기",
 		"noOrgs": "아직 조직이 없습니다",
-		"switchTo": "{{name}}(으)로 전환"
+		"switchTo": "{{name}}(으)로 전환",
+		"back": "뒤로",
+		"close": "닫기"
 	},
 	"create": {
 		"title": "조직 만들기",

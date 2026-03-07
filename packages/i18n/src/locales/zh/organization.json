@@ -4,7 +4,9 @@
 		"label": "组织",
 		"create": "创建组织",
 		"noOrgs": "暂无组织",
-		"switchTo": "切换到 {{name}}"
+		"switchTo": "切换到 {{name}}",
+		"back": "返回",
+		"close": "关闭"
 	},
 	"create": {
 		"title": "创建组织",

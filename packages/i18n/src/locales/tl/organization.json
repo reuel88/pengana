@@ -4,7 +4,9 @@
 		"label": "Mga Organisasyon",
 		"create": "Lumikha ng Organisasyon",
 		"noOrgs": "Wala pang mga organisasyon",
-		"switchTo": "Lumipat sa {{name}}"
+		"switchTo": "Lumipat sa {{name}}",
+		"back": "Bumalik",
+		"close": "Isara"
 	},
 	"create": {
 		"title": "Lumikha ng Organisasyon",

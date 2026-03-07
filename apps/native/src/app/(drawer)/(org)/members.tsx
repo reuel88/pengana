@@ -47,7 +47,7 @@ export default function MembersScreen() {
 
 	const handleRemove = (memberId: string) => {
 		Alert.alert(t("members.remove"), t("members.removeConfirm"), [
-			{ text: "Cancel", style: "cancel" },
+			{ text: t("common:confirm.no"), style: "cancel" },
 			{
 				text: t("members.remove"),
 				style: "destructive",
@@ -62,14 +62,17 @@ export default function MembersScreen() {
 	};
 
 	const handleLeave = () => {
+		if (!currentUserId) {
+			return;
+		}
 		Alert.alert(t("members.leave"), t("members.leaveConfirm"), [
-			{ text: "Cancel", style: "cancel" },
+			{ text: t("common:confirm.no"), style: "cancel" },
 			{
 				text: t("members.leave"),
 				style: "destructive",
 				onPress: async () => {
 					const { error } = await authClient.organization.removeMember({
-						memberIdOrEmail: currentUserId ?? "",
+						memberIdOrEmail: currentUserId,
 					});
 					if (error) {
 						Alert.alert(t("members.error"), error.message);

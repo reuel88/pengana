@@ -8,7 +8,11 @@ import { useTheme } from "@/lib/theme";
 export default function OrgLayout() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { data: session } = authClient.useSession();
+	const { data: session, isPending } = authClient.useSession();
+
+	if (isPending) {
+		return null;
+	}
 
 	if (!session) {
 		return <Redirect href="/" />;

@@ -18,6 +18,7 @@ import { useTheme } from "@/lib/theme";
 interface UserInvitation {
 	id: string;
 	organizationId: string;
+	organizationName: string;
 	email: string;
 	role: string;
 	status: string;
@@ -32,11 +33,16 @@ export default function InvitationsScreen() {
 	const [loading, setLoading] = useState(false);
 	const { isAdmin } = useOrgRole();
 	const [myInvitations, setMyInvitations] = useState<UserInvitation[]>([]);
+	const [myInvitationsLoading, setMyInvitationsLoading] = useState(true);
+	const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
 	useEffect(() => {
-		authClient.organization.listUserInvitations().then(({ data }) => {
-			if (data) setMyInvitations(data as UserInvitation[]);
-		});
+		authClient.organization
+			.listUserInvitations()
+			.then(({ data }) => {
+				if (data) setMyInvitations(data as UserInvitation[]);
+			})
+			.finally(() => setMyInvitationsLoading(false));
 	}, []);
 
 	if (isPending) {
@@ -77,42 +83,72 @@ export default function InvitationsScreen() {
 	};
 
 	const handleCancel = (invitationId: string) => {
+		if (pendingIds.has(invitationId)) return;
 		Alert.alert(t("invitations.cancel"), "", [
-			{ text: "No", style: "cancel" },
+			{ text: t("common:confirm.no"), style: "cancel" },
 			{
-				text: "Yes",
+				text: t("common:confirm.yes"),
 				onPress: async () => {
-					const { error } = await authClient.organization.cancelInvitation({
-						invitationId,
-					});
-					if (error) Alert.alert(t("invitations.error"), error.message);
+					setPendingIds((prev) => new Set(prev).add(invitationId));
+					try {
+						const { error } = await authClient.organization.cancelInvitation({
+							invitationId,
+						});
+						if (error) Alert.alert(t("invitations.error"), error.message);
+					} finally {
+						setPendingIds((prev) => {
+							const next = new Set(prev);
+							next.delete(invitationId);
+							return next;
+						});
+					}
 				},
 			},
 		]);
 	};
 
 	const handleAccept = async (invitationId: string) => {
-		const { error } = await authClient.organization.acceptInvitation({
-			invitationId,
-		});
-		if (error) {
-			Alert.alert(t("invitations.error"), error.message);
-			return;
+		if (pendingIds.has(invitationId)) return;
+		setPendingIds((prev) => new Set(prev).add(invitationId));
+		try {
+			const { error } = await authClient.organization.acceptInvitation({
+				invitationId,
+			});
+			if (error) {
+				Alert.alert(t("invitations.error"), error.message);
+				return;
+			}
+			Alert.alert(t("invitations.acceptSuccess"));
+			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
+		} finally {
+			setPendingIds((prev) => {
+				const next = new Set(prev);
+				next.delete(invitationId);
+				return next;
+			});
 		}
-		Alert.alert(t("invitations.acceptSuccess"));
-		setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
 	};
 
 	const handleReject = async (invitationId: string) => {
-		const { error } = await authClient.organization.rejectInvitation({
-			invitationId,
-		});
-		if (error) {
-			Alert.alert(t("invitations.error"), error.message);
-			return;
+		if (pendingIds.has(invitationId)) return;
+		setPendingIds((prev) => new Set(prev).add(invitationId));
+		try {
+			const { error } = await authClient.organization.rejectInvitation({
+				invitationId,
+			});
+			if (error) {
+				Alert.alert(t("invitations.error"), error.message);
+				return;
+			}
+			Alert.alert(t("invitations.rejectSuccess"));
+			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
+		} finally {
+			setPendingIds((prev) => {
+				const next = new Set(prev);
+				next.delete(invitationId);
+				return next;
+			});
 		}
-		Alert.alert(t("invitations.rejectSuccess"));
-		setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
 	};
 
 	return (
@@ -201,9 +237,11 @@ export default function InvitationsScreen() {
 									{isAdmin && inv.status === "pending" && (
 										<TouchableOpacity
 											onPress={() => handleCancel(inv.id)}
+											disabled={pendingIds.has(inv.id)}
 											style={[
 												styles.cancelButton,
 												{ borderColor: theme.border },
+												pendingIds.has(inv.id) && { opacity: 0.5 },
 											]}
 										>
 											<Text style={{ color: theme.text, fontSize: 12 }}>
@@ -222,7 +260,11 @@ export default function InvitationsScreen() {
 				>
 					{t("invitations.myInvitations")}
 				</Text>
-				{pendingUserInvitations.length === 0 ? (
+				{myInvitationsLoading ? (
+					<Text style={{ color: theme.text, opacity: 0.5 }}>
+						{t("common:status.loading")}
+					</Text>
+				) : pendingUserInvitations.length === 0 ? (
 					<Text style={{ color: theme.text, opacity: 0.5 }}>
 						{t("invitations.noInvitations")}
 					</Text>
@@ -236,7 +278,9 @@ export default function InvitationsScreen() {
 							]}
 						>
 							<View style={{ flex: 1 }}>
-								<Text style={{ color: theme.text }}>{inv.organizationId}</Text>
+								<Text style={{ color: theme.text }}>
+									{inv.organizationName}
+								</Text>
 								<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
 									{inv.role}
 								</Text>
@@ -244,9 +288,11 @@ export default function InvitationsScreen() {
 							<View style={styles.actionRow}>
 								<TouchableOpacity
 									onPress={() => handleAccept(inv.id)}
+									disabled={pendingIds.has(inv.id)}
 									style={[
 										styles.acceptButton,
 										{ backgroundColor: theme.primary },
+										pendingIds.has(inv.id) && { opacity: 0.5 },
 									]}
 								>
 									<Text style={{ color: "#fff", fontSize: 12 }}>
@@ -255,7 +301,12 @@ export default function InvitationsScreen() {
 								</TouchableOpacity>
 								<TouchableOpacity
 									onPress={() => handleReject(inv.id)}
-									style={[styles.cancelButton, { borderColor: theme.border }]}
+									disabled={pendingIds.has(inv.id)}
+									style={[
+										styles.cancelButton,
+										{ borderColor: theme.border },
+										pendingIds.has(inv.id) && { opacity: 0.5 },
+									]}
 								>
 									<Text style={{ color: theme.text, fontSize: 12 }}>
 										{t("invitations.reject")}

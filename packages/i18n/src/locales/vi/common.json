@@ -38,5 +38,9 @@
 		"heading": "Không tìm thấy trang",
 		"description": "Xin lỗi, trang bạn đang tìm không tồn tại.",
 		"goHome": "Về trang chủ"
+	},
+	"confirm": {
+		"yes": "Có",
+		"no": "Không"
 	}
 }

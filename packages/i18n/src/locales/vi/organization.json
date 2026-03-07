@@ -4,7 +4,9 @@
 		"label": "Tổ chức",
 		"create": "Tạo tổ chức",
 		"noOrgs": "Chưa có tổ chức nào",
-		"switchTo": "Chuyển sang {{name}}"
+		"switchTo": "Chuyển sang {{name}}",
+		"back": "Quay lại",
+		"close": "Đóng"
 	},
 	"create": {
 		"title": "Tạo tổ chức",

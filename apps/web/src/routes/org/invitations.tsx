@@ -218,7 +218,7 @@ function InvitationsPage() {
 						<tbody>
 							{pendingUserInvitations.map((inv) => (
 								<tr key={inv.id} className="border-b">
-									<td className="py-2">{inv.organizationId}</td>
+									<td className="py-2">{inv.organizationName}</td>
 									<td className="py-2">{inv.role}</td>
 									<td className="py-2 text-right">
 										<div className="flex justify-end gap-2">

@@ -4,7 +4,9 @@
 		"label": "Organizations",
 		"create": "Create Organization",
 		"noOrgs": "No organizations yet",
-		"switchTo": "Switch to {{name}}"
+		"switchTo": "Switch to {{name}}",
+		"back": "Back",
+		"close": "Close"
 	},
 	"create": {
 		"title": "Create Organization",

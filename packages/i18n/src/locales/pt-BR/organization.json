@@ -4,7 +4,9 @@
 		"label": "Organizações",
 		"create": "Criar organização",
 		"noOrgs": "Nenhuma organização ainda",
-		"switchTo": "Mudar para {{name}}"
+		"switchTo": "Mudar para {{name}}",
+		"back": "Voltar",
+		"close": "Fechar"
 	},
 	"create": {
 		"title": "Criar organização",

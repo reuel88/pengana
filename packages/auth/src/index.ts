@@ -1,4 +1,5 @@
 import { expo } from "@better-auth/expo";
+import { getLogger } from "@logtape/logtape";
 import { db } from "@pengana/db";
 import { findUserByEmail } from "@pengana/db/notification-queries";
 import * as schema from "@pengana/db/schema/auth";
@@ -9,6 +10,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
 
 // import { polarClient } from "./lib/payments";
+
+const logger = getLogger(["app", "auth"]);
 
 let _notifyUser: (userId: string) => void = () => {};
 
@@ -68,18 +71,34 @@ export const auth = betterAuth({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
 			organizationHooks: {
 				afterCreateInvitation: async (data) => {
-					const user = await findUserByEmail(data.invitation.email);
-					if (user) _notifyUser(user.id);
+					try {
+						const user = await findUserByEmail(data.invitation.email);
+						if (user) _notifyUser(user.id);
+					} catch (error) {
+						logger.error`Failed to notify after invitation created: ${error}`;
+					}
 				},
 				afterAcceptInvitation: async (data) => {
-					_notifyUser(data.invitation.inviterId);
+					try {
+						_notifyUser(data.invitation.inviterId);
+					} catch (error) {
+						logger.error`Failed to notify after invitation accepted: ${error}`;
+					}
 				},
 				afterRejectInvitation: async (data) => {
-					_notifyUser(data.invitation.inviterId);
+					try {
+						_notifyUser(data.invitation.inviterId);
+					} catch (error) {
+						logger.error`Failed to notify after invitation rejected: ${error}`;
+					}
 				},
 				afterCancelInvitation: async (data) => {
-					const user = await findUserByEmail(data.invitation.email);
-					if (user) _notifyUser(user.id);
+					try {
+						const user = await findUserByEmail(data.invitation.email);
+						if (user) _notifyUser(user.id);
+					} catch (error) {
+						logger.error`Failed to notify after invitation cancelled: ${error}`;
+					}
 				},
 			},
 		}),
