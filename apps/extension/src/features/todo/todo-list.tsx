@@ -4,20 +4,21 @@ import {
 	isAllowedMimeType,
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/sync-engine";
-import { Button } from "@pengana/ui/components/button";
-import { Checkbox } from "@pengana/ui/components/checkbox";
-import { useRef, useState } from "react";
-import type { WebTodo } from "@/entities/todo";
-import { storeFileForUpload } from "@/entities/upload-queue";
-import { useSync } from "@/features/sync/sync-context";
-import { cn } from "@/lib/utils";
-
+import type { WebTodo } from "@pengana/todo-client";
 import {
 	attachFile,
 	deleteTodo,
 	resolveConflict,
 	toggleTodo,
-} from "./todo-actions";
+} from "@pengana/todo-client";
+import { AttachmentIndicator } from "@pengana/ui/components/attachment-indicator";
+import { Button } from "@pengana/ui/components/button";
+import { Checkbox } from "@pengana/ui/components/checkbox";
+import { SyncDot } from "@pengana/ui/components/sync-dot";
+import { cn } from "@pengana/ui/lib/utils";
+import { useRef, useState } from "react";
+import { storeFileForUpload } from "@/entities/upload-queue";
+import { useSync } from "@/features/sync/sync-context";
 
 function validateFile(file: File, t: (key: string) => string): string | null {
 	if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
@@ -73,65 +74,6 @@ function TodoItemActions({
 			</Button>
 		</>
 	);
-}
-
-// SyncDot and AttachmentIndicator are intentionally duplicated across web and extension.
-// They're ~20 lines each, tightly coupled to each app's cn() utility and Tailwind config.
-function SyncDot({ status }: { status: WebTodo["syncStatus"] }) {
-	const { t } = useTranslation("todos");
-
-	const colors = {
-		synced: "bg-green-500",
-		pending: "bg-yellow-500",
-		conflict: "bg-red-500",
-	};
-
-	const labels = {
-		synced: t("sync.synced"),
-		pending: t("sync.pending"),
-		conflict: t("sync.conflict"),
-	};
-
-	return (
-		<span
-			className={cn("inline-block size-2 rounded-full", colors[status])}
-			title={labels[status]}
-		/>
-	);
-}
-
-function AttachmentIndicator({
-	status,
-	attachmentUrl,
-}: {
-	status: WebTodo["attachmentStatus"];
-	attachmentUrl: string | null;
-}) {
-	const { t } = useTranslation("todos");
-
-	if (attachmentUrl && (!status || status === "uploaded")) {
-		return (
-			<span
-				className="text-green-500 text-xs"
-				title={t("attachment.fileAttached")}
-			>
-				{t("attachment.attached")}
-			</span>
-		);
-	}
-	if (status === "queued" || status === "uploading") {
-		return (
-			<span className="animate-pulse text-muted-foreground text-xs">
-				{t("attachment.uploading")}
-			</span>
-		);
-	}
-	if (status === "failed") {
-		return (
-			<span className="text-red-500 text-xs">{t("attachment.failed")}</span>
-		);
-	}
-	return null;
 }
 
 function TodoItem({ todo }: { todo: WebTodo }) {

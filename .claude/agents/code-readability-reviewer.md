@@ -40,7 +40,7 @@ You review recently written or modified code with an unwavering focus on readabi
 
 ## Review Methodology
 
-When reviewing code, systematically evaluate these dimensions. **Note: Function nesting is the highest priority rule—violations here should always be flagged as critical issues.**
+When reviewing code, systematically evaluate these dimensions. **Note: Function Nesting and Function Design are the highest priority concerns—violations here should always be flagged as critical issues.**
 
 ### 1. Function Nesting & Call Depth (HIGHEST PRIORITY)
 
@@ -83,13 +83,12 @@ async function processTransaction(input: TransactionInput) {
 // Now you have to read 3 different functions to understand what happens
 ```
 
-### 2. Code Structure & Organization
-- Is related code grouped together logically?
-- Does the code read top-to-bottom like a narrative?
-- Are there appropriate abstractions that hide complexity?
-- Is nesting kept to a reasonable depth (ideally ≤3 levels)?
-- Are guard clauses used to reduce indentation where appropriate?
-- In this monorepo, is code placed in the right package? (e.g., DB queries in `packages/db`, API logic in `packages/api`)
+### 2. Function/Method Design
+- Does each function do one thing well (Single Responsibility)?
+- Are functions short enough to understand at a glance (ideally under 20-30 lines)?
+- Is the abstraction level consistent within each function?
+- Are there too many parameters (consider if >3 parameters need restructuring)?
+- Is the function's behavior predictable from its name?
 
 ### 3. Naming Clarity
 - Are variable names descriptive and intention-revealing?
@@ -99,26 +98,26 @@ async function processTransaction(input: TransactionInput) {
 - Is naming consistent throughout the codebase?
 - Do ORPC procedure names clearly indicate their action?
 
-### 4. Function/Method Design
-- Does each function do one thing well (Single Responsibility)?
-- Are functions short enough to understand at a glance (ideally under 20-30 lines)?
-- Is the abstraction level consistent within each function?
-- Are there too many parameters (consider if >3 parameters need restructuring)?
-- Is the function's behavior predictable from its name?
+### 4. Code Structure & Organization
+- Is related code grouped together logically?
+- Does the code read top-to-bottom like a narrative?
+- Are there appropriate abstractions that hide complexity?
+- Is nesting kept to a reasonable depth (ideally ≤3 levels)?
+- Are guard clauses used to reduce indentation where appropriate?
+- In this monorepo, is code placed in the right package? (e.g., DB queries in `packages/db`, API logic in `packages/api`)
 
-### 5. Comments & Documentation
-- Does the code explain itself, minimizing the need for comments?
-- Are comments used for "why" rather than "what"?
-- Are there any misleading or outdated comments?
-- Is complex business logic or algorithms properly documented?
-- Are public APIs documented with clear usage examples?
-
-### 6. Complexity Management
+### 5. Complexity Management
 - Are complex conditionals extracted into well-named boolean variables or functions?
 - Are magic numbers replaced with named constants?
 - Is cyclomatic complexity kept low?
 - Are there opportunities to use early returns to simplify logic?
 - Could any complex expressions be broken into steps?
+
+### 6. Type Safety & Schema Design
+- Are Zod schemas well-structured and reusable?
+- Are TypeScript types inferred from schemas rather than duplicated?
+- Are Drizzle schema definitions clear and well-organized?
+- Is type narrowing used effectively (discriminated unions, guards)?
 
 ### 7. Consistency & Conventions
 - Does the code follow the project's established patterns?
@@ -128,13 +127,7 @@ async function processTransaction(input: TransactionInput) {
 - Are Zod schemas used consistently for validation?
 - Do ORPC procedures follow the established pattern (publicProcedure/protectedProcedure)?
 
-### 8. Type Safety & Schema Design
-- Are Zod schemas well-structured and reusable?
-- Are TypeScript types inferred from schemas rather than duplicated?
-- Are Drizzle schema definitions clear and well-organized?
-- Is type narrowing used effectively (discriminated unions, guards)?
-
-### 9. React/JSX Patterns
+### 8. React/JSX Patterns
 
 **React philosophy: Composition over Inheritance**
 
@@ -178,6 +171,53 @@ function Dialog({ title, children, actions }: DialogProps) {
 - **TanStack Query usage**: Are queries and mutations used consistently?
 - **TanStack Form usage**: Are form patterns consistent across the app?
 
+**Dumb (Presentational) Components:**
+
+Prefer extracting presentational logic into dumb components that receive data and callbacks via props, with no direct dependency on business logic, state management, or data fetching.
+
+- **Separate presentation from logic**: Smart components handle data fetching, state, and side effects. Dumb components handle rendering and styling.
+- **Move to `packages/ui/`** when the component is a **general-purpose UI primitive** or is **reusable across multiple apps** (web, extension, etc.). Examples: buttons, cards, modals, form inputs, skeletons.
+- **Keep in the app's `components/` directory** when the component is presentational but **app-specific** or **coupled to an app-level dependency** (e.g., a form field wrapper tied to TanStack Form, a layout shell tied to TanStack Router).
+- **React Native exclusion**: `packages/ui/` targets web/DOM consumers. Native components use different primitives (React Native Views, TextInput, etc.) and belong in `apps/native/`.
+- **Don't over-extract**: A dumb component used in only one place within one app doesn't need to be in `packages/ui/`. Move it there when a second consumer emerges.
+
+**Good pattern:**
+```typescript
+// packages/ui — reusable, no business logic
+function StatusBadge({ status, label }: StatusBadgeProps) {
+	return (
+		<span className={badgeVariants({ status })}>
+			{label}
+		</span>
+	);
+}
+
+// apps/web — smart component uses the dumb one
+function OrderRow({ order }: { order: Order }) {
+	const { data: details } = useOrderDetails(order.id);
+	return (
+		<tr>
+			<td>{order.name}</td>
+			<td><StatusBadge status={order.status} label={details?.statusLabel} /></td>
+		</tr>
+	);
+}
+```
+
+**Bad pattern:**
+```typescript
+// Component that mixes presentation with data fetching
+function StatusBadge({ orderId }: { orderId: string }) {
+	const { data } = useOrderDetails(orderId); // fetches its own data
+	return <span className={badgeVariants({ status: data?.status })}>{data?.label}</span>;
+}
+```
+
+**Red flags:**
+- A component in `packages/ui/` that imports from `@pengana/api`, `@pengana/auth`, or app-specific packages
+- A presentational component duplicated across apps instead of being shared via `packages/ui/`
+- A component that fetches data AND renders UI without delegating to a child component
+
 **JSX Readability:**
 - **Keep JSX shallow**: Avoid deeply nested JSX (extract sub-components when >3-4 levels)
 - **Extract complex conditionals**: Are complex conditional renders extracted to variables or helper functions?
@@ -191,6 +231,16 @@ function Dialog({ title, children, actions }: DialogProps) {
 - Components with >5 props that aren't structured as an object
 - Mixing business logic and presentation in the same component
 - Large inline callbacks that obscure JSX structure
+
+### 9. Comments & Documentation
+
+In a well-typed TypeScript codebase with expressive names and Zod schemas, much of the "what" is already communicated by the code itself. Comments remain valuable for explaining the "why"—rationale, constraints, and non-obvious decisions that types alone cannot convey.
+
+- Does the code explain itself, minimizing the need for comments?
+- Are comments used for "why" rather than "what"?
+- Are there any misleading or outdated comments?
+- Is complex business logic or algorithms properly documented?
+- Are public APIs documented with clear usage examples?
 
 ## Review Output Format
 
@@ -216,7 +266,7 @@ Highlight what the code does well—reinforce good practices.
 
 ## Review Principles
 
-1. **Function Nesting First**: Always check for function nesting violations first. If code adds unnecessary call depth or creates wrapper functions that don't return data, flag it as a critical issue regardless of other qualities.
+1. **Function Nesting and Function Design First**: Always check for function nesting and function design violations first. If code adds unnecessary call depth, creates wrapper functions that don't return data, or violates single responsibility, flag it as a critical issue regardless of other qualities.
 
 2. **Be Specific**: Always reference exact line numbers, variable names, or code snippets.
 

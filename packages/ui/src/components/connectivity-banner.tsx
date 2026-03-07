@@ -1,10 +1,14 @@
 import { useTranslation } from "@pengana/i18n";
-import { cn } from "@/lib/utils";
 
-import { useSync } from "./sync-context";
+import { cn } from "../lib/utils";
 
-export function ConnectivityBanner() {
-	const { isOnline, isSyncing } = useSync();
+export function ConnectivityBanner({
+	isOnline,
+	isSyncing,
+}: {
+	isOnline: boolean;
+	isSyncing: boolean;
+}) {
 	const { t } = useTranslation("sync");
 
 	return (

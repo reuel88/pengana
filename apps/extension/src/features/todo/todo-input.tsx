@@ -1,10 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
+import { addTodo } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { useState } from "react";
 import { useSync } from "@/features/sync/sync-context";
-
-import { addTodo } from "./todo-actions";
 
 export function TodoInput({ userId }: { userId: string }) {
 	const [title, setTitle] = useState("");

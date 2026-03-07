@@ -7,7 +7,7 @@ import type {
 } from "@pengana/sync-engine";
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 
-import { createDexieSyncAdapter } from "@/entities/todo";
+import { createDexieSyncAdapter } from "@pengana/todo-client";
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,

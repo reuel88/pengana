@@ -9,6 +9,8 @@
 		"./lib/*": "./src/lib/*.ts"
 	},
 	"peerDependencies": {
+		"@pengana/i18n": "workspace:*",
+		"@pengana/sync-engine": "workspace:*",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0"
 	},

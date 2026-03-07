@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 
-import { todoDb } from "@/entities/todo";
+import { todoDb } from "./db";
 
 export function useTodos(userId: string) {
 	const todos = useLiveQuery(

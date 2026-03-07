@@ -1,8 +1,7 @@
 import type { SyncEvent, SyncInput, SyncOutput } from "@pengana/sync-engine";
 import { SyncEngine } from "@pengana/sync-engine";
+import { createDexieSyncAdapter } from "@pengana/todo-client";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-import { createDexieSyncAdapter } from "@/entities/todo";
 import { client } from "@/utils/orpc";
 
 import { useNetworkStatus } from "./use-network-status";

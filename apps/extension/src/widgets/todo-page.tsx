@@ -1,13 +1,14 @@
 import { useTranslation } from "@pengana/i18n";
+import { useTodos } from "@pengana/todo-client";
+import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
-import { useTodos } from "@/features/todo/use-todos";
 
 function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(userId);
+	const { isOnline, isSyncing } = useSync();
 	const { t } = useTranslation("todos");
 
 	return (
@@ -16,7 +17,7 @@ function TodoContent({ userId }: { userId: string }) {
 				<h1 className="font-bold text-xl">{t("title")}</h1>
 				<LanguageSwitcher />
 			</div>
-			<ConnectivityBanner />
+			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />
 			<TodoList todos={todos} />
 		</div>

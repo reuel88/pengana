@@ -1,8 +1,8 @@
+import { todoDb } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
+import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";
-import { todoDb } from "@/entities/todo";
 import { useSync } from "@/features/sync/sync-context";
-import { cn } from "@/lib/utils";
 import { client } from "@/utils/orpc";
 
 export function SyncDevtoolsImpl() {
