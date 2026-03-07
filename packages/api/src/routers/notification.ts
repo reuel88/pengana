@@ -1,4 +1,5 @@
 import {
+	findNotificationByTypeAndInvitation,
 	getInvitationWithOrg,
 	getUnreadNotifications,
 	insertNotification,
@@ -75,6 +76,17 @@ export const notificationRouter = {
 			}
 			if (row.status !== "accepted") {
 				throw apiError("BAD_REQUEST", "Invitation is not accepted");
+			}
+			if (row.email !== context.session.user.email) {
+				throw apiError("FORBIDDEN", "Not the invitation recipient");
+			}
+
+			const existing = await findNotificationByTypeAndInvitation(
+				row.inviterId,
+				input.invitationId,
+			);
+			if (existing) {
+				return envelope({ notified: false });
 			}
 
 			const accepterName =

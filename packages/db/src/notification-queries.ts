@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "./index";
 import { invitation, organization, user } from "./schema/auth";
@@ -49,6 +49,7 @@ export async function getInvitationWithOrg(invitationId: string) {
 	const rows = await db
 		.select({
 			inviterId: invitation.inviterId,
+			email: invitation.email,
 			orgName: organization.name,
 			status: invitation.status,
 		})
@@ -58,4 +59,22 @@ export async function getInvitationWithOrg(invitationId: string) {
 		.limit(1);
 
 	return rows[0] ?? null;
+}
+
+export async function findNotificationByTypeAndInvitation(
+	userId: string,
+	invitationId: string,
+) {
+	const [found] = await db
+		.select({ id: notification.id })
+		.from(notification)
+		.where(
+			and(
+				eq(notification.userId, userId),
+				eq(notification.type, "invitation_accepted"),
+				sql`${notification.metadata}::jsonb->>'invitationId' = ${invitationId}`,
+			),
+		)
+		.limit(1);
+	return found ?? null;
 }

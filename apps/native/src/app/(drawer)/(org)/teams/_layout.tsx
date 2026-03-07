@@ -11,7 +11,6 @@ export default function TeamsLayout() {
 				headerStyle: { backgroundColor: theme.background },
 				headerTitleStyle: { color: theme.text },
 				headerTintColor: theme.text,
-				headerShown: false,
 			}}
 		/>
 	);

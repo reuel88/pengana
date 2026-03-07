@@ -41,7 +41,7 @@ export default function OrgLayout() {
 				name="invitations"
 				options={{ headerTitle: t("nav.invitations") }}
 			/>
-			<Stack.Screen name="teams" options={{ headerTitle: t("nav.teams") }} />
+			<Stack.Screen name="teams" options={{ headerShown: false }} />
 			<Stack.Screen name="roles" options={{ headerTitle: t("nav.roles") }} />
 		</Stack>
 	);

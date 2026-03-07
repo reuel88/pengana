@@ -49,17 +49,7 @@ export default function InvitationsScreen() {
 		);
 	}
 
-	if (!activeOrg) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
-					{t("noActiveOrg")}
-				</Text>
-			</Container>
-		);
-	}
-
-	const invitations = activeOrg.invitations || [];
+	const invitations = activeOrg?.invitations || [];
 	const pendingUserInvitations = myInvitations.filter(
 		(i) => i.status === "pending",
 	);
@@ -71,7 +61,7 @@ export default function InvitationsScreen() {
 			const { error } = await authClient.organization.inviteMember({
 				email,
 				role,
-				organizationId: activeOrg.id,
+				organizationId: activeOrg!.id,
 			});
 			if (error) {
 				Alert.alert(t("invitations.error"), error.message);
@@ -128,7 +118,7 @@ export default function InvitationsScreen() {
 	return (
 		<Container>
 			<ScrollView contentContainerStyle={styles.list}>
-				{isAdmin && (
+				{activeOrg && isAdmin && (
 					<View style={styles.inviteForm}>
 						<TextInput
 							style={[
@@ -182,40 +172,49 @@ export default function InvitationsScreen() {
 					</View>
 				)}
 
-				<Text style={[styles.sectionTitle, { color: theme.text }]}>
-					{t("invitations.pending")}
-				</Text>
-				{invitations.length === 0 ? (
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("invitations.noPending")}
-					</Text>
-				) : (
-					invitations.map((inv) => (
-						<View
-							key={inv.id}
-							style={[
-								styles.invItem,
-								{ borderColor: theme.border, backgroundColor: theme.card },
-							]}
-						>
-							<View style={{ flex: 1 }}>
-								<Text style={{ color: theme.text }}>{inv.email}</Text>
-								<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-									{inv.role} - {t(`invitations.status.${inv.status}`)}
-								</Text>
-							</View>
-							{isAdmin && inv.status === "pending" && (
-								<TouchableOpacity
-									onPress={() => handleCancel(inv.id)}
-									style={[styles.cancelButton, { borderColor: theme.border }]}
+				{activeOrg && (
+					<>
+						<Text style={[styles.sectionTitle, { color: theme.text }]}>
+							{t("invitations.pending")}
+						</Text>
+						{invitations.length === 0 ? (
+							<Text style={{ color: theme.text, opacity: 0.5 }}>
+								{t("invitations.noPending")}
+							</Text>
+						) : (
+							invitations.map((inv) => (
+								<View
+									key={inv.id}
+									style={[
+										styles.invItem,
+										{ borderColor: theme.border, backgroundColor: theme.card },
+									]}
 								>
-									<Text style={{ color: theme.text, fontSize: 12 }}>
-										{t("invitations.cancel")}
-									</Text>
-								</TouchableOpacity>
-							)}
-						</View>
-					))
+									<View style={{ flex: 1 }}>
+										<Text style={{ color: theme.text }}>{inv.email}</Text>
+										<Text
+											style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}
+										>
+											{inv.role} - {t(`invitations.status.${inv.status}`)}
+										</Text>
+									</View>
+									{isAdmin && inv.status === "pending" && (
+										<TouchableOpacity
+											onPress={() => handleCancel(inv.id)}
+											style={[
+												styles.cancelButton,
+												{ borderColor: theme.border },
+											]}
+										>
+											<Text style={{ color: theme.text, fontSize: 12 }}>
+												{t("invitations.cancel")}
+											</Text>
+										</TouchableOpacity>
+									)}
+								</View>
+							))
+						)}
+					</>
 				)}
 
 				<Text
