@@ -1,9 +1,10 @@
 import type { UploadTransport } from "@pengana/sync-engine";
 import { createUploadTransport } from "@pengana/todo-client";
-
+import {
+	getFileForUpload,
+	removeFileForUpload,
+} from "@pengana/todo-client/dexie-file-store";
 import { client } from "@/utils/orpc";
-
-import { getFileForUpload, removeFileForUpload } from "./file-store";
 
 export function createWebUploadTransport(): UploadTransport {
 	return createUploadTransport({
@@ -18,7 +19,7 @@ export function createWebUploadTransport(): UploadTransport {
 			return fileData.base64;
 		},
 		onUploaded(todoId) {
-			removeFileForUpload(todoId);
+			void removeFileForUpload(todoId);
 		},
 	});
 }

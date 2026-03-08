@@ -10,6 +10,7 @@
 	},
 	"create": {
 		"title": "Lumikha ng Organisasyon",
+		"description": "Lumikha ng bagong organisasyon para magsimula.",
 		"name": "Pangalan ng Organisasyon",
 		"slug": "Slug",
 		"logo": "URL ng Logo",

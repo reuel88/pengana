@@ -13,6 +13,7 @@ import {
 } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/teams/$teamId")({
 	component: TeamDetailPage,
@@ -33,7 +34,7 @@ function TeamDetailPage() {
 	const [newName, setNewName] = useState("");
 	const [savingName, setSavingName] = useState(false);
 
-	const team = teams?.find((t) => t.id === teamId);
+	const team = teams?.find((tm) => tm.id === teamId);
 
 	if (teamsLoading || membersLoading) {
 		return <p>{t("common:status.loading")}</p>;
@@ -50,78 +51,63 @@ function TeamDetailPage() {
 			toast.error(t("teams.error"));
 			return;
 		}
-		try {
-			const { error } = await authClient.organization.addTeamMember({
-				teamId: team.id,
-				userId: member.userId,
-			});
-			if (error) {
-				toast.error(error.message || t("teams.error"));
-				return;
-			}
-			toast.success(t("teams.addMemberSuccess"));
-			setMemberEmail("");
-			await invalidateTeamMembers(teamId);
-		} catch {
-			toast.error(t("teams.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.addTeamMember({
+					teamId: team.id,
+					userId: member.userId,
+				}),
+			successMessage: t("teams.addMemberSuccess"),
+			errorMessage: t("teams.error"),
+			onSuccess: () => {
+				setMemberEmail("");
+				return invalidateTeamMembers(teamId);
+			},
+		});
 	};
 
 	const handleRemoveMember = async (userId: string) => {
-		try {
-			const { error } = await authClient.organization.removeTeamMember({
-				teamId: team.id,
-				userId,
-			});
-			if (error) {
-				toast.error(error.message || t("teams.error"));
-				return;
-			}
-			toast.success(t("teams.removeMemberSuccess"));
-			await invalidateTeamMembers(teamId);
-		} catch {
-			toast.error(t("teams.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.removeTeamMember({
+					teamId: team.id,
+					userId,
+				}),
+			successMessage: t("teams.removeMemberSuccess"),
+			errorMessage: t("teams.error"),
+			onSuccess: () => invalidateTeamMembers(teamId),
+		});
 	};
 
 	const handleDelete = async () => {
 		if (!confirm(t("teams.deleteConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.removeTeam({
-				teamId: team.id,
-			});
-			if (error) {
-				toast.error(error.message || t("teams.error"));
-				return;
-			}
-			toast.success(t("teams.deleteSuccess"));
-			await invalidateTeams(activeOrg?.id);
-			navigate({ to: "/org/teams" });
-		} catch {
-			toast.error(t("teams.error"));
-		}
+		await authMutation({
+			mutationFn: () => authClient.organization.removeTeam({ teamId: team.id }),
+			successMessage: t("teams.deleteSuccess"),
+			errorMessage: t("teams.error"),
+			onSuccess: async () => {
+				await invalidateTeams(activeOrg?.id);
+				navigate({ to: "/org/teams" });
+			},
+		});
 	};
 
 	const handleUpdateName = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setSavingName(true);
-		try {
-			const { error } = await authClient.organization.updateTeam({
-				teamId: team.id,
-				data: { name: newName },
-			});
-			if (error) {
-				toast.error(error.message || t("teams.error"));
-				return;
-			}
-			toast.success(t("teams.updateNameSuccess"));
-			await invalidateTeams(activeOrg?.id);
-			setEditingName(false);
-		} catch {
-			toast.error(t("teams.error"));
-		} finally {
-			setSavingName(false);
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.updateTeam({
+					teamId: team.id,
+					data: { name: newName },
+				}),
+			successMessage: t("teams.updateNameSuccess"),
+			errorMessage: t("teams.error"),
+			setLoading: setSavingName,
+			onSuccess: async () => {
+				await invalidateTeams(activeOrg?.id);
+				setEditingName(false);
+			},
+		});
 	};
 
 	return (

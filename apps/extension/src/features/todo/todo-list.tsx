@@ -35,6 +35,10 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 		try {
 			setError(id, null);
 			await deleteTodo(id);
+			setErrors((prev) => {
+				const { [id]: _, ...rest } = prev;
+				return rest;
+			});
 			triggerSync();
 		} catch {
 			setError(id, t("errors:failedToDeleteTodo"));

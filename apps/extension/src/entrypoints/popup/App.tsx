@@ -5,69 +5,66 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { authClient } from "@/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
+function LoadingState() {
+	const { t } = useTranslation();
+	return (
+		<div className="flex items-center justify-center p-8">
+			<p className="text-muted-foreground text-sm">{t("status.loading")}</p>
+		</div>
+	);
+}
+
+function ActionPrompt({
+	messageKey,
+	buttonKey,
+	url,
+}: {
+	messageKey: string;
+	buttonKey: string;
+	url: string;
+}) {
+	const { t } = useTranslation();
+	return (
+		<>
+			<header className="flex w-full justify-end p-2">
+				<LanguageSwitcher />
+			</header>
+			<div className="flex flex-col items-center justify-center gap-4 p-8">
+				<p className="text-muted-foreground text-sm">{t(messageKey)}</p>
+				<Button onClick={() => browser.tabs.create({ url })}>
+					{t(buttonKey)}
+				</Button>
+			</div>
+		</>
+	);
+}
+
 function App() {
 	const { data: session, isPending } = authClient.useSession();
 	const { data: orgs, isPending: isOrgsPending } =
 		authClient.useListOrganizations();
-	const { t } = useTranslation();
 
-	if (isPending) {
-		return (
-			<div className="flex items-center justify-center p-8">
-				<p className="text-muted-foreground text-sm">{t("status.loading")}</p>
-			</div>
-		);
-	}
+	if (isPending) return <LoadingState />;
 
 	if (!session) {
 		return (
-			<>
-				<header className="flex w-full justify-end p-2">
-					<LanguageSwitcher />
-				</header>
-				<div className="flex flex-col items-center justify-center gap-4 p-8">
-					<p className="text-muted-foreground text-sm">{t("loginPrompt")}</p>
-					<Button
-						onClick={() =>
-							browser.tabs.create({ url: `${env.VITE_WEB_URL}/login` })
-						}
-					>
-						{t("loginButton")}
-					</Button>
-				</div>
-			</>
+			<ActionPrompt
+				messageKey="loginPrompt"
+				buttonKey="loginButton"
+				url={`${env.VITE_WEB_URL}/login`}
+			/>
 		);
 	}
 
-	if (isOrgsPending) {
-		return (
-			<div className="flex items-center justify-center p-8">
-				<p className="text-muted-foreground text-sm">{t("status.loading")}</p>
-			</div>
-		);
-	}
+	if (isOrgsPending) return <LoadingState />;
 
 	if (!orgs || orgs.length === 0) {
 		return (
-			<>
-				<header className="flex w-full justify-end p-2">
-					<LanguageSwitcher />
-				</header>
-				<div className="flex flex-col items-center justify-center gap-4 p-8">
-					<p className="text-muted-foreground text-sm">
-						{t("onboardingPrompt")}
-					</p>
-					<Button
-						onClick={() =>
-							browser.tabs.create({
-								url: `${env.VITE_WEB_URL}/onboarding`,
-							})
-						}
-					>
-						{t("onboardingButton")}
-					</Button>
-				</div>
-			</>
+			<ActionPrompt
+				messageKey="onboardingPrompt"
+				buttonKey="onboardingButton"
+				url={`${env.VITE_WEB_URL}/onboarding`}
+			/>
 		);
 	}
 

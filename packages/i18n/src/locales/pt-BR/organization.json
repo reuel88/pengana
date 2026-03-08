@@ -10,6 +10,7 @@
 	},
 	"create": {
 		"title": "Criar organização",
+		"description": "Crie uma nova organização para começar.",
 		"name": "Nome da organização",
 		"slug": "Slug",
 		"logo": "URL do logo",

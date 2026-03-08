@@ -2,7 +2,6 @@ import { useTranslation } from "@pengana/i18n";
 import { useState } from "react";
 import {
 	ActivityIndicator,
-	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -12,6 +11,7 @@ import {
 
 import { useInvalidateOrg } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export function OnboardingCreateOrg({
@@ -30,29 +30,34 @@ export function OnboardingCreateOrg({
 	const [logo, setLogo] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = async () => {
-		if (!name) return;
-		setLoading(true);
-		try {
-			const { data, error } = await authClient.organization.create({
-				name,
-				slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
-				logo: logo || undefined,
-			});
-			if (error) {
-				Alert.alert(t("create.error"), error.message);
-				return;
-			}
-			await authClient.organization.setActive({
-				organizationId: data.id,
-			});
-			await invalidateAll();
-			onCreated();
-		} catch {
-			Alert.alert(t("create.error"));
-		} finally {
-			setLoading(false);
-		}
+	const handleSubmit = () => {
+		const trimmedName = name.trim();
+		const trimmedSlug = slug.trim();
+		if (!trimmedName) return;
+		return authMutation({
+			mutationFn: () =>
+				authClient.organization.create({
+					name: trimmedName,
+					slug: trimmedSlug || trimmedName.toLowerCase().replace(/\s+/g, "-"),
+					logo: logo.trim() || undefined,
+				}),
+			errorMessage: t("create.error"),
+			onSuccess: async (data) => {
+				if (!data) return;
+				await authMutation({
+					mutationFn: () =>
+						authClient.organization.setActive({
+							organizationId: data.id,
+						}),
+					errorMessage: t("create.error"),
+					onSuccess: async () => {
+						await invalidateAll();
+						onCreated();
+					},
+				});
+			},
+			setLoading,
+		});
 	};
 
 	return (

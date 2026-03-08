@@ -10,6 +10,7 @@
 	},
 	"create": {
 		"title": "创建组织",
+		"description": "创建一个新组织以开始使用。",
 		"name": "组织名称",
 		"slug": "标识符",
 		"logo": "Logo 链接",

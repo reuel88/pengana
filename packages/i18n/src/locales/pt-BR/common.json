@@ -32,7 +32,7 @@
 	"privateData": "Dados Privados",
 	"modal": "Modal",
 	"submitting": "Enviando...",
-	"loginPrompt": "Por favor, faca login no aplicativo web primeiro.",
+	"loginPrompt": "Por favor, faça login no aplicativo web primeiro.",
 	"loginButton": "Entrar",
 	"onboardingPrompt": "Por favor, conclua a configuração da sua conta no aplicativo web.",
 	"onboardingButton": "Concluir configuração",
@@ -44,6 +44,11 @@
 	},
 	"confirm": {
 		"yes": "Sim",
-		"no": "Não"
+		"no": "Não",
+		"cancel": "Cancelar"
+	},
+	"error": {
+		"generic": "Algo deu errado. Por favor, tente novamente.",
+		"retry": "Tentar novamente"
 	}
 }

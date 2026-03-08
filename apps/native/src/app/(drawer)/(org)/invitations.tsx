@@ -1,5 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
 	Alert,
@@ -12,21 +11,166 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
-import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
+import { useInvitationMutations } from "@/hooks/use-invitation-mutations";
+import { useActiveOrg, useUserInvitations } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
-export default function InvitationsScreen() {
+function InviteForm({ orgId }: { orgId: string }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
 	const [email, setEmail] = useState("");
 	const [role, setRole] = useState<"member" | "admin">("member");
 	const [loading, setLoading] = useState(false);
-	const { isAdmin } = useOrgRole();
-	const { invalidateUserInvitations } = useInvalidateOrg();
 
+	const handleInvite = () => {
+		if (!email) return;
+		return authMutation({
+			mutationFn: () =>
+				authClient.organization.inviteMember({
+					email,
+					role,
+					organizationId: orgId,
+				}),
+			successMessage: t("invitations.sendSuccess"),
+			errorMessage: t("invitations.error"),
+			onSuccess: () => {
+				setEmail("");
+			},
+			setLoading,
+		});
+	};
+
+	return (
+		<View style={styles.inviteForm}>
+			<TextInput
+				style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+				value={email}
+				onChangeText={setEmail}
+				placeholder={t("invitations.emailPlaceholder")}
+				placeholderTextColor={theme.border}
+				keyboardType="email-address"
+				autoCapitalize="none"
+			/>
+			<View style={styles.roleRow}>
+				<TouchableOpacity
+					style={[
+						styles.roleButton,
+						{
+							borderColor: theme.border,
+							backgroundColor:
+								role === "member" ? `${theme.primary}30` : "transparent",
+						},
+					]}
+					onPress={() => setRole("member")}
+				>
+					<Text style={{ color: theme.text }}>{t("roles.member")}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={[
+						styles.roleButton,
+						{
+							borderColor: theme.border,
+							backgroundColor:
+								role === "admin" ? `${theme.primary}30` : "transparent",
+						},
+					]}
+					onPress={() => setRole("admin")}
+				>
+					<Text style={{ color: theme.text }}>{t("roles.admin")}</Text>
+				</TouchableOpacity>
+			</View>
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: theme.primary }]}
+				onPress={handleInvite}
+				disabled={loading || !email}
+			>
+				<Text style={styles.buttonText}>
+					{loading ? t("common:submitting") : t("invitations.send")}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
+
+function OrgInvitationsList({
+	invitations,
+	isPendingFor,
+	onCancel,
+}: {
+	invitations: Array<{
+		id: string;
+		email: string;
+		role: string;
+		status: string;
+	}>;
+	isPendingFor: (id: string) => boolean;
+	onCancel: (id: string) => void;
+}) {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
+	const { isAdmin } = useOrgRole();
+
+	return (
+		<>
+			<Text style={[styles.sectionTitle, { color: theme.text }]}>
+				{t("invitations.pending")}
+			</Text>
+			{invitations.length === 0 ? (
+				<Text style={{ color: theme.text, opacity: 0.5 }}>
+					{t("invitations.noPending")}
+				</Text>
+			) : (
+				invitations.map((inv) => (
+					<View
+						key={inv.id}
+						style={[
+							styles.invItem,
+							{ borderColor: theme.border, backgroundColor: theme.card },
+						]}
+					>
+						<View style={{ flex: 1 }}>
+							<Text style={{ color: theme.text }}>{inv.email}</Text>
+							<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
+								{t(`roles.${inv.role}`)} -{" "}
+								{t(`invitations.status.${inv.status}`)}
+							</Text>
+						</View>
+						{isAdmin && inv.status === "pending" && (
+							<TouchableOpacity
+								onPress={() => onCancel(inv.id)}
+								disabled={isPendingFor(inv.id)}
+								style={[
+									styles.cancelButton,
+									{ borderColor: theme.border },
+									isPendingFor(inv.id) && { opacity: 0.5 },
+								]}
+							>
+								<Text style={{ color: theme.text, fontSize: 12 }}>
+									{t("invitations.cancel")}
+								</Text>
+							</TouchableOpacity>
+						)}
+					</View>
+				))
+			)}
+		</>
+	);
+}
+
+function UserInvitationsList({
+	isPendingFor,
+	acceptMutation,
+	rejectMutation,
+}: {
+	isPendingFor: (id: string) => boolean;
+	acceptMutation: ReturnType<typeof useInvitationMutations>["acceptMutation"];
+	rejectMutation: ReturnType<typeof useInvitationMutations>["rejectMutation"];
+}) {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
 	const {
 		data: myInvitations,
 		isPending: myInvitationsLoading,
@@ -34,60 +178,94 @@ export default function InvitationsScreen() {
 		refetch: refetchMyInvitations,
 	} = useUserInvitations();
 
-	const acceptMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
-			});
-			if (error) throw error;
-		},
-		onSuccess: () => {
-			Alert.alert(t("invitations.acceptSuccess"));
-			invalidateUserInvitations();
-		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
-	});
+	const pendingUserInvitations = (myInvitations ?? []).filter(
+		(i) => i.status === "pending",
+	);
 
-	const rejectMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId,
-			});
-			if (error) throw error;
-		},
-		onSuccess: () => {
-			Alert.alert(t("invitations.rejectSuccess"));
-			invalidateUserInvitations();
-		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
-	});
+	return (
+		<>
+			<Text style={[styles.sectionTitle, { color: theme.text, marginTop: 16 }]}>
+				{t("invitations.myInvitations")}
+			</Text>
+			{myInvitationsLoading ? (
+				<Text style={{ color: theme.text, opacity: 0.5 }}>
+					{t("common:status.loading")}
+				</Text>
+			) : myInvitationsError ? (
+				<View style={{ gap: 8 }}>
+					<Text style={{ color: theme.text, opacity: 0.5 }}>
+						{t("invitations.fetchError")}
+					</Text>
+					<TouchableOpacity
+						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
+						onPress={() => refetchMyInvitations()}
+					>
+						<Text style={{ color: "#fff", fontSize: 12 }}>
+							{t("invitations.retry")}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			) : pendingUserInvitations.length === 0 ? (
+				<Text style={{ color: theme.text, opacity: 0.5 }}>
+					{t("invitations.noInvitations")}
+				</Text>
+			) : (
+				pendingUserInvitations.map((inv) => (
+					<View
+						key={inv.id}
+						style={[
+							styles.invItem,
+							{ borderColor: theme.border, backgroundColor: theme.card },
+						]}
+					>
+						<View style={{ flex: 1 }}>
+							<Text style={{ color: theme.text }}>{inv.organizationName}</Text>
+							<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
+								{t(`roles.${inv.role}`)}
+							</Text>
+						</View>
+						<View style={styles.actionRow}>
+							<TouchableOpacity
+								onPress={() => acceptMutation.mutate(inv.id)}
+								disabled={isPendingFor(inv.id)}
+								style={[
+									styles.acceptButton,
+									{ backgroundColor: theme.primary },
+									isPendingFor(inv.id) && { opacity: 0.5 },
+								]}
+							>
+								<Text style={{ color: "#fff", fontSize: 12 }}>
+									{t("invitations.accept")}
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={() => rejectMutation.mutate(inv.id)}
+								disabled={isPendingFor(inv.id)}
+								style={[
+									styles.cancelButton,
+									{ borderColor: theme.border },
+									isPendingFor(inv.id) && { opacity: 0.5 },
+								]}
+							>
+								<Text style={{ color: theme.text, fontSize: 12 }}>
+									{t("invitations.reject")}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				))
+			)}
+		</>
+	);
+}
 
-	const cancelMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.cancelInvitation({
-				invitationId,
-			});
-			if (error) throw error;
-		},
-		onSuccess: () => {
-			Alert.alert(t("invitations.cancelSuccess"));
-		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
-	});
-
-	const getMutatingId = (mutation: typeof acceptMutation) =>
-		mutation.isPending ? mutation.variables : null;
-
-	const isPendingFor = (invitationId: string) =>
-		getMutatingId(acceptMutation) === invitationId ||
-		getMutatingId(rejectMutation) === invitationId ||
-		getMutatingId(cancelMutation) === invitationId;
+export default function InvitationsScreen() {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
+	const { data: activeOrg, isPending } = useActiveOrg();
+	const { isAdmin } = useOrgRole();
+	const { acceptMutation, rejectMutation, cancelMutation, isPendingFor } =
+		useInvitationMutations();
 
 	if (isPending) {
 		return (
@@ -100,31 +278,6 @@ export default function InvitationsScreen() {
 	}
 
 	const invitations = activeOrg?.invitations || [];
-	const pendingUserInvitations = (myInvitations ?? []).filter(
-		(i) => i.status === "pending",
-	);
-
-	const handleInvite = async () => {
-		if (!email) return;
-		setLoading(true);
-		try {
-			const { error } = await authClient.organization.inviteMember({
-				email,
-				role,
-				organizationId: activeOrg?.id,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			Alert.alert(t("invitations.sendSuccess"));
-			setEmail("");
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	const handleCancel = (invitationId: string) => {
 		if (isPendingFor(invitationId)) return;
@@ -140,183 +293,21 @@ export default function InvitationsScreen() {
 	return (
 		<Container>
 			<ScrollView contentContainerStyle={styles.list}>
-				{activeOrg && isAdmin && (
-					<View style={styles.inviteForm}>
-						<TextInput
-							style={[
-								styles.input,
-								{ color: theme.text, borderColor: theme.border },
-							]}
-							value={email}
-							onChangeText={setEmail}
-							placeholder={t("invitations.emailPlaceholder")}
-							placeholderTextColor={theme.border}
-							keyboardType="email-address"
-							autoCapitalize="none"
-						/>
-						<View style={styles.roleRow}>
-							<TouchableOpacity
-								style={[
-									styles.roleButton,
-									{
-										borderColor: theme.border,
-										backgroundColor:
-											role === "member" ? `${theme.primary}30` : "transparent",
-									},
-								]}
-								onPress={() => setRole("member")}
-							>
-								<Text style={{ color: theme.text }}>{t("roles.member")}</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[
-									styles.roleButton,
-									{
-										borderColor: theme.border,
-										backgroundColor:
-											role === "admin" ? `${theme.primary}30` : "transparent",
-									},
-								]}
-								onPress={() => setRole("admin")}
-							>
-								<Text style={{ color: theme.text }}>{t("roles.admin")}</Text>
-							</TouchableOpacity>
-						</View>
-						<TouchableOpacity
-							style={[styles.button, { backgroundColor: theme.primary }]}
-							onPress={handleInvite}
-							disabled={loading || !email}
-						>
-							<Text style={styles.buttonText}>
-								{loading ? t("common:submitting") : t("invitations.send")}
-							</Text>
-						</TouchableOpacity>
-					</View>
-				)}
+				{activeOrg && isAdmin && <InviteForm orgId={activeOrg.id} />}
 
 				{activeOrg && (
-					<>
-						<Text style={[styles.sectionTitle, { color: theme.text }]}>
-							{t("invitations.pending")}
-						</Text>
-						{invitations.length === 0 ? (
-							<Text style={{ color: theme.text, opacity: 0.5 }}>
-								{t("invitations.noPending")}
-							</Text>
-						) : (
-							invitations.map((inv) => (
-								<View
-									key={inv.id}
-									style={[
-										styles.invItem,
-										{ borderColor: theme.border, backgroundColor: theme.card },
-									]}
-								>
-									<View style={{ flex: 1 }}>
-										<Text style={{ color: theme.text }}>{inv.email}</Text>
-										<Text
-											style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}
-										>
-											{t(`roles.${inv.role}`)} -{" "}
-											{t(`invitations.status.${inv.status}`)}
-										</Text>
-									</View>
-									{isAdmin && inv.status === "pending" && (
-										<TouchableOpacity
-											onPress={() => handleCancel(inv.id)}
-											disabled={isPendingFor(inv.id)}
-											style={[
-												styles.cancelButton,
-												{ borderColor: theme.border },
-												isPendingFor(inv.id) && { opacity: 0.5 },
-											]}
-										>
-											<Text style={{ color: theme.text, fontSize: 12 }}>
-												{t("invitations.cancel")}
-											</Text>
-										</TouchableOpacity>
-									)}
-								</View>
-							))
-						)}
-					</>
+					<OrgInvitationsList
+						invitations={invitations}
+						isPendingFor={isPendingFor}
+						onCancel={handleCancel}
+					/>
 				)}
 
-				<Text
-					style={[styles.sectionTitle, { color: theme.text, marginTop: 16 }]}
-				>
-					{t("invitations.myInvitations")}
-				</Text>
-				{myInvitationsLoading ? (
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("common:status.loading")}
-					</Text>
-				) : myInvitationsError ? (
-					<View style={{ gap: 8 }}>
-						<Text style={{ color: theme.text, opacity: 0.5 }}>
-							{t("invitations.fetchError")}
-						</Text>
-						<TouchableOpacity
-							style={[styles.acceptButton, { backgroundColor: theme.primary }]}
-							onPress={() => refetchMyInvitations()}
-						>
-							<Text style={{ color: "#fff", fontSize: 12 }}>
-								{t("invitations.retry")}
-							</Text>
-						</TouchableOpacity>
-					</View>
-				) : pendingUserInvitations.length === 0 ? (
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("invitations.noInvitations")}
-					</Text>
-				) : (
-					pendingUserInvitations.map((inv) => (
-						<View
-							key={inv.id}
-							style={[
-								styles.invItem,
-								{ borderColor: theme.border, backgroundColor: theme.card },
-							]}
-						>
-							<View style={{ flex: 1 }}>
-								<Text style={{ color: theme.text }}>
-									{inv.organizationName}
-								</Text>
-								<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-									{t(`roles.${inv.role}`)}
-								</Text>
-							</View>
-							<View style={styles.actionRow}>
-								<TouchableOpacity
-									onPress={() => acceptMutation.mutate(inv.id)}
-									disabled={isPendingFor(inv.id)}
-									style={[
-										styles.acceptButton,
-										{ backgroundColor: theme.primary },
-										isPendingFor(inv.id) && { opacity: 0.5 },
-									]}
-								>
-									<Text style={{ color: "#fff", fontSize: 12 }}>
-										{t("invitations.accept")}
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									onPress={() => rejectMutation.mutate(inv.id)}
-									disabled={isPendingFor(inv.id)}
-									style={[
-										styles.cancelButton,
-										{ borderColor: theme.border },
-										isPendingFor(inv.id) && { opacity: 0.5 },
-									]}
-								>
-									<Text style={{ color: theme.text, fontSize: 12 }}>
-										{t("invitations.reject")}
-									</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					))
-				)}
+				<UserInvitationsList
+					isPendingFor={isPendingFor}
+					acceptMutation={acceptMutation}
+					rejectMutation={rejectMutation}
+				/>
 			</ScrollView>
 		</Container>
 	);

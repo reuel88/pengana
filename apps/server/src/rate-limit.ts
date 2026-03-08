@@ -7,8 +7,7 @@ const isDev = env.NODE_ENV === "development";
 const keyGenerator = (c: Parameters<typeof getConnInfo>[0]) =>
 	getConnInfo(c).remote.address ?? "unknown";
 
-// biome-ignore lint/complexity/noBannedTypes: hono-rate-limiter handler expects generic json method
-const handler = (c: { json: Function }) =>
+const handler = (c: { json: (data: unknown, status: number) => Response }) =>
 	c.json(
 		{
 			success: false,

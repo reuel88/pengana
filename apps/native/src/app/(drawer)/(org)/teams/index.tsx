@@ -1,8 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-	Alert,
 	FlatList,
 	StyleSheet,
 	Text,
@@ -12,30 +11,26 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import {
+	useActiveOrg,
+	useInvalidateOrg,
+	useTeams,
+} from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function TeamsIndexScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const router = useRouter();
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
-	const [teams, setTeams] = useState<Array<{ id: string; name: string }>>([]);
-	const [teamsLoading, setTeamsLoading] = useState(true);
+	const { data: activeOrg, isPending } = useActiveOrg();
+	const { data: teams = [], isPending: teamsLoading } = useTeams(activeOrg?.id);
 	const [teamName, setTeamName] = useState("");
 	const [creating, setCreating] = useState(false);
 	const { isAdmin } = useOrgRole();
-
-	useEffect(() => {
-		if (!activeOrg) return;
-		authClient.organization
-			.listTeams({ query: { organizationId: activeOrg.id } })
-			.then(({ data }) => {
-				if (data) setTeams(data);
-			})
-			.finally(() => setTeamsLoading(false));
-	}, [activeOrg]);
+	const { invalidateTeams } = useInvalidateOrg();
 
 	if (isPending || teamsLoading) {
 		return (
@@ -57,25 +52,21 @@ export default function TeamsIndexScreen() {
 		);
 	}
 
-	const handleCreate = async () => {
+	const handleCreate = () => {
 		if (!teamName) return;
-		setCreating(true);
-		try {
-			const { data, error } = await authClient.organization.createTeam({
-				name: teamName,
-				organizationId: activeOrg.id,
-			});
-			if (error) {
-				Alert.alert(t("teams.error"), error.message);
-				return;
-			}
-			if (data) setTeams((prev) => [...prev, data]);
-			setTeamName("");
-		} catch {
-			Alert.alert(t("teams.error"));
-		} finally {
-			setCreating(false);
-		}
+		return authMutation({
+			mutationFn: () =>
+				authClient.organization.createTeam({
+					name: teamName,
+					organizationId: activeOrg.id,
+				}),
+			errorMessage: t("teams.error"),
+			onSuccess: () => {
+				invalidateTeams(activeOrg.id);
+				setTeamName("");
+			},
+			setLoading: setCreating,
+		});
 	};
 
 	return (

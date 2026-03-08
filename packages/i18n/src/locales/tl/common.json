@@ -44,6 +44,11 @@
 	},
 	"confirm": {
 		"yes": "Oo",
-		"no": "Hindi"
+		"no": "Hindi",
+		"cancel": "Kanselahin"
+	},
+	"error": {
+		"generic": "May nangyaring mali. Pakisubukan muli.",
+		"retry": "Subukan muli"
 	}
 }

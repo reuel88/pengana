@@ -9,6 +9,7 @@ export function useSyncOnFocus(
 ) {
 	const syncRef = useStableSyncRef(engineRef);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref, its .current never triggers re-renders
 	useEffect(() => {
 		if (!isOnline) return;
 
@@ -24,5 +25,5 @@ export function useSyncOnFocus(
 		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () =>
 			document.removeEventListener("visibilitychange", onVisibilityChange);
-	}, [isOnline, syncRef.current]);
+	}, [isOnline]);
 }

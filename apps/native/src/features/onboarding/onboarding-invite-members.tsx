@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	Alert,
@@ -20,11 +20,6 @@ interface InviteEntry {
 	role: "member" | "admin";
 }
 
-let entryCounter = 0;
-function generateId() {
-	return `entry-${++entryCounter}-${Date.now()}`;
-}
-
 export function OnboardingInviteMembers({
 	onInvited,
 	onSkip,
@@ -36,6 +31,12 @@ export function OnboardingInviteMembers({
 	const { t: tOrg } = useTranslation("organization");
 	const { theme } = useTheme();
 	const { data: activeOrg } = useActiveOrg();
+	const entryCounter = useRef(0);
+
+	const generateId = () => {
+		return `entry-${++entryCounter.current}-${Date.now()}`;
+	};
+
 	const [entries, setEntries] = useState<InviteEntry[]>([
 		{ id: generateId(), email: "", role: "member" },
 	]);

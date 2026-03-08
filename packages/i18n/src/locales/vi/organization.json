@@ -10,6 +10,7 @@
 	},
 	"create": {
 		"title": "Tạo tổ chức",
+		"description": "Tạo một tổ chức mới để bắt đầu.",
 		"name": "Tên tổ chức",
 		"slug": "Slug",
 		"logo": "URL logo",

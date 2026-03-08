@@ -8,14 +8,98 @@ import {
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import {
 	useInvalidateNotifications,
 	useNotifications,
 } from "@/features/notifications/use-notification-queries";
 import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { client } from "@/utils/orpc";
+
+function InvitationItem({
+	invitation,
+	disabled,
+	onAccept,
+	onReject,
+}: {
+	invitation: {
+		id: string;
+		organizationName: string;
+		organizationId: string;
+		role: string;
+	};
+	disabled: boolean;
+	onAccept: (id: string, orgId: string) => void;
+	onReject: (id: string) => void;
+}) {
+	const { t } = useTranslation("notifications");
+
+	return (
+		<DropdownMenuItem
+			onSelect={(e) => e.preventDefault()}
+			className="flex flex-col items-start gap-2 p-2"
+		>
+			<div className="flex w-full items-center justify-between">
+				<div className="flex flex-col gap-0.5">
+					<span className="font-medium text-sm">
+						{invitation.organizationName}
+					</span>
+					<span className="text-muted-foreground text-xs">
+						{invitation.role}
+					</span>
+				</div>
+				<div className="flex gap-1">
+					<Button
+						size="sm"
+						variant="default"
+						disabled={disabled}
+						onClick={() => onAccept(invitation.id, invitation.organizationId)}
+					>
+						{t("accept")}
+					</Button>
+					<Button
+						size="sm"
+						variant="outline"
+						disabled={disabled}
+						onClick={() => onReject(invitation.id)}
+					>
+						{t("reject")}
+					</Button>
+				</div>
+			</div>
+		</DropdownMenuItem>
+	);
+}
+
+function NotificationItem({
+	notification,
+	onMarkRead,
+}: {
+	notification: { id: string; body: string; createdAt: Date };
+	onMarkRead: (id: string) => void;
+}) {
+	return (
+		<DropdownMenuItem
+			onSelect={(e) => e.preventDefault()}
+			className="flex items-center justify-between gap-2 p-2"
+		>
+			<div className="flex flex-col gap-0.5">
+				<span className="text-sm">{notification.body}</span>
+				<span className="text-muted-foreground text-xs">
+					{notification.createdAt.toLocaleDateString()}
+				</span>
+			</div>
+			<Button
+				size="sm"
+				variant="ghost"
+				onClick={() => onMarkRead(notification.id)}
+			>
+				&times;
+			</Button>
+		</DropdownMenuItem>
+	);
+}
 
 export function NotificationCenter() {
 	const { t } = useTranslation("notifications");
@@ -33,25 +117,23 @@ export function NotificationCenter() {
 	const handleAccept = async (invitationId: string, organizationId: string) => {
 		setActingId(invitationId);
 		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
+			await authMutation({
+				mutationFn: () =>
+					authClient.organization.acceptInvitation({ invitationId }),
+				successMessage: t("accepted"),
+				errorMessage: t("error"),
+				onSuccess: async () => {
+					await authClient.organization.setActive({ organizationId });
+					await Promise.all([
+						invalidateUserInvitations(),
+						invalidateActiveOrg(),
+						invalidateListOrgs(),
+					]);
+					client.notification
+						.onInvitationAccepted({ invitationId })
+						.catch(() => {});
+				},
 			});
-			if (error) {
-				toast.error(error.message || t("error"));
-				return;
-			}
-			await authClient.organization.setActive({ organizationId });
-			await Promise.all([
-				invalidateUserInvitations(),
-				invalidateActiveOrg(),
-				invalidateListOrgs(),
-			]);
-			toast.success(t("accepted"));
-			client.notification
-				.onInvitationAccepted({ invitationId })
-				.catch(() => {});
-		} catch {
-			toast.error(t("error"));
 		} finally {
 			setActingId(null);
 		}
@@ -60,17 +142,13 @@ export function NotificationCenter() {
 	const handleReject = async (invitationId: string) => {
 		setActingId(invitationId);
 		try {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId,
+			await authMutation({
+				mutationFn: () =>
+					authClient.organization.rejectInvitation({ invitationId }),
+				successMessage: t("rejected"),
+				errorMessage: t("error"),
+				onSuccess: () => invalidateUserInvitations(),
 			});
-			if (error) {
-				toast.error(error.message || t("error"));
-				return;
-			}
-			await invalidateUserInvitations();
-			toast.success(t("rejected"));
-		} catch {
-			toast.error(t("error"));
 		} finally {
 			setActingId(null);
 		}
@@ -112,45 +190,13 @@ export function NotificationCenter() {
 									{t("invitations")}
 								</div>
 								{pending.map((invitation) => (
-									<DropdownMenuItem
+									<InvitationItem
 										key={invitation.id}
-										onSelect={(e) => e.preventDefault()}
-										className="flex flex-col items-start gap-2 p-2"
-									>
-										<div className="flex w-full items-center justify-between">
-											<div className="flex flex-col gap-0.5">
-												<span className="font-medium text-sm">
-													{invitation.organizationName}
-												</span>
-												<span className="text-muted-foreground text-xs">
-													{invitation.role}
-												</span>
-											</div>
-											<div className="flex gap-1">
-												<Button
-													size="sm"
-													variant="default"
-													disabled={actingId !== null}
-													onClick={() =>
-														handleAccept(
-															invitation.id,
-															invitation.organizationId,
-														)
-													}
-												>
-													{t("accept")}
-												</Button>
-												<Button
-													size="sm"
-													variant="outline"
-													disabled={actingId !== null}
-													onClick={() => handleReject(invitation.id)}
-												>
-													{t("reject")}
-												</Button>
-											</div>
-										</div>
-									</DropdownMenuItem>
+										invitation={invitation}
+										disabled={actingId !== null}
+										onAccept={handleAccept}
+										onReject={handleReject}
+									/>
 								))}
 							</>
 						)}
@@ -160,25 +206,11 @@ export function NotificationCenter() {
 									{t("notifications")}
 								</div>
 								{unreadNotifications.map((n) => (
-									<DropdownMenuItem
+									<NotificationItem
 										key={n.id}
-										onSelect={(e) => e.preventDefault()}
-										className="flex items-center justify-between gap-2 p-2"
-									>
-										<div className="flex flex-col gap-0.5">
-											<span className="text-sm">{n.body}</span>
-											<span className="text-muted-foreground text-xs">
-												{new Date(n.createdAt).toLocaleDateString()}
-											</span>
-										</div>
-										<Button
-											size="sm"
-											variant="ghost"
-											onClick={() => handleMarkRead(n.id)}
-										>
-											&times;
-										</Button>
-									</DropdownMenuItem>
+										notification={n}
+										onMarkRead={handleMarkRead}
+									/>
 								))}
 								<div className="border-t px-2 py-1.5">
 									<button

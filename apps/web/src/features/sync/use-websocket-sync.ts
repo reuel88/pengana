@@ -31,11 +31,9 @@ export function useWebSocketSync(
 		function connect() {
 			if (unmounted) return;
 
-			console.log("[ws] connecting to", getWsUrl());
 			ws = new WebSocket(getWsUrl());
 
 			ws.onopen = () => {
-				console.log("[ws] connected");
 				backoff = 1000;
 				syncRef.current();
 			};
@@ -43,9 +41,7 @@ export function useWebSocketSync(
 			ws.onmessage = (event) => {
 				try {
 					const data = JSON.parse(event.data);
-					console.log("[ws] message received:", data.type);
 					if (data.type === "sync-notify") {
-						console.log("[ws] sync-notify received, triggering sync");
 						syncRef.current();
 						queryClient.invalidateQueries({
 							queryKey: notificationQueryKeys.list,
@@ -59,8 +55,7 @@ export function useWebSocketSync(
 				}
 			};
 
-			ws.onclose = (event) => {
-				console.log("[ws] closed, code:", event.code, "reason:", event.reason);
+			ws.onclose = () => {
 				if (unmounted) return;
 				reconnectTimeout = setTimeout(() => {
 					backoff = Math.min(backoff * 2, 30_000);

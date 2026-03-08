@@ -1,10 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import { Link } from "expo-router";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, Text } from "react-native";
 
 import { Container } from "@/components/container";
 import { SignIn } from "@/components/sign-in";
 import { useTheme } from "@/lib/theme";
+import { authScreenStyles as styles } from "@/styles/auth";
 
 export default function LoginScreen() {
 	const { t } = useTranslation();
@@ -26,21 +27,3 @@ export default function LoginScreen() {
 		</Container>
 	);
 }
-
-const styles = StyleSheet.create({
-	scrollView: {
-		flex: 1,
-	},
-	content: {
-		padding: 16,
-		justifyContent: "center",
-		flexGrow: 1,
-	},
-	link: {
-		alignSelf: "center",
-		marginTop: 16,
-	},
-	linkText: {
-		fontSize: 14,
-	},
-});

@@ -8,11 +8,17 @@
 	"type": "module",
 	"scripts": {
 		"dev": "turbo dev",
-		"build": "turbo build",
-		"check-types": "turbo check-types",
 		"dev:native": "turbo -F native dev",
 		"dev:web": "turbo -F web dev",
 		"dev:server": "turbo -F server dev",
+
+		"build": "turbo build",
+
+		"check": "biome check .",
+		"check-types": "turbo check-types",
+		"check:i18n": "turbo -F @pengana/i18n check:i18n",
+		"format": "biome check --write .",
+
 		"db:push": "turbo -F @pengana/db db:push",
 		"db:studio": "turbo -F @pengana/db db:studio",
 		"db:generate": "turbo -F @pengana/db db:generate",
@@ -21,10 +27,10 @@
 		"db:watch": "turbo -F @pengana/db db:watch",
 		"db:stop": "turbo -F @pengana/db db:stop",
 		"db:down": "turbo -F @pengana/db db:down",
+		"db:destroy": "turbo -F @pengana/db db:destroy",
+
 		"test": "turbo test",
-		"check:i18n": "turbo -F @pengana/i18n check:i18n",
-		"format": "biome check --write .",
-		"check": "biome check .",
+
 		"prepare": "husky"
 	},
 	"dependencies": {

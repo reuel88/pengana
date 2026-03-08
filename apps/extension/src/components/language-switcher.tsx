@@ -6,7 +6,7 @@ export function LanguageSwitcher() {
 
 	const handleChange = (locale: SupportedLocale) => {
 		localStorage.setItem("locale", locale);
-		window.location.reload();
+		void i18n.changeLanguage(locale);
 	};
 
 	return (

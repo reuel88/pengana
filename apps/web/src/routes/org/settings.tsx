@@ -3,12 +3,12 @@ import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,
@@ -24,7 +24,15 @@ function OrgSettingsPage() {
 	const [name, setName] = useState("");
 	const [slug, setSlug] = useState("");
 	const [logo, setLogo] = useState("");
-	const [initialized, setInitialized] = useState(false);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
+	useEffect(() => {
+		if (activeOrg) {
+			setName(activeOrg.name);
+			setSlug(activeOrg.slug);
+			setLogo(activeOrg.logo || "");
+		}
+	}, [activeOrg?.id]);
 
 	if (isPending) {
 		return <p>{t("common:status.loading")}</p>;
@@ -34,52 +42,30 @@ function OrgSettingsPage() {
 		return <p className="text-muted-foreground">{t("noActiveOrg")}</p>;
 	}
 
-	if (!initialized) {
-		setName(activeOrg.name);
-		setSlug(activeOrg.slug);
-		setLogo(activeOrg.logo || "");
-		setInitialized(true);
-	}
-
 	const handleUpdate = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setLoading(true);
-		try {
-			const { error } = await authClient.organization.update({
-				data: {
-					name,
-					slug,
-					logo: logo || undefined,
-				},
-			});
-			if (error) {
-				toast.error(error.message || t("settings.error"));
-				return;
-			}
-			toast.success(t("settings.updateSuccess"));
-			await Promise.all([invalidateActiveOrg(), invalidateListOrgs()]);
-		} catch {
-			toast.error(t("settings.error"));
-		} finally {
-			setLoading(false);
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.update({
+					data: { name, slug, logo: logo || undefined },
+				}),
+			successMessage: t("settings.updateSuccess"),
+			errorMessage: t("settings.error"),
+			setLoading,
+			onSuccess: () =>
+				Promise.all([invalidateActiveOrg(), invalidateListOrgs()]),
+		});
 	};
 
 	const handleDelete = async () => {
 		if (!confirm(t("settings.deleteConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.delete({
-				organizationId: activeOrg.id,
-			});
-			if (error) {
-				toast.error(error.message || t("settings.error"));
-				return;
-			}
-			toast.success(t("settings.deleteSuccess"));
-			await invalidateAll();
-		} catch {
-			toast.error(t("settings.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.delete({ organizationId: activeOrg.id }),
+			successMessage: t("settings.deleteSuccess"),
+			errorMessage: t("settings.error"),
+			onSuccess: () => invalidateAll(),
+		});
 	};
 
 	return (

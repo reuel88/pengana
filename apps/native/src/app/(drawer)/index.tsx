@@ -28,8 +28,7 @@ export default function Home() {
 						]}
 					>
 						<Text style={[styles.welcomeText, { color: theme.text }]}>
-							{t("dashboard:welcome", { name: "" })}
-							<Text style={styles.userName}>{session?.user?.name}</Text>
+							{t("dashboard:welcome", { name: session?.user?.name || "" })}
 						</Text>
 						<Text
 							style={[styles.userEmail, { color: theme.text, opacity: 0.7 }]}
@@ -72,9 +71,6 @@ const styles = StyleSheet.create({
 	welcomeText: {
 		fontSize: 18,
 		marginBottom: 4,
-	},
-	userName: {
-		fontWeight: "bold",
 	},
 	userEmail: {
 		fontSize: 14,

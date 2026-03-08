@@ -10,6 +10,7 @@
 	},
 	"create": {
 		"title": "조직 만들기",
+		"description": "시작하려면 새 조직을 만드세요.",
 		"name": "조직 이름",
 		"slug": "슬러그",
 		"logo": "로고 URL",

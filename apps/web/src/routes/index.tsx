@@ -27,7 +27,13 @@ function DashboardPage() {
 		<div>
 			<h1>{t("title")}</h1>
 			<p>{t("welcome", { name: session.data.user.name })}</p>
-			<p>API: {privateData.data?.data?.message}</p>
+			{privateData.isLoading ? (
+				<p>{t("common:status.loading")}</p>
+			) : privateData.isError ? (
+				<p>{t("common:status.disconnected")}</p>
+			) : (
+				<p>API: {privateData.data?.data?.message}</p>
+			)}
 			<p>{hasProSubscription ? t("planPro") : t("planFree")}</p>
 			{hasProSubscription ? (
 				<Button

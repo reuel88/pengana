@@ -1,7 +1,7 @@
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { isRtlLocale } from "@pengana/i18n/rtl";
-import { deLocalizeUrl, detectLocaleFromUrl } from "@pengana/i18n/urls";
+
 import {
 	DarkTheme,
 	DefaultTheme,
@@ -16,23 +16,41 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { I18nManager, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useLocaleUrl } from "@/hooks/use-locale-url";
+
 import { authClient } from "@/lib/auth-client";
 import { NAV_THEME } from "@/lib/constants";
 import { useColorScheme } from "@/lib/use-color-scheme";
 import { queryClient } from "@/utils/orpc";
 
-if (Platform.OS === "web") {
-	const detected = detectLocaleFromUrl(window.location.pathname);
-	const stripped = deLocalizeUrl(window.location.pathname);
-	if (stripped !== window.location.pathname) {
-		window.history.replaceState(
-			null,
-			"",
-			stripped + window.location.search + window.location.hash,
-		);
+type RouteTarget = "/(auth)/login" | "/onboarding" | "/(drawer)" | null;
+
+function resolveRoute(
+	session: unknown,
+	lifecycleChecked: boolean,
+	needsOnboarding: boolean,
+	segments: string[],
+): RouteTarget {
+	const inAuthGroup = segments[0] === "(auth)";
+	const inInvitation = segments[0] === "invitation";
+	const inOnboarding = segments[0] === "onboarding";
+
+	if (!session && !inAuthGroup && !inInvitation) {
+		return "/(auth)/login";
 	}
-	localStorage.setItem("appLocale", detected);
+
+	if (!session || !lifecycleChecked) return null;
+
+	if (session && inAuthGroup) {
+		return needsOnboarding ? "/onboarding" : "/(drawer)";
+	}
+	if (session && !inOnboarding && !inInvitation && needsOnboarding) {
+		return "/onboarding";
+	}
+	if (session && inOnboarding && !needsOnboarding) {
+		return "/(drawer)";
+	}
+
+	return null;
 }
 
 const LIGHT_THEME: Theme = {
@@ -59,8 +77,6 @@ function RootLayoutInner() {
 	const { data: session, isPending } = authClient.useSession();
 	const segments = useSegments();
 	const router = useRouter();
-	useLocaleUrl();
-
 	const [lifecycleChecked, setLifecycleChecked] = useState(false);
 	const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
@@ -79,10 +95,9 @@ function RootLayoutInner() {
 				const hasOrg = (orgs.data?.length ?? 0) > 0;
 				setNeedsOnboarding(!hasOrg);
 				setLifecycleChecked(true);
-			} catch {
+			} catch (err) {
 				if (!cancelled) {
-					setNeedsOnboarding(false);
-					setLifecycleChecked(true);
+					console.error("Failed to check org lifecycle:", err);
 				}
 			}
 		})();
@@ -94,27 +109,14 @@ function RootLayoutInner() {
 	useEffect(() => {
 		if (isPending) return;
 
-		const inAuthGroup = segments[0] === "(auth)";
-		const inInvitation = segments[0] === "invitation";
-		const inOnboarding = segments[0] === "onboarding";
-
-		if (!session && !inAuthGroup && !inInvitation) {
-			router.replace("/(auth)/login");
-			return;
-		}
-
-		if (!session || !lifecycleChecked) return;
-
-		if (session && inAuthGroup) {
-			if (needsOnboarding) {
-				router.replace("/onboarding");
-			} else {
-				router.replace("/(drawer)");
-			}
-		} else if (session && !inOnboarding && !inInvitation && needsOnboarding) {
-			router.replace("/onboarding");
-		} else if (session && inOnboarding && !needsOnboarding) {
-			router.replace("/(drawer)");
+		const target = resolveRoute(
+			session,
+			lifecycleChecked,
+			needsOnboarding,
+			segments,
+		);
+		if (target) {
+			router.replace(target);
 		}
 	}, [session, isPending, segments, router, lifecycleChecked, needsOnboarding]);
 

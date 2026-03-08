@@ -44,6 +44,11 @@
 	},
 	"confirm": {
 		"yes": "Có",
-		"no": "Không"
+		"no": "Không",
+		"cancel": "Hủy"
+	},
+	"error": {
+		"generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+		"retry": "Thử lại"
 	}
 }

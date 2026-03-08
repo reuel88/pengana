@@ -5,7 +5,7 @@ import {
 	useTranslation,
 } from "@pengana/i18n";
 import { isRtlLocale } from "@pengana/i18n/rtl";
-import { localizeUrl } from "@pengana/i18n/urls";
+
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
 
 		if (Platform.OS === "web") {
 			localStorage.setItem("appLocale", locale);
-			window.location.href = localizeUrl(window.location.pathname, locale);
+			window.location.reload();
 			return;
 		}
 

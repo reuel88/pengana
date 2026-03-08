@@ -44,14 +44,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	}),
 });
 
+const HEADERLESS_ROUTES = ["/login", "/sign-up", "/onboarding"] as const;
+
 function RootComponent() {
 	const { i18n } = useTranslation();
 	const matches = useMatches();
-	const hideHeader = matches.some(
-		(m) =>
-			m.routeId === "/login" ||
-			m.routeId === "/sign-up" ||
-			m.routeId === "/onboarding",
+	const hideHeader = matches.some((m) =>
+		(HEADERLESS_ROUTES as readonly string[]).includes(m.routeId),
 	);
 
 	useEffect(() => {

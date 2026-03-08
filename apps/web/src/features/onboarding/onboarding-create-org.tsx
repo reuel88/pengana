@@ -8,11 +8,8 @@ import {
 } from "@pengana/ui/components/card";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
+import { useCreateOrg } from "@/hooks/use-create-org";
 
 export function OnboardingCreateOrg({
 	onCreated,
@@ -22,37 +19,13 @@ export function OnboardingCreateOrg({
 	onBackToInvitations?: () => void;
 }) {
 	const { t } = useTranslation("onboarding");
-	const { invalidateAll } = useInvalidateOrg();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
-	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setLoading(true);
-		try {
-			const { data, error } = await authClient.organization.create({
-				name,
-				slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
-				logo: logo || undefined,
-			});
-			if (error) {
-				toast.error(error.message || t("create.error"));
-				return;
-			}
-			await authClient.organization.setActive({
-				organizationId: data.id,
-			});
-			await invalidateAll();
-			toast.success(t("create.success"));
-			onCreated();
-		} catch {
-			toast.error(t("create.error"));
-		} finally {
-			setLoading(false);
-		}
-	};
+	const { name, setName, slug, setSlug, logo, setLogo, loading, handleSubmit } =
+		useCreateOrg({
+			successMessage: t("create.success"),
+			errorMessage: t("create.error"),
+			onSuccess: onCreated,
+		});
 
 	return (
 		<Card className="w-full max-w-md">

@@ -11,7 +11,7 @@ import { auth, setNotifyUser } from "@pengana/auth";
 import { env } from "@pengana/env/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
 import { initServerI18n } from "@pengana/i18n/server";
-import { Hono } from "hono";
+import { type Context, Hono, type Next } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import { initLogger, logger, orpcLogger, requestLogger } from "./logger";
@@ -46,20 +46,29 @@ app.use(
 );
 
 app.use("/*", globalLimiter);
-app.use("/api/auth/sign-in/*", authLimiter);
-app.use("/api/auth/sign-up/*", authLimiter);
-app.use("/api/auth/forgot-password", authLimiter);
-app.use("/api/auth/reset-password", authLimiter);
-app.use("/api/auth/change-password", authLimiter);
-app.use("/api/auth/verify-email", authLimiter);
+
+// Rate-limit sensitive auth endpoints individually (not all of /api/auth/*
+// because session/profile endpoints don't need brute-force protection)
+const rateLimitedAuthPaths = [
+	"/api/auth/sign-in/*",
+	"/api/auth/sign-up/*",
+	"/api/auth/forgot-password",
+	"/api/auth/reset-password",
+	"/api/auth/change-password",
+	"/api/auth/verify-email",
+];
+for (const path of rateLimitedAuthPaths) {
+	app.use(path, authLimiter);
+}
+
 app.use("/rpc/upload.*", uploadLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-const logUnhandledError = (error: unknown) => {
+function logUnhandledError(error: unknown) {
 	orpcLogger.error`Unhandled error: ${error}`;
-};
+}
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
 	plugins: [
@@ -74,17 +83,36 @@ export const rpcHandler = new RPCHandler(appRouter, {
 	interceptors: [onError(logUnhandledError)],
 });
 
-const ws = { notifyUser: (_userId: string) => {} };
+// Initialized after server starts — WebSocket needs the HTTP server instance.
+// The middleware closure captures this reference so it always uses the live function.
+let notifyUser: (userId: string) => void = () => {};
 
-app.use("/*", async (c, next) => {
+async function wrapApiErrorResponse(c: Context, response: Response) {
+	const contentType = response.headers.get("content-type") ?? "";
+	if (contentType.includes("application/json") && response.status >= 400) {
+		const body = (await response.json()) as Record<string, unknown>;
+		return c.json(
+			{
+				success: false,
+				error: {
+					code: body.code ?? "INTERNAL_SERVER_ERROR",
+					message: body.message ?? "Unknown error",
+				},
+			},
+			response.status as never,
+		);
+	}
+	return c.newResponse(response.body, response);
+}
+
+async function handleOrpcRoutes(c: Context, next: Next) {
 	const appContext = await createContext({ context: c });
-	const fullContext = { ...appContext, notifyUser: ws.notifyUser };
+	const fullContext = { ...appContext, notifyUser };
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",
 		context: fullContext,
 	});
-
 	if (rpcResult.matched) {
 		return c.newResponse(rpcResult.response.body, rpcResult.response);
 	}
@@ -93,28 +121,14 @@ app.use("/*", async (c, next) => {
 		prefix: "/api-reference",
 		context: fullContext,
 	});
-
 	if (apiResult.matched) {
-		const original = apiResult.response;
-		const contentType = original.headers.get("content-type") ?? "";
-
-		if (contentType.includes("application/json") && original.status >= 400) {
-			const body = (await original.json()) as Record<string, unknown>;
-			const envelope = {
-				success: false,
-				error: {
-					code: body.code ?? "INTERNAL_SERVER_ERROR",
-					message: body.message ?? "Unknown error",
-				},
-			};
-			return c.json(envelope, original.status as never);
-		}
-
-		return c.newResponse(original.body, original);
+		return wrapApiErrorResponse(c, apiResult.response);
 	}
 
 	await next();
-});
+}
+
+app.use("/*", handleOrpcRoutes);
 
 app.get("/", (c) => {
 	return c.text("OK");
@@ -136,5 +150,5 @@ const server = serve(
 	},
 );
 
-ws.notifyUser = setupWebSocket(server).notifyUser;
-setNotifyUser(ws.notifyUser);
+notifyUser = setupWebSocket(server).notifyUser;
+setNotifyUser(notifyUser);

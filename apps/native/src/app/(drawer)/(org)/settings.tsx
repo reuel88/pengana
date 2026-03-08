@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -12,21 +12,31 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function OrgSettingsScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const router = useRouter();
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
+	const { data: activeOrg, isPending } = useActiveOrg();
 	const [name, setName] = useState("");
 	const [slug, setSlug] = useState("");
 	const [logo, setLogo] = useState("");
-	const [initialized, setInitialized] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const { isOwner, isAdmin } = useOrgRole();
+	const { invalidateActiveOrg } = useInvalidateOrg();
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
+	useEffect(() => {
+		if (!activeOrg) return;
+		setName(activeOrg.name);
+		setSlug(activeOrg.slug);
+		setLogo(activeOrg.logo || "");
+	}, [activeOrg?.id]);
 
 	if (isPending) {
 		return (
@@ -48,51 +58,35 @@ export default function OrgSettingsScreen() {
 		);
 	}
 
-	if (!initialized) {
-		setName(activeOrg.name);
-		setSlug(activeOrg.slug);
-		setLogo(activeOrg.logo || "");
-		setInitialized(true);
-	}
-
-	const handleUpdate = async () => {
-		setLoading(true);
-		try {
-			const { error } = await authClient.organization.update({
-				data: { name, slug, logo: logo || undefined },
-			});
-			if (error) {
-				Alert.alert(t("settings.error"), error.message);
-				return;
-			}
-			Alert.alert(t("settings.updateSuccess"));
-		} catch {
-			Alert.alert(t("settings.error"));
-		} finally {
-			setLoading(false);
-		}
-	};
+	const handleUpdate = () =>
+		authMutation({
+			mutationFn: () =>
+				authClient.organization.update({
+					data: { name, slug, logo: logo || undefined },
+				}),
+			successMessage: t("settings.updateSuccess"),
+			errorMessage: t("settings.error"),
+			onSuccess: () => invalidateActiveOrg(),
+			setLoading,
+		});
 
 	const handleDelete = () => {
 		Alert.alert(t("settings.delete"), t("settings.deleteConfirm"), [
-			{ text: "Cancel", style: "cancel" },
+			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("settings.delete"),
 				style: "destructive",
-				onPress: async () => {
-					try {
-						const { error } = await authClient.organization.delete({
-							organizationId: activeOrg.id,
-						});
-						if (error) {
-							Alert.alert(t("settings.error"), error.message);
-							return;
-						}
-						router.replace("/");
-					} catch {
-						Alert.alert(t("settings.error"));
-					}
-				},
+				onPress: () =>
+					authMutation({
+						mutationFn: () =>
+							authClient.organization.delete({
+								organizationId: activeOrg.id,
+							}),
+						errorMessage: t("settings.error"),
+						onSuccess: () => {
+							router.replace("/");
+						},
+					}),
 			},
 		]);
 	};

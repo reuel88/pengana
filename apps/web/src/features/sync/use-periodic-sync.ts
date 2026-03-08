@@ -13,6 +13,7 @@ export function usePeriodicSync(
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const syncRef = useStableSyncRef(engineRef);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref, its .current never triggers re-renders
 	useEffect(() => {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
@@ -30,5 +31,5 @@ export function usePeriodicSync(
 				clearInterval(intervalRef.current);
 			}
 		};
-	}, [isOnline, syncRef.current]);
+	}, [isOnline]);
 }

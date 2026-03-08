@@ -35,15 +35,45 @@ async function fetchUserLifecycleData(): Promise<UserLifecycleData> {
 }
 
 export default function OnboardingScreen() {
+	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const [lifecycleData, setLifecycleData] = useState<UserLifecycleData | null>(
 		null,
 	);
 
+	const [error, setError] = useState(false);
+
 	useEffect(() => {
-		fetchUserLifecycleData().then(setLifecycleData);
+		fetchUserLifecycleData()
+			.then(setLifecycleData)
+			.catch((err: unknown) => {
+				console.error("Failed to fetch lifecycle data:", err);
+				setError(true);
+			});
 	}, []);
+
+	if (error) {
+		return (
+			<View style={[styles.container, { backgroundColor: theme.background }]}>
+				<Text style={{ color: theme.text, marginBottom: 12 }}>
+					{t("common:error.generic")}
+				</Text>
+				<TouchableOpacity
+					onPress={() => {
+						setError(false);
+						fetchUserLifecycleData()
+							.then(setLifecycleData)
+							.catch(() => setError(true));
+					}}
+				>
+					<Text style={{ color: theme.primary }}>
+						{t("common:error.retry")}
+					</Text>
+				</TouchableOpacity>
+			</View>
+		);
+	}
 
 	if (!lifecycleData) {
 		return (

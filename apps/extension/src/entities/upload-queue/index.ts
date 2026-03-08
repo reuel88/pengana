@@ -8,5 +8,5 @@ export {
 	getFileForUpload,
 	removeFileForUpload,
 	storeFileForUpload,
-} from "./file-store";
+} from "@pengana/todo-client/dexie-file-store";
 export { createWebUploadTransport } from "./transport";

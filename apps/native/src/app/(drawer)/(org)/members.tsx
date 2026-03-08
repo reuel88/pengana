@@ -10,18 +10,21 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function MembersScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const router = useRouter();
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
+	const { data: activeOrg, isPending } = useActiveOrg();
 	const { data: session } = authClient.useSession();
 	const currentUserId = session?.user?.id;
 	const { isAdmin } = useOrgRole();
+	const { invalidateActiveOrg } = useInvalidateOrg();
 
 	if (isPending) {
 		return (
@@ -51,12 +54,15 @@ export default function MembersScreen() {
 			{
 				text: t("members.remove"),
 				style: "destructive",
-				onPress: async () => {
-					const { error } = await authClient.organization.removeMember({
-						memberIdOrEmail: memberId,
-					});
-					if (error) Alert.alert(t("members.error"), error.message);
-				},
+				onPress: () =>
+					authMutation({
+						mutationFn: () =>
+							authClient.organization.removeMember({
+								memberIdOrEmail: memberId,
+							}),
+						errorMessage: t("members.error"),
+						onSuccess: () => invalidateActiveOrg(),
+					}),
 			},
 		]);
 	};
@@ -70,16 +76,17 @@ export default function MembersScreen() {
 			{
 				text: t("members.leave"),
 				style: "destructive",
-				onPress: async () => {
-					const { error } = await authClient.organization.removeMember({
-						memberIdOrEmail: currentUserId,
-					});
-					if (error) {
-						Alert.alert(t("members.error"), error.message);
-						return;
-					}
-					router.replace("/");
-				},
+				onPress: () =>
+					authMutation({
+						mutationFn: () =>
+							authClient.organization.removeMember({
+								memberIdOrEmail: currentUserId,
+							}),
+						errorMessage: t("members.error"),
+						onSuccess: () => {
+							router.replace("/");
+						},
+					}),
 			},
 		]);
 	};

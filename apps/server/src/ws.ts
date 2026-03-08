@@ -7,6 +7,7 @@ import { wsLogger } from "./logger";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
+const WS_CLOSE_TRY_AGAIN_LATER = 1013;
 
 export function setupWebSocket(server: ServerType) {
 	const connections = new Map<string, Set<WebSocket>>();
@@ -41,7 +42,7 @@ export function setupWebSocket(server: ServerType) {
 
 			if (userSockets.size >= MAX_CONNECTIONS_PER_USER) {
 				wsLogger.warn`Rejected connection for user ${userId} (max connections reached)`;
-				ws.close(1013, "Too many connections");
+				ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
 				return;
 			}
 

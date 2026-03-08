@@ -1,11 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
@@ -35,59 +35,44 @@ function MembersPage() {
 		memberId: string,
 		role: "member" | "admin",
 	) => {
-		try {
-			const { error } = await authClient.organization.updateMemberRole({
-				memberId,
-				role,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
-			toast.success(t("members.updateRoleSuccess"));
-			await Promise.all([invalidateActiveOrg(), invalidateActiveMember()]);
-		} catch {
-			toast.error(t("members.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.updateMemberRole({ memberId, role }),
+			successMessage: t("members.updateRoleSuccess"),
+			errorMessage: t("members.error"),
+			onSuccess: () =>
+				Promise.all([invalidateActiveOrg(), invalidateActiveMember()]),
+		});
 	};
 
 	const handleRemove = async (memberIdOrEmail: string) => {
 		if (!confirm(t("members.removeConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
-			toast.success(t("members.removeSuccess"));
-			await invalidateActiveOrg();
-		} catch {
-			toast.error(t("members.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.removeMember({ memberIdOrEmail }),
+			successMessage: t("members.removeSuccess"),
+			errorMessage: t("members.error"),
+			onSuccess: () => invalidateActiveOrg(),
+		});
 	};
 
 	const handleLeave = async () => {
 		if (!currentUserId) {
-			toast.error(t("members.error"));
 			return;
 		}
 		if (!confirm(t("members.leaveConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail: currentUserId,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
-			toast.success(t("members.leaveSuccess"));
-			await invalidateAll();
-			navigate({ to: "/" });
-		} catch {
-			toast.error(t("members.error"));
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.removeMember({
+					memberIdOrEmail: currentUserId,
+				}),
+			successMessage: t("members.leaveSuccess"),
+			errorMessage: t("members.error"),
+			onSuccess: async () => {
+				await invalidateAll();
+				navigate({ to: "/" });
+			},
+		});
 	};
 
 	return (

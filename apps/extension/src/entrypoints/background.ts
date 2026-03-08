@@ -6,8 +6,8 @@ import type {
 	UploadEvent,
 } from "@pengana/sync-engine";
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
-
 import { createDexieSyncAdapter } from "@pengana/todo-client";
+import { z } from "zod";
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,
@@ -55,15 +55,20 @@ function broadcast(message: BackgroundBroadcast) {
 	});
 }
 
+const sessionResponseSchema = z.object({
+	session: z.object({ userId: z.string() }).optional(),
+	user: z.object({ id: z.string() }).optional(),
+});
+
 async function fetchUserId(): Promise<string | null> {
 	try {
 		const res = await fetch(`${env.VITE_SERVER_URL}/api/auth/get-session`, {
 			credentials: "include",
 		});
 		if (!res.ok) return null;
-		const data: { session?: { userId?: string }; user?: { id?: string } } =
-			await res.json();
-		return data?.session?.userId ?? data?.user?.id ?? null;
+		const parsed = sessionResponseSchema.safeParse(await res.json());
+		if (!parsed.success) return null;
+		return parsed.data.session?.userId ?? parsed.data.user?.id ?? null;
 	} catch {
 		return null;
 	}
@@ -128,6 +133,20 @@ function setupEngine(userId: string) {
 	state.engine.sync();
 }
 
+/** Fetches the current userId (if needed) and initializes the sync engine. */
+async function ensureEngine(): Promise<void> {
+	if (state.engine) return;
+	const userId = state.currentUserId ?? (await fetchUserId());
+	if (userId) setupEngine(userId);
+}
+
+/**
+ * Handles messages from the popup/content scripts.
+ *
+ * Returns `true` when the response will be sent asynchronously (keeps the
+ * Chrome messaging channel open), `false` when the response is sent
+ * synchronously before this function returns.
+ */
 function handleMessage(
 	message: BackgroundMessage,
 	sendResponse: (response: unknown) => void,
@@ -141,10 +160,7 @@ function handleMessage(
 
 		case "sync:trigger": {
 			if (state.isOnline) {
-				if (!state.engine && state.currentUserId) {
-					setupEngine(state.currentUserId);
-				}
-				state.engine?.sync();
+				ensureEngine().then(() => state.engine?.sync());
 			}
 			sendResponse({ ok: true });
 			return false;
@@ -165,10 +181,7 @@ function handleMessage(
 
 		case "status:get": {
 			if (!state.currentUserId) {
-				fetchUserId().then((userId) => {
-					if (userId) setupEngine(userId);
-					sendResponse(getStatus());
-				});
+				ensureEngine().then(() => sendResponse(getStatus()));
 				return true; // Keep message channel open for async response
 			}
 			sendResponse(getStatus());
@@ -189,14 +202,15 @@ async function initBackground() {
 }
 
 export default defineBackground(() => {
-	console.log("Background service worker started", { id: browser.runtime.id });
+	if (import.meta.env.DEV) {
+		console.log("Background service worker started", {
+			id: browser.runtime.id,
+		});
+	}
 
 	browser.alarms.onAlarm.addListener(async (alarm) => {
 		if (alarm.name === SYNC_ALARM_NAME && state.isOnline) {
-			if (!state.engine) {
-				const userId = await fetchUserId();
-				if (userId) setupEngine(userId);
-			}
+			await ensureEngine();
 			state.engine?.sync();
 		}
 	});

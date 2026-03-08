@@ -44,6 +44,11 @@
 	},
 	"confirm": {
 		"yes": "Sí",
-		"no": "No"
+		"no": "No",
+		"cancel": "Cancelar"
+	},
+	"error": {
+		"generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+		"retry": "Reintentar"
 	}
 }
