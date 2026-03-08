@@ -19,6 +19,7 @@ export function useWebSocketSync(
 ) {
 	const syncRef = useStableSyncRef(engineRef);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref, its .current never triggers re-renders
 	useEffect(() => {
 		if (!userId || !isOnline) return;
 
@@ -80,6 +81,5 @@ export function useWebSocketSync(
 			if (reconnectTimeout) clearTimeout(reconnectTimeout);
 			ws?.close();
 		};
-		// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref
 	}, [userId, isOnline]);
 }
