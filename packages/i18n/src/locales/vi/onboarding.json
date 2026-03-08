@@ -1,0 +1,30 @@
+{
+	"title": "Chào mừng đến với pengana",
+	"description": "Để bắt đầu, hãy tham gia hoặc tạo một tổ chức.",
+	"invitations": {
+		"title": "Lời mời đang chờ",
+		"description": "Bạn đã được mời tham gia các tổ chức sau.",
+		"accept": "Chấp nhận",
+		"accepted": "Đã chấp nhận lời mời",
+		"error": "Không thể xử lý lời mời",
+		"createInstead": "Tạo tổ chức mới thay thế"
+	},
+	"invite": {
+		"title": "Mời thành viên",
+		"description": "Mời mọi người tham gia tổ chức của bạn. Bạn luôn có thể làm điều này sau.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "Thêm người khác",
+		"send": "Gửi lời mời",
+		"skip": "Bỏ qua",
+		"success": "Đã gửi lời mời",
+		"error": "Không thể gửi lời mời",
+		"remove": "Xóa"
+	},
+	"create": {
+		"title": "Tạo tổ chức",
+		"description": "Tạo một tổ chức mới để bắt đầu.",
+		"success": "Đã tạo tổ chức",
+		"error": "Không thể tạo tổ chức",
+		"backToInvitations": "Quay lại lời mời"
+	}
+}

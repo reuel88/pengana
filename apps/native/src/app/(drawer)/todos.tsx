@@ -5,8 +5,12 @@ import { authClient } from "@/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
 export default function TodosScreen() {
-	const { data: session } = authClient.useSession();
+	const { data: session, isPending } = authClient.useSession();
 	const userId = session?.user?.id;
+
+	if (isPending) {
+		return null;
+	}
 
 	if (!session || !userId) {
 		return <Redirect href="/" />;

@@ -22,6 +22,7 @@
 		"db:stop": "turbo -F @pengana/db db:stop",
 		"db:down": "turbo -F @pengana/db db:down",
 		"test": "turbo test",
+		"check:i18n": "turbo -F @pengana/i18n check:i18n",
 		"format": "biome check --write .",
 		"check": "biome check .",
 		"prepare": "husky"

@@ -34,9 +34,13 @@
 	"submitting": "Isinusumite...",
 	"loginPrompt": "Mangyaring mag-log in muna sa web app.",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "Naku!",
+		"heading": "Hindi Nahanap ang Pahina",
+		"description": "Paumanhin, ang pahina na hinahanap mo ay hindi umiiral.",
+		"goHome": "Pumunta sa Home"
+	},
+	"confirm": {
+		"yes": "Oo",
+		"no": "Hindi"
 	}
 }

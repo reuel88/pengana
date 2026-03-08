@@ -2,18 +2,12 @@ import { todoDb } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";
-import { useSync } from "@/features/sync/sync-context";
+import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
 import { client } from "@/utils/orpc";
 
 export function SyncDevtoolsImpl() {
-	const {
-		isOnline,
-		isSyncing,
-		events,
-		triggerSync,
-		simulateOffline,
-		setSimulateOffline,
-	} = useSync();
+	const { isOnline, isSyncing, triggerSync } = useSync();
+	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
 

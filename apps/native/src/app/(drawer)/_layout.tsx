@@ -52,6 +52,17 @@ const DrawerLayout = () => {
 				}}
 			/>
 			<Drawer.Screen
+				name="(org)"
+				options={{
+					headerTitle: t("organization:title"),
+					drawerLabel: t("organization:title"),
+					drawerIcon: ({ size, color }) => (
+						<Ionicons name="people-outline" size={size} color={color} />
+					),
+					headerShown: false,
+				}}
+			/>
+			<Drawer.Screen
 				name="(tabs)"
 				options={{
 					headerTitle: t("nav.tabs"),

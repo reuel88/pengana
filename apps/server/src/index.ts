@@ -7,15 +7,14 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createContext } from "@pengana/api/context";
 import { appRouter } from "@pengana/api/routers/index";
-import { auth } from "@pengana/auth";
+import { auth, setNotifyUser } from "@pengana/auth";
 import { env } from "@pengana/env/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
 import { initServerI18n } from "@pengana/i18n/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
-import { logger } from "hono/logger";
-
+import { initLogger, logger, orpcLogger, requestLogger } from "./logger";
 import {
 	authLimiter,
 	globalLimiter,
@@ -26,7 +25,7 @@ import { setupWebSocket } from "./ws";
 
 const app = new Hono();
 
-app.use(logger());
+app.use(requestLogger);
 app.use(
 	"/*",
 	cors({
@@ -47,14 +46,19 @@ app.use(
 );
 
 app.use("/*", globalLimiter);
-app.use("/api/auth/*", authLimiter);
+app.use("/api/auth/sign-in/*", authLimiter);
+app.use("/api/auth/sign-up/*", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+app.use("/api/auth/reset-password", authLimiter);
+app.use("/api/auth/change-password", authLimiter);
+app.use("/api/auth/verify-email", authLimiter);
 app.use("/rpc/upload.*", uploadLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 const logUnhandledError = (error: unknown) => {
-	console.error("[orpc] unhandled error:", error);
+	orpcLogger.error`Unhandled error: ${error}`;
 };
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
@@ -118,6 +122,7 @@ app.get("/", (c) => {
 
 app.use("/uploads/*", serveStatic({ root: "./" }));
 
+await initLogger();
 await initServerI18n();
 
 const server = serve(
@@ -127,8 +132,9 @@ const server = serve(
 		hostname: "0.0.0.0",
 	},
 	(info) => {
-		console.log(`Server is running on http://localhost:${info.port}`);
+		logger.info`Server is running on http://localhost:${String(info.port)}`;
 	},
 );
 
 ws.notifyUser = setupWebSocket(server).notifyUser;
+setNotifyUser(ws.notifyUser);

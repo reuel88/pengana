@@ -13,9 +13,9 @@
 		"uploading": "ina-upload...",
 		"failed": "nabigo",
 		"fileAttached": "Nakalakip ang file",
-		"invalidFile": "Invalid file",
-		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"invalidFile": "Hindi wastong file",
+		"cameraUnavailable": "Hindi magamit ang camera",
+		"cameraNotAvailable": "Hindi available ang camera sa device na ito."
 	},
 	"actions": {
 		"keepLocal": "Panatilihin ang Lokal",
@@ -23,10 +23,10 @@
 		"attach": "Ilakip",
 		"retry": "Subukan Muli",
 		"delete": "Tanggalin",
-		"takePhoto": "Take Photo",
-		"chooseFromLibrary": "Choose from Library",
-		"choosePdf": "Choose PDF",
-		"cancel": "Cancel",
-		"chooseOption": "Choose an option"
+		"takePhoto": "Kumuha ng Litrato",
+		"chooseFromLibrary": "Pumili mula sa Library",
+		"choosePdf": "Pumili ng PDF",
+		"cancel": "Kanselahin",
+		"chooseOption": "Pumili ng opsyon"
 	}
 }

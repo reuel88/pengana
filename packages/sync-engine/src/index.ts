@@ -1,3 +1,5 @@
+import type { SyncEvent, UploadEvent } from "./types";
+
 export type { AllowedMimeType } from "./allowed-mime-types";
 export {
 	ALLOWED_MIME_TYPES,
@@ -34,4 +36,21 @@ export type {
 	UploadTransport,
 } from "./types";
 export type { UploadQueueConfig } from "./upload-queue";
+
+/** Core sync context shape shared by all apps (web, native, extension). */
+export interface SyncContextValue {
+	isOnline: boolean;
+	isSyncing: boolean;
+	isUploading: boolean;
+	triggerSync: () => void;
+	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
+}
+
+/** Devtools-only sync state (web/native only, not exposed via useSync). */
+export interface SyncDevtoolsValue {
+	events: SyncEvent[];
+	uploadEvents: UploadEvent[];
+	simulateOffline: boolean;
+	setSimulateOffline: (value: boolean) => void;
+}
 export { UploadQueue } from "./upload-queue";

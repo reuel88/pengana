@@ -13,9 +13,9 @@
 		"uploading": "업로드 중...",
 		"failed": "실패",
 		"fileAttached": "파일 첨부됨",
-		"invalidFile": "Invalid file",
-		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"invalidFile": "잘못된 파일",
+		"cameraUnavailable": "카메라 사용 불가",
+		"cameraNotAvailable": "이 기기에서는 카메라를 사용할 수 없습니다."
 	},
 	"actions": {
 		"keepLocal": "로컬 유지",
@@ -23,10 +23,10 @@
 		"attach": "첨부",
 		"retry": "재시도",
 		"delete": "삭제",
-		"takePhoto": "Take Photo",
-		"chooseFromLibrary": "Choose from Library",
-		"choosePdf": "Choose PDF",
-		"cancel": "Cancel",
-		"chooseOption": "Choose an option"
+		"takePhoto": "사진 촬영",
+		"chooseFromLibrary": "라이브러리에서 선택",
+		"choosePdf": "PDF 선택",
+		"cancel": "취소",
+		"chooseOption": "옵션 선택"
 	}
 }

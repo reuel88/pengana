@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { requireAuth } from "@/lib/auth-client";
+import { requireAuthAndOrg } from "@/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
 export const Route = createFileRoute("/todos")({
 	component: TodosPage,
-	beforeLoad: requireAuth,
+	beforeLoad: requireAuthAndOrg,
 });
 
 function TodosPage() {

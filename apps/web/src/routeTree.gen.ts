@@ -11,9 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as OrgRouteRouteImport } from './routes/org/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrgIndexRouteImport } from './routes/org/index'
+import { Route as OrgSettingsRouteImport } from './routes/org/settings'
+import { Route as OrgRolesRouteImport } from './routes/org/roles'
+import { Route as OrgMembersRouteImport } from './routes/org/members'
+import { Route as OrgInvitationsRouteImport } from './routes/org/invitations'
+import { Route as InvitationInvitationIdRouteImport } from './routes/invitation/$invitationId'
+import { Route as OrgTeamsRouteRouteImport } from './routes/org/teams/route'
+import { Route as OrgTeamsIndexRouteImport } from './routes/org/teams/index'
+import { Route as OrgTeamsTeamIdRouteImport } from './routes/org/teams/$teamId'
 
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
@@ -23,6 +34,11 @@ const TodosRoute = TodosRouteImport.update({
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -35,48 +51,179 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrgRouteRoute = OrgRouteRouteImport.update({
+  id: '/org',
+  path: '/org',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrgIndexRoute = OrgIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const OrgSettingsRoute = OrgSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const OrgRolesRoute = OrgRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const OrgMembersRoute = OrgMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const OrgInvitationsRoute = OrgInvitationsRouteImport.update({
+  id: '/invitations',
+  path: '/invitations',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const InvitationInvitationIdRoute = InvitationInvitationIdRouteImport.update({
+  id: '/invitation/$invitationId',
+  path: '/invitation/$invitationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgTeamsRouteRoute = OrgTeamsRouteRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => OrgRouteRoute,
+} as any)
+const OrgTeamsIndexRoute = OrgTeamsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrgTeamsRouteRoute,
+} as any)
+const OrgTeamsTeamIdRoute = OrgTeamsTeamIdRouteImport.update({
+  id: '/$teamId',
+  path: '/$teamId',
+  getParentRoute: () => OrgTeamsRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/org': typeof OrgRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
+  '/org/teams': typeof OrgTeamsRouteRouteWithChildren
+  '/invitation/$invitationId': typeof InvitationInvitationIdRoute
+  '/org/invitations': typeof OrgInvitationsRoute
+  '/org/members': typeof OrgMembersRoute
+  '/org/roles': typeof OrgRolesRoute
+  '/org/settings': typeof OrgSettingsRoute
+  '/org/': typeof OrgIndexRoute
+  '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/org/teams/': typeof OrgTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
+  '/invitation/$invitationId': typeof InvitationInvitationIdRoute
+  '/org/invitations': typeof OrgInvitationsRoute
+  '/org/members': typeof OrgMembersRoute
+  '/org/roles': typeof OrgRolesRoute
+  '/org/settings': typeof OrgSettingsRoute
+  '/org': typeof OrgIndexRoute
+  '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/org/teams': typeof OrgTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/org': typeof OrgRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
+  '/org/teams': typeof OrgTeamsRouteRouteWithChildren
+  '/invitation/$invitationId': typeof InvitationInvitationIdRoute
+  '/org/invitations': typeof OrgInvitationsRoute
+  '/org/members': typeof OrgMembersRoute
+  '/org/roles': typeof OrgRolesRoute
+  '/org/settings': typeof OrgSettingsRoute
+  '/org/': typeof OrgIndexRoute
+  '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/org/teams/': typeof OrgTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/success' | '/todos'
+  fullPaths:
+    | '/'
+    | '/org'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/success'
+    | '/todos'
+    | '/org/teams'
+    | '/invitation/$invitationId'
+    | '/org/invitations'
+    | '/org/members'
+    | '/org/roles'
+    | '/org/settings'
+    | '/org/'
+    | '/org/teams/$teamId'
+    | '/org/teams/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/success' | '/todos'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/success' | '/todos'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/success'
+    | '/todos'
+    | '/invitation/$invitationId'
+    | '/org/invitations'
+    | '/org/members'
+    | '/org/roles'
+    | '/org/settings'
+    | '/org'
+    | '/org/teams/$teamId'
+    | '/org/teams'
+  id:
+    | '__root__'
+    | '/'
+    | '/org'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/success'
+    | '/todos'
+    | '/org/teams'
+    | '/invitation/$invitationId'
+    | '/org/invitations'
+    | '/org/members'
+    | '/org/roles'
+    | '/org/settings'
+    | '/org/'
+    | '/org/teams/$teamId'
+    | '/org/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OrgRouteRoute: typeof OrgRouteRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   SuccessRoute: typeof SuccessRoute
   TodosRoute: typeof TodosRoute
+  InvitationInvitationIdRoute: typeof InvitationInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -95,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -109,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/org': {
+      id: '/org'
+      path: '/org'
+      fullPath: '/org'
+      preLoaderRoute: typeof OrgRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,15 +277,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/org/': {
+      id: '/org/'
+      path: '/'
+      fullPath: '/org/'
+      preLoaderRoute: typeof OrgIndexRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/org/settings': {
+      id: '/org/settings'
+      path: '/settings'
+      fullPath: '/org/settings'
+      preLoaderRoute: typeof OrgSettingsRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/org/roles': {
+      id: '/org/roles'
+      path: '/roles'
+      fullPath: '/org/roles'
+      preLoaderRoute: typeof OrgRolesRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/org/members': {
+      id: '/org/members'
+      path: '/members'
+      fullPath: '/org/members'
+      preLoaderRoute: typeof OrgMembersRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/org/invitations': {
+      id: '/org/invitations'
+      path: '/invitations'
+      fullPath: '/org/invitations'
+      preLoaderRoute: typeof OrgInvitationsRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/invitation/$invitationId': {
+      id: '/invitation/$invitationId'
+      path: '/invitation/$invitationId'
+      fullPath: '/invitation/$invitationId'
+      preLoaderRoute: typeof InvitationInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/org/teams': {
+      id: '/org/teams'
+      path: '/teams'
+      fullPath: '/org/teams'
+      preLoaderRoute: typeof OrgTeamsRouteRouteImport
+      parentRoute: typeof OrgRouteRoute
+    }
+    '/org/teams/': {
+      id: '/org/teams/'
+      path: '/'
+      fullPath: '/org/teams/'
+      preLoaderRoute: typeof OrgTeamsIndexRouteImport
+      parentRoute: typeof OrgTeamsRouteRoute
+    }
+    '/org/teams/$teamId': {
+      id: '/org/teams/$teamId'
+      path: '/$teamId'
+      fullPath: '/org/teams/$teamId'
+      preLoaderRoute: typeof OrgTeamsTeamIdRouteImport
+      parentRoute: typeof OrgTeamsRouteRoute
+    }
   }
 }
 
+interface OrgTeamsRouteRouteChildren {
+  OrgTeamsTeamIdRoute: typeof OrgTeamsTeamIdRoute
+  OrgTeamsIndexRoute: typeof OrgTeamsIndexRoute
+}
+
+const OrgTeamsRouteRouteChildren: OrgTeamsRouteRouteChildren = {
+  OrgTeamsTeamIdRoute: OrgTeamsTeamIdRoute,
+  OrgTeamsIndexRoute: OrgTeamsIndexRoute,
+}
+
+const OrgTeamsRouteRouteWithChildren = OrgTeamsRouteRoute._addFileChildren(
+  OrgTeamsRouteRouteChildren,
+)
+
+interface OrgRouteRouteChildren {
+  OrgTeamsRouteRoute: typeof OrgTeamsRouteRouteWithChildren
+  OrgInvitationsRoute: typeof OrgInvitationsRoute
+  OrgMembersRoute: typeof OrgMembersRoute
+  OrgRolesRoute: typeof OrgRolesRoute
+  OrgSettingsRoute: typeof OrgSettingsRoute
+  OrgIndexRoute: typeof OrgIndexRoute
+}
+
+const OrgRouteRouteChildren: OrgRouteRouteChildren = {
+  OrgTeamsRouteRoute: OrgTeamsRouteRouteWithChildren,
+  OrgInvitationsRoute: OrgInvitationsRoute,
+  OrgMembersRoute: OrgMembersRoute,
+  OrgRolesRoute: OrgRolesRoute,
+  OrgSettingsRoute: OrgSettingsRoute,
+  OrgIndexRoute: OrgIndexRoute,
+}
+
+const OrgRouteRouteWithChildren = OrgRouteRoute._addFileChildren(
+  OrgRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OrgRouteRoute: OrgRouteRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   SuccessRoute: SuccessRoute,
   TodosRoute: TodosRoute,
+  InvitationInvitationIdRoute: InvitationInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

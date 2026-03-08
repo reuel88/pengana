@@ -45,7 +45,7 @@ export function useUploadQueue(
 			unsubscribe();
 			uploadQueueRef.current = null;
 		};
-	}, [userId]);
+	}, [userId, syncRef.current]);
 
 	useEffect(() => {
 		if (isOnline) {

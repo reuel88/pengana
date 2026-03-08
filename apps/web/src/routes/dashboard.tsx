@@ -3,13 +3,13 @@ import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { authClient, requireAuth } from "@/lib/auth-client";
+import { authClient, requireAuthAndOrg } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/dashboard")({
 	component: DashboardPage,
 	beforeLoad: async () => {
-		const { session } = await requireAuth();
+		const { session } = await requireAuthAndOrg();
 		const { data: customerState } = await authClient.customer.state();
 		return { session, customerState };
 	},

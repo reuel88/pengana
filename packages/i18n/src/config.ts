@@ -25,6 +25,9 @@ export const NAMESPACES = [
 	"sync",
 	"dashboard",
 	"errors",
+	"organization",
+	"onboarding",
+	"notifications",
 ] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];

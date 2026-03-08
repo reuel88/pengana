@@ -47,22 +47,22 @@ export function useSyncEngine(userId: string | undefined) {
 		};
 	}, []);
 
-	const result = useSyncEngineCore(userId, isOnline, platformDeps);
+	const { core, devtools } = useSyncEngineCore(userId, isOnline, platformDeps);
 
 	// Sync when app comes to foreground (e.g. user returns from another device)
 	useEffect(() => {
-		if (!result.isOnline) return;
+		if (!core.isOnline) return;
 
 		const subscription = AppState.addEventListener(
 			"change",
 			(nextAppState: AppStateStatus) => {
 				if (nextAppState === "active") {
-					result.triggerSync();
+					core.triggerSync();
 				}
 			},
 		);
 		return () => subscription.remove();
-	}, [result.isOnline, result.triggerSync]);
+	}, [core.isOnline, core.triggerSync]);
 
-	return result;
+	return { core, devtools };
 }
