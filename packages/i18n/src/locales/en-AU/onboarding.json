@@ -1,0 +1,30 @@
+{
+	"title": "Welcome to pengana",
+	"description": "To get started, join or create an organisation.",
+	"invitations": {
+		"title": "Pending Invitations",
+		"description": "You have been invited to join the following organisations.",
+		"accept": "Accept",
+		"accepted": "Invitation accepted",
+		"error": "Failed to process invitation",
+		"createInstead": "Create a new organisation instead"
+	},
+	"invite": {
+		"title": "Invite Team Members",
+		"description": "Invite people to join your organisation. You can always do this later.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "Add another",
+		"send": "Send Invitations",
+		"skip": "Skip for now",
+		"success": "Invitations sent",
+		"error": "Failed to send invitation",
+		"remove": "Remove"
+	},
+	"create": {
+		"title": "Create Organisation",
+		"description": "Create a new organisation to get started.",
+		"success": "Organisation created",
+		"error": "Failed to create organisation",
+		"backToInvitations": "Back to invitations"
+	}
+}

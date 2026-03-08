@@ -18,7 +18,7 @@
 		"logoPlaceholder": "https://example.com/logo.png",
 		"submit": "Lumikha",
 		"success": "Nalikha ang organisasyon",
-		"error": "Hindi nalikha ang organisasyon"
+		"error": "Nabigong likhain ang organisasyon"
 	},
 	"settings": {
 		"title": "Mga Setting",
@@ -27,7 +27,7 @@
 		"deleteConfirm": "Sigurado ka ba? Hindi na ito mababawi.",
 		"updateSuccess": "Na-update ang organisasyon",
 		"deleteSuccess": "Nabura ang organisasyon",
-		"error": "Hindi na-update ang organisasyon"
+		"error": "Nabigong i-update ang organisasyon"
 	},
 	"members": {
 		"title": "Mga Miyembro",
@@ -42,7 +42,7 @@
 		"removeSuccess": "Naalis ang miyembro",
 		"leaveSuccess": "Umalis sa organisasyon",
 		"updateRoleSuccess": "Na-update ang tungkulin",
-		"error": "Hindi napamahalaan ang miyembro",
+		"error": "Nabigong pamahalaan ang miyembro",
 		"noMembers": "Walang mga miyembro"
 	},
 	"invitations": {
@@ -61,7 +61,7 @@
 		"cancelSuccess": "Nakansela ang imbitasyon",
 		"acceptSuccess": "Natanggap ang imbitasyon",
 		"rejectSuccess": "Natanggihan ang imbitasyon",
-		"error": "Hindi napamahalaan ang imbitasyon",
+		"error": "Nabigong pamahalaan ang imbitasyon",
 		"noPending": "Walang nakabinbing imbitasyon",
 		"noInvitations": "Walang mga imbitasyon",
 		"statusHeader": "Katayuan",
@@ -89,7 +89,7 @@
 		"deleteSuccess": "Nabura ang koponan",
 		"addMemberSuccess": "Naidagdag ang miyembro sa koponan",
 		"removeMemberSuccess": "Naalis ang miyembro sa koponan",
-		"error": "Hindi napamahalaan ang koponan",
+		"error": "Nabigong pamahalaan ang koponan",
 		"noTeams": "Wala pang mga koponan",
 		"noMembers": "Walang mga miyembro sa koponan",
 		"updateName": "I-update ang Pangalan ng Koponan",

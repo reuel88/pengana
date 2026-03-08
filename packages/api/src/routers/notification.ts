@@ -16,7 +16,7 @@ const notificationSchema = z.object({
 	type: z.string(),
 	body: z.string(),
 	read: z.boolean(),
-	metadata: z.record(z.unknown()).nullable(),
+	metadata: z.record(z.string(), z.unknown()).nullable(),
 	createdAt: z.date(),
 });
 
@@ -32,7 +32,12 @@ export const notificationRouter = {
 			const notifications = await getUnreadNotifications(
 				context.session.user.id,
 			);
-			return envelope(notifications);
+			return envelope(
+				notifications.map((n) => ({
+					...n,
+					metadata: n.metadata as Record<string, unknown> | null,
+				})),
+			);
 		}),
 
 	markRead: protectedProcedure

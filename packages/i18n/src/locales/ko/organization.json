@@ -100,10 +100,10 @@
 		"owner": "소유자",
 		"admin": "관리자",
 		"member": "멤버",
-		"description": "역할은 조직 내에서 구성원이 할 수 있는 작업을 정의합니다.",
+		"description": "역할은 조직 내에서 멤버가 할 수 있는 작업을 정의합니다.",
 		"permissions": "권한",
 		"ownerDescription": "조직에 대한 전체 제어 권한을 가집니다.",
-		"adminDescription": "구성원, 초대 및 팀을 관리할 수 있습니다.",
+		"adminDescription": "멤버, 초대 및 팀을 관리할 수 있습니다.",
 		"memberDescription": "조직 데이터를 볼 수 있습니다."
 	},
 	"nav": {

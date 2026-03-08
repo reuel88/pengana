@@ -68,7 +68,7 @@ export default function InvitationsScreen() {
 			const { error } = await authClient.organization.inviteMember({
 				email,
 				role,
-				organizationId: activeOrg!.id,
+				organizationId: activeOrg?.id,
 			});
 			if (error) {
 				Alert.alert(t("invitations.error"), error.message);

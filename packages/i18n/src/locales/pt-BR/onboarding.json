@@ -1,0 +1,30 @@
+{
+	"title": "Bem-vindo ao pengana",
+	"description": "Para começar, entre em uma organização ou crie uma.",
+	"invitations": {
+		"title": "Convites pendentes",
+		"description": "Você foi convidado para participar das seguintes organizações.",
+		"accept": "Aceitar",
+		"accepted": "Convite aceito",
+		"error": "Falha ao processar o convite",
+		"createInstead": "Criar uma nova organização"
+	},
+	"invite": {
+		"title": "Convidar membros da equipe",
+		"description": "Convide pessoas para participar da sua organização. Você pode fazer isso depois.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "Adicionar outro",
+		"send": "Enviar convites",
+		"skip": "Pular por enquanto",
+		"success": "Convites enviados",
+		"error": "Falha ao enviar o convite",
+		"remove": "Remover"
+	},
+	"create": {
+		"title": "Criar organização",
+		"description": "Crie uma nova organização para começar.",
+		"success": "Organização criada",
+		"error": "Falha ao criar a organização",
+		"backToInvitations": "Voltar aos convites"
+	}
+}
