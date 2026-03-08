@@ -7,7 +7,9 @@ const isDev = env.NODE_ENV === "development";
 const keyGenerator = (c: Parameters<typeof getConnInfo>[0]) =>
 	getConnInfo(c).remote.address ?? "unknown";
 
-const handler = (c: { json: (data: unknown, status: number) => Response }) =>
+const rateLimitExceededHandler = (c: {
+	json: (data: unknown, status: number) => Response;
+}) =>
 	c.json(
 		{
 			success: false,
@@ -26,7 +28,7 @@ export const globalLimiter = rateLimiter({
 	limit: isDev ? 1200 : 120,
 	standardHeaders: "draft-6",
 	keyGenerator,
-	handler,
+	handler: rateLimitExceededHandler,
 });
 
 // Applied to auth routes (/api/auth/*). 20 requests per 15 minutes per IP.
@@ -36,7 +38,7 @@ export const authLimiter = rateLimiter({
 	limit: isDev ? 200 : 20,
 	standardHeaders: "draft-6",
 	keyGenerator,
-	handler,
+	handler: rateLimitExceededHandler,
 });
 
 // Applied to upload routes (/rpc/upload.*). 10 requests per minute per IP.
@@ -46,7 +48,7 @@ export const uploadLimiter = rateLimiter({
 	limit: isDev ? 100 : 10,
 	standardHeaders: "draft-6",
 	keyGenerator,
-	handler,
+	handler: rateLimitExceededHandler,
 });
 
 // Applied to todo sync routes (/rpc/todo.*). 60 requests per minute per IP.
@@ -56,5 +58,5 @@ export const syncLimiter = rateLimiter({
 	limit: isDev ? 600 : 60,
 	standardHeaders: "draft-6",
 	keyGenerator,
-	handler,
+	handler: rateLimitExceededHandler,
 });

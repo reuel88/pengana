@@ -6,7 +6,8 @@
 		"noOrgs": "아직 조직이 없습니다",
 		"switchTo": "{{name}}(으)로 전환",
 		"back": "뒤로",
-		"close": "닫기"
+		"close": "닫기",
+		"switchError": "조직 전환에 실패했습니다. 다시 시도해 주세요."
 	},
 	"create": {
 		"title": "조직 만들기",

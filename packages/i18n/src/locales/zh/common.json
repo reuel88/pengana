@@ -48,7 +48,12 @@
 		"cancel": "取消"
 	},
 	"error": {
+		"title": "错误",
 		"generic": "出了点问题。请重试。",
 		"retry": "重试"
+	},
+	"restartRequired": {
+		"title": "需要重启",
+		"message": "应用需要重启以应用布局方向的更改。请关闭并重新打开应用。"
 	}
 }

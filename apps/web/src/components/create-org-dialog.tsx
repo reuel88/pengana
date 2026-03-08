@@ -53,8 +53,9 @@ export function CreateOrgDialog({
 				</DialogDescription>
 				<form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.name")}</Label>
+						<Label htmlFor="dialog-org-name">{t("create.name")}</Label>
 						<Input
+							id="dialog-org-name"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder={t("create.namePlaceholder")}
@@ -62,16 +63,18 @@ export function CreateOrgDialog({
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.slug")}</Label>
+						<Label htmlFor="dialog-org-slug">{t("create.slug")}</Label>
 						<Input
+							id="dialog-org-slug"
 							value={slug}
 							onChange={(e) => setSlug(e.target.value)}
 							placeholder={t("create.slugPlaceholder")}
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.logo")}</Label>
+						<Label htmlFor="dialog-org-logo">{t("create.logo")}</Label>
 						<Input
+							id="dialog-org-logo"
 							value={logo}
 							onChange={(e) => setLogo(e.target.value)}
 							placeholder={t("create.logoPlaceholder")}

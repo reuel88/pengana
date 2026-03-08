@@ -33,9 +33,10 @@ export function useCreateOrg({
 			setLoading,
 			onSuccess: async (data) => {
 				if (!data) return;
-				await authClient.organization.setActive({
+				const { error } = await authClient.organization.setActive({
 					organizationId: data.id,
 				});
+				if (error) throw error;
 				await invalidateAll();
 				await onSuccess?.();
 			},

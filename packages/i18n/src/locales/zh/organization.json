@@ -6,7 +6,8 @@
 		"noOrgs": "暂无组织",
 		"switchTo": "切换到 {{name}}",
 		"back": "返回",
-		"close": "关闭"
+		"close": "关闭",
+		"switchError": "切换组织失败，请重试。"
 	},
 	"create": {
 		"title": "创建组织",

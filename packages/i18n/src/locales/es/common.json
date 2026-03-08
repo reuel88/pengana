@@ -48,7 +48,12 @@
 		"cancel": "Cancelar"
 	},
 	"error": {
+		"title": "Error",
 		"generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
 		"retry": "Reintentar"
+	},
+	"restartRequired": {
+		"title": "Reinicio necesario",
+		"message": "La aplicación necesita reiniciarse para aplicar el cambio de dirección del diseño. Por favor, cierre y vuelva a abrir la aplicación."
 	}
 }

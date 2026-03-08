@@ -11,7 +11,6 @@ import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import {
 	useActiveOrg,
@@ -20,6 +19,7 @@ import {
 } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/teams/")({
 	component: TeamsIndexPage,
@@ -45,25 +45,21 @@ function TeamsIndexPage() {
 
 	const handleCreate = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setLoading(true);
-		try {
-			const { error } = await authClient.organization.createTeam({
-				name: teamName,
-				organizationId: activeOrg.id,
-			});
-			if (error) {
-				toast.error(error.message || t("teams.error"));
-				return;
-			}
-			toast.success(t("teams.createSuccess"));
-			await invalidateTeams(activeOrg.id);
-			setCreateOpen(false);
-			setTeamName("");
-		} catch {
-			toast.error(t("teams.error"));
-		} finally {
-			setLoading(false);
-		}
+		await authMutation({
+			mutationFn: () =>
+				authClient.organization.createTeam({
+					name: teamName,
+					organizationId: activeOrg.id,
+				}),
+			successMessage: t("teams.createSuccess"),
+			errorMessage: t("teams.error"),
+			setLoading,
+			onSuccess: async () => {
+				await invalidateTeams(activeOrg.id);
+				setCreateOpen(false);
+				setTeamName("");
+			},
+		});
 	};
 
 	return (
@@ -83,8 +79,9 @@ function TeamsIndexPage() {
 								className="mt-4 flex flex-col gap-3"
 							>
 								<div className="flex flex-col gap-1">
-									<Label>{t("teams.name")}</Label>
+									<Label htmlFor="team-name">{t("teams.name")}</Label>
 									<Input
+										id="team-name"
 										value={teamName}
 										onChange={(e) => setTeamName(e.target.value)}
 										placeholder={t("teams.namePlaceholder")}

@@ -6,7 +6,8 @@
 		"noOrgs": "Aún no hay organizaciones",
 		"switchTo": "Cambiar a {{name}}",
 		"back": "Volver",
-		"close": "Cerrar"
+		"close": "Cerrar",
+		"switchError": "No se pudo cambiar de organización. Inténtalo de nuevo."
 	},
 	"create": {
 		"title": "Crear organización",

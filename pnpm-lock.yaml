@@ -190,6 +190,9 @@ importers:
       '@pengana/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@pengana/org-client':
+        specifier: workspace:*
+        version: link:../../packages/org-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
@@ -432,6 +435,9 @@ importers:
       '@pengana/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@pengana/org-client':
+        specifier: workspace:*
+        version: link:../../packages/org-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
@@ -716,6 +722,28 @@ importers:
       '@pengana/config':
         specifier: workspace:*
         version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/org-client:
+    dependencies:
+      '@tanstack/react-query':
+        specifier: ^5
+        version: 5.90.21(react@19.2.4)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+      xstate:
+        specifier: ^5
+        version: 5.28.0
+    devDependencies:
+      '@pengana/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.14
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -14829,6 +14857,11 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.90.20
       react: 19.2.3
+
+  '@tanstack/react-query@5.90.21(react@19.2.4)':
+    dependencies:
+      '@tanstack/query-core': 5.90.20
+      react: 19.2.4
 
   '@tanstack/react-router-devtools@1.163.3(@tanstack/react-router@1.163.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@tanstack/router-core@1.163.3)(csstype@3.2.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:

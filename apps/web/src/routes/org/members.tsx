@@ -14,8 +14,8 @@ export const Route = createFileRoute("/org/members")({
 function MembersPage() {
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
+	const { session } = Route.useRouteContext();
 	const { data: activeOrg, isPending } = useActiveOrg();
-	const { data: session } = authClient.useSession();
 	const { isAdmin } = useOrgRole();
 	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
 		useInvalidateOrg();
@@ -29,7 +29,7 @@ function MembersPage() {
 	}
 
 	const members = activeOrg.members || [];
-	const currentUserId = session?.user?.id;
+	const currentUserId = session.data.user.id;
 
 	const handleUpdateRole = async (
 		memberId: string,

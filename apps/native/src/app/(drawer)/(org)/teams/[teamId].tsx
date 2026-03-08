@@ -1,17 +1,19 @@
 import { useTranslation } from "@pengana/i18n";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
 import {
 	Alert,
 	FlatList,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { EmptyOrgScreen } from "@/components/empty-org-screen";
+import { LoadingScreen } from "@/components/loading-screen";
+import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
+import { TeamNameEditor } from "@/features/org/team-name-editor";
 import {
 	useActiveOrg,
 	useInvalidateOrg,
@@ -22,144 +24,6 @@ import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
-
-function TeamNameEditor({
-	teamId,
-	teamName,
-	orgId,
-	theme,
-}: {
-	teamId: string;
-	teamName: string;
-	orgId: string;
-	theme: ReturnType<typeof useTheme>["theme"];
-}) {
-	const { t } = useTranslation("organization");
-	const { isAdmin } = useOrgRole();
-	const { invalidateTeams } = useInvalidateOrg();
-	const [editing, setEditing] = useState(false);
-	const [newName, setNewName] = useState("");
-	const [saving, setSaving] = useState(false);
-
-	const handleUpdateName = () =>
-		authMutation({
-			mutationFn: () =>
-				authClient.organization.updateTeam({
-					teamId,
-					data: { name: newName },
-				}),
-			successMessage: t("teams.updateNameSuccess"),
-			errorMessage: t("teams.error"),
-			onSuccess: () => {
-				invalidateTeams(orgId);
-				setEditing(false);
-			},
-			setLoading: setSaving,
-		});
-
-	if (isAdmin && editing) {
-		return (
-			<View style={styles.editNameRow}>
-				<TextInput
-					style={[
-						styles.input,
-						{ flex: 1, color: theme.text, borderColor: theme.border },
-					]}
-					value={newName}
-					onChangeText={setNewName}
-				/>
-				<TouchableOpacity
-					style={[styles.addButton, { backgroundColor: theme.primary }]}
-					onPress={handleUpdateName}
-					disabled={saving}
-				>
-					<Text style={{ color: "#fff", fontSize: 12 }}>
-						{t("teams.updateName")}
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={[styles.cancelBtn, { borderColor: theme.border }]}
-					onPress={() => setEditing(false)}
-				>
-					<Text style={{ color: theme.text, fontSize: 12 }}>
-						{t("common:confirm.cancel")}
-					</Text>
-				</TouchableOpacity>
-			</View>
-		);
-	}
-
-	return (
-		<TouchableOpacity
-			onLongPress={() => {
-				if (isAdmin) {
-					setNewName(teamName);
-					setEditing(true);
-				}
-			}}
-		>
-			<Text style={[styles.title, { color: theme.text }]}>{teamName}</Text>
-		</TouchableOpacity>
-	);
-}
-
-function TeamMemberAddForm({
-	teamId,
-	members,
-	theme,
-}: {
-	teamId: string;
-	members: Array<{ userId: string; user: { email: string } }> | undefined;
-	theme: ReturnType<typeof useTheme>["theme"];
-}) {
-	const { t } = useTranslation("organization");
-	const { invalidateTeamMembers } = useInvalidateOrg();
-	const [memberEmail, setMemberEmail] = useState("");
-
-	const handleAddMember = async () => {
-		if (!memberEmail) return;
-		const member = members?.find((m) => m.user.email === memberEmail);
-		if (!member) {
-			Alert.alert(t("teams.error"));
-			return;
-		}
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.addTeamMember({
-					teamId,
-					userId: member.userId,
-				}),
-			errorMessage: t("teams.error"),
-			onSuccess: () => {
-				setMemberEmail("");
-				invalidateTeamMembers(teamId);
-			},
-		});
-	};
-
-	return (
-		<View style={styles.addRow}>
-			<TextInput
-				style={[
-					styles.input,
-					{ flex: 1, color: theme.text, borderColor: theme.border },
-				]}
-				value={memberEmail}
-				onChangeText={setMemberEmail}
-				placeholder={t("invitations.emailPlaceholder")}
-				placeholderTextColor={theme.border}
-				keyboardType="email-address"
-				autoCapitalize="none"
-			/>
-			<TouchableOpacity
-				style={[styles.addButton, { backgroundColor: theme.primary }]}
-				onPress={handleAddMember}
-			>
-				<Text style={{ color: "#fff" }}>{t("teams.addMember")}</Text>
-			</TouchableOpacity>
-		</View>
-	);
-}
 
 export default function TeamDetailScreen() {
 	const { theme } = useTheme();
@@ -176,25 +40,8 @@ export default function TeamDetailScreen() {
 	const team = teams.find((item) => item.id === teamId);
 	const teamName = team?.name ?? "";
 
-	if (loading) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16 }}>
-					{t("common:status.loading")}
-				</Text>
-			</Container>
-		);
-	}
-
-	if (!teamId || !teamName || !activeOrg) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
-					{t("noActiveOrg")}
-				</Text>
-			</Container>
-		);
-	}
+	if (loading) return <LoadingScreen />;
+	if (!teamId || !teamName || !activeOrg) return <EmptyOrgScreen />;
 
 	const handleRemoveMember = (userId: string) => {
 		Alert.alert(t("teams.removeMember"), "", [
@@ -245,7 +92,6 @@ export default function TeamDetailScreen() {
 								teamId={teamId}
 								teamName={teamName}
 								orgId={activeOrg.id}
-								theme={theme}
 							/>
 							{isAdmin && (
 								<TouchableOpacity
@@ -262,11 +108,7 @@ export default function TeamDetailScreen() {
 							)}
 						</View>
 						{isAdmin && (
-							<TeamMemberAddForm
-								teamId={teamId}
-								members={activeOrg.members}
-								theme={theme}
-							/>
+							<TeamMemberAddForm teamId={teamId} members={activeOrg.members} />
 						)}
 					</>
 				}
@@ -277,7 +119,8 @@ export default function TeamDetailScreen() {
 				}
 				renderItem={({ item }) => {
 					const orgMember = activeOrg.members?.find(
-						(m) => m.userId === item.userId,
+						(m: { userId: string; user: { name?: string } }) =>
+							m.userId === item.userId,
 					);
 					return (
 						<View
@@ -323,11 +166,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 12,
 	},
-	title: { fontSize: 18, fontWeight: "bold" },
 	deleteButton: { paddingHorizontal: 12, paddingVertical: 6 },
-	addRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
-	addButton: { paddingHorizontal: 16, justifyContent: "center" },
 	memberItem: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -335,12 +174,4 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 	},
 	removeButton: { paddingHorizontal: 12, paddingVertical: 6 },
-	editNameRow: {
-		flex: 1,
-		flexDirection: "row",
-		gap: 8,
-		alignItems: "center",
-		marginRight: 8,
-	},
-	cancelBtn: { paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
 });

@@ -2,6 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -11,7 +12,6 @@ import {
 
 import { useInvalidateOrg } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export function OnboardingCreateOrg({
@@ -30,34 +30,41 @@ export function OnboardingCreateOrg({
 	const [logo, setLogo] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		const trimmedName = name.trim();
 		const trimmedSlug = slug.trim();
 		if (!trimmedName) return;
-		return authMutation({
-			mutationFn: () =>
-				authClient.organization.create({
+
+		setLoading(true);
+		try {
+			const { data: org, error: createError } =
+				await authClient.organization.create({
 					name: trimmedName,
 					slug: trimmedSlug || trimmedName.toLowerCase().replace(/\s+/g, "-"),
 					logo: logo.trim() || undefined,
-				}),
-			errorMessage: t("create.error"),
-			onSuccess: async (data) => {
-				if (!data) return;
-				await authMutation({
-					mutationFn: () =>
-						authClient.organization.setActive({
-							organizationId: data.id,
-						}),
-					errorMessage: t("create.error"),
-					onSuccess: async () => {
-						await invalidateAll();
-						onCreated();
-					},
 				});
-			},
-			setLoading,
-		});
+			if (createError || !org) {
+				Alert.alert(createError?.message || t("create.error"));
+				return;
+			}
+
+			const { error: setActiveError } = await authClient.organization.setActive(
+				{
+					organizationId: org.id,
+				},
+			);
+			if (setActiveError) {
+				Alert.alert(setActiveError.message || t("create.error"));
+				return;
+			}
+
+			await invalidateAll();
+			onCreated();
+		} catch {
+			Alert.alert(t("create.error"));
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -133,11 +140,11 @@ export function OnboardingCreateOrg({
 					styles.submitButton,
 					{
 						backgroundColor: theme.primary,
-						opacity: loading || !name ? 0.5 : 1,
+						opacity: loading || !name.trim() ? 0.5 : 1,
 					},
 				]}
 				onPress={handleSubmit}
-				disabled={loading || !name}
+				disabled={loading || !name.trim()}
 			>
 				{loading ? (
 					<ActivityIndicator size="small" color="#fff" />

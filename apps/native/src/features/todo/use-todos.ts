@@ -8,9 +8,9 @@ export function useTodos(userId: string) {
 		db.select().from(todos).where(eq(todos.userId, userId)),
 	);
 
-	const activeTodos = (allTodos ?? []).filter((t) => !t.deleted);
+	const activeTodos = (allTodos ?? []).filter((todo) => !todo.deleted);
 	const conflictTodos = (allTodos ?? []).filter(
-		(t) => t.syncStatus === "conflict",
+		(todo) => todo.syncStatus === "conflict",
 	);
 
 	return { todos: activeTodos, conflictTodos };

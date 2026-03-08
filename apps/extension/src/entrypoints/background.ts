@@ -7,7 +7,6 @@ import type {
 } from "@pengana/sync-engine";
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 import { createDexieSyncAdapter } from "@pengana/todo-client";
-import { z } from "zod";
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,
@@ -18,6 +17,7 @@ import type {
 	SyncStatus,
 } from "@/utils/background-messages";
 import { client } from "@/utils/orpc";
+import { sessionResponseSchema } from "@/utils/session-schema";
 
 const SYNC_ALARM_NAME = "periodic-sync";
 const SYNC_INTERVAL_MINUTES = 0.5; // 30 seconds
@@ -31,6 +31,9 @@ interface BackgroundState {
 	isUploading: boolean;
 }
 
+// Mutable singleton — async interleaving is safe because all mutations are
+// idempotent (setupEngine checks userId equality) or last-write-wins (boolean
+// flags overwritten by the next event). No torn state is possible.
 const state: BackgroundState = {
 	engine: null,
 	uploadQueue: null,
@@ -54,11 +57,6 @@ function broadcast(message: BackgroundBroadcast) {
 		// Popup not open — ignore
 	});
 }
-
-const sessionResponseSchema = z.object({
-	session: z.object({ userId: z.string() }).optional(),
-	user: z.object({ id: z.string() }).optional(),
-});
 
 async function fetchUserId(): Promise<string | null> {
 	try {
@@ -160,7 +158,11 @@ function handleMessage(
 
 		case "sync:trigger": {
 			if (state.isOnline) {
-				ensureEngine().then(() => state.engine?.sync());
+				ensureEngine()
+					.then(() => state.engine?.sync())
+					.catch((err) =>
+						console.error("[background] sync:trigger failed:", err),
+					);
 			}
 			sendResponse({ ok: true });
 			return false;
@@ -174,17 +176,27 @@ function handleMessage(
 					fileUri: message.payload.fileUri,
 					mimeType: message.payload.mimeType,
 				});
+				sendResponse({ ok: true });
+			} else {
+				console.warn("[background] upload:enqueue dropped — queue not ready");
+				sendResponse({ ok: false, error: "Upload queue not ready" });
 			}
-			sendResponse({ ok: true });
 			return false;
 		}
 
 		case "status:get": {
 			if (!state.currentUserId) {
-				ensureEngine().then(() => sendResponse(getStatus()));
+				ensureEngine()
+					.then(() => sendResponse(getStatus()))
+					.catch(() => sendResponse(getStatus()));
 				return true; // Keep message channel open for async response
 			}
 			sendResponse(getStatus());
+			return false;
+		}
+
+		default: {
+			sendResponse({ ok: false, error: "Unknown message type" });
 			return false;
 		}
 	}
@@ -234,5 +246,7 @@ export default defineBackground(() => {
 		broadcast({ type: "status:update", status: getStatus() });
 	});
 
-	initBackground();
+	initBackground().catch((err) =>
+		console.error("[background] initBackground failed:", err),
+	);
 });

@@ -1,8 +1,10 @@
-export { createWebUploadAdapter } from "./adapter";
-export { uploadQueueDb } from "./db";
+export type { FileDataRecord } from "@pengana/todo-client";
 export {
+	createWebUploadAdapter,
 	getFileForUpload,
 	removeFileForUpload,
 	storeFileForUpload,
-} from "./file-store";
+	UploadQueueDatabase,
+	uploadQueueDb,
+} from "@pengana/todo-client";
 export { createWebUploadTransport } from "./transport";

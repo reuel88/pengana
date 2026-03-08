@@ -48,7 +48,12 @@
 		"cancel": "Cancel"
 	},
 	"error": {
+		"title": "Error",
 		"generic": "Something went wrong. Please try again.",
 		"retry": "Retry"
+	},
+	"restartRequired": {
+		"title": "Restart Required",
+		"message": "The app needs to restart to apply the layout direction change. Please close and reopen the app."
 	}
 }

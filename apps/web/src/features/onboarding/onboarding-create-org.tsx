@@ -38,8 +38,11 @@ export function OnboardingCreateOrg({
 			<CardContent>
 				<form onSubmit={handleSubmit} className="flex flex-col gap-3">
 					<div className="flex flex-col gap-1">
-						<Label>{t("organization:create.name")}</Label>
+						<Label htmlFor="onboard-org-name">
+							{t("organization:create.name")}
+						</Label>
 						<Input
+							id="onboard-org-name"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							placeholder={t("organization:create.namePlaceholder")}
@@ -47,16 +50,22 @@ export function OnboardingCreateOrg({
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("organization:create.slug")}</Label>
+						<Label htmlFor="onboard-org-slug">
+							{t("organization:create.slug")}
+						</Label>
 						<Input
+							id="onboard-org-slug"
 							value={slug}
 							onChange={(e) => setSlug(e.target.value)}
 							placeholder={t("organization:create.slugPlaceholder")}
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("organization:create.logo")}</Label>
+						<Label htmlFor="onboard-org-logo">
+							{t("organization:create.logo")}
+						</Label>
 						<Input
+							id="onboard-org-logo"
 							value={logo}
 							onChange={(e) => setLogo(e.target.value)}
 							placeholder={t("organization:create.logoPlaceholder")}

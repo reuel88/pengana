@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	Modal,
 	ScrollView,
 	StyleSheet,
@@ -12,6 +13,7 @@ import {
 	View,
 } from "react-native";
 
+import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
@@ -30,12 +32,14 @@ function CreateOrgModal({
 	const [loading, setLoading] = useState(false);
 
 	const handleCreate = () => {
-		if (!name) return;
+		const trimmedName = name.trim();
+		const trimmedSlug = slug.trim();
+		if (!trimmedName) return;
 		return authMutation({
 			mutationFn: () =>
 				authClient.organization.create({
-					name,
-					slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
+					name: trimmedName,
+					slug: trimmedSlug || trimmedName.toLowerCase().replace(/\s+/g, "-"),
 				}),
 			errorMessage: t("create.error"),
 			onSuccess: (data) => {
@@ -86,21 +90,33 @@ export function OrgSwitcher() {
 	const { t } = useTranslation("organization");
 	const router = useRouter();
 	const { data: session } = authClient.useSession();
-	const { data: orgs, isPending } = authClient.useListOrganizations();
-	const { data: activeOrg } = authClient.useActiveOrganization();
+	const { data: orgs, isPending } = useListOrgs();
+	const { data: activeOrg } = useActiveOrg();
 	const [showPicker, setShowPicker] = useState(false);
 	const [showCreate, setShowCreate] = useState(false);
 
 	if (!session) return null;
 
 	const handleSwitch = async (orgId: string) => {
-		await authClient.organization.setActive({ organizationId: orgId });
+		const { error } = await authClient.organization.setActive({
+			organizationId: orgId,
+		});
+		if (error) {
+			Alert.alert(error.message || t("switcher.switchError"));
+			return;
+		}
 		setShowPicker(false);
 		router.push("/(drawer)/(org)");
 	};
 
 	const handleCreated = async (orgId: string) => {
-		await authClient.organization.setActive({ organizationId: orgId });
+		const { error } = await authClient.organization.setActive({
+			organizationId: orgId,
+		});
+		if (error) {
+			Alert.alert(error.message || t("switcher.switchError"));
+			return;
+		}
 		setShowCreate(false);
 		setShowPicker(false);
 		router.push("/(drawer)/(org)");

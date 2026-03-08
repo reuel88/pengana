@@ -1,8 +1,7 @@
+import { onboardingMachine } from "@pengana/org-client/onboarding-machine";
 import { useMachine } from "@xstate/react";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-
-import { onboardingMachine } from "./onboarding-machine";
 
 export function useOnboarding(hasPendingInvitations: boolean) {
 	const router = useRouter();

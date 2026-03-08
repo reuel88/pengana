@@ -7,10 +7,10 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
+import { authMutation } from "@/lib/auth-mutation";
 
 export function OnboardingInvitations({
 	onAccepted,
@@ -27,18 +27,16 @@ export function OnboardingInvitations({
 	const handleAccept = async (invitationId: string) => {
 		setActing(true);
 		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
+			await authMutation({
+				mutationFn: () =>
+					authClient.organization.acceptInvitation({ invitationId }),
+				successMessage: t("invitations.accepted"),
+				errorMessage: t("invitations.error"),
+				onSuccess: async () => {
+					await invalidateAll();
+					onAccepted();
+				},
 			});
-			if (error) {
-				toast.error(error.message || t("invitations.error"));
-				return;
-			}
-			await invalidateAll();
-			toast.success(t("invitations.accepted"));
-			onAccepted();
-		} catch {
-			toast.error(t("invitations.error"));
 		} finally {
 			setActing(false);
 		}

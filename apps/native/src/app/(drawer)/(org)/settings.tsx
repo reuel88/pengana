@@ -12,6 +12,8 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { EmptyOrgScreen } from "@/components/empty-org-screen";
+import { LoadingScreen } from "@/components/loading-screen";
 import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
@@ -28,7 +30,7 @@ export default function OrgSettingsScreen() {
 	const [logo, setLogo] = useState("");
 	const [loading, setLoading] = useState(false);
 	const { isOwner, isAdmin } = useOrgRole();
-	const { invalidateActiveOrg } = useInvalidateOrg();
+	const { invalidateActiveOrg, invalidateAll } = useInvalidateOrg();
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
@@ -38,25 +40,8 @@ export default function OrgSettingsScreen() {
 		setLogo(activeOrg.logo || "");
 	}, [activeOrg?.id]);
 
-	if (isPending) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16 }}>
-					{t("common:status.loading")}
-				</Text>
-			</Container>
-		);
-	}
-
-	if (!activeOrg) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
-					{t("noActiveOrg")}
-				</Text>
-			</Container>
-		);
-	}
+	if (isPending) return <LoadingScreen />;
+	if (!activeOrg) return <EmptyOrgScreen />;
 
 	const handleUpdate = () =>
 		authMutation({
@@ -83,7 +68,8 @@ export default function OrgSettingsScreen() {
 								organizationId: activeOrg.id,
 							}),
 						errorMessage: t("settings.error"),
-						onSuccess: () => {
+						onSuccess: async () => {
+							await invalidateAll();
 							router.replace("/");
 						},
 					}),

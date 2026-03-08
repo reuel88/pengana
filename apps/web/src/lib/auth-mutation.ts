@@ -1,35 +1,16 @@
+import type { NotifyFn } from "@pengana/org-client/auth-mutation";
+import { authMutation as coreAuthMutation } from "@pengana/org-client/auth-mutation";
 import { toast } from "sonner";
 
-interface AuthMutationOptions<T> {
-	mutationFn: () => Promise<{
-		data?: T | null;
-		error?: { message?: string } | null;
-	}>;
-	successMessage: string;
-	errorMessage: string;
-	onSuccess?: (data: T | null) => undefined | Promise<unknown>;
-	setLoading?: (loading: boolean) => void;
-}
+const notify: NotifyFn = {
+	success: (message) => toast.success(message),
+	error: (message) => toast.error(message),
+};
 
-export async function authMutation<T>({
-	mutationFn,
-	successMessage,
-	errorMessage,
-	onSuccess,
-	setLoading,
-}: AuthMutationOptions<T>) {
-	setLoading?.(true);
-	try {
-		const { data, error } = await mutationFn();
-		if (error) {
-			toast.error(error.message || errorMessage);
-			return;
-		}
-		toast.success(successMessage);
-		await onSuccess?.(data as T);
-	} catch {
-		toast.error(errorMessage);
-	} finally {
-		setLoading?.(false);
-	}
+export async function authMutation<T>(
+	opts: Parameters<typeof coreAuthMutation<T>>[0] extends infer O
+		? Omit<O, "notify">
+		: never,
+) {
+	return coreAuthMutation<T>({ ...opts, notify });
 }

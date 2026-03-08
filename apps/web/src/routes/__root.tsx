@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { getDirection } from "@pengana/i18n/rtl";
+import { AuthClientProvider } from "@pengana/org-client";
 import { Toaster } from "@pengana/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -14,6 +15,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { authClient } from "@/lib/auth-client";
 import type { orpc } from "@/utils/orpc";
 
 import "@pengana/ui/globals.css";
@@ -70,7 +72,7 @@ function RootComponent() {
 	}, [i18n]);
 
 	return (
-		<>
+		<AuthClientProvider client={authClient}>
 			<HeadContent />
 			<ThemeProvider
 				attribute="class"
@@ -86,6 +88,6 @@ function RootComponent() {
 			</ThemeProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 			<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
-		</>
+		</AuthClientProvider>
 	);
 }

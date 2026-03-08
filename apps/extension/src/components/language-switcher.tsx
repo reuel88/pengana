@@ -1,4 +1,9 @@
-import { type SupportedLocale, useTranslation } from "@pengana/i18n";
+import {
+	DEFAULT_LOCALE,
+	isSupportedLocale,
+	type SupportedLocale,
+	useTranslation,
+} from "@pengana/i18n";
 import { LanguageSwitcher as LanguageSwitcherBase } from "@pengana/ui/components/language-switcher";
 
 export function LanguageSwitcher() {
@@ -11,7 +16,9 @@ export function LanguageSwitcher() {
 
 	return (
 		<LanguageSwitcherBase
-			currentLocale={i18n.language as SupportedLocale}
+			currentLocale={
+				isSupportedLocale(i18n.language) ? i18n.language : DEFAULT_LOCALE
+			}
 			onLocaleChange={handleChange}
 		/>
 	);

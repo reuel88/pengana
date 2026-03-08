@@ -1,0 +1,24 @@
+{
+	"name": "@pengana/org-client",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"peerDependencies": {
+		"@tanstack/react-query": "^5",
+		"react": "^19.0.0",
+		"xstate": "^5"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.7",
+		"typescript": "catalog:"
+	}
+}

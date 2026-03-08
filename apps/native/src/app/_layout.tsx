@@ -1,6 +1,8 @@
+import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { isRtlLocale } from "@pengana/i18n/rtl";
+import { AuthClientProvider } from "@pengana/org-client";
 
 import {
 	DarkTheme,
@@ -13,8 +15,15 @@ import { getLocales } from "expo-localization";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { I18nManager, Platform, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+	I18nManager,
+	Platform,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { authClient } from "@/lib/auth-client";
@@ -40,13 +49,13 @@ function resolveRoute(
 
 	if (!session || !lifecycleChecked) return null;
 
-	if (session && inAuthGroup) {
+	if (inAuthGroup) {
 		return needsOnboarding ? "/onboarding" : "/(drawer)";
 	}
-	if (session && !inOnboarding && !inInvitation && needsOnboarding) {
+	if (!inOnboarding && !inInvitation && needsOnboarding) {
 		return "/onboarding";
 	}
-	if (session && inOnboarding && !needsOnboarding) {
+	if (inOnboarding && !needsOnboarding) {
 		return "/(drawer)";
 	}
 
@@ -70,20 +79,45 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
+	errorContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 12,
+	},
+	errorText: {
+		fontSize: 14,
+		opacity: 0.7,
+	},
+	retryButton: {
+		paddingHorizontal: 20,
+		paddingVertical: 10,
+		borderRadius: 6,
+		backgroundColor: "#007AFF",
+	},
+	retryText: {
+		color: "#fff",
+		fontWeight: "600",
+	},
 });
 
 function RootLayoutInner() {
 	const { isDarkColorScheme } = useColorScheme();
+	const { t } = useTranslation("common");
 	const { data: session, isPending } = authClient.useSession();
 	const segments = useSegments();
 	const router = useRouter();
 	const [lifecycleChecked, setLifecycleChecked] = useState(false);
 	const [needsOnboarding, setNeedsOnboarding] = useState(false);
+	const [orgError, setOrgError] = useState(false);
 
 	useEffect(() => {
-		if (isPending || !session) {
-			setLifecycleChecked(false);
-			setNeedsOnboarding(false);
+		if (isPending || !session || orgError) {
+			if (isPending || !session) {
+				setLifecycleChecked(false);
+				setNeedsOnboarding(false);
+				setOrgError(false);
+			}
 			return;
 		}
 
@@ -98,13 +132,15 @@ function RootLayoutInner() {
 			} catch (err) {
 				if (!cancelled) {
 					console.error("Failed to check org lifecycle:", err);
+					setOrgError(true);
+					setLifecycleChecked(true);
 				}
 			}
 		})();
 		return () => {
 			cancelled = true;
 		};
-	}, [isPending, session]);
+	}, [isPending, session, orgError]);
 
 	useEffect(() => {
 		if (isPending) return;
@@ -120,7 +156,23 @@ function RootLayoutInner() {
 		}
 	}, [session, isPending, segments, router, lifecycleChecked, needsOnboarding]);
 
+	const retryLifecycleCheck = useCallback(() => {
+		setOrgError(false);
+		setLifecycleChecked(false);
+	}, []);
+
 	if (isPending) return null;
+
+	if (orgError) {
+		return (
+			<View style={styles.errorContainer}>
+				<Text style={styles.errorText}>{t("error.generic")}</Text>
+				<Pressable style={styles.retryButton} onPress={retryLifecycleCheck}>
+					<Text style={styles.retryText}>{t("error.retry")}</Text>
+				</Pressable>
+			</View>
+		);
+	}
 
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
@@ -173,7 +225,9 @@ export default function RootLayout() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<RootLayoutInner />
+			<AuthClientProvider client={authClient}>
+				<RootLayoutInner />
+			</AuthClientProvider>
 		</QueryClientProvider>
 	);
 }

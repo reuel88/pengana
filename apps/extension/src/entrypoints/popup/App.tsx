@@ -58,7 +58,7 @@ function App() {
 
 	if (isOrgsPending) return <LoadingState />;
 
-	if (!orgs || orgs.length === 0) {
+	if (!Array.isArray(orgs) || orgs.length === 0) {
 		return (
 			<ActionPrompt
 				messageKey="onboardingPrompt"

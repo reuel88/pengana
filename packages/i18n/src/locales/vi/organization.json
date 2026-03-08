@@ -6,7 +6,8 @@
 		"noOrgs": "Chưa có tổ chức nào",
 		"switchTo": "Chuyển sang {{name}}",
 		"back": "Quay lại",
-		"close": "Đóng"
+		"close": "Đóng",
+		"switchError": "Không thể chuyển tổ chức. Vui lòng thử lại."
 	},
 	"create": {
 		"title": "Tạo tổ chức",

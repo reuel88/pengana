@@ -48,7 +48,12 @@
 		"cancel": "Hủy"
 	},
 	"error": {
+		"title": "Lỗi",
 		"generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
 		"retry": "Thử lại"
+	},
+	"restartRequired": {
+		"title": "Cần khởi động lại",
+		"message": "Ứng dụng cần khởi động lại để áp dụng thay đổi hướng bố cục. Vui lòng đóng và mở lại ứng dụng."
 	}
 }

@@ -4,6 +4,7 @@ import type {
 	BackgroundBroadcast,
 	SyncStatus,
 } from "@/utils/background-messages";
+import { sendBackgroundMessage } from "@/utils/send-background-message";
 
 const KNOWN_BROADCAST_TYPES = new Set([
 	"sync:event",
@@ -20,8 +21,8 @@ export function useSyncEngine(userId: string) {
 	useEffect(() => {
 		const init = async () => {
 			try {
-				await browser.runtime.sendMessage({ type: "init", userId });
-				const status: SyncStatus = await browser.runtime.sendMessage({
+				await sendBackgroundMessage({ type: "init", userId });
+				const status = await sendBackgroundMessage<SyncStatus>({
 					type: "status:get",
 				});
 				if (status) {
@@ -29,7 +30,7 @@ export function useSyncEngine(userId: string) {
 					setIsSyncing(status.isSyncing);
 					setIsUploading(status.isUploading);
 				}
-				await browser.runtime.sendMessage({ type: "sync:trigger" });
+				await sendBackgroundMessage({ type: "sync:trigger" });
 			} catch (err) {
 				console.error("[sync-engine] init failed:", err);
 			}
@@ -81,21 +82,19 @@ export function useSyncEngine(userId: string) {
 	}, []);
 
 	const triggerSync = useCallback(() => {
-		browser.runtime
-			.sendMessage({ type: "sync:trigger" })
-			.catch((err) => console.error("[sync-engine] trigger failed:", err));
+		sendBackgroundMessage({ type: "sync:trigger" }).catch((err) =>
+			console.error("[sync-engine] trigger failed:", err),
+		);
 	}, []);
 
 	const enqueueUpload = useCallback(
 		(todoId: string, fileUri: string, mimeType: string) => {
-			browser.runtime
-				.sendMessage({
-					type: "upload:enqueue",
-					payload: { todoId, fileUri, mimeType },
-				})
-				.catch((err) =>
-					console.error("[sync-engine] enqueue upload failed:", err),
-				);
+			sendBackgroundMessage({
+				type: "upload:enqueue",
+				payload: { todoId, fileUri, mimeType },
+			}).catch((err) =>
+				console.error("[sync-engine] enqueue upload failed:", err),
+			);
 		},
 		[],
 	);

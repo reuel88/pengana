@@ -14,6 +14,7 @@ import { initServerI18n } from "@pengana/i18n/server";
 import { type Context, Hono, type Next } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { initLogger, logger, orpcLogger, requestLogger } from "./logger";
 import {
 	authLimiter,
@@ -85,7 +86,9 @@ export const rpcHandler = new RPCHandler(appRouter, {
 
 // Initialized after server starts — WebSocket needs the HTTP server instance.
 // The middleware closure captures this reference so it always uses the live function.
-let notifyUser: (userId: string) => void = () => {};
+const notifyRef: { current: (userId: string) => void } = {
+	current: () => {},
+};
 
 async function wrapApiErrorResponse(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
@@ -99,7 +102,7 @@ async function wrapApiErrorResponse(c: Context, response: Response) {
 					message: body.message ?? "Unknown error",
 				},
 			},
-			response.status as never,
+			response.status as ContentfulStatusCode,
 		);
 	}
 	return c.newResponse(response.body, response);
@@ -107,7 +110,7 @@ async function wrapApiErrorResponse(c: Context, response: Response) {
 
 async function handleOrpcRoutes(c: Context, next: Next) {
 	const appContext = await createContext({ context: c });
-	const fullContext = { ...appContext, notifyUser };
+	const fullContext = { ...appContext, notifyUser: notifyRef.current };
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",
@@ -150,5 +153,5 @@ const server = serve(
 	},
 );
 
-notifyUser = setupWebSocket(server).notifyUser;
-setNotifyUser(notifyUser);
+notifyRef.current = setupWebSocket(server).notifyUser;
+setNotifyUser(notifyRef.current);

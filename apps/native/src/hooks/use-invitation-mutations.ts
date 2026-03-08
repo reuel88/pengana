@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 
 export function useInvitationMutations() {
 	const { t } = useTranslation("organization");
-	const { invalidateUserInvitations } = useInvalidateOrg();
+	const { invalidateUserInvitations, invalidateActiveOrg } = useInvalidateOrg();
 
 	const acceptMutation = useMutation({
 		mutationFn: async (invitationId: string) => {
@@ -50,6 +50,7 @@ export function useInvitationMutations() {
 		},
 		onSuccess: () => {
 			Alert.alert(t("invitations.cancelSuccess"));
+			invalidateActiveOrg();
 		},
 		onError: (error: { message?: string }) => {
 			Alert.alert(t("invitations.error"), error.message);

@@ -48,7 +48,12 @@
 		"cancel": "Cancelar"
 	},
 	"error": {
+		"title": "Erro",
 		"generic": "Algo deu errado. Por favor, tente novamente.",
 		"retry": "Tentar novamente"
+	},
+	"restartRequired": {
+		"title": "Reinicialização necessária",
+		"message": "O aplicativo precisa ser reiniciado para aplicar a alteração na direção do layout. Por favor, feche e reabra o aplicativo."
 	}
 }

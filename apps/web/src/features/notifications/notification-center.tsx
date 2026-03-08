@@ -8,6 +8,7 @@ import {
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
 	useInvalidateNotifications,
 	useNotifications,
@@ -155,13 +156,21 @@ export function NotificationCenter() {
 	};
 
 	const handleMarkRead = async (id: string) => {
-		await client.notification.markRead({ id });
-		await invalidateNotifications();
+		try {
+			await client.notification.markRead({ id });
+			await invalidateNotifications();
+		} catch {
+			toast.error(t("error"));
+		}
 	};
 
 	const handleMarkAllRead = async () => {
-		await client.notification.markAllRead();
-		await invalidateNotifications();
+		try {
+			await client.notification.markAllRead();
+			await invalidateNotifications();
+		} catch {
+			toast.error(t("error"));
+		}
 	};
 
 	return (

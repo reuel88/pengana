@@ -44,13 +44,19 @@ export default function OnboardingScreen() {
 
 	const [error, setError] = useState(false);
 
-	useEffect(() => {
+	const loadLifecycleData = () => {
+		setError(false);
 		fetchUserLifecycleData()
 			.then(setLifecycleData)
 			.catch((err: unknown) => {
 				console.error("Failed to fetch lifecycle data:", err);
 				setError(true);
 			});
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount
+	useEffect(() => {
+		loadLifecycleData();
 	}, []);
 
 	if (error) {
@@ -59,14 +65,7 @@ export default function OnboardingScreen() {
 				<Text style={{ color: theme.text, marginBottom: 12 }}>
 					{t("common:error.generic")}
 				</Text>
-				<TouchableOpacity
-					onPress={() => {
-						setError(false);
-						fetchUserLifecycleData()
-							.then(setLifecycleData)
-							.catch(() => setError(true));
-					}}
-				>
+				<TouchableOpacity onPress={loadLifecycleData}>
 					<Text style={{ color: theme.primary }}>
 						{t("common:error.retry")}
 					</Text>

@@ -48,7 +48,12 @@
 		"cancel": "Kanselahin"
 	},
 	"error": {
+		"title": "Error",
 		"generic": "May nangyaring mali. Pakisubukan muli.",
 		"retry": "Subukan muli"
+	},
+	"restartRequired": {
+		"title": "Kailangang I-restart",
+		"message": "Kailangang i-restart ang app para mailapat ang pagbabago sa direksyon ng layout. Pakisara at buksan muli ang app."
 	}
 }

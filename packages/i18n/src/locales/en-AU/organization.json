@@ -6,7 +6,8 @@
 		"noOrgs": "No organisations yet",
 		"switchTo": "Switch to {{name}}",
 		"back": "Back",
-		"close": "Close"
+		"close": "Close",
+		"switchError": "Failed to switch organisation. Please try again."
 	},
 	"create": {
 		"title": "Create Organisation",

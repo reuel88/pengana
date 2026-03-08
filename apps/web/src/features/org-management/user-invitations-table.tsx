@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
+import { useState } from "react";
 
 import { useInvalidateOrg } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
@@ -20,35 +21,46 @@ export function UserInvitationsTable({
 	const { t } = useTranslation("organization");
 	const { invalidateUserInvitations, invalidateActiveOrg, invalidateListOrgs } =
 		useInvalidateOrg();
+	const [actingId, setActingId] = useState<string | null>(null);
 
 	const handleAccept = async (invitationId: string) => {
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.acceptInvitation({ invitationId }),
-			successMessage: t("invitations.acceptSuccess"),
-			errorMessage: t("invitations.error"),
-			onSuccess: () =>
-				Promise.all([
-					invalidateUserInvitations(),
-					invalidateActiveOrg(),
-					invalidateListOrgs(),
-				]),
-		});
+		setActingId(invitationId);
+		try {
+			await authMutation({
+				mutationFn: () =>
+					authClient.organization.acceptInvitation({ invitationId }),
+				successMessage: t("invitations.acceptSuccess"),
+				errorMessage: t("invitations.error"),
+				onSuccess: () =>
+					Promise.all([
+						invalidateUserInvitations(),
+						invalidateActiveOrg(),
+						invalidateListOrgs(),
+					]),
+			});
+		} finally {
+			setActingId(null);
+		}
 	};
 
 	const handleReject = async (invitationId: string) => {
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.rejectInvitation({ invitationId }),
-			successMessage: t("invitations.rejectSuccess"),
-			errorMessage: t("invitations.error"),
-			onSuccess: () =>
-				Promise.all([
-					invalidateUserInvitations(),
-					invalidateActiveOrg(),
-					invalidateListOrgs(),
-				]),
-		});
+		setActingId(invitationId);
+		try {
+			await authMutation({
+				mutationFn: () =>
+					authClient.organization.rejectInvitation({ invitationId }),
+				successMessage: t("invitations.rejectSuccess"),
+				errorMessage: t("invitations.error"),
+				onSuccess: () =>
+					Promise.all([
+						invalidateUserInvitations(),
+						invalidateActiveOrg(),
+						invalidateListOrgs(),
+					]),
+			});
+		} finally {
+			setActingId(null);
+		}
 	};
 
 	return (
@@ -74,13 +86,18 @@ export function UserInvitationsTable({
 								<td className="py-2">{inv.role}</td>
 								<td className="py-2 text-right">
 									<div className="flex justify-end gap-2">
-										<Button size="xs" onClick={() => handleAccept(inv.id)}>
+										<Button
+											size="xs"
+											onClick={() => handleAccept(inv.id)}
+											disabled={actingId !== null}
+										>
 											{t("invitations.accept")}
 										</Button>
 										<Button
 											variant="outline"
 											size="xs"
 											onClick={() => handleReject(inv.id)}
+											disabled={actingId !== null}
 										>
 											{t("invitations.reject")}
 										</Button>

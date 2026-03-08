@@ -46,7 +46,10 @@ function TeamDetailPage() {
 
 	const handleAddMember = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const member = activeOrg.members?.find((m) => m.user.email === memberEmail);
+		const member = activeOrg.members?.find(
+			(m: { id: string; user: { email: string } }) =>
+				m.user.email === memberEmail,
+		);
 		if (!member) {
 			toast.error(t("teams.error"));
 			return;
@@ -177,15 +180,16 @@ function TeamDetailPage() {
 				<table className="w-full text-xs">
 					<thead>
 						<tr className="border-b text-left text-muted-foreground">
-							<th className="pb-2">Name</th>
-							<th className="pb-2">Email</th>
+							<th className="pb-2">{t("members.name")}</th>
+							<th className="pb-2">{t("members.email")}</th>
 							<th className="pb-2" />
 						</tr>
 					</thead>
 					<tbody>
 						{teamMembers.map((tm) => {
 							const orgMember = activeOrg?.members?.find(
-								(m) => m.userId === tm.userId,
+								(m: { userId: string; user: { name?: string } }) =>
+									m.userId === tm.userId,
 							);
 							return (
 								<tr key={tm.id} className="border-b">

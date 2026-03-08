@@ -37,7 +37,7 @@ const LOCALE_LABELS: Record<SupportedLocale, string> = {
 };
 
 export function LanguageSwitcher() {
-	const { i18n } = useTranslation();
+	const { i18n, t } = useTranslation();
 	const { theme } = useTheme();
 	const [visible, setVisible] = useState(false);
 
@@ -62,8 +62,8 @@ export function LanguageSwitcher() {
 			I18nManager.allowRTL(true);
 			I18nManager.forceRTL(willBeRtl);
 			Alert.alert(
-				"Restart Required",
-				"The app needs to restart to apply the layout direction change. Please close and reopen the app.",
+				t("common:restartRequired.title"),
+				t("common:restartRequired.message"),
 			);
 		}
 

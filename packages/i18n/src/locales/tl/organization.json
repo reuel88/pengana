@@ -6,7 +6,8 @@
 		"noOrgs": "Wala pang mga organisasyon",
 		"switchTo": "Lumipat sa {{name}}",
 		"back": "Bumalik",
-		"close": "Isara"
+		"close": "Isara",
+		"switchError": "Nabigong lumipat ng organisasyon. Pakisubukan muli."
 	},
 	"create": {
 		"title": "Lumikha ng Organisasyon",

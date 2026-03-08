@@ -1,8 +1,7 @@
+import { onboardingMachine } from "@pengana/org-client/onboarding-machine";
 import { useNavigate } from "@tanstack/react-router";
 import { useMachine } from "@xstate/react";
 import { useEffect } from "react";
-
-import { onboardingMachine } from "./onboarding-machine";
 
 export function useOnboarding({
 	hasPendingInvitations,

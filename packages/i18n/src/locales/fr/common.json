@@ -48,7 +48,12 @@
 		"cancel": "Annuler"
 	},
 	"error": {
+		"title": "Erreur",
 		"generic": "Une erreur est survenue. Veuillez réessayer.",
 		"retry": "Réessayer"
+	},
+	"restartRequired": {
+		"title": "Redémarrage requis",
+		"message": "L'application doit redémarrer pour appliquer le changement de direction de mise en page. Veuillez fermer et rouvrir l'application."
 	}
 }

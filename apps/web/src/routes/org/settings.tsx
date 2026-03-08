@@ -74,24 +74,27 @@ function OrgSettingsPage() {
 				<form onSubmit={handleUpdate} className="flex flex-col gap-3">
 					<h2 className="font-medium text-sm">{t("settings.update")}</h2>
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.name")}</Label>
+						<Label htmlFor="org-name">{t("create.name")}</Label>
 						<Input
+							id="org-name"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							required
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.slug")}</Label>
+						<Label htmlFor="org-slug">{t("create.slug")}</Label>
 						<Input
+							id="org-slug"
 							value={slug}
 							onChange={(e) => setSlug(e.target.value)}
 							required
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
-						<Label>{t("create.logo")}</Label>
+						<Label htmlFor="org-logo">{t("create.logo")}</Label>
 						<Input
+							id="org-logo"
 							value={logo}
 							onChange={(e) => setLogo(e.target.value)}
 							placeholder={t("create.logoPlaceholder")}

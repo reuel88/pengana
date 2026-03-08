@@ -10,8 +10,10 @@ export function useTodos(userId: string) {
 		[] as Todo[],
 	);
 
-	const activeTodos = todos.filter((t: Todo) => !t.deleted);
-	const conflictTodos = todos.filter((t: Todo) => t.syncStatus === "conflict");
+	const activeTodos = todos.filter((todo: Todo) => !todo.deleted);
+	const conflictTodos = todos.filter(
+		(todo: Todo) => todo.syncStatus === "conflict",
+	);
 
 	return { todos: activeTodos, conflictTodos };
 }

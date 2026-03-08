@@ -120,7 +120,8 @@ async function authenticateRequest(
 
 		const session = await auth.api.getSession({ headers });
 		return session?.user?.id ?? null;
-	} catch {
+	} catch (error) {
+		wsLogger.debug`authenticateRequest failed: ${error}`;
 		return null;
 	}
 }

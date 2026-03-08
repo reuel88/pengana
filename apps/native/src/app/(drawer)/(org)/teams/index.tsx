@@ -11,6 +11,8 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { EmptyOrgScreen } from "@/components/empty-org-screen";
+import { LoadingScreen } from "@/components/loading-screen";
 import {
 	useActiveOrg,
 	useInvalidateOrg,
@@ -32,32 +34,16 @@ export default function TeamsIndexScreen() {
 	const { isAdmin } = useOrgRole();
 	const { invalidateTeams } = useInvalidateOrg();
 
-	if (isPending || teamsLoading) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16 }}>
-					{t("common:status.loading")}
-				</Text>
-			</Container>
-		);
-	}
-
-	if (!activeOrg) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
-					{t("noActiveOrg")}
-				</Text>
-			</Container>
-		);
-	}
+	if (isPending || teamsLoading) return <LoadingScreen />;
+	if (!activeOrg) return <EmptyOrgScreen />;
 
 	const handleCreate = () => {
-		if (!teamName) return;
+		const trimmed = teamName.trim();
+		if (!trimmed) return;
 		return authMutation({
 			mutationFn: () =>
 				authClient.organization.createTeam({
-					name: teamName,
+					name: trimmed,
 					organizationId: activeOrg.id,
 				}),
 			errorMessage: t("teams.error"),
@@ -94,7 +80,7 @@ export default function TeamsIndexScreen() {
 									{ backgroundColor: theme.primary },
 								]}
 								onPress={handleCreate}
-								disabled={creating || !teamName}
+								disabled={creating || !teamName.trim()}
 							>
 								<Text style={{ color: "#fff" }}>{t("teams.create")}</Text>
 							</TouchableOpacity>

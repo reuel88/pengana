@@ -34,18 +34,26 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 			await toggleTodo(todo.id);
 			triggerSync();
 		} catch {
-			Alert.alert("Error", t("errors:failedToToggleTodo"));
+			Alert.alert(t("error.title"), t("errors:failedToToggleTodo"));
 		}
 	};
 
 	const handleDelete = async () => {
-		await deleteTodo(todo.id);
-		triggerSync();
+		try {
+			await deleteTodo(todo.id);
+			triggerSync();
+		} catch {
+			Alert.alert(t("error.title"), t("errors:failedToDeleteTodo"));
+		}
 	};
 
 	const handleResolve = async (resolution: "local" | "server") => {
-		await resolveConflict(todo.id, resolution);
-		triggerSync();
+		try {
+			await resolveConflict(todo.id, resolution);
+			triggerSync();
+		} catch {
+			Alert.alert(t("error.title"), t("errors:failedToResolveConflict"));
+		}
 	};
 
 	return (
