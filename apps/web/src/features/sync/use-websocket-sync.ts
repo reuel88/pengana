@@ -80,5 +80,6 @@ export function useWebSocketSync(
 			if (reconnectTimeout) clearTimeout(reconnectTimeout);
 			ws?.close();
 		};
+		// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref
 	}, [userId, isOnline]);
 }
