@@ -36,8 +36,10 @@ function InvitationPage() {
 
 	const acceptMutation = useMutation({
 		mutationFn: async () => {
+			if (!invitation?.id) throw Error(t("invitations.error"));
+
 			const { error } = await authClient.organization.acceptInvitation({
-				invitationId: invitation?.id,
+				invitationId: invitation.id,
 			});
 			if (error) throw error;
 		},
@@ -53,8 +55,10 @@ function InvitationPage() {
 
 	const rejectMutation = useMutation({
 		mutationFn: async () => {
+			if (!invitation?.id) throw Error(t("invitations.error"));
+
 			const { error } = await authClient.organization.rejectInvitation({
-				invitationId: invitation?.id,
+				invitationId: invitation.id,
 			});
 			if (error) throw error;
 		},
