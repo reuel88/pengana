@@ -1,0 +1,12 @@
+{
+	"title": "알림",
+	"empty": "새로운 알림이 없습니다",
+	"accept": "수락",
+	"reject": "거절",
+	"accepted": "초대가 수락되었습니다",
+	"rejected": "초대가 거절되었습니다",
+	"error": "문제가 발생했습니다",
+	"markAllRead": "모두 읽음으로 표시",
+	"invitations": "초대",
+	"notifications": "알림"
+}

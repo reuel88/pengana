@@ -10,20 +10,14 @@ import {
 } from "react-native";
 
 import { db, todos } from "@/entities/todo";
-import { useSync } from "@/features/sync/sync-context";
+import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
 import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { client } from "@/utils/orpc";
 
 export function SyncDevtools() {
-	const {
-		isOnline,
-		isSyncing,
-		events,
-		triggerSync,
-		simulateOffline,
-		setSimulateOffline,
-	} = useSync();
+	const { isOnline, isSyncing, triggerSync } = useSync();
+	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
 	const { theme, colorScheme } = useTheme();

@@ -3,6 +3,7 @@ import type { ServerType } from "@hono/node-server";
 import type { WsMessage } from "@pengana/api/ws-types";
 import { auth } from "@pengana/auth";
 import { WebSocket, WebSocketServer } from "ws";
+import { wsLogger } from "./logger";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
@@ -21,7 +22,7 @@ export function setupWebSocket(server: ServerType) {
 
 		const userId = await authenticateRequest(req, url);
 		if (!userId) {
-			console.log("[ws] auth failed for upgrade request");
+			wsLogger.warn`Auth failed for upgrade request`;
 			socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
 			socket.destroy();
 			return;
@@ -39,23 +40,17 @@ export function setupWebSocket(server: ServerType) {
 			connections.set(userId, userSockets);
 
 			if (userSockets.size >= MAX_CONNECTIONS_PER_USER) {
-				console.log(
-					`[ws] rejected connection for user ${userId} (max connections reached)`,
-				);
+				wsLogger.warn`Rejected connection for user ${userId} (max connections reached)`;
 				ws.close(1013, "Too many connections");
 				return;
 			}
 
 			userSockets.add(ws);
-			console.log(
-				`[ws] connection accepted for user ${userId} (${userSockets.size} total)`,
-			);
+			wsLogger.info`Connection accepted for user ${userId} (${String(userSockets.size)} total)`;
 
 			ws.on("close", () => {
 				userSockets.delete(ws);
-				console.log(
-					`[ws] connection closed for user ${userId} (${userSockets.size} remaining)`,
-				);
+				wsLogger.info`Connection closed for user ${userId} (${String(userSockets.size)} remaining)`;
 				if (userSockets.size === 0) {
 					connections.delete(userId);
 				}
@@ -84,7 +79,7 @@ export function setupWebSocket(server: ServerType) {
 	function notifyUser(userId: string) {
 		const sockets = connections.get(userId);
 		if (!sockets) {
-			console.log(`[ws] notifyUser(${userId}): no connections found`);
+			wsLogger.debug`notifyUser(${userId}): no connections found`;
 			return;
 		}
 
@@ -97,9 +92,7 @@ export function setupWebSocket(server: ServerType) {
 				sentCount++;
 			}
 		}
-		console.log(
-			`[ws] notifyUser(${userId}): sent to ${sentCount}/${sockets.size} sockets`,
-		);
+		wsLogger.debug`notifyUser(${userId}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
 	return { notifyUser };

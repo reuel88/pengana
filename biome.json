@@ -25,7 +25,8 @@
 			"!**/wrangler.jsonc",
 			"!**/.source",
 			"!**/convex/_generated",
-			"!**/.output"
+			"!**/.output",
+			"!**/.wxt"
 		]
 	},
 	"formatter": {

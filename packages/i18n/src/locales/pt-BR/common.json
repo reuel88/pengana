@@ -33,10 +33,17 @@
 	"modal": "Modal",
 	"submitting": "Enviando...",
 	"loginPrompt": "Por favor, faca login no aplicativo web primeiro.",
+	"loginButton": "Entrar",
+	"onboardingPrompt": "Por favor, conclua a configuração da sua conta no aplicativo web.",
+	"onboardingButton": "Concluir configuração",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "Ops!",
+		"heading": "Página não encontrada",
+		"description": "Desculpe, a página que você procura não existe.",
+		"goHome": "Ir para o início"
+	},
+	"confirm": {
+		"yes": "Sim",
+		"no": "Não"
 	}
 }

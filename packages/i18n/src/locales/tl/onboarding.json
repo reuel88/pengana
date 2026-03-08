@@ -1,0 +1,30 @@
+{
+	"title": "Maligayang pagdating sa Pengana, {{name}}",
+	"description": "Upang magsimula, sumali o lumikha ng isang organisasyon.",
+	"invitations": {
+		"title": "Mga Naghihintay na Imbitasyon",
+		"description": "Inimbitahan kang sumali sa mga sumusunod na organisasyon.",
+		"accept": "Tanggapin",
+		"accepted": "Tinanggap ang imbitasyon",
+		"error": "Nabigong iproseso ang imbitasyon",
+		"createInstead": "Lumikha ng bagong organisasyon sa halip"
+	},
+	"invite": {
+		"title": "Mag-imbita ng Mga Miyembro",
+		"description": "Mag-imbita ng mga tao na sumali sa iyong organisasyon. Magagawa mo ito sa ibang pagkakataon.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "Magdagdag pa",
+		"send": "Ipadala ang mga imbitasyon",
+		"skip": "Laktawan muna",
+		"success": "Naipadala na ang mga imbitasyon",
+		"error": "Nabigong ipadala ang imbitasyon",
+		"remove": "Alisin"
+	},
+	"create": {
+		"title": "Lumikha ng Organisasyon",
+		"description": "Lumikha ng bagong organisasyon upang magsimula.",
+		"success": "Nalikha ang organisasyon",
+		"error": "Nabigong likhain ang organisasyon",
+		"backToInvitations": "Bumalik sa mga imbitasyon"
+	}
+}

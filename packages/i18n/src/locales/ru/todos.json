@@ -13,9 +13,9 @@
 		"uploading": "загрузка...",
 		"failed": "ошибка",
 		"fileAttached": "Файл прикреплён",
-		"invalidFile": "Invalid file",
-		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"invalidFile": "Недопустимый файл",
+		"cameraUnavailable": "Камера недоступна",
+		"cameraNotAvailable": "Камера недоступна на этом устройстве."
 	},
 	"actions": {
 		"keepLocal": "Оставить локальную",
@@ -23,10 +23,10 @@
 		"attach": "Прикрепить",
 		"retry": "Повторить",
 		"delete": "Удалить",
-		"takePhoto": "Take Photo",
-		"chooseFromLibrary": "Choose from Library",
-		"choosePdf": "Choose PDF",
-		"cancel": "Cancel",
-		"chooseOption": "Choose an option"
+		"takePhoto": "Сделать фото",
+		"chooseFromLibrary": "Выбрать из библиотеки",
+		"choosePdf": "Выбрать PDF",
+		"cancel": "Отмена",
+		"chooseOption": "Выберите вариант"
 	}
 }

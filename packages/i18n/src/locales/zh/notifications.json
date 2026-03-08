@@ -1,0 +1,12 @@
+{
+	"title": "通知",
+	"empty": "没有新通知",
+	"accept": "接受",
+	"reject": "拒绝",
+	"accepted": "已接受邀请",
+	"rejected": "已拒绝邀请",
+	"error": "出了点问题",
+	"markAllRead": "全部标记为已读",
+	"invitations": "邀请",
+	"notifications": "通知"
+}

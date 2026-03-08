@@ -1,53 +1,55 @@
 import { useTranslation } from "@pengana/i18n";
+import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-
+import { toast } from "sonner";
+import { authClient, requireAuthAndOrg } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/")({
-	component: HomeComponent,
+	component: DashboardPage,
+	beforeLoad: async () => {
+		const { session } = await requireAuthAndOrg();
+		const { data: customerState } = await authClient.customer.state();
+		return { session, customerState };
+	},
 });
 
-const TITLE_TEXT = `
- ██████╗ ███████╗████████╗████████╗███████╗██████╗
- ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
- ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝
- ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗
- ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║
- ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
+function DashboardPage() {
+	const { session, customerState } = Route.useRouteContext();
+	const { t } = useTranslation("dashboard");
 
- ████████╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
- ╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
-    ██║       ███████╗   ██║   ███████║██║     █████╔╝
-    ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
-    ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
-    ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
+	const privateData = useQuery(orpc.privateData.queryOptions());
 
-function HomeComponent() {
-	const healthCheck = useQuery(orpc.healthCheck.queryOptions());
-	const { t } = useTranslation();
-
+	const hasProSubscription =
+		(customerState?.activeSubscriptions?.length ?? 0) > 0;
 	return (
-		<div className="container mx-auto max-w-3xl px-4 py-2">
-			<pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-			<div className="grid gap-6">
-				<section className="rounded-lg border p-4">
-					<h2 className="mb-2 font-medium">{t("apiStatus")}</h2>
-					<div className="flex items-center gap-2">
-						<div
-							className={`h-2 w-2 rounded-full ${healthCheck.data?.data ? "bg-green-500" : "bg-red-500"}`}
-						/>
-						<span className="text-muted-foreground text-sm">
-							{healthCheck.isLoading
-								? t("status.checking")
-								: healthCheck.data?.data
-									? t("status.connected")
-									: t("status.disconnected")}
-						</span>
-					</div>
-				</section>
-			</div>
+		<div>
+			<h1>{t("title")}</h1>
+			<p>{t("welcome", { name: session.data.user.name })}</p>
+			<p>API: {privateData.data?.data?.message}</p>
+			<p>{hasProSubscription ? t("planPro") : t("planFree")}</p>
+			{hasProSubscription ? (
+				<Button
+					onClick={() => {
+						authClient.customer
+							.portal()
+							.catch(() => toast.error(t("errors:paymentError")));
+					}}
+				>
+					{t("manageSubscription")}
+				</Button>
+			) : (
+				<Button
+					onClick={() => {
+						authClient
+							.checkout({ slug: "pro" })
+							.catch(() => toast.error(t("errors:paymentError")));
+					}}
+				>
+					{t("upgradeToPro")}
+				</Button>
+			)}
 		</div>
 	);
 }

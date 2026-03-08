@@ -20,6 +20,7 @@ const SYNC_INTERVAL_MS = 5 * 60_000;
 export interface SyncEnginePlatformDeps {
 	getWsUrl: () => string;
 	generateUUID: () => string;
+	onSyncNotify?: () => void;
 }
 
 export function useSyncEngineCore(
@@ -141,6 +142,7 @@ export function useSyncEngineCore(
 					const data = JSON.parse(event.data as string);
 					if (data.type === "sync-notify") {
 						engineRef.current?.sync();
+						deps.onSyncNotify?.();
 					}
 				} catch {
 					// ignore malformed messages
@@ -176,9 +178,6 @@ export function useSyncEngineCore(
 		}
 	}, [effectiveOnline]);
 
-	/** Trigger sync after a local write (create/update/delete) */
-	const syncAfterWrite = triggerSync;
-
 	const enqueueUpload = useCallback(
 		(todoId: string, fileUri: string, mimeType: string) => {
 			uploadQueueRef.current?.enqueue({
@@ -192,15 +191,18 @@ export function useSyncEngineCore(
 	);
 
 	return {
-		isOnline: effectiveOnline,
-		isSyncing,
-		isUploading,
-		events,
-		uploadEvents,
-		triggerSync,
-		syncAfterWrite,
-		enqueueUpload,
-		simulateOffline,
-		setSimulateOffline,
+		core: {
+			isOnline: effectiveOnline,
+			isSyncing,
+			isUploading,
+			triggerSync,
+			enqueueUpload,
+		},
+		devtools: {
+			events,
+			uploadEvents,
+			simulateOffline,
+			setSimulateOffline,
+		},
 	};
 }

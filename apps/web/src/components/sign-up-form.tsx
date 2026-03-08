@@ -9,11 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { AuthFormField } from "./auth-form-field";
 import { AuthFormShell } from "./auth-form-shell";
 
-export function SignUpForm({
-	onSwitchToSignIn,
-}: {
-	onSwitchToSignIn: () => void;
-}) {
+export function SignUpForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 
@@ -33,7 +29,7 @@ export function SignUpForm({
 				{
 					onSuccess: () => {
 						navigate({
-							to: "/dashboard",
+							to: "/onboarding",
 						});
 						toast.success(t("auth:signUp.success"));
 					},
@@ -53,7 +49,7 @@ export function SignUpForm({
 			title={t("auth:signUp.title")}
 			submitLabel={t("auth:signUp.submit")}
 			switchLabel={t("auth:signUp.switchToSignIn")}
-			onSwitch={onSwitchToSignIn}
+			switchTo="/login"
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>

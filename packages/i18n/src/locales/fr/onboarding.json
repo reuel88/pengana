@@ -1,0 +1,30 @@
+{
+	"title": "Bienvenue sur Pengana, {{name}}",
+	"description": "Pour commencer, rejoignez ou créez une organisation.",
+	"invitations": {
+		"title": "Invitations en attente",
+		"description": "Vous avez été invité à rejoindre les organisations suivantes.",
+		"accept": "Accepter",
+		"accepted": "Invitation acceptée",
+		"error": "Impossible de traiter l'invitation",
+		"createInstead": "Créer une nouvelle organisation à la place"
+	},
+	"invite": {
+		"title": "Inviter des membres",
+		"description": "Invitez des personnes à rejoindre votre organisation. Vous pourrez toujours le faire plus tard.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "Ajouter un autre",
+		"send": "Envoyer les invitations",
+		"skip": "Passer pour le moment",
+		"success": "Invitations envoyées",
+		"error": "Impossible d'envoyer l'invitation",
+		"remove": "Supprimer"
+	},
+	"create": {
+		"title": "Créer une organisation",
+		"description": "Créez une nouvelle organisation pour commencer.",
+		"success": "Organisation créée",
+		"error": "Impossible de créer l'organisation",
+		"backToInvitations": "Retour aux invitations"
+	}
+}

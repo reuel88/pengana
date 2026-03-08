@@ -16,7 +16,7 @@ import { addTodo } from "./todo-actions";
 export function TodoInput({ userId }: { userId: string }) {
 	const [title, setTitle] = useState("");
 	const [submitting, setSubmitting] = useState(false);
-	const { syncAfterWrite } = useSync();
+	const { triggerSync } = useSync();
 	const { theme, colorScheme } = useTheme();
 	const { t } = useTranslation();
 
@@ -28,7 +28,7 @@ export function TodoInput({ userId }: { userId: string }) {
 		try {
 			await addTodo(userId, trimmed);
 			setTitle("");
-			syncAfterWrite();
+			triggerSync();
 		} finally {
 			setSubmitting(false);
 		}

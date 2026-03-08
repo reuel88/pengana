@@ -2,6 +2,10 @@ import { env } from "@pengana/env/web";
 import type { SyncEngine } from "@pengana/sync-engine";
 import { useEffect } from "react";
 
+import { notificationQueryKeys } from "@/features/notifications/use-notification-queries";
+import { orgQueryKeys } from "@/hooks/use-org-queries";
+import { queryClient } from "@/utils/orpc";
+
 import { useStableSyncRef } from "./use-stable-sync-ref";
 
 function getWsUrl() {
@@ -42,6 +46,12 @@ export function useWebSocketSync(
 					if (data.type === "sync-notify") {
 						console.log("[ws] sync-notify received, triggering sync");
 						syncRef.current();
+						queryClient.invalidateQueries({
+							queryKey: notificationQueryKeys.list,
+						});
+						queryClient.invalidateQueries({
+							queryKey: orgQueryKeys.userInvitations,
+						});
 					}
 				} catch {
 					// ignore malformed messages

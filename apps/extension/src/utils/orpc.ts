@@ -1,3 +1,13 @@
+/**
+ * oRPC client for the extension — no React Query integration.
+ *
+ * The extension follows an offline-first sync engine pattern:
+ *   UI → Dexie (local) → background worker → server
+ *
+ * The UI reads from local Dexie state, so React Query's server-state
+ * caching is unnecessary. If a future use case needs React Query,
+ * evaluate whether it fits the sync engine pattern before adding it.
+ */
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { AppRouterClient } from "@pengana/api/routers/index";

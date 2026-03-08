@@ -9,11 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { AuthFormField } from "./auth-form-field";
 import { AuthFormShell } from "./auth-form-shell";
 
-export function SignInForm({
-	onSwitchToSignUp,
-}: {
-	onSwitchToSignUp: () => void;
-}) {
+export function SignInForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 
@@ -31,7 +27,7 @@ export function SignInForm({
 				{
 					onSuccess: () => {
 						navigate({
-							to: "/dashboard",
+							to: "/",
 						});
 						toast.success(t("auth:signIn.success"));
 					},
@@ -51,7 +47,7 @@ export function SignInForm({
 			title={t("auth:signIn.title")}
 			submitLabel={t("auth:signIn.submit")}
 			switchLabel={t("auth:signIn.switchToSignUp")}
-			onSwitch={onSwitchToSignUp}
+			switchTo="/sign-up"
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>

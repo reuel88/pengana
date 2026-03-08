@@ -33,10 +33,17 @@
 	"modal": "Модальное окно",
 	"submitting": "Отправка...",
 	"loginPrompt": "Пожалуйста, сначала войдите в веб-приложение.",
+	"loginButton": "Войти",
+	"onboardingPrompt": "Пожалуйста, завершите настройку учётной записи в веб-приложении.",
+	"onboardingButton": "Завершить настройку",
 	"notFound": {
-		"title": "Oops!",
-		"heading": "Page Not Found",
-		"description": "Sorry, the page you're looking for doesn't exist.",
-		"goHome": "Go to Home"
+		"title": "Ой!",
+		"heading": "Страница не найдена",
+		"description": "Извините, запрашиваемая страница не существует.",
+		"goHome": "На главную"
+	},
+	"confirm": {
+		"yes": "Да",
+		"no": "Нет"
 	}
 }

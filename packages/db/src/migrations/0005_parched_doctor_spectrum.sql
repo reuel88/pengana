@@ -1,0 +1,1 @@
+ALTER TABLE "notification" ALTER COLUMN "metadata" SET DATA TYPE jsonb USING metadata::jsonb;

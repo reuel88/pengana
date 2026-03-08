@@ -5,6 +5,7 @@ import {
 	useTranslation,
 } from "@pengana/i18n";
 import { isRtlLocale } from "@pengana/i18n/rtl";
+import { localizeUrl } from "@pengana/i18n/urls";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
@@ -48,9 +49,11 @@ export function LanguageSwitcher() {
 
 		if (Platform.OS === "web") {
 			localStorage.setItem("appLocale", locale);
-		} else {
-			await SecureStore.setItemAsync("appLocale", locale);
+			window.location.href = localizeUrl(window.location.pathname, locale);
+			return;
 		}
+
+		await SecureStore.setItemAsync("appLocale", locale);
 
 		const wasRtl = isRtlLocale(currentLocale);
 		const willBeRtl = isRtlLocale(locale);
@@ -58,10 +61,6 @@ export function LanguageSwitcher() {
 		if (wasRtl !== willBeRtl) {
 			I18nManager.allowRTL(true);
 			I18nManager.forceRTL(willBeRtl);
-			if (Platform.OS === "web") {
-				window.location.reload();
-				return;
-			}
 			Alert.alert(
 				"Restart Required",
 				"The app needs to restart to apply the layout direction change. Please close and reopen the app.",

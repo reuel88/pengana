@@ -1,0 +1,30 @@
+{
+	"title": "Pengana에 오신 것을 환영합니다, {{name}}",
+	"description": "시작하려면 조직에 가입하거나 새로 만드세요.",
+	"invitations": {
+		"title": "대기 중인 초대",
+		"description": "다음 조직에 초대되었습니다.",
+		"accept": "수락",
+		"accepted": "초대가 수락되었습니다",
+		"error": "초대를 처리하지 못했습니다",
+		"createInstead": "대신 새 조직 만들기"
+	},
+	"invite": {
+		"title": "멤버 초대",
+		"description": "조직에 사람들을 초대하세요. 나중에 언제든지 할 수 있습니다.",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "추가",
+		"send": "초대 보내기",
+		"skip": "나중에 하기",
+		"success": "초대가 전송되었습니다",
+		"error": "초대를 보내지 못했습니다",
+		"remove": "삭제"
+	},
+	"create": {
+		"title": "조직 만들기",
+		"description": "시작하려면 새 조직을 만드세요.",
+		"success": "조직이 생성되었습니다",
+		"error": "조직을 만들지 못했습니다",
+		"backToInvitations": "초대로 돌아가기"
+	}
+}

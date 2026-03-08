@@ -24,5 +24,5 @@ export function useSyncOnFocus(
 		document.addEventListener("visibilitychange", onVisibilityChange);
 		return () =>
 			document.removeEventListener("visibilitychange", onVisibilityChange);
-	}, [isOnline]);
+	}, [isOnline, syncRef.current]);
 }

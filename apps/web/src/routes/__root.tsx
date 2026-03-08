@@ -8,6 +8,7 @@ import {
 	createRootRouteWithContext,
 	HeadContent,
 	Outlet,
+	useMatches,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
@@ -45,6 +46,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootComponent() {
 	const { i18n } = useTranslation();
+	const matches = useMatches();
+	const hideHeader = matches.some(
+		(m) =>
+			m.routeId === "/login" ||
+			m.routeId === "/sign-up" ||
+			m.routeId === "/onboarding",
+	);
 
 	useEffect(() => {
 		const locale = i18n.language as SupportedLocale;
@@ -71,8 +79,8 @@ function RootComponent() {
 				disableTransitionOnChange
 				storageKey="vite-ui-theme"
 			>
-				<div className="grid h-svh grid-rows-[auto_1fr]">
-					<Header />
+				<div className={hideHeader ? "" : "grid h-svh grid-rows-[auto_1fr]"}>
+					{!hideHeader && <Header />}
 					<Outlet />
 				</div>
 				<Toaster richColors />

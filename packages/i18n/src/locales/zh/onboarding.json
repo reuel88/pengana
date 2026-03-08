@@ -1,0 +1,30 @@
+{
+	"title": "欢迎使用 Pengana，{{name}}",
+	"description": "要开始使用，请加入或创建一个组织。",
+	"invitations": {
+		"title": "待处理的邀请",
+		"description": "您已被邀请加入以下组织。",
+		"accept": "接受",
+		"accepted": "已接受邀请",
+		"error": "处理邀请失败",
+		"createInstead": "改为创建新组织"
+	},
+	"invite": {
+		"title": "邀请成员",
+		"description": "邀请他人加入您的组织。您随时可以稍后再做。",
+		"emailPlaceholder": "colleague@example.com",
+		"addAnother": "再添加一个",
+		"send": "发送邀请",
+		"skip": "暂时跳过",
+		"success": "邀请已发送",
+		"error": "发送邀请失败",
+		"remove": "移除"
+	},
+	"create": {
+		"title": "创建组织",
+		"description": "创建一个新组织以开始使用。",
+		"success": "组织已创建",
+		"error": "创建组织失败",
+		"backToInvitations": "返回邀请"
+	}
+}

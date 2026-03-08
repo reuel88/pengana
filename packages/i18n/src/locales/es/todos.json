@@ -13,9 +13,9 @@
 		"uploading": "subiendo...",
 		"failed": "fallido",
 		"fileAttached": "Archivo adjunto",
-		"invalidFile": "Invalid file",
-		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"invalidFile": "Archivo inválido",
+		"cameraUnavailable": "Cámara no disponible",
+		"cameraNotAvailable": "La cámara no está disponible en este dispositivo."
 	},
 	"actions": {
 		"keepLocal": "Mantener local",
@@ -23,10 +23,10 @@
 		"attach": "Adjuntar",
 		"retry": "Reintentar",
 		"delete": "Eliminar",
-		"takePhoto": "Take Photo",
-		"chooseFromLibrary": "Choose from Library",
-		"choosePdf": "Choose PDF",
-		"cancel": "Cancel",
-		"chooseOption": "Choose an option"
+		"takePhoto": "Tomar foto",
+		"chooseFromLibrary": "Elegir de la biblioteca",
+		"choosePdf": "Elegir PDF",
+		"cancel": "Cancelar",
+		"chooseOption": "Elige una opción"
 	}
 }
