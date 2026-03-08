@@ -12,6 +12,7 @@ export const orgQueryKeys = {
 	teams: (orgId: string | undefined) => ["auth", "teams", orgId] as const,
 	teamMembers: (teamId: string) => ["auth", "team-members", teamId] as const,
 	userInvitations: ["auth", "user-invitations"] as const,
+	invitation: (id: string) => ["auth", "invitation", id] as const,
 };
 
 export function useActiveOrg() {
@@ -85,6 +86,19 @@ export function useUserInvitations() {
 	});
 }
 
+export function useInvitation(invitationId: string) {
+	return useQuery({
+		queryKey: orgQueryKeys.invitation(invitationId),
+		queryFn: async () => {
+			const { data } = await authClient.organization.getInvitation({
+				query: { id: invitationId },
+			});
+			return data;
+		},
+		staleTime: STALE_TIME,
+	});
+}
+
 export function useInvalidateOrg() {
 	const queryClient = useQueryClient();
 
@@ -126,6 +140,14 @@ export function useInvalidateOrg() {
 		[queryClient],
 	);
 
+	const invalidateInvitation = useCallback(
+		(id: string) =>
+			queryClient.invalidateQueries({
+				queryKey: orgQueryKeys.invitation(id),
+			}),
+		[queryClient],
+	);
+
 	const invalidateAll = useCallback(
 		() => queryClient.invalidateQueries({ queryKey: ["auth"], exact: false }),
 		[queryClient],
@@ -138,6 +160,7 @@ export function useInvalidateOrg() {
 		invalidateTeams,
 		invalidateTeamMembers,
 		invalidateUserInvitations,
+		invalidateInvitation,
 		invalidateAll,
 	};
 }

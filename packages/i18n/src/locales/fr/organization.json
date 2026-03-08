@@ -73,8 +73,10 @@
 			"canceled": "Annulée",
 			"expired": "Expirée"
 		},
-		"invitedAs": "Vous avez été invité à rejoindre {{org}} en tant que {{role}}.",
-		"invitedBy": "Invité par : {{email}}"
+		"invitedAs": "Vous avez reçu une invitation à rejoindre {{org}} en tant que {{role}}.",
+		"invitedBy": "Invitation envoyée par : {{email}}",
+		"fetchError": "Une erreur est survenue lors du chargement des invitations",
+		"retry": "Réessayer"
 	},
 	"teams": {
 		"title": "Équipes",

@@ -74,7 +74,9 @@
 			"expired": "Đã hết hạn"
 		},
 		"invitedAs": "Bạn đã được mời tham gia {{org}} với vai trò {{role}}.",
-		"invitedBy": "Được mời bởi: {{email}}"
+		"invitedBy": "Được mời bởi: {{email}}",
+		"fetchError": "Đã xảy ra lỗi khi tải lời mời",
+		"retry": "Thử lại"
 	},
 	"teams": {
 		"title": "Nhóm",

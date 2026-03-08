@@ -6,10 +6,11 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { useInvalidateOrg, useInvitation } from "@/hooks/use-org-queries";
 import { authClient, requireAuth } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/invitation/$invitationId")({
@@ -24,32 +25,66 @@ function InvitationPage() {
 	const { invitationId } = Route.useParams();
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
-	const [invitation, setInvitation] = useState<{
-		id: string;
-		organizationName: string;
-		organizationSlug: string;
-		inviterEmail: string;
-		email: string;
-		role: string;
-		status: string;
-	} | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [acting, setActing] = useState(false);
+	const { invalidateUserInvitations } = useInvalidateOrg();
 
-	useEffect(() => {
-		authClient.organization
-			.getInvitation({ query: { id: invitationId } })
-			.then(({ data }) => {
-				if (data) setInvitation(data);
-			})
-			.catch(() => {})
-			.finally(() => setLoading(false));
-	}, [invitationId]);
+	const {
+		data: invitation,
+		isPending,
+		isError,
+		refetch,
+	} = useInvitation(invitationId);
 
-	if (loading) {
+	const acceptMutation = useMutation({
+		mutationFn: async () => {
+			const { error } = await authClient.organization.acceptInvitation({
+				invitationId: invitation?.id,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			toast.success(t("invitations.acceptSuccess"));
+			invalidateUserInvitations();
+			navigate({ to: "/org" });
+		},
+		onError: (error: { message?: string }) => {
+			toast.error(error.message || t("invitations.error"));
+		},
+	});
+
+	const rejectMutation = useMutation({
+		mutationFn: async () => {
+			const { error } = await authClient.organization.rejectInvitation({
+				invitationId: invitation?.id,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			toast.success(t("invitations.rejectSuccess"));
+			invalidateUserInvitations();
+			navigate({ to: "/dashboard" });
+		},
+		onError: (error: { message?: string }) => {
+			toast.error(error.message || t("invitations.error"));
+		},
+	});
+
+	const acting = acceptMutation.isPending || rejectMutation.isPending;
+
+	if (isPending) {
 		return (
 			<div className="flex items-center justify-center p-8">
 				<p>{t("common:status.loading")}</p>
+			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-3 p-8">
+				<p className="text-muted-foreground">{t("invitations.fetchError")}</p>
+				<Button variant="outline" onClick={() => refetch()}>
+					{t("invitations.retry")}
+				</Button>
 			</div>
 		);
 	}
@@ -64,45 +99,7 @@ function InvitationPage() {
 		);
 	}
 
-	const handleAccept = async () => {
-		setActing(true);
-		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) {
-				toast.error(error.message || t("invitations.error"));
-				return;
-			}
-			toast.success(t("invitations.acceptSuccess"));
-			navigate({ to: "/org" });
-		} catch {
-			toast.error(t("invitations.error"));
-		} finally {
-			setActing(false);
-		}
-	};
-
-	const handleReject = async () => {
-		setActing(true);
-		try {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) {
-				toast.error(error.message || t("invitations.error"));
-				return;
-			}
-			toast.success(t("invitations.rejectSuccess"));
-			navigate({ to: "/dashboard" });
-		} catch {
-			toast.error(t("invitations.error"));
-		} finally {
-			setActing(false);
-		}
-	};
-
-	const isPending = invitation.status === "pending";
+	const isInvitationPending = invitation.status === "pending";
 
 	return (
 		<div className="flex items-center justify-center p-8">
@@ -112,21 +109,24 @@ function InvitationPage() {
 				</CardHeader>
 				<CardContent className="flex flex-col gap-3 text-xs">
 					<p>
-						You have been invited to join{" "}
-						<strong>{invitation.organizationName}</strong> as{" "}
-						<strong>{invitation.role}</strong>.
+						{t("invitations.invitedAs", {
+							org: invitation.organizationName,
+							role: t(`roles.${invitation.role}`),
+						})}
 					</p>
 					<p className="text-muted-foreground">
-						Invited by: {invitation.inviterEmail}
+						{t("invitations.invitedBy", {
+							email: invitation.inviterEmail,
+						})}
 					</p>
-					{isPending ? (
+					{isInvitationPending ? (
 						<div className="flex gap-2">
-							<Button onClick={handleAccept} disabled={acting}>
+							<Button onClick={() => acceptMutation.mutate()} disabled={acting}>
 								{t("invitations.accept")}
 							</Button>
 							<Button
 								variant="outline"
-								onClick={handleReject}
+								onClick={() => rejectMutation.mutate()}
 								disabled={acting}
 							>
 								{t("invitations.reject")}

@@ -10,7 +10,7 @@
 		"createInstead": "أنشئ مؤسسة جديدة بدلاً من ذلك"
 	},
 	"invite": {
-		"title": "دعوة أعضاء الفريق",
+		"title": "دعوة الأعضاء",
 		"description": "ادعُ أشخاصًا للانضمام إلى مؤسستك. يمكنك فعل ذلك لاحقًا.",
 		"emailPlaceholder": "colleague@example.com",
 		"addAnother": "إضافة آخر",

@@ -27,7 +27,7 @@
 		"deleteConfirm": "确定吗？此操作无法撤销。",
 		"updateSuccess": "组织已更新",
 		"deleteSuccess": "组织已删除",
-		"error": "更新组织失败"
+		"error": "管理组织失败"
 	},
 	"members": {
 		"title": "成员",
@@ -74,7 +74,9 @@
 			"expired": "已过期"
 		},
 		"invitedAs": "您已被邀请以{{role}}身份加入{{org}}。",
-		"invitedBy": "邀请人：{{email}}"
+		"invitedBy": "邀请人：{{email}}",
+		"fetchError": "加载邀请时出错",
+		"retry": "重试"
 	},
 	"teams": {
 		"title": "团队",

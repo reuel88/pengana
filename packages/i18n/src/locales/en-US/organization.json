@@ -27,7 +27,7 @@
 		"deleteConfirm": "Are you sure? This action cannot be undone.",
 		"updateSuccess": "Organization updated",
 		"deleteSuccess": "Organization deleted",
-		"error": "Failed to update organization"
+		"error": "Failed to manage organization"
 	},
 	"members": {
 		"title": "Members",
@@ -74,7 +74,9 @@
 			"expired": "Expired"
 		},
 		"invitedAs": "You have been invited to join {{org}} as {{role}}.",
-		"invitedBy": "Invited by: {{email}}"
+		"invitedBy": "Invited by: {{email}}",
+		"fetchError": "Something went wrong loading invitations",
+		"retry": "Retry"
 	},
 	"teams": {
 		"title": "Teams",

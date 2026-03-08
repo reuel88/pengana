@@ -10,7 +10,7 @@
 		"createInstead": "Criar uma nova organização"
 	},
 	"invite": {
-		"title": "Convidar membros da equipe",
+		"title": "Convidar membros",
 		"description": "Convide pessoas para participar da sua organização. Você pode fazer isso depois.",
 		"emailPlaceholder": "colleague@example.com",
 		"addAnother": "Adicionar outro",

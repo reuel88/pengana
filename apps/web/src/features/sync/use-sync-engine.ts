@@ -67,14 +67,18 @@ export function useSyncEngine(userId: string | undefined) {
 	}, [isOnline]);
 
 	return {
-		isOnline,
-		isSyncing,
-		isUploading,
-		events,
-		uploadEvents,
-		triggerSync,
-		enqueueUpload,
-		simulateOffline,
-		setSimulateOffline,
+		core: {
+			isOnline,
+			isSyncing,
+			isUploading,
+			triggerSync,
+			enqueueUpload,
+		},
+		devtools: {
+			events,
+			uploadEvents,
+			simulateOffline,
+			setSimulateOffline,
+		},
 	};
 }

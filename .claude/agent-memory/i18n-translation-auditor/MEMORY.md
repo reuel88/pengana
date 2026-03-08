@@ -15,8 +15,8 @@
 - Korean: use "멤버" (not "구성원") for "member" throughout
 - Tagalog: use "Nabigong..." pattern for "Failed to..." error messages (not "Hindi na-...")
 - en-AU: uses British spelling ("Organisation", "cancelled")
-- Spanish: uses informal "tu" form ("Estas seguro")
-- French: uses formal "vous" form ("Etes-vous sur")
+- Spanish: uses informal "tu" form ("¿Estás seguro?")
+- French: uses formal "vous" form ("Êtes-vous sûr ?")
 
 ## Quality Notes by Locale
 - ar: Good quality, natural Arabic

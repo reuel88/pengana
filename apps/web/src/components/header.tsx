@@ -10,7 +10,6 @@ export function Header() {
 	const { t } = useTranslation();
 
 	const links = [
-		{ to: "/", label: t("nav.home") },
 		{ to: "/dashboard", label: t("nav.dashboard") },
 		{ to: "/todos", label: t("nav.todos") },
 	] as const;

@@ -74,7 +74,9 @@
 			"expired": "Expirado"
 		},
 		"invitedAs": "Você foi convidado a participar de {{org}} como {{role}}.",
-		"invitedBy": "Convidado por: {{email}}"
+		"invitedBy": "Convidado por: {{email}}",
+		"fetchError": "Algo deu errado ao carregar os convites",
+		"retry": "Tentar novamente"
 	},
 	"teams": {
 		"title": "Equipes",

@@ -74,7 +74,9 @@
 			"expired": "Nag-expire na"
 		},
 		"invitedAs": "Inimbitahan kang sumali sa {{org}} bilang {{role}}.",
-		"invitedBy": "Inimbitahan ni: {{email}}"
+		"invitedBy": "Inimbitahan ni: {{email}}",
+		"fetchError": "May nangyaring mali sa pagkarga ng mga imbitasyon",
+		"retry": "Subukan muli"
 	},
 	"teams": {
 		"title": "Mga Koponan",

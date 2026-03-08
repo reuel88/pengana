@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -11,18 +12,10 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
-
-interface UserInvitation {
-	id: string;
-	organizationId: string;
-	organizationName: string;
-	email: string;
-	role: string;
-	status: string;
-}
 
 export default function InvitationsScreen() {
 	const { theme } = useTheme();
@@ -32,19 +25,69 @@ export default function InvitationsScreen() {
 	const [role, setRole] = useState<"member" | "admin">("member");
 	const [loading, setLoading] = useState(false);
 	const { isAdmin } = useOrgRole();
-	const [myInvitations, setMyInvitations] = useState<UserInvitation[]>([]);
-	const [myInvitationsLoading, setMyInvitationsLoading] = useState(true);
-	const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+	const { invalidateUserInvitations } = useInvalidateOrg();
 
-	useEffect(() => {
-		authClient.organization
-			.listUserInvitations()
-			.then(({ data }) => {
-				if (data) setMyInvitations(data as UserInvitation[]);
-			})
-			.catch(() => {})
-			.finally(() => setMyInvitationsLoading(false));
-	}, []);
+	const {
+		data: myInvitations,
+		isPending: myInvitationsLoading,
+		isError: myInvitationsError,
+		refetch: refetchMyInvitations,
+	} = useUserInvitations();
+
+	const acceptMutation = useMutation({
+		mutationFn: async (invitationId: string) => {
+			const { error } = await authClient.organization.acceptInvitation({
+				invitationId,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			Alert.alert(t("invitations.acceptSuccess"));
+			invalidateUserInvitations();
+		},
+		onError: (error: { message?: string }) => {
+			Alert.alert(t("invitations.error"), error.message);
+		},
+	});
+
+	const rejectMutation = useMutation({
+		mutationFn: async (invitationId: string) => {
+			const { error } = await authClient.organization.rejectInvitation({
+				invitationId,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			Alert.alert(t("invitations.rejectSuccess"));
+			invalidateUserInvitations();
+		},
+		onError: (error: { message?: string }) => {
+			Alert.alert(t("invitations.error"), error.message);
+		},
+	});
+
+	const cancelMutation = useMutation({
+		mutationFn: async (invitationId: string) => {
+			const { error } = await authClient.organization.cancelInvitation({
+				invitationId,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			Alert.alert(t("invitations.cancelSuccess"));
+		},
+		onError: (error: { message?: string }) => {
+			Alert.alert(t("invitations.error"), error.message);
+		},
+	});
+
+	const getMutatingId = (mutation: typeof acceptMutation) =>
+		mutation.isPending ? mutation.variables : null;
+
+	const isPendingFor = (invitationId: string) =>
+		getMutatingId(acceptMutation) === invitationId ||
+		getMutatingId(rejectMutation) === invitationId ||
+		getMutatingId(cancelMutation) === invitationId;
 
 	if (isPending) {
 		return (
@@ -57,7 +100,7 @@ export default function InvitationsScreen() {
 	}
 
 	const invitations = activeOrg?.invitations || [];
-	const pendingUserInvitations = myInvitations.filter(
+	const pendingUserInvitations = (myInvitations ?? []).filter(
 		(i) => i.status === "pending",
 	);
 
@@ -84,78 +127,14 @@ export default function InvitationsScreen() {
 	};
 
 	const handleCancel = (invitationId: string) => {
-		if (pendingIds.has(invitationId)) return;
+		if (isPendingFor(invitationId)) return;
 		Alert.alert(t("invitations.cancel"), "", [
 			{ text: t("common:confirm.no"), style: "cancel" },
 			{
 				text: t("common:confirm.yes"),
-				onPress: async () => {
-					setPendingIds((prev) => new Set(prev).add(invitationId));
-					try {
-						const { error } = await authClient.organization.cancelInvitation({
-							invitationId,
-						});
-						if (error) Alert.alert(t("invitations.error"), error.message);
-					} catch {
-						Alert.alert(t("invitations.error"));
-					} finally {
-						setPendingIds((prev) => {
-							const next = new Set(prev);
-							next.delete(invitationId);
-							return next;
-						});
-					}
-				},
+				onPress: () => cancelMutation.mutate(invitationId),
 			},
 		]);
-	};
-
-	const handleAccept = async (invitationId: string) => {
-		if (pendingIds.has(invitationId)) return;
-		setPendingIds((prev) => new Set(prev).add(invitationId));
-		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			Alert.alert(t("invitations.acceptSuccess"));
-			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setPendingIds((prev) => {
-				const next = new Set(prev);
-				next.delete(invitationId);
-				return next;
-			});
-		}
-	};
-
-	const handleReject = async (invitationId: string) => {
-		if (pendingIds.has(invitationId)) return;
-		setPendingIds((prev) => new Set(prev).add(invitationId));
-		try {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			Alert.alert(t("invitations.rejectSuccess"));
-			setMyInvitations((prev) => prev.filter((i) => i.id !== invitationId));
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setPendingIds((prev) => {
-				const next = new Set(prev);
-				next.delete(invitationId);
-				return next;
-			});
-		}
 	};
 
 	return (
@@ -245,11 +224,11 @@ export default function InvitationsScreen() {
 									{isAdmin && inv.status === "pending" && (
 										<TouchableOpacity
 											onPress={() => handleCancel(inv.id)}
-											disabled={pendingIds.has(inv.id)}
+											disabled={isPendingFor(inv.id)}
 											style={[
 												styles.cancelButton,
 												{ borderColor: theme.border },
-												pendingIds.has(inv.id) && { opacity: 0.5 },
+												isPendingFor(inv.id) && { opacity: 0.5 },
 											]}
 										>
 											<Text style={{ color: theme.text, fontSize: 12 }}>
@@ -272,6 +251,20 @@ export default function InvitationsScreen() {
 					<Text style={{ color: theme.text, opacity: 0.5 }}>
 						{t("common:status.loading")}
 					</Text>
+				) : myInvitationsError ? (
+					<View style={{ gap: 8 }}>
+						<Text style={{ color: theme.text, opacity: 0.5 }}>
+							{t("invitations.fetchError")}
+						</Text>
+						<TouchableOpacity
+							style={[styles.acceptButton, { backgroundColor: theme.primary }]}
+							onPress={() => refetchMyInvitations()}
+						>
+							<Text style={{ color: "#fff", fontSize: 12 }}>
+								{t("invitations.retry")}
+							</Text>
+						</TouchableOpacity>
+					</View>
 				) : pendingUserInvitations.length === 0 ? (
 					<Text style={{ color: theme.text, opacity: 0.5 }}>
 						{t("invitations.noInvitations")}
@@ -295,12 +288,12 @@ export default function InvitationsScreen() {
 							</View>
 							<View style={styles.actionRow}>
 								<TouchableOpacity
-									onPress={() => handleAccept(inv.id)}
-									disabled={pendingIds.has(inv.id)}
+									onPress={() => acceptMutation.mutate(inv.id)}
+									disabled={isPendingFor(inv.id)}
 									style={[
 										styles.acceptButton,
 										{ backgroundColor: theme.primary },
-										pendingIds.has(inv.id) && { opacity: 0.5 },
+										isPendingFor(inv.id) && { opacity: 0.5 },
 									]}
 								>
 									<Text style={{ color: "#fff", fontSize: 12 }}>
@@ -308,12 +301,12 @@ export default function InvitationsScreen() {
 									</Text>
 								</TouchableOpacity>
 								<TouchableOpacity
-									onPress={() => handleReject(inv.id)}
-									disabled={pendingIds.has(inv.id)}
+									onPress={() => rejectMutation.mutate(inv.id)}
+									disabled={isPendingFor(inv.id)}
 									style={[
 										styles.cancelButton,
 										{ borderColor: theme.border },
-										pendingIds.has(inv.id) && { opacity: 0.5 },
+										isPendingFor(inv.id) && { opacity: 0.5 },
 									]}
 								>
 									<Text style={{ color: theme.text, fontSize: 12 }}>

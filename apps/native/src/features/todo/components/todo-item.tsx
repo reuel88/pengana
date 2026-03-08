@@ -24,7 +24,7 @@ export interface TodoItemRow extends Todo {
 }
 
 export function TodoItem({ todo }: { todo: TodoItemRow }) {
-	const { syncAfterWrite } = useSync();
+	const { triggerSync } = useSync();
 	const { theme } = useTheme();
 	const { t } = useTranslation();
 	const { showPicker } = useFilePicker(todo.id);
@@ -32,7 +32,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 	const handleToggle = async () => {
 		try {
 			await toggleTodo(todo.id);
-			syncAfterWrite();
+			triggerSync();
 		} catch {
 			Alert.alert("Error", t("errors:failedToToggleTodo"));
 		}
@@ -40,12 +40,12 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 
 	const handleDelete = async () => {
 		await deleteTodo(todo.id);
-		syncAfterWrite();
+		triggerSync();
 	};
 
 	const handleResolve = async (resolution: "local" | "server") => {
 		await resolveConflict(todo.id, resolution);
-		syncAfterWrite();
+		triggerSync();
 	};
 
 	return (

@@ -74,7 +74,9 @@
 			"expired": "만료됨"
 		},
 		"invitedAs": "{{org}}에 {{role}}(으)로 초대되었습니다.",
-		"invitedBy": "초대한 사람: {{email}}"
+		"invitedBy": "초대한 사람: {{email}}",
+		"fetchError": "초대를 불러오는 중 오류가 발생했습니다",
+		"retry": "다시 시도"
 	},
 	"teams": {
 		"title": "팀",

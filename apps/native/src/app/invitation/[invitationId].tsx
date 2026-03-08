@@ -1,9 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
+import { useMutation } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Container } from "@/components/container";
+import { useInvalidateOrg, useInvitation } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 
@@ -13,26 +14,50 @@ export default function InvitationScreen() {
 	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
 	const router = useRouter();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
-	const [invitation, setInvitation] = useState<{
-		id: string;
-		organizationName: string;
-		inviterEmail: string;
-		role: string;
-		status: string;
-	} | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [acting, setActing] = useState(false);
+	const { invalidateUserInvitations } = useInvalidateOrg();
 
-	useEffect(() => {
-		if (!invitationId) return;
-		authClient.organization
-			.getInvitation({ query: { id: invitationId } })
-			.then(({ data }) => {
-				if (data) setInvitation(data);
-			})
-			.catch(() => {})
-			.finally(() => setLoading(false));
-	}, [invitationId]);
+	const {
+		data: invitation,
+		isPending: loading,
+		isError: fetchError,
+		refetch,
+	} = useInvitation(invitationId ?? "");
+
+	const acceptMutation = useMutation({
+		mutationFn: async () => {
+			const { error } = await authClient.organization.acceptInvitation({
+				invitationId: invitation?.id,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			Alert.alert(t("invitations.acceptSuccess"));
+			invalidateUserInvitations();
+			router.replace("/(drawer)/(org)");
+		},
+		onError: (error: { message?: string }) => {
+			Alert.alert(t("invitations.error"), error.message);
+		},
+	});
+
+	const rejectMutation = useMutation({
+		mutationFn: async () => {
+			const { error } = await authClient.organization.rejectInvitation({
+				invitationId: invitation?.id,
+			});
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			Alert.alert(t("invitations.rejectSuccess"));
+			invalidateUserInvitations();
+			router.replace("/");
+		},
+		onError: (error: { message?: string }) => {
+			Alert.alert(t("invitations.error"), error.message);
+		},
+	});
+
+	const acting = acceptMutation.isPending || rejectMutation.isPending;
 
 	if (sessionPending) {
 		return null;
@@ -52,6 +77,26 @@ export default function InvitationScreen() {
 		);
 	}
 
+	if (fetchError) {
+		return (
+			<Container>
+				<View style={{ padding: 16, gap: 12 }}>
+					<Text style={{ color: theme.text, opacity: 0.5 }}>
+						{t("invitations.fetchError")}
+					</Text>
+					<TouchableOpacity
+						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
+						onPress={() => refetch()}
+					>
+						<Text style={{ color: "#fff", fontWeight: "bold" }}>
+							{t("invitations.retry")}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</Container>
+		);
+	}
+
 	if (!invitation) {
 		return (
 			<Container>
@@ -61,44 +106,6 @@ export default function InvitationScreen() {
 			</Container>
 		);
 	}
-
-	const handleAccept = async () => {
-		setActing(true);
-		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			Alert.alert(t("invitations.acceptSuccess"));
-			router.replace("/(drawer)/(org)");
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setActing(false);
-		}
-	};
-
-	const handleReject = async () => {
-		setActing(true);
-		try {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			Alert.alert(t("invitations.rejectSuccess"));
-			router.replace("/");
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setActing(false);
-		}
-	};
 
 	const isPending = invitation.status === "pending";
 
@@ -138,7 +145,7 @@ export default function InvitationScreen() {
 									styles.acceptButton,
 									{ backgroundColor: theme.primary },
 								]}
-								onPress={handleAccept}
+								onPress={() => acceptMutation.mutate()}
 								disabled={acting}
 							>
 								<Text style={{ color: "#fff", fontWeight: "bold" }}>
@@ -147,7 +154,7 @@ export default function InvitationScreen() {
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={[styles.rejectButton, { borderColor: theme.border }]}
-								onPress={handleReject}
+								onPress={() => rejectMutation.mutate()}
 								disabled={acting}
 							>
 								<Text style={{ color: theme.text }}>

@@ -35,7 +35,7 @@
 		"email": "Correo electrónico",
 		"role": "Rol",
 		"remove": "Eliminar",
-		"leave": "Abandonar organización",
+		"leave": "Abandonar la organización",
 		"leaveConfirm": "¿Estás seguro de que quieres abandonar esta organización?",
 		"updateRole": "Actualizar rol",
 		"removeConfirm": "¿Estás seguro de que quieres eliminar a este miembro?",
@@ -47,7 +47,7 @@
 	},
 	"invitations": {
 		"title": "Invitaciones",
-		"invite": "Invitar miembro",
+		"invite": "Invitar a un miembro",
 		"email": "Correo electrónico",
 		"emailPlaceholder": "usuario@ejemplo.com",
 		"role": "Rol",
@@ -74,7 +74,9 @@
 			"expired": "Expirada"
 		},
 		"invitedAs": "Has sido invitado a unirte a {{org}} como {{role}}.",
-		"invitedBy": "Invitado por: {{email}}"
+		"invitedBy": "Invitado por: {{email}}",
+		"fetchError": "Algo salió mal al cargar las invitaciones",
+		"retry": "Reintentar"
 	},
 	"teams": {
 		"title": "Equipos",

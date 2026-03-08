@@ -178,9 +178,6 @@ export function useSyncEngineCore(
 		}
 	}, [effectiveOnline]);
 
-	/** Trigger sync after a local write (create/update/delete) */
-	const syncAfterWrite = triggerSync;
-
 	const enqueueUpload = useCallback(
 		(todoId: string, fileUri: string, mimeType: string) => {
 			uploadQueueRef.current?.enqueue({
@@ -194,15 +191,18 @@ export function useSyncEngineCore(
 	);
 
 	return {
-		isOnline: effectiveOnline,
-		isSyncing,
-		isUploading,
-		events,
-		uploadEvents,
-		triggerSync,
-		syncAfterWrite,
-		enqueueUpload,
-		simulateOffline,
-		setSimulateOffline,
+		core: {
+			isOnline: effectiveOnline,
+			isSyncing,
+			isUploading,
+			triggerSync,
+			enqueueUpload,
+		},
+		devtools: {
+			events,
+			uploadEvents,
+			simulateOffline,
+			setSimulateOffline,
+		},
 	};
 }
