@@ -28,8 +28,8 @@ export default defineConfig({
 			output: {
 				manualChunks(id) {
 					if (id.includes("node_modules") || id.includes(".pnpm")) {
-						if (id.includes("react-dom")) return "react-dom";
-						if (id.match(/\/react\//)) return "react";
+						if (id.includes("react-dom") || id.match(/\/react\//))
+							return "react";
 						if (id.includes("@tanstack") && id.includes("react-router"))
 							return "router";
 						if (id.includes("@tanstack") && id.includes("react-query"))
