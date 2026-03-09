@@ -1,23 +1,33 @@
-export { createDexieSyncAdapter } from "./adapter";
-export type { WebTodo } from "./db";
-export { TodoDatabase, todoDb } from "./db";
-export * as dexieFileStore from "./dexie-file-store";
-export { readFileAsBase64 } from "./file-utils";
+export { createDexieSyncAdapter } from "./adapters/adapter";
+export {
+	getFileFromIndexedDB,
+	removeFileFromIndexedDB,
+	storeFileInIndexedDB,
+} from "./adapters/dexie-file-store";
 // File store & transport utilities
 export {
-	getFileForUpload,
-	removeFileForUpload,
-	storeFileForUpload,
-} from "./memory-file-store";
+	getFileFromMemory,
+	removeFileFromMemory,
+	storeFileInMemory,
+} from "./adapters/memory-file-store";
+export { createMemoryUploadTransport } from "./adapters/memory-upload-transport";
+export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
+export { createUploadTransport } from "./adapters/upload-transport";
+export type {
+	FileStorageStrategy,
+	TodoHandlerDeps,
+} from "./hooks/use-todo-handlers";
+export { useTodoHandlers } from "./hooks/use-todo-handlers";
+export { useTodos } from "./hooks/use-todos";
+export type { WebTodo } from "./lib/db";
+export { TodoDatabase, todoDb } from "./lib/db";
+export { readFileAsBase64 } from "./lib/file-utils";
 export {
 	addTodo,
 	attachFile,
 	deleteTodo,
 	resolveConflict,
 	toggleTodo,
-} from "./todo-actions";
-export { createWebUploadAdapter } from "./upload-queue-adapter";
-export type { FileDataRecord } from "./upload-queue-db";
-export { UploadQueueDatabase, uploadQueueDb } from "./upload-queue-db";
-export { createUploadTransport } from "./upload-transport";
-export { useTodos } from "./use-todos";
+} from "./lib/todo-actions";
+export type { FileDataRecord } from "./lib/upload-queue-db";
+export { UploadQueueDatabase, uploadQueueDb } from "./lib/upload-queue-db";

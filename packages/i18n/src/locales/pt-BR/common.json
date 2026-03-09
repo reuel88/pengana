@@ -32,15 +32,38 @@
 	"privateData": "Dados Privados",
 	"modal": "Modal",
 	"submitting": "Enviando...",
-	"loginPrompt": "Por favor, faca login no aplicativo web primeiro.",
+	"loginPrompt": "Por favor, faça login no aplicativo web primeiro.",
+	"loginButton": "Entrar",
+	"onboardingPrompt": "Por favor, conclua a configuração da sua conta no aplicativo web.",
+	"onboardingButton": "Concluir configuração",
 	"notFound": {
 		"title": "Ops!",
 		"heading": "Página não encontrada",
 		"description": "Desculpe, a página que você procura não existe.",
 		"goHome": "Ir para o início"
 	},
+	"tabs": {
+		"one": {
+			"title": "Aba Um",
+			"subtitle": "Explore a primeira seção do seu aplicativo"
+		},
+		"two": {
+			"title": "Aba Dois",
+			"subtitle": "Descubra mais recursos e conteúdo"
+		}
+	},
 	"confirm": {
 		"yes": "Sim",
-		"no": "Não"
+		"no": "Não",
+		"cancel": "Cancelar"
+	},
+	"error": {
+		"title": "Erro",
+		"generic": "Algo deu errado. Por favor, tente novamente.",
+		"retry": "Tentar novamente"
+	},
+	"restartRequired": {
+		"title": "Reinicialização necessária",
+		"message": "O aplicativo precisa ser reiniciado para aplicar a alteração na direção do layout. Por favor, feche e reabra o aplicativo."
 	}
 }

@@ -33,14 +33,37 @@
 	"modal": "Modal",
 	"submitting": "Isinusumite...",
 	"loginPrompt": "Mangyaring mag-log in muna sa web app.",
+	"loginButton": "Mag-log in",
+	"onboardingPrompt": "Pakitapos ang pag-setup ng iyong account sa web app.",
+	"onboardingButton": "Tapusin ang Setup",
 	"notFound": {
 		"title": "Naku!",
 		"heading": "Hindi Nahanap ang Pahina",
 		"description": "Paumanhin, ang pahina na hinahanap mo ay hindi umiiral.",
 		"goHome": "Pumunta sa Home"
 	},
+	"tabs": {
+		"one": {
+			"title": "Tab Isa",
+			"subtitle": "I-explore ang unang seksyon ng iyong app"
+		},
+		"two": {
+			"title": "Tab Dalawa",
+			"subtitle": "Tuklasin ang higit pang mga tampok at nilalaman"
+		}
+	},
 	"confirm": {
 		"yes": "Oo",
-		"no": "Hindi"
+		"no": "Hindi",
+		"cancel": "Kanselahin"
+	},
+	"error": {
+		"title": "Error",
+		"generic": "May nangyaring mali. Pakisubukan muli.",
+		"retry": "Subukan muli"
+	},
+	"restartRequired": {
+		"title": "Kailangang I-restart",
+		"message": "Kailangang i-restart ang app para mailapat ang pagbabago sa direksyon ng layout. Pakisara at buksan muli ang app."
 	}
 }

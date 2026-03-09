@@ -1,5 +1,5 @@
 {
-	"title": "pengana에 오신 것을 환영합니다",
+	"title": "Pengana에 오신 것을 환영합니다, {{name}}",
 	"description": "시작하려면 조직에 가입하거나 새로 만드세요.",
 	"invitations": {
 		"title": "대기 중인 초대",

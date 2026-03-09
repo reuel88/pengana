@@ -33,14 +33,37 @@
 	"modal": "Modal",
 	"submitting": "Submitting...",
 	"loginPrompt": "Please log in at the web app first.",
+	"loginButton": "Log In",
+	"onboardingPrompt": "Please finish setting up your account in the web app.",
+	"onboardingButton": "Complete Setup",
 	"notFound": {
 		"title": "Oops!",
 		"heading": "Page Not Found",
 		"description": "Sorry, the page you're looking for doesn't exist.",
 		"goHome": "Go to Home"
 	},
+	"tabs": {
+		"one": {
+			"title": "Tab One",
+			"subtitle": "Explore the first section of your app"
+		},
+		"two": {
+			"title": "Tab Two",
+			"subtitle": "Discover more features and content"
+		}
+	},
 	"confirm": {
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"cancel": "Cancel"
+	},
+	"error": {
+		"title": "Error",
+		"generic": "Something went wrong. Please try again.",
+		"retry": "Retry"
+	},
+	"restartRequired": {
+		"title": "Restart Required",
+		"message": "The app needs to restart to apply the layout direction change. Please close and reopen the app."
 	}
 }

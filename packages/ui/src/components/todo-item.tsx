@@ -72,7 +72,7 @@ export function TodoItem({
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept="image/jpeg,image/png,image/heic,.pdf"
+					accept="image/jpeg,image/png,image/heic,application/pdf"
 					className="hidden"
 					onChange={handleFileChange}
 				/>

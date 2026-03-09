@@ -10,13 +10,13 @@ import {
 
 import { Container } from "@/components/container";
 import { OrgSwitcher } from "@/components/org-switcher";
-import { authClient } from "@/lib/auth-client";
+import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
 
 export default function OrgIndexScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
+	const { data: activeOrg, isPending } = useActiveOrg();
 	const router = useRouter();
 
 	const navItems = [

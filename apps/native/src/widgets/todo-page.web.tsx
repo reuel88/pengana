@@ -2,7 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
@@ -13,11 +13,12 @@ function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(userId);
 	const { theme } = useTheme();
 	const { t } = useTranslation("todos");
+	const { isOnline, isSyncing } = useSync();
 
 	return (
 		<View style={styles.content}>
 			<Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
-			<ConnectivityBanner />
+			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />
 			<TodoList todos={todos} />
 			<SyncDevtools />

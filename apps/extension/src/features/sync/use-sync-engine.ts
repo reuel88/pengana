@@ -4,12 +4,8 @@ import type {
 	BackgroundBroadcast,
 	SyncStatus,
 } from "@/utils/background-messages";
-
-const KNOWN_BROADCAST_TYPES = new Set([
-	"sync:event",
-	"upload:event",
-	"status:update",
-]);
+import { isSyncActive, isUploadActive } from "@/utils/background-messages";
+import { sendBackgroundMessage } from "@/utils/send-background-message";
 
 export function useSyncEngine(userId: string) {
 	const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -20,8 +16,8 @@ export function useSyncEngine(userId: string) {
 	useEffect(() => {
 		const init = async () => {
 			try {
-				await browser.runtime.sendMessage({ type: "init", userId });
-				const status: SyncStatus = await browser.runtime.sendMessage({
+				await sendBackgroundMessage({ type: "init", userId });
+				const status = await sendBackgroundMessage<SyncStatus>({
 					type: "status:get",
 				});
 				if (status) {
@@ -29,7 +25,7 @@ export function useSyncEngine(userId: string) {
 					setIsSyncing(status.isSyncing);
 					setIsUploading(status.isUploading);
 				}
-				await browser.runtime.sendMessage({ type: "sync:trigger" });
+				await sendBackgroundMessage({ type: "sync:trigger" });
 			} catch (err) {
 				console.error("[sync-engine] init failed:", err);
 			}
@@ -41,26 +37,24 @@ export function useSyncEngine(userId: string) {
 	// Listen for broadcasts from background
 	useEffect(() => {
 		const listener = (message: BackgroundBroadcast) => {
-			if (!message?.type || !KNOWN_BROADCAST_TYPES.has(message.type)) return;
+			if (!message?.type) return;
 
-			if (message.type === "sync:event") {
-				if (message.event.type === "sync:start") setIsSyncing(true);
-				if (
-					message.event.type === "sync:complete" ||
-					message.event.type === "sync:error"
-				)
-					setIsSyncing(false);
-			} else if (message.type === "upload:event") {
-				if (message.event.type === "upload:start") setIsUploading(true);
-				if (
-					message.event.type === "upload:complete" ||
-					message.event.type === "upload:error"
-				)
-					setIsUploading(false);
-			} else if (message.type === "status:update") {
-				setIsOnline(message.status.isOnline);
-				setIsSyncing(message.status.isSyncing);
-				setIsUploading(message.status.isUploading);
+			switch (message.type) {
+				case "sync:event": {
+					const active = isSyncActive(message.event);
+					if (active !== null) setIsSyncing(active);
+					break;
+				}
+				case "upload:event": {
+					const active = isUploadActive(message.event);
+					if (active !== null) setIsUploading(active);
+					break;
+				}
+				case "status:update":
+					setIsOnline(message.status.isOnline);
+					setIsSyncing(message.status.isSyncing);
+					setIsUploading(message.status.isUploading);
+					break;
 			}
 		};
 
@@ -81,21 +75,19 @@ export function useSyncEngine(userId: string) {
 	}, []);
 
 	const triggerSync = useCallback(() => {
-		browser.runtime
-			.sendMessage({ type: "sync:trigger" })
-			.catch((err) => console.error("[sync-engine] trigger failed:", err));
+		sendBackgroundMessage({ type: "sync:trigger" }).catch((err) =>
+			console.error("[sync-engine] trigger failed:", err),
+		);
 	}, []);
 
 	const enqueueUpload = useCallback(
 		(todoId: string, fileUri: string, mimeType: string) => {
-			browser.runtime
-				.sendMessage({
-					type: "upload:enqueue",
-					payload: { todoId, fileUri, mimeType },
-				})
-				.catch((err) =>
-					console.error("[sync-engine] enqueue upload failed:", err),
-				);
+			sendBackgroundMessage({
+				type: "upload:enqueue",
+				payload: { todoId, fileUri, mimeType },
+			}).catch((err) =>
+				console.error("[sync-engine] enqueue upload failed:", err),
+			);
 		},
 		[],
 	);

@@ -13,6 +13,7 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
+		"@logtape/logtape": "catalog:",
 		"@pengana/auth": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/db": "workspace:*",

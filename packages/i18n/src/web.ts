@@ -3,39 +3,11 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import resourcesToBackend from "i18next-resources-to-backend";
 import { initReactI18next } from "react-i18next";
 
-import {
-	DEFAULT_LOCALE,
-	isSupportedLocale,
-	NAMESPACES,
-	SUPPORTED_LOCALES,
-	type SupportedLocale,
-} from "./config";
+import { DEFAULT_LOCALE, NAMESPACES, SUPPORTED_LOCALES } from "./config";
 
-export function detectLocaleFromUrl(pathname: string): SupportedLocale {
-	const segments = pathname.split("/").filter(Boolean);
-	const first = segments[0];
-	if (first && isSupportedLocale(first)) {
-		return first;
-	}
-	return DEFAULT_LOCALE;
-}
+import { detectLocaleFromUrl } from "./urls";
 
-export function deLocalizeUrl(pathname: string): string {
-	const segments = pathname.split("/").filter(Boolean);
-	const first = segments[0];
-	if (first && isSupportedLocale(first)) {
-		return `/${segments.slice(1).join("/")}` || "/";
-	}
-	return pathname;
-}
-
-export function localizeUrl(pathname: string, locale: SupportedLocale): string {
-	const clean = deLocalizeUrl(pathname);
-	if (locale === DEFAULT_LOCALE) {
-		return clean;
-	}
-	return `/${locale}${clean === "/" ? "" : clean}`;
-}
+export { deLocalizeUrl, detectLocaleFromUrl, localizeUrl } from "./urls";
 
 export async function initWebI18n() {
 	const detectedLocale = detectLocaleFromUrl(window.location.pathname);

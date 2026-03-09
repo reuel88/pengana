@@ -49,7 +49,13 @@ export const notificationRouter = {
 		.input(z.object({ id: z.string() }))
 		.output(envelopeOutput(z.object({ success: z.boolean() })))
 		.handler(async ({ input, context }) => {
-			await markNotificationRead(input.id, context.session.user.id);
+			const found = await markNotificationRead(
+				input.id,
+				context.session.user.id,
+			);
+			if (!found) {
+				throw apiError("NOT_FOUND", "Notification not found");
+			}
 			return envelope({ success: true });
 		}),
 

@@ -50,6 +50,9 @@
 		"db:down": {
 			"cache": false
 		},
+		"db:destroy": {
+			"cache": false
+		},
 		"test": {
 			"cache": false
 		},

@@ -6,10 +6,12 @@
 		"noOrgs": "Wala pang mga organisasyon",
 		"switchTo": "Lumipat sa {{name}}",
 		"back": "Bumalik",
-		"close": "Isara"
+		"close": "Isara",
+		"switchError": "Nabigong lumipat ng organisasyon. Pakisubukan muli."
 	},
 	"create": {
 		"title": "Lumikha ng Organisasyon",
+		"description": "Lumikha ng bagong organisasyon para magsimula.",
 		"name": "Pangalan ng Organisasyon",
 		"slug": "Slug",
 		"logo": "URL ng Logo",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "Umalis sa organisasyon",
 		"updateRoleSuccess": "Na-update ang tungkulin",
 		"error": "Nabigong pamahalaan ang miyembro",
+		"updateRoleError": "Nabigong i-update ang tungkulin",
+		"removeError": "Nabigong alisin ang miyembro",
+		"leaveError": "Nabigong umalis sa organisasyon",
 		"noMembers": "Walang mga miyembro"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "Inimbitahan kang sumali sa {{org}} bilang {{role}}.",
 		"invitedBy": "Inimbitahan ni: {{email}}",
 		"fetchError": "May nangyaring mali sa pagkarga ng mga imbitasyon",
-		"retry": "Subukan muli"
+		"retry": "Subukan muli",
+		"unknownError": "May naganap na hindi inaasahang error"
 	},
 	"teams": {
 		"title": "Mga Koponan",
@@ -95,7 +101,10 @@
 		"noTeams": "Wala pang mga koponan",
 		"noMembers": "Walang mga miyembro sa koponan",
 		"updateName": "I-update ang Pangalan ng Koponan",
-		"updateNameSuccess": "Na-update ang pangalan ng koponan"
+		"updateNameSuccess": "Na-update ang pangalan ng koponan",
+		"memberNotFound": "Walang nahanap na miyembro ng organisasyon na may ganitong email address",
+		"notFound": "Hindi nahanap ang koponan",
+		"rename": "Palitan ang pangalan ng koponan"
 	},
 	"roles": {
 		"title": "Mga Tungkulin",
@@ -114,6 +123,10 @@
 		"invitations": "Mga Imbitasyon",
 		"teams": "Mga Koponan",
 		"roles": "Mga Tungkulin"
+	},
+	"notifications": {
+		"markReadError": "Nabigong markahan ang notipikasyon bilang nabasa",
+		"markAllReadError": "Nabigong markahan ang lahat ng notipikasyon bilang nabasa"
 	},
 	"noActiveOrg": "Walang aktibong organisasyon. Pumili o lumikha ng isa para magsimula."
 }

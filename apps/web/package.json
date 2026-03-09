@@ -23,6 +23,7 @@
 		"@pengana/api": "workspace:*",
 		"@pengana/auth": "workspace:*",
 		"@pengana/env": "workspace:*",
+		"@pengana/org-client": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
 		"@pengana/todo-client": "workspace:*",

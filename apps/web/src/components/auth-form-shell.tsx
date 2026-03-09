@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Loader } from "./loader";
@@ -12,7 +13,7 @@ interface AuthFormShellProps {
 	title: string;
 	submitLabel: string;
 	switchLabel: string;
-	onSwitch: () => void;
+	switchTo: string;
 	onSubmit: () => void;
 	form: { Subscribe: React.ComponentType<FormSubscribeProps> };
 	children: ReactNode;
@@ -22,7 +23,7 @@ export function AuthFormShell({
 	title,
 	submitLabel,
 	switchLabel,
-	onSwitch,
+	switchTo,
 	onSubmit,
 	form,
 	children,
@@ -62,13 +63,12 @@ export function AuthFormShell({
 			</form>
 
 			<div className="mt-4 text-center">
-				<Button
-					variant="link"
-					onClick={onSwitch}
-					className="text-primary hover:text-primary/80"
+				<Link
+					to={switchTo}
+					className="text-primary text-sm hover:text-primary/80"
 				>
 					{switchLabel}
-				</Button>
+				</Link>
 			</div>
 		</div>
 	);

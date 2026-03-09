@@ -33,14 +33,37 @@
 	"modal": "Fenêtre modale",
 	"submitting": "Envoi en cours...",
 	"loginPrompt": "Veuillez d'abord vous connecter via l'application web.",
+	"loginButton": "Se connecter",
+	"onboardingPrompt": "Veuillez terminer la configuration de votre compte dans l'application web.",
+	"onboardingButton": "Terminer la configuration",
 	"notFound": {
 		"title": "Oups !",
 		"heading": "Page introuvable",
 		"description": "Désolé, la page que vous recherchez n'existe pas.",
 		"goHome": "Retour à l'accueil"
 	},
+	"tabs": {
+		"one": {
+			"title": "Onglet Un",
+			"subtitle": "Explorez la première section de votre application"
+		},
+		"two": {
+			"title": "Onglet Deux",
+			"subtitle": "Découvrez plus de fonctionnalités et de contenu"
+		}
+	},
 	"confirm": {
 		"yes": "Oui",
-		"no": "Non"
+		"no": "Non",
+		"cancel": "Annuler"
+	},
+	"error": {
+		"title": "Erreur",
+		"generic": "Une erreur est survenue. Veuillez réessayer.",
+		"retry": "Réessayer"
+	},
+	"restartRequired": {
+		"title": "Redémarrage requis",
+		"message": "L'application doit redémarrer pour appliquer le changement de direction de mise en page. Veuillez fermer et rouvrir l'application."
 	}
 }

@@ -6,10 +6,12 @@
 		"noOrgs": "暂无组织",
 		"switchTo": "切换到 {{name}}",
 		"back": "返回",
-		"close": "关闭"
+		"close": "关闭",
+		"switchError": "切换组织失败，请重试。"
 	},
 	"create": {
 		"title": "创建组织",
+		"description": "创建一个新组织以开始使用。",
 		"name": "组织名称",
 		"slug": "标识符",
 		"logo": "Logo 链接",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "已离开组织",
 		"updateRoleSuccess": "角色已更新",
 		"error": "管理成员失败",
+		"updateRoleError": "更新角色失败",
+		"removeError": "移除成员失败",
+		"leaveError": "离开组织失败",
 		"noMembers": "暂无成员"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "您已被邀请以{{role}}身份加入{{org}}。",
 		"invitedBy": "邀请人：{{email}}",
 		"fetchError": "加载邀请时出错",
-		"retry": "重试"
+		"retry": "重试",
+		"unknownError": "发生了意外错误"
 	},
 	"teams": {
 		"title": "团队",
@@ -95,7 +101,10 @@
 		"noTeams": "暂无团队",
 		"noMembers": "暂无团队成员",
 		"updateName": "更新团队名称",
-		"updateNameSuccess": "团队名称已更新"
+		"updateNameSuccess": "团队名称已更新",
+		"memberNotFound": "未找到使用该电子邮件地址的组织成员",
+		"notFound": "未找到团队",
+		"rename": "重命名团队"
 	},
 	"roles": {
 		"title": "角色",
@@ -114,6 +123,10 @@
 		"invitations": "邀请",
 		"teams": "团队",
 		"roles": "角色"
+	},
+	"notifications": {
+		"markReadError": "无法将通知标记为已读",
+		"markAllReadError": "无法将所有通知标记为已读"
 	},
 	"noActiveOrg": "没有活跃的组织。选择或创建一个以开始使用。"
 }

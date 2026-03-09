@@ -6,12 +6,11 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
+import { useInvitationActions } from "@/hooks/use-invitation-actions";
 import { useInvalidateOrg, useInvitation } from "@/hooks/use-org-queries";
-import { authClient, requireAuth } from "@/lib/auth-client";
+import { requireAuth } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/invitation/$invitationId")({
 	component: InvitationPage,
@@ -34,45 +33,21 @@ function InvitationPage() {
 		refetch,
 	} = useInvitation(invitationId);
 
-	const acceptMutation = useMutation({
-		mutationFn: async () => {
-			if (!invitation?.id) throw Error(t("invitations.error"));
-
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) throw error;
-		},
-		onSuccess: () => {
-			toast.success(t("invitations.acceptSuccess"));
-			invalidateUserInvitations();
+	const { actingId, handleAccept, handleReject } = useInvitationActions({
+		successMessage: t("invitations.acceptSuccess"),
+		errorMessage: t("invitations.error"),
+		rejectSuccessMessage: t("invitations.rejectSuccess"),
+		onAcceptSuccess: async () => {
+			await invalidateUserInvitations();
 			navigate({ to: "/org" });
 		},
-		onError: (error: { message?: string }) => {
-			toast.error(error.message || t("invitations.error"));
+		onRejectSuccess: async () => {
+			await invalidateUserInvitations();
+			navigate({ to: "/" });
 		},
 	});
 
-	const rejectMutation = useMutation({
-		mutationFn: async () => {
-			if (!invitation?.id) throw Error(t("invitations.error"));
-
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId: invitation.id,
-			});
-			if (error) throw error;
-		},
-		onSuccess: () => {
-			toast.success(t("invitations.rejectSuccess"));
-			invalidateUserInvitations();
-			navigate({ to: "/dashboard" });
-		},
-		onError: (error: { message?: string }) => {
-			toast.error(error.message || t("invitations.error"));
-		},
-	});
-
-	const acting = acceptMutation.isPending || rejectMutation.isPending;
+	const acting = actingId !== null;
 
 	if (isPending) {
 		return (
@@ -125,12 +100,15 @@ function InvitationPage() {
 					</p>
 					{isInvitationPending ? (
 						<div className="flex gap-2">
-							<Button onClick={() => acceptMutation.mutate()} disabled={acting}>
+							<Button
+								onClick={() => handleAccept(invitation.id)}
+								disabled={acting}
+							>
 								{t("invitations.accept")}
 							</Button>
 							<Button
 								variant="outline"
-								onClick={() => rejectMutation.mutate()}
+								onClick={() => handleReject(invitation.id)}
 								disabled={acting}
 							>
 								{t("invitations.reject")}

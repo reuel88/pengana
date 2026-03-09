@@ -11,5 +11,6 @@
 	"failedToStoreFile": "Error al guardar el archivo. El almacenamiento puede estar lleno.",
 	"todoNotFound": "Tarea no encontrada",
 	"unauthorized": "No autorizado",
-	"paymentError": "Algo salió mal con el pago. Por favor, inténtelo de nuevo."
+	"paymentError": "Algo salió mal con el pago. Por favor, inténtelo de nuevo.",
+	"migrationError": "Error de migración: {{message}}. Intenta reiniciar la aplicación."
 }

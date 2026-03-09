@@ -5,22 +5,18 @@ import { Drawer } from "expo-router/drawer";
 
 import { HeaderButton } from "@/components/header-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { useThemedScreenOptions } from "@/hooks/use-themed-screen-options";
 import { useTheme } from "@/lib/theme";
 
 const DrawerLayout = () => {
 	const { theme } = useTheme();
 	const { t } = useTranslation();
+	const screenOptions = useThemedScreenOptions();
 
 	return (
 		<Drawer
 			screenOptions={{
-				headerStyle: {
-					backgroundColor: theme.background,
-				},
-				headerTitleStyle: {
-					color: theme.text,
-				},
-				headerTintColor: theme.text,
+				...screenOptions,
 				headerRight: () => <LanguageSwitcher />,
 				drawerStyle: {
 					backgroundColor: theme.background,

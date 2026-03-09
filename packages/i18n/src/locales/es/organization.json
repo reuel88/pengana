@@ -6,10 +6,12 @@
 		"noOrgs": "Aún no hay organizaciones",
 		"switchTo": "Cambiar a {{name}}",
 		"back": "Volver",
-		"close": "Cerrar"
+		"close": "Cerrar",
+		"switchError": "No se pudo cambiar de organización. Inténtalo de nuevo."
 	},
 	"create": {
 		"title": "Crear organización",
+		"description": "Crea una nueva organización para comenzar.",
 		"name": "Nombre de la organización",
 		"slug": "Slug",
 		"logo": "URL del logo",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "Has abandonado la organización",
 		"updateRoleSuccess": "Rol actualizado",
 		"error": "Error al gestionar miembro",
+		"updateRoleError": "Error al actualizar el rol",
+		"removeError": "Error al eliminar miembro",
+		"leaveError": "Error al abandonar la organización",
 		"noMembers": "No hay miembros"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "Has sido invitado a unirte a {{org}} como {{role}}.",
 		"invitedBy": "Invitado por: {{email}}",
 		"fetchError": "Algo salió mal al cargar las invitaciones",
-		"retry": "Reintentar"
+		"retry": "Reintentar",
+		"unknownError": "Ocurrió un error inesperado"
 	},
 	"teams": {
 		"title": "Equipos",
@@ -95,7 +101,10 @@
 		"noTeams": "Aún no hay equipos",
 		"noMembers": "No hay miembros en el equipo",
 		"updateName": "Actualizar nombre del equipo",
-		"updateNameSuccess": "Nombre del equipo actualizado"
+		"updateNameSuccess": "Nombre del equipo actualizado",
+		"memberNotFound": "No se encontró ningún miembro de la organización con esa dirección de correo electrónico",
+		"notFound": "Equipo no encontrado",
+		"rename": "Renombrar equipo"
 	},
 	"roles": {
 		"title": "Roles",
@@ -114,6 +123,10 @@
 		"invitations": "Invitaciones",
 		"teams": "Equipos",
 		"roles": "Roles"
+	},
+	"notifications": {
+		"markReadError": "Error al marcar la notificación como leída",
+		"markAllReadError": "Error al marcar todas las notificaciones como leídas"
 	},
 	"noActiveOrg": "No hay organización activa. Selecciona o crea una para comenzar."
 }

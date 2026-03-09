@@ -6,10 +6,12 @@
 		"noOrgs": "Aucune organisation pour le moment",
 		"switchTo": "Basculer vers {{name}}",
 		"back": "Retour",
-		"close": "Fermer"
+		"close": "Fermer",
+		"switchError": "Impossible de changer d'organisation. Veuillez réessayer."
 	},
 	"create": {
 		"title": "Créer une organisation",
+		"description": "Créez une nouvelle organisation pour commencer.",
 		"name": "Nom de l'organisation",
 		"slug": "Identifiant",
 		"logo": "URL du logo",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "Organisation quittée",
 		"updateRoleSuccess": "Rôle mis à jour",
 		"error": "Échec de la gestion du membre",
+		"updateRoleError": "Échec de la mise à jour du rôle",
+		"removeError": "Échec du retrait du membre",
+		"leaveError": "Échec du départ de l'organisation",
 		"noMembers": "Aucun membre"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "Vous avez reçu une invitation à rejoindre {{org}} en tant que {{role}}.",
 		"invitedBy": "Invitation envoyée par : {{email}}",
 		"fetchError": "Une erreur est survenue lors du chargement des invitations",
-		"retry": "Réessayer"
+		"retry": "Réessayer",
+		"unknownError": "Une erreur inattendue s'est produite"
 	},
 	"teams": {
 		"title": "Équipes",
@@ -95,7 +101,10 @@
 		"noTeams": "Aucune équipe pour le moment",
 		"noMembers": "Aucun membre dans l'équipe",
 		"updateName": "Mettre à jour le nom de l'équipe",
-		"updateNameSuccess": "Nom de l'équipe mis à jour"
+		"updateNameSuccess": "Nom de l'équipe mis à jour",
+		"memberNotFound": "Aucun membre de l'organisation trouvé avec cette adresse e-mail",
+		"notFound": "Équipe introuvable",
+		"rename": "Renommer l'équipe"
 	},
 	"roles": {
 		"title": "Rôles",
@@ -114,6 +123,10 @@
 		"invitations": "Invitations",
 		"teams": "Équipes",
 		"roles": "Rôles"
+	},
+	"notifications": {
+		"markReadError": "Échec du marquage de la notification comme lue",
+		"markAllReadError": "Échec du marquage de toutes les notifications comme lues"
 	},
 	"noActiveOrg": "Aucune organisation active. Sélectionnez ou créez-en une pour commencer."
 }

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import { isAllowedMimeType } from "@pengana/sync-engine";
+import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { ActionSheetIOS, Alert, Platform } from "react-native";
 
@@ -8,14 +9,24 @@ import { useSync } from "@/features/sync/sync-context";
 
 import { attachFile } from "../todo-actions";
 
+type PickerResult = {
+	canceled: boolean;
+	assets:
+		| {
+				uri: string;
+				mimeType?: string | null;
+				fileSize?: number | null;
+				size?: number | null;
+		  }[]
+		| null;
+};
+
 async function pickAsset(
-	picker: () => Promise<{
-		canceled: boolean;
-		assets: { uri: string; mimeType?: string | null }[] | null;
-	}>,
+	picker: () => Promise<PickerResult>,
 	defaultMimeType: string,
 	invalidTitle: string,
 	invalidMessage: string,
+	fileTooLargeMessage: string,
 ): Promise<{ uri: string; mimeType: string } | null> {
 	const result = await picker();
 	if (result.canceled || !result.assets || result.assets.length === 0)
@@ -24,6 +35,17 @@ async function pickAsset(
 	const mimeType = asset.mimeType ?? defaultMimeType;
 	if (!isAllowedMimeType(mimeType)) {
 		Alert.alert(invalidTitle, invalidMessage);
+		return null;
+	}
+	let fileSize = asset.fileSize ?? asset.size;
+	if (fileSize == null) {
+		const info = await FileSystem.getInfoAsync(asset.uri);
+		if (info.exists && "size" in info) {
+			fileSize = info.size;
+		}
+	}
+	if (fileSize != null && fileSize > MAX_FILE_SIZE_BYTES) {
+		Alert.alert(invalidTitle, fileTooLargeMessage);
 		return null;
 	}
 	return { uri: asset.uri, mimeType };
@@ -40,20 +62,28 @@ export function useFilePicker(todoId: string) {
 
 	const invalidFileTitle = t("todos:attachment.invalidFile");
 	const invalidFileMessage = t("errors:invalidFileType");
+	const fileTooLargeMessage = t("errors:fileTooLarge");
+
+	const pick = (picker: () => Promise<PickerResult>, defaultMimeType: string) =>
+		pickAsset(
+			picker,
+			defaultMimeType,
+			invalidFileTitle,
+			invalidFileMessage,
+			fileTooLargeMessage,
+		);
 
 	const pickFromCamera = async () => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
 		if (!permission.granted) return;
 		try {
-			const asset = await pickAsset(
+			const asset = await pick(
 				() =>
 					ImagePicker.launchCameraAsync({
 						mediaTypes: ["images"],
 						quality: 0.8,
 					}),
 				"image/jpeg",
-				invalidFileTitle,
-				invalidFileMessage,
 			);
 			if (asset) await attachAsset(asset.uri, asset.mimeType);
 		} catch {
@@ -65,29 +95,25 @@ export function useFilePicker(todoId: string) {
 	};
 
 	const pickFromLibrary = async () => {
-		const asset = await pickAsset(
+		const asset = await pick(
 			() =>
 				ImagePicker.launchImageLibraryAsync({
 					mediaTypes: ["images"],
 					quality: 0.8,
 				}),
 			"image/jpeg",
-			invalidFileTitle,
-			invalidFileMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};
 
 	const pickPdf = async () => {
-		const asset = await pickAsset(
+		const asset = await pick(
 			() =>
 				DocumentPicker.getDocumentAsync({
 					type: ["application/pdf"],
 					copyToCacheDirectory: true,
 				}),
 			"application/pdf",
-			invalidFileTitle,
-			invalidFileMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};

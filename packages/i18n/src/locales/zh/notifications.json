@@ -6,6 +6,7 @@
 	"accepted": "已接受邀请",
 	"rejected": "已拒绝邀请",
 	"error": "出了点问题",
+	"markRead": "标记为已读",
 	"markAllRead": "全部标记为已读",
 	"invitations": "邀请",
 	"notifications": "通知"

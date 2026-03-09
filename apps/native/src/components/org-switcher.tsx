@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSwitcher } from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,53 +14,91 @@ import {
 	View,
 } from "react-native";
 
+import { useCreateOrg } from "@/hooks/use-create-org";
+import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
+
+function CreateOrgModal({
+	onCreated,
+	onBack,
+}: {
+	onCreated: (orgId: string) => void;
+	onBack: () => void;
+}) {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
+
+	const { name, setName, slug, setSlug, loading, handleSubmit } = useCreateOrg({
+		errorMessage: t("create.error"),
+		onSuccess: onCreated,
+	});
+
+	return (
+		<View style={styles.createForm}>
+			<TextInput
+				style={[sharedStyles.input, inputThemed(theme)]}
+				value={name}
+				onChangeText={setName}
+				placeholder={t("create.namePlaceholder")}
+				placeholderTextColor={theme.border}
+			/>
+			<TextInput
+				style={[sharedStyles.input, inputThemed(theme)]}
+				value={slug}
+				onChangeText={setSlug}
+				placeholder={t("create.slugPlaceholder")}
+				placeholderTextColor={theme.border}
+			/>
+			<TouchableOpacity
+				style={[sharedStyles.button, { backgroundColor: theme.primary }]}
+				onPress={handleSubmit}
+				disabled={loading}
+			>
+				{loading ? (
+					<ActivityIndicator color="#fff" />
+				) : (
+					<Text style={sharedStyles.buttonText}>{t("create.submit")}</Text>
+				)}
+			</TouchableOpacity>
+			<TouchableOpacity onPress={onBack} disabled={loading}>
+				<Text style={[styles.linkText, { color: theme.primary }]}>
+					{t("switcher.back")}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
 
 export function OrgSwitcher() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const router = useRouter();
 	const { data: session } = authClient.useSession();
-	const { data: orgs, isPending } = authClient.useListOrganizations();
-	const { data: activeOrg } = authClient.useActiveOrganization();
+	const { data: orgs, isPending } = useListOrgs();
+	const { data: activeOrg } = useActiveOrg();
 	const [showPicker, setShowPicker] = useState(false);
 	const [showCreate, setShowCreate] = useState(false);
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [loading, setLoading] = useState(false);
+
+	const { handleSwitch, switchingId } = useOrgSwitcher({
+		onSwitchSuccess: () => {
+			setShowPicker(false);
+			router.push("/(drawer)/(org)");
+		},
+		onError: (message) =>
+			Alert.alert(
+				t("common:error.title"),
+				message || t("switcher.switchError"),
+			),
+	});
 
 	if (!session) return null;
 
-	const handleSwitch = async (orgId: string) => {
-		await authClient.organization.setActive({ organizationId: orgId });
+	const handleCreated = (_orgId: string) => {
+		setShowCreate(false);
 		setShowPicker(false);
 		router.push("/(drawer)/(org)");
-	};
-
-	const handleCreate = async () => {
-		if (!name) return;
-		setLoading(true);
-		try {
-			const { data, error } = await authClient.organization.create({
-				name,
-				slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
-			});
-			if (error) {
-				Alert.alert(t("create.error"), error.message);
-				return;
-			}
-			await authClient.organization.setActive({ organizationId: data.id });
-			setShowCreate(false);
-			setShowPicker(false);
-			setName("");
-			setSlug("");
-			router.push("/(drawer)/(org)");
-		} catch {
-			Alert.alert(t("create.error"));
-		} finally {
-			setLoading(false);
-		}
 	};
 
 	return (
@@ -91,44 +130,10 @@ export function OrgSwitcher() {
 						</Text>
 
 						{showCreate ? (
-							<View style={styles.createForm}>
-								<TextInput
-									style={[
-										styles.input,
-										{ color: theme.text, borderColor: theme.border },
-									]}
-									value={name}
-									onChangeText={setName}
-									placeholder={t("create.namePlaceholder")}
-									placeholderTextColor={theme.border}
-								/>
-								<TextInput
-									style={[
-										styles.input,
-										{ color: theme.text, borderColor: theme.border },
-									]}
-									value={slug}
-									onChangeText={setSlug}
-									placeholder={t("create.slugPlaceholder")}
-									placeholderTextColor={theme.border}
-								/>
-								<TouchableOpacity
-									style={[styles.button, { backgroundColor: theme.primary }]}
-									onPress={handleCreate}
-									disabled={loading}
-								>
-									{loading ? (
-										<ActivityIndicator color="#fff" />
-									) : (
-										<Text style={styles.buttonText}>{t("create.submit")}</Text>
-									)}
-								</TouchableOpacity>
-								<TouchableOpacity onPress={() => setShowCreate(false)}>
-									<Text style={[styles.linkText, { color: theme.primary }]}>
-										{t("switcher.back")}
-									</Text>
-								</TouchableOpacity>
-							</View>
+							<CreateOrgModal
+								onCreated={handleCreated}
+								onBack={() => setShowCreate(false)}
+							/>
 						) : (
 							<ScrollView style={styles.orgList}>
 								{isPending ? (
@@ -150,9 +155,7 @@ export function OrgSwitcher() {
 										</TouchableOpacity>
 									))
 								) : (
-									<Text
-										style={{ color: theme.text, opacity: 0.5, padding: 16 }}
-									>
+									<Text style={[mutedText(theme), { padding: 16 }]}>
 										{t("switcher.noOrgs")}
 									</Text>
 								)}
@@ -169,6 +172,7 @@ export function OrgSwitcher() {
 
 						<TouchableOpacity
 							style={styles.closeButton}
+							disabled={switchingId !== null || showCreate}
 							onPress={() => {
 								setShowPicker(false);
 								setShowCreate(false);
@@ -216,19 +220,6 @@ const styles = StyleSheet.create({
 	},
 	createForm: {
 		gap: 12,
-	},
-	input: {
-		borderWidth: 1,
-		padding: 12,
-		fontSize: 14,
-	},
-	button: {
-		padding: 12,
-		alignItems: "center",
-	},
-	buttonText: {
-		color: "#fff",
-		fontWeight: "bold",
 	},
 	linkText: {
 		textAlign: "center",

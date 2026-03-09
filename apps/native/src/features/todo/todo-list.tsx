@@ -2,6 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/lib/theme";
+import { mutedText } from "@/styles/shared";
 
 import type { TodoItemRow } from "./components/todo-item";
 import { TodoItem } from "./components/todo-item";
@@ -14,9 +15,7 @@ export function TodoList({ todos }: { todos: TodoItemRow[] }) {
 
 	if (todos.length === 0) {
 		return (
-			<Text style={[styles.emptyText, { color: theme.text, opacity: 0.5 }]}>
-				{t("empty")}
-			</Text>
+			<Text style={[styles.emptyText, mutedText(theme)]}>{t("empty")}</Text>
 		);
 	}
 

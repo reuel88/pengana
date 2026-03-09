@@ -1,8 +1,7 @@
+import { onboardingMachine } from "@pengana/org-client/machines/onboarding-machine";
 import { useNavigate } from "@tanstack/react-router";
 import { useMachine } from "@xstate/react";
 import { useEffect } from "react";
-
-import { onboardingMachine } from "./onboarding-machine";
 
 export function useOnboarding({
 	hasPendingInvitations,
@@ -19,7 +18,7 @@ export function useOnboarding({
 
 	useEffect(() => {
 		if (state.matches("complete")) {
-			navigate({ to: "/dashboard" });
+			navigate({ to: "/" });
 		}
 	}, [state, navigate]);
 

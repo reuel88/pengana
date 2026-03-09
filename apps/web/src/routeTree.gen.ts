@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as OrgRouteRouteImport } from './routes/org/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgIndexRouteImport } from './routes/org/index'
@@ -36,6 +36,11 @@ const SuccessRoute = SuccessRouteImport.update({
   path: '/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -44,11 +49,6 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrgRouteRoute = OrgRouteRouteImport.update({
@@ -110,9 +110,9 @@ const OrgTeamsTeamIdRoute = OrgTeamsTeamIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/org': typeof OrgRouteRouteWithChildren
-  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/sign-up': typeof SignUpRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
@@ -127,9 +127,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/sign-up': typeof SignUpRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/invitation/$invitationId': typeof InvitationInvitationIdRoute
@@ -145,9 +145,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/org': typeof OrgRouteRouteWithChildren
-  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/sign-up': typeof SignUpRoute
   '/success': typeof SuccessRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
@@ -165,9 +165,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/org'
-    | '/dashboard'
     | '/login'
     | '/onboarding'
+    | '/sign-up'
     | '/success'
     | '/todos'
     | '/org/teams'
@@ -182,9 +182,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/dashboard'
     | '/login'
     | '/onboarding'
+    | '/sign-up'
     | '/success'
     | '/todos'
     | '/invitation/$invitationId'
@@ -199,9 +199,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/org'
-    | '/dashboard'
     | '/login'
     | '/onboarding'
+    | '/sign-up'
     | '/success'
     | '/todos'
     | '/org/teams'
@@ -218,9 +218,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OrgRouteRoute: typeof OrgRouteRouteWithChildren
-  DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  SignUpRoute: typeof SignUpRoute
   SuccessRoute: typeof SuccessRoute
   TodosRoute: typeof TodosRoute
   InvitationInvitationIdRoute: typeof InvitationInvitationIdRoute
@@ -242,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -254,13 +261,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/org': {
@@ -382,9 +382,9 @@ const OrgRouteRouteWithChildren = OrgRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OrgRouteRoute: OrgRouteRouteWithChildren,
-  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  SignUpRoute: SignUpRoute,
   SuccessRoute: SuccessRoute,
   TodosRoute: TodosRoute,
   InvitationInvitationIdRoute: InvitationInvitationIdRoute,

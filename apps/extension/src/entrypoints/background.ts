@@ -6,18 +6,19 @@ import type {
 	UploadEvent,
 } from "@pengana/sync-engine";
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
-
 import { createDexieSyncAdapter } from "@pengana/todo-client";
 import {
+	createIndexedDbUploadTransport,
 	createWebUploadAdapter,
-	createWebUploadTransport,
 } from "@/entities/upload-queue";
 import type {
 	BackgroundBroadcast,
 	BackgroundMessage,
 	SyncStatus,
 } from "@/utils/background-messages";
+import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { client } from "@/utils/orpc";
+import { sessionResponseSchema } from "@/utils/session-schema";
 
 const SYNC_ALARM_NAME = "periodic-sync";
 const SYNC_INTERVAL_MINUTES = 0.5; // 30 seconds
@@ -31,6 +32,9 @@ interface BackgroundState {
 	isUploading: boolean;
 }
 
+// Mutable singleton — async interleaving is safe because all mutations are
+// idempotent (setupEngine checks userId equality) or last-write-wins (boolean
+// flags overwritten by the next event). No torn state is possible.
 const state: BackgroundState = {
 	engine: null,
 	uploadQueue: null,
@@ -61,9 +65,10 @@ async function fetchUserId(): Promise<string | null> {
 			credentials: "include",
 		});
 		if (!res.ok) return null;
-		const data: { session?: { userId?: string }; user?: { id?: string } } =
-			await res.json();
-		return data?.session?.userId ?? data?.user?.id ?? null;
+		const parsed = sessionResponseSchema.safeParse(await res.json());
+		if (!parsed.success) return null;
+		// Better Auth returns session.userId for cookie sessions, user.id for token responses
+		return parsed.data.session?.userId ?? parsed.data.user?.id ?? null;
 	} catch {
 		return null;
 	}
@@ -88,9 +93,8 @@ function createSyncEngine(userId: string): SyncEngine {
 	const engine = new SyncEngine(adapter, transport);
 
 	engine.onEvent((event: SyncEvent) => {
-		if (event.type === "sync:start") state.isSyncing = true;
-		if (event.type === "sync:complete" || event.type === "sync:error")
-			state.isSyncing = false;
+		const active = isSyncActive(event);
+		if (active !== null) state.isSyncing = active;
 		broadcast({ type: "sync:event", event });
 	});
 
@@ -99,13 +103,12 @@ function createSyncEngine(userId: string): SyncEngine {
 
 function createUploadQueueForEngine(engine: SyncEngine): UploadQueue {
 	const uploadAdapter = createWebUploadAdapter();
-	const uploadTransport = createWebUploadTransport();
+	const uploadTransport = createIndexedDbUploadTransport();
 	const queue = new UploadQueue(uploadAdapter, uploadTransport);
 
 	queue.onEvent((event: UploadEvent) => {
-		if (event.type === "upload:start") state.isUploading = true;
-		if (event.type === "upload:complete" || event.type === "upload:error")
-			state.isUploading = false;
+		const active = isUploadActive(event);
+		if (active !== null) state.isUploading = active;
 		if (event.type === "upload:complete") {
 			engine.sync();
 		}
@@ -128,6 +131,20 @@ function setupEngine(userId: string) {
 	state.engine.sync();
 }
 
+/** Fetches the current userId (if needed) and initializes the sync engine. */
+async function ensureEngine(): Promise<void> {
+	if (state.engine) return;
+	const userId = state.currentUserId ?? (await fetchUserId());
+	if (userId) setupEngine(userId);
+}
+
+/**
+ * Handles messages from the popup/content scripts.
+ *
+ * Returns `true` when the response will be sent asynchronously (keeps the
+ * Chrome messaging channel open), `false` when the response is sent
+ * synchronously before this function returns.
+ */
 function handleMessage(
 	message: BackgroundMessage,
 	sendResponse: (response: unknown) => void,
@@ -141,10 +158,11 @@ function handleMessage(
 
 		case "sync:trigger": {
 			if (state.isOnline) {
-				if (!state.engine && state.currentUserId) {
-					setupEngine(state.currentUserId);
-				}
-				state.engine?.sync();
+				ensureEngine()
+					.then(() => state.engine?.sync())
+					.catch((err) =>
+						console.error("[background] sync:trigger failed:", err),
+					);
 			}
 			sendResponse({ ok: true });
 			return false;
@@ -158,20 +176,27 @@ function handleMessage(
 					fileUri: message.payload.fileUri,
 					mimeType: message.payload.mimeType,
 				});
+				sendResponse({ ok: true });
+			} else {
+				console.warn("[background] upload:enqueue dropped — queue not ready");
+				sendResponse({ ok: false, error: "Upload queue not ready" });
 			}
-			sendResponse({ ok: true });
 			return false;
 		}
 
 		case "status:get": {
-			if (!state.currentUserId) {
-				fetchUserId().then((userId) => {
-					if (userId) setupEngine(userId);
-					sendResponse(getStatus());
-				});
+			if (!state.currentUserId || !state.engine) {
+				ensureEngine()
+					.then(() => sendResponse(getStatus()))
+					.catch(() => sendResponse(getStatus()));
 				return true; // Keep message channel open for async response
 			}
 			sendResponse(getStatus());
+			return false;
+		}
+
+		default: {
+			sendResponse({ ok: false, error: "Unknown message type" });
 			return false;
 		}
 	}
@@ -189,14 +214,15 @@ async function initBackground() {
 }
 
 export default defineBackground(() => {
-	console.log("Background service worker started", { id: browser.runtime.id });
+	if (import.meta.env.DEV) {
+		console.log("Background service worker started", {
+			id: browser.runtime.id,
+		});
+	}
 
 	browser.alarms.onAlarm.addListener(async (alarm) => {
 		if (alarm.name === SYNC_ALARM_NAME && state.isOnline) {
-			if (!state.engine) {
-				const userId = await fetchUserId();
-				if (userId) setupEngine(userId);
-			}
+			await ensureEngine();
 			state.engine?.sync();
 		}
 	});
@@ -220,5 +246,7 @@ export default defineBackground(() => {
 		broadcast({ type: "status:update", status: getStatus() });
 	});
 
-	initBackground();
+	initBackground().catch((err) =>
+		console.error("[background] initBackground failed:", err),
+	);
 });

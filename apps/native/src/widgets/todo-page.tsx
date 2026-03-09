@@ -3,7 +3,7 @@ import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { db } from "@/entities/todo";
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
@@ -16,11 +16,12 @@ function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(userId);
 	const { theme } = useTheme();
 	const { t } = useTranslation("todos");
+	const { isOnline, isSyncing } = useSync();
 
 	return (
 		<View style={styles.content}>
 			<Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
-			<ConnectivityBanner />
+			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />
 			<TodoList todos={todos} />
 			<SyncDevtools />
@@ -31,12 +32,15 @@ function TodoContent({ userId }: { userId: string }) {
 export function TodoPage({ userId }: { userId: string }) {
 	const { success, error } = useMigrations(db, migrations);
 	const { theme } = useTheme();
+	const { t } = useTranslation("errors");
 
 	if (error) {
 		return (
 			<View style={styles.center}>
 				<Text style={{ color: STATUS_COLORS.error }}>
-					Migration error: {error.message}. Try restarting the app.
+					{t("migrationError", {
+						message: String(error.message).slice(0, 200),
+					})}
 				</Text>
 			</View>
 		);

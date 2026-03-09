@@ -1,4 +1,4 @@
-import type { SupportedLocale } from "@pengana/i18n/config";
+import { resolveLocale } from "@pengana/i18n";
 import { initExtensionI18n } from "@pengana/i18n/extension";
 import { getDirection } from "@pengana/i18n/rtl";
 import React from "react";
@@ -13,7 +13,7 @@ async function main() {
 		},
 	});
 
-	const locale = i18n.language as SupportedLocale;
+	const locale = resolveLocale(i18n.language);
 	document.documentElement.lang = locale;
 	document.documentElement.dir = getDirection(locale);
 

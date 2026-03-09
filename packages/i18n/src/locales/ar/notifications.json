@@ -6,6 +6,7 @@
 	"accepted": "تم قبول الدعوة",
 	"rejected": "تم رفض الدعوة",
 	"error": "حدث خطأ ما",
+	"markRead": "تعيين كمقروء",
 	"markAllRead": "تعيين الكل كمقروء",
 	"invitations": "الدعوات",
 	"notifications": "الإشعارات"

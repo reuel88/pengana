@@ -22,3 +22,19 @@ export interface SyncStatus {
 	isUploading: boolean;
 	userId: string | null;
 }
+
+/** Returns `true` on start, `false` on complete/error, `null` for no state change. */
+export function isSyncActive(event: SyncEvent): boolean | null {
+	if (event.type === "sync:start") return true;
+	if (event.type === "sync:complete" || event.type === "sync:error")
+		return false;
+	return null;
+}
+
+/** Returns `true` on start, `false` on complete/error, `null` for no state change. */
+export function isUploadActive(event: UploadEvent): boolean | null {
+	if (event.type === "upload:start") return true;
+	if (event.type === "upload:complete" || event.type === "upload:error")
+		return false;
+	return null;
+}

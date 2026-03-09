@@ -11,5 +11,6 @@
 	"failedToStoreFile": "Failed to store file. Storage may be full.",
 	"todoNotFound": "Todo not found",
 	"unauthorized": "Unauthorized",
-	"paymentError": "Something went wrong with payment. Please try again."
+	"paymentError": "Something went wrong with payment. Please try again.",
+	"migrationError": "Migration error: {{message}}. Try restarting the app."
 }

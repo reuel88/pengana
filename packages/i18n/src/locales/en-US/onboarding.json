@@ -1,5 +1,5 @@
 {
-	"title": "Welcome to pengana",
+	"title": "Welcome to Pengana, {{name}}",
 	"description": "To get started, join or create an organization.",
 	"invitations": {
 		"title": "Pending Invitations",

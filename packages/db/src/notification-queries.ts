@@ -13,10 +13,12 @@ export async function getUnreadNotifications(userId: string) {
 }
 
 export async function markNotificationRead(id: string, userId: string) {
-	await db
+	const updated = await db
 		.update(notification)
 		.set({ read: true })
-		.where(and(eq(notification.id, id), eq(notification.userId, userId)));
+		.where(and(eq(notification.id, id), eq(notification.userId, userId)))
+		.returning({ id: notification.id });
+	return updated.length > 0;
 }
 
 export async function markAllNotificationsRead(userId: string) {

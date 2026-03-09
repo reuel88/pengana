@@ -33,14 +33,37 @@
 	"modal": "Modal",
 	"submitting": "Enviando...",
 	"loginPrompt": "Inicie sesion en la aplicacion web primero.",
+	"loginButton": "Iniciar sesión",
+	"onboardingPrompt": "Por favor, termina de configurar tu cuenta en la aplicación web.",
+	"onboardingButton": "Completar configuración",
 	"notFound": {
 		"title": "¡Ups!",
 		"heading": "Página no encontrada",
 		"description": "Lo sentimos, la página que buscas no existe.",
 		"goHome": "Ir al inicio"
 	},
+	"tabs": {
+		"one": {
+			"title": "Pestaña Uno",
+			"subtitle": "Explora la primera sección de tu aplicación"
+		},
+		"two": {
+			"title": "Pestaña Dos",
+			"subtitle": "Descubre más funciones y contenido"
+		}
+	},
 	"confirm": {
 		"yes": "Sí",
-		"no": "No"
+		"no": "No",
+		"cancel": "Cancelar"
+	},
+	"error": {
+		"title": "Error",
+		"generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+		"retry": "Reintentar"
+	},
+	"restartRequired": {
+		"title": "Reinicio necesario",
+		"message": "La aplicación necesita reiniciarse para aplicar el cambio de dirección del diseño. Por favor, cierre y vuelva a abrir la aplicación."
 	}
 }

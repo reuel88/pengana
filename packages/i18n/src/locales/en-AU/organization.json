@@ -6,10 +6,12 @@
 		"noOrgs": "No organisations yet",
 		"switchTo": "Switch to {{name}}",
 		"back": "Back",
-		"close": "Close"
+		"close": "Close",
+		"switchError": "Failed to switch organisation. Please try again."
 	},
 	"create": {
 		"title": "Create Organisation",
+		"description": "Create a new organisation to get started.",
 		"name": "Organisation Name",
 		"slug": "Slug",
 		"logo": "Logo URL",
@@ -45,6 +47,9 @@
 		"leaveSuccess": "Left organisation",
 		"updateRoleSuccess": "Role updated",
 		"error": "Failed to manage member",
+		"updateRoleError": "Failed to update role",
+		"removeError": "Failed to remove member",
+		"leaveError": "Failed to leave organisation",
 		"noMembers": "No members"
 	},
 	"invitations": {
@@ -78,7 +83,8 @@
 		"invitedAs": "You have been invited to join {{org}} as {{role}}.",
 		"invitedBy": "Invited by: {{email}}",
 		"fetchError": "Something went wrong loading invitations",
-		"retry": "Retry"
+		"retry": "Retry",
+		"unknownError": "An unexpected error occurred"
 	},
 	"teams": {
 		"title": "Teams",
@@ -97,7 +103,10 @@
 		"noTeams": "No teams yet",
 		"noMembers": "No team members",
 		"updateName": "Update Team Name",
-		"updateNameSuccess": "Team name updated"
+		"updateNameSuccess": "Team name updated",
+		"memberNotFound": "No organisation member found with that email address",
+		"notFound": "Team not found",
+		"rename": "Rename team"
 	},
 	"roles": {
 		"title": "Roles",
@@ -116,6 +125,10 @@
 		"invitations": "Invitations",
 		"teams": "Teams",
 		"roles": "Roles"
+	},
+	"notifications": {
+		"markReadError": "Failed to mark notification as read",
+		"markAllReadError": "Failed to mark all notifications as read"
 	},
 	"noActiveOrg": "No active organisation. Select or create one to get started."
 }

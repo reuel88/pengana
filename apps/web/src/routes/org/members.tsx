@@ -1,11 +1,13 @@
 import { useTranslation } from "@pengana/i18n";
+import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
+import type { Column } from "@/components/data-table";
+import { DataTable } from "@/components/data-table";
+import { OrgGuard } from "@/components/org-guard";
+import { useOrgRole } from "@/hooks/use-org-queries";
 
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
@@ -14,150 +16,114 @@ export const Route = createFileRoute("/org/members")({
 function MembersPage() {
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
-	const { data: activeOrg, isPending } = useActiveOrg();
-	const { data: session } = authClient.useSession();
+	const { session } = Route.useRouteContext();
 	const { isAdmin } = useOrgRole();
-	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
-		useInvalidateOrg();
 
-	if (isPending) {
-		return <p>{t("common:status.loading")}</p>;
-	}
-
-	if (!activeOrg) {
-		return <p className="text-muted-foreground">{t("noActiveOrg")}</p>;
-	}
-
-	const members = activeOrg.members || [];
-	const currentUserId = session?.user?.id;
-
-	const handleUpdateRole = async (
-		memberId: string,
-		role: "member" | "admin",
-	) => {
-		try {
-			const { error } = await authClient.organization.updateMemberRole({
-				memberId,
-				role,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
-			toast.success(t("members.updateRoleSuccess"));
-			await Promise.all([invalidateActiveOrg(), invalidateActiveMember()]);
-		} catch {
-			toast.error(t("members.error"));
-		}
-	};
-
-	const handleRemove = async (memberIdOrEmail: string) => {
-		if (!confirm(t("members.removeConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
-			toast.success(t("members.removeSuccess"));
-			await invalidateActiveOrg();
-		} catch {
-			toast.error(t("members.error"));
-		}
-	};
-
-	const handleLeave = async () => {
-		if (!currentUserId) {
-			toast.error(t("members.error"));
-			return;
-		}
-		if (!confirm(t("members.leaveConfirm"))) return;
-		try {
-			const { error } = await authClient.organization.removeMember({
-				memberIdOrEmail: currentUserId,
-			});
-			if (error) {
-				toast.error(error.message || t("members.error"));
-				return;
-			}
+	const { handleUpdateRole, handleRemove, handleLeave } = useMemberActions({
+		onUpdateRoleSuccess: () => toast.success(t("members.updateRoleSuccess")),
+		onRemoveSuccess: () => toast.success(t("members.removeSuccess")),
+		onLeaveSuccess: async () => {
 			toast.success(t("members.leaveSuccess"));
-			await invalidateAll();
-			navigate({ to: "/dashboard" });
-		} catch {
-			toast.error(t("members.error"));
-		}
+			navigate({ to: "/" });
+		},
+		onError: (message) => toast.error(message || t("members.error")),
+		errorMessages: {
+			updateRole: t("members.updateRoleError"),
+			remove: t("members.removeError"),
+			leave: t("members.leaveError"),
+		},
+	});
+
+	const currentUserId = session.data.user.id;
+
+	const onRemove = async (memberIdOrEmail: string) => {
+		if (!confirm(t("members.removeConfirm"))) return;
+		await handleRemove(memberIdOrEmail);
 	};
+
+	type Member = {
+		id: string;
+		userId: string;
+		role: string;
+		user: { name: string; email: string };
+	};
+
+	const columns: Column<Member>[] = [
+		{ id: "name", header: t("members.name"), cell: (m) => m.user.name },
+		{ id: "email", header: t("members.email"), cell: (m) => m.user.email },
+		{
+			id: "role",
+			header: t("members.role"),
+			cell: (m) =>
+				m.role === "owner" ? (
+					<span className="text-xs">{t("roles.owner")}</span>
+				) : isAdmin ? (
+					<select
+						value={m.role}
+						onChange={(e) =>
+							handleUpdateRole(m.id, e.target.value as "member" | "admin")
+						}
+						className="bg-transparent text-xs"
+					>
+						<option value="admin">{t("roles.admin")}</option>
+						<option value="member">{t("roles.member")}</option>
+					</select>
+				) : (
+					<span className="text-xs">{t(`roles.${m.role}`)}</span>
+				),
+		},
+		{
+			id: "actions",
+			header: "",
+			cellClassName: "py-2 text-right",
+			cell: (m) =>
+				isAdmin &&
+				currentUserId &&
+				m.userId !== currentUserId &&
+				m.role !== "owner" ? (
+					<Button
+						variant="destructive"
+						size="xs"
+						onClick={() => onRemove(m.id)}
+					>
+						{t("members.remove")}
+					</Button>
+				) : null,
+		},
+	];
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex items-center justify-between">
-				<h2 className="font-medium text-sm">{t("members.title")}</h2>
-				<Button variant="outline" size="sm" onClick={handleLeave}>
-					{t("members.leave")}
-				</Button>
-			</div>
+		<OrgGuard>
+			{(activeOrg) => {
+				const members = (activeOrg.members || []) as Member[];
 
-			{members.length === 0 ? (
-				<p className="text-muted-foreground text-xs">
-					{t("members.noMembers")}
-				</p>
-			) : (
-				<table className="w-full text-xs">
-					<thead>
-						<tr className="border-b text-left text-muted-foreground">
-							<th className="pb-2">{t("members.name")}</th>
-							<th className="pb-2">{t("members.email")}</th>
-							<th className="pb-2">{t("members.role")}</th>
-							<th className="pb-2" />
-						</tr>
-					</thead>
-					<tbody>
-						{members.map((member) => (
-							<tr key={member.id} className="border-b">
-								<td className="py-2">{member.user.name}</td>
-								<td className="py-2">{member.user.email}</td>
-								<td className="py-2">
-									{member.role === "owner" ? (
-										<span className="text-xs">{t("roles.owner")}</span>
-									) : isAdmin ? (
-										<select
-											value={member.role}
-											onChange={(e) =>
-												handleUpdateRole(
-													member.id,
-													e.target.value as "member" | "admin",
-												)
-											}
-											className="bg-transparent text-xs"
-										>
-											<option value="admin">{t("roles.admin")}</option>
-											<option value="member">{t("roles.member")}</option>
-										</select>
-									) : (
-										<span className="text-xs">{t(`roles.${member.role}`)}</span>
-									)}
-								</td>
-								<td className="py-2 text-right">
-									{isAdmin &&
-										currentUserId &&
-										member.userId !== currentUserId &&
-										member.role !== "owner" && (
-											<Button
-												variant="destructive"
-												size="xs"
-												onClick={() => handleRemove(member.id)}
-											>
-												{t("members.remove")}
-											</Button>
-										)}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			)}
-		</div>
+				const onLeave = async () => {
+					if (!currentUserId) return;
+					const currentMember = members.find((m) => m.userId === currentUserId);
+					if (!currentMember) return;
+					if (!confirm(t("members.leaveConfirm"))) return;
+					await handleLeave(currentMember.id);
+				};
+
+				return (
+					<div className="flex flex-col gap-4">
+						<div className="flex items-center justify-between">
+							<h2 className="font-medium text-sm">{t("members.title")}</h2>
+							<Button variant="outline" size="sm" onClick={onLeave}>
+								{t("members.leave")}
+							</Button>
+						</div>
+
+						{members.length === 0 ? (
+							<p className="text-muted-foreground text-xs">
+								{t("members.noMembers")}
+							</p>
+						) : (
+							<DataTable columns={columns} data={members} keyFn={(m) => m.id} />
+						)}
+					</div>
+				);
+			}}
+		</OrgGuard>
 	);
 }

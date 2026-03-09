@@ -6,10 +6,12 @@
 		"noOrgs": "Nenhuma organização ainda",
 		"switchTo": "Mudar para {{name}}",
 		"back": "Voltar",
-		"close": "Fechar"
+		"close": "Fechar",
+		"switchError": "Falha ao trocar de organização. Tente novamente."
 	},
 	"create": {
 		"title": "Criar organização",
+		"description": "Crie uma nova organização para começar.",
 		"name": "Nome da organização",
 		"slug": "Slug",
 		"logo": "URL do logo",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "Saiu da organização",
 		"updateRoleSuccess": "Função atualizada",
 		"error": "Falha ao gerenciar membro",
+		"updateRoleError": "Falha ao atualizar a função",
+		"removeError": "Falha ao remover membro",
+		"leaveError": "Falha ao sair da organização",
 		"noMembers": "Nenhum membro"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "Você foi convidado a participar de {{org}} como {{role}}.",
 		"invitedBy": "Convidado por: {{email}}",
 		"fetchError": "Algo deu errado ao carregar os convites",
-		"retry": "Tentar novamente"
+		"retry": "Tentar novamente",
+		"unknownError": "Ocorreu um erro inesperado"
 	},
 	"teams": {
 		"title": "Equipes",
@@ -95,7 +101,10 @@
 		"noTeams": "Nenhuma equipe ainda",
 		"noMembers": "Nenhum membro na equipe",
 		"updateName": "Atualizar nome da equipe",
-		"updateNameSuccess": "Nome da equipe atualizado"
+		"updateNameSuccess": "Nome da equipe atualizado",
+		"memberNotFound": "Nenhum membro da organização encontrado com esse endereço de e-mail",
+		"notFound": "Equipe não encontrada",
+		"rename": "Renomear equipe"
 	},
 	"roles": {
 		"title": "Funções",
@@ -114,6 +123,10 @@
 		"invitations": "Convites",
 		"teams": "Equipes",
 		"roles": "Funções"
+	},
+	"notifications": {
+		"markReadError": "Falha ao marcar notificação como lida",
+		"markAllReadError": "Falha ao marcar todas as notificações como lidas"
 	},
 	"noActiveOrg": "Nenhuma organização ativa. Selecione ou crie uma para começar."
 }

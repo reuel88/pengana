@@ -6,6 +6,7 @@ export {
 	NAMESPACES,
 	type Namespace,
 	RTL_LOCALES,
+	resolveLocale,
 	SUPPORTED_LOCALES,
 	type SupportedLocale,
 } from "./config";

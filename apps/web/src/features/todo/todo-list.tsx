@@ -1,57 +1,44 @@
 import { useTranslation } from "@pengana/i18n";
 import type { WebTodo } from "@pengana/todo-client";
-import {
-	attachFile,
-	deleteTodo,
-	resolveConflict,
-	toggleTodo,
-} from "@pengana/todo-client";
+import { useTodoHandlers } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { storeFileForUpload } from "@/entities/upload-queue";
+import { storeFileInMemory } from "@/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
+
+const noop = (_id: string) => {};
 
 export function TodoList({ todos }: { todos: WebTodo[] }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const { t } = useTranslation();
 
-	const handleToggle = async (id: string) => {
-		try {
-			await toggleTodo(id);
-			triggerSync();
-		} catch {
-			toast.error(t("errors:failedToToggleTodo"));
-		}
-	};
+	const onError = useCallback((_id: string, msg: string) => {
+		toast.error(msg);
+	}, []);
 
-	const handleDelete = async (id: string) => {
-		try {
-			await deleteTodo(id);
-			triggerSync();
-		} catch {
-			toast.error(t("errors:failedToDeleteTodo"));
-		}
-	};
+	const fileStorage = useMemo(
+		() => ({
+			storeFile: (_id: string, file: File) => storeFileInMemory(_id, file),
+			createFileRef: (_id: string, file: File) => URL.createObjectURL(file),
+		}),
+		[],
+	);
 
-	const handleResolve = async (id: string, resolution: "local" | "server") => {
-		try {
-			await resolveConflict(id, resolution);
-			triggerSync();
-		} catch {
-			toast.error(t("errors:failedToResolveConflict"));
-		}
-	};
+	const deps = useMemo(
+		() => ({
+			triggerSync,
+			enqueueUpload,
+			onError,
+			clearError: noop,
+			fileStorage,
+			t,
+		}),
+		[triggerSync, enqueueUpload, onError, fileStorage, t],
+	);
 
-	const handleFileSelected = async (id: string, file: File) => {
-		try {
-			storeFileForUpload(id, file);
-			const blobUrl = URL.createObjectURL(file);
-			await attachFile(id, blobUrl);
-			enqueueUpload(id, blobUrl, file.type);
-		} catch {
-			toast.error(t("errors:failedToAttachFile"));
-		}
-	};
+	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
+		useTodoHandlers(deps);
 
 	return (
 		<TodoListBase

@@ -11,6 +11,7 @@ import arAuth from "./locales/ar/auth.json";
 import arCommon from "./locales/ar/common.json";
 import arDashboard from "./locales/ar/dashboard.json";
 import arErrors from "./locales/ar/errors.json";
+import arOnboarding from "./locales/ar/onboarding.json";
 import arOrganization from "./locales/ar/organization.json";
 import arSync from "./locales/ar/sync.json";
 import arTodos from "./locales/ar/todos.json";
@@ -18,6 +19,7 @@ import enAUAuth from "./locales/en-AU/auth.json";
 import enAUCommon from "./locales/en-AU/common.json";
 import enAUDashboard from "./locales/en-AU/dashboard.json";
 import enAUErrors from "./locales/en-AU/errors.json";
+import enAUOnboarding from "./locales/en-AU/onboarding.json";
 import enAUOrganization from "./locales/en-AU/organization.json";
 import enAUSync from "./locales/en-AU/sync.json";
 import enAUTodos from "./locales/en-AU/todos.json";
@@ -25,6 +27,7 @@ import enUSAuth from "./locales/en-US/auth.json";
 import enUSCommon from "./locales/en-US/common.json";
 import enUSDashboard from "./locales/en-US/dashboard.json";
 import enUSErrors from "./locales/en-US/errors.json";
+import enUSOnboarding from "./locales/en-US/onboarding.json";
 import enUSOrganization from "./locales/en-US/organization.json";
 import enUSSync from "./locales/en-US/sync.json";
 import enUSTodos from "./locales/en-US/todos.json";
@@ -32,6 +35,7 @@ import esAuth from "./locales/es/auth.json";
 import esCommon from "./locales/es/common.json";
 import esDashboard from "./locales/es/dashboard.json";
 import esErrors from "./locales/es/errors.json";
+import esOnboarding from "./locales/es/onboarding.json";
 import esOrganization from "./locales/es/organization.json";
 import esSync from "./locales/es/sync.json";
 import esTodos from "./locales/es/todos.json";
@@ -39,6 +43,7 @@ import frAuth from "./locales/fr/auth.json";
 import frCommon from "./locales/fr/common.json";
 import frDashboard from "./locales/fr/dashboard.json";
 import frErrors from "./locales/fr/errors.json";
+import frOnboarding from "./locales/fr/onboarding.json";
 import frOrganization from "./locales/fr/organization.json";
 import frSync from "./locales/fr/sync.json";
 import frTodos from "./locales/fr/todos.json";
@@ -46,6 +51,7 @@ import koAuth from "./locales/ko/auth.json";
 import koCommon from "./locales/ko/common.json";
 import koDashboard from "./locales/ko/dashboard.json";
 import koErrors from "./locales/ko/errors.json";
+import koOnboarding from "./locales/ko/onboarding.json";
 import koOrganization from "./locales/ko/organization.json";
 import koSync from "./locales/ko/sync.json";
 import koTodos from "./locales/ko/todos.json";
@@ -53,6 +59,7 @@ import ptBRAuth from "./locales/pt-BR/auth.json";
 import ptBRCommon from "./locales/pt-BR/common.json";
 import ptBRDashboard from "./locales/pt-BR/dashboard.json";
 import ptBRErrors from "./locales/pt-BR/errors.json";
+import ptBROnboarding from "./locales/pt-BR/onboarding.json";
 import ptBROrganization from "./locales/pt-BR/organization.json";
 import ptBRSync from "./locales/pt-BR/sync.json";
 import ptBRTodos from "./locales/pt-BR/todos.json";
@@ -60,6 +67,7 @@ import ruAuth from "./locales/ru/auth.json";
 import ruCommon from "./locales/ru/common.json";
 import ruDashboard from "./locales/ru/dashboard.json";
 import ruErrors from "./locales/ru/errors.json";
+import ruOnboarding from "./locales/ru/onboarding.json";
 import ruOrganization from "./locales/ru/organization.json";
 import ruSync from "./locales/ru/sync.json";
 import ruTodos from "./locales/ru/todos.json";
@@ -67,6 +75,7 @@ import tlAuth from "./locales/tl/auth.json";
 import tlCommon from "./locales/tl/common.json";
 import tlDashboard from "./locales/tl/dashboard.json";
 import tlErrors from "./locales/tl/errors.json";
+import tlOnboarding from "./locales/tl/onboarding.json";
 import tlOrganization from "./locales/tl/organization.json";
 import tlSync from "./locales/tl/sync.json";
 import tlTodos from "./locales/tl/todos.json";
@@ -74,6 +83,7 @@ import viAuth from "./locales/vi/auth.json";
 import viCommon from "./locales/vi/common.json";
 import viDashboard from "./locales/vi/dashboard.json";
 import viErrors from "./locales/vi/errors.json";
+import viOnboarding from "./locales/vi/onboarding.json";
 import viOrganization from "./locales/vi/organization.json";
 import viSync from "./locales/vi/sync.json";
 import viTodos from "./locales/vi/todos.json";
@@ -81,6 +91,7 @@ import zhAuth from "./locales/zh/auth.json";
 import zhCommon from "./locales/zh/common.json";
 import zhDashboard from "./locales/zh/dashboard.json";
 import zhErrors from "./locales/zh/errors.json";
+import zhOnboarding from "./locales/zh/onboarding.json";
 import zhOrganization from "./locales/zh/organization.json";
 import zhSync from "./locales/zh/sync.json";
 import zhTodos from "./locales/zh/todos.json";
@@ -94,6 +105,7 @@ const resources = {
 		dashboard: enUSDashboard,
 		errors: enUSErrors,
 		organization: enUSOrganization,
+		onboarding: enUSOnboarding,
 	},
 	es: {
 		common: esCommon,
@@ -103,6 +115,7 @@ const resources = {
 		dashboard: esDashboard,
 		errors: esErrors,
 		organization: esOrganization,
+		onboarding: esOnboarding,
 	},
 	ar: {
 		common: arCommon,
@@ -112,6 +125,7 @@ const resources = {
 		dashboard: arDashboard,
 		errors: arErrors,
 		organization: arOrganization,
+		onboarding: arOnboarding,
 	},
 	"en-AU": {
 		common: enAUCommon,
@@ -121,6 +135,7 @@ const resources = {
 		dashboard: enAUDashboard,
 		errors: enAUErrors,
 		organization: enAUOrganization,
+		onboarding: enAUOnboarding,
 	},
 	zh: {
 		common: zhCommon,
@@ -130,6 +145,7 @@ const resources = {
 		dashboard: zhDashboard,
 		errors: zhErrors,
 		organization: zhOrganization,
+		onboarding: zhOnboarding,
 	},
 	tl: {
 		common: tlCommon,
@@ -139,6 +155,7 @@ const resources = {
 		dashboard: tlDashboard,
 		errors: tlErrors,
 		organization: tlOrganization,
+		onboarding: tlOnboarding,
 	},
 	vi: {
 		common: viCommon,
@@ -148,6 +165,7 @@ const resources = {
 		dashboard: viDashboard,
 		errors: viErrors,
 		organization: viOrganization,
+		onboarding: viOnboarding,
 	},
 	fr: {
 		common: frCommon,
@@ -157,6 +175,7 @@ const resources = {
 		dashboard: frDashboard,
 		errors: frErrors,
 		organization: frOrganization,
+		onboarding: frOnboarding,
 	},
 	ko: {
 		common: koCommon,
@@ -166,6 +185,7 @@ const resources = {
 		dashboard: koDashboard,
 		errors: koErrors,
 		organization: koOrganization,
+		onboarding: koOnboarding,
 	},
 	ru: {
 		common: ruCommon,
@@ -175,6 +195,7 @@ const resources = {
 		dashboard: ruDashboard,
 		errors: ruErrors,
 		organization: ruOrganization,
+		onboarding: ruOnboarding,
 	},
 	"pt-BR": {
 		common: ptBRCommon,
@@ -184,6 +205,7 @@ const resources = {
 		dashboard: ptBRDashboard,
 		errors: ptBRErrors,
 		organization: ptBROrganization,
+		onboarding: ptBROnboarding,
 	},
 } as const;
 

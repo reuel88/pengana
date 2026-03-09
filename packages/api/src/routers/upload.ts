@@ -55,7 +55,8 @@ export const uploadRouter = {
 				return envelope({
 					attachmentUrl: `/uploads/${filename}`,
 				});
-			} catch {
+			} catch (err) {
+				if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
 				// File doesn't exist, proceed with writing
 			}
 

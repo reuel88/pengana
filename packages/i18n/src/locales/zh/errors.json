@@ -11,5 +11,6 @@
 	"failedToStoreFile": "存储文件失败。存储空间可能已满。",
 	"todoNotFound": "待办事项未找到",
 	"unauthorized": "未授权",
-	"paymentError": "支付出现问题，请重试。"
+	"paymentError": "支付出现问题，请重试。",
+	"migrationError": "迁移错误：{{message}}。请尝试重新启动应用。"
 }

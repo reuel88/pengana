@@ -1,5 +1,5 @@
 export {
-	getFileForUpload,
-	removeFileForUpload,
-	storeFileForUpload,
+	getFileFromMemory,
+	removeFileFromMemory,
+	storeFileInMemory,
 } from "@pengana/todo-client";

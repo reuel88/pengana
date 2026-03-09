@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { getDirection } from "@pengana/i18n/rtl";
+import { AuthClientProvider } from "@pengana/org-client";
 import { Toaster } from "@pengana/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -14,6 +15,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { authClient } from "@/lib/auth-client";
 import type { orpc } from "@/utils/orpc";
 
 import "@pengana/ui/globals.css";
@@ -23,8 +25,18 @@ export interface RouterAppContext {
 	queryClient: QueryClient;
 }
 
+function RootErrorComponent({ error }: { error: Error }) {
+	return (
+		<div className="flex h-svh flex-col items-center justify-center gap-4 p-8">
+			<p className="font-medium text-destructive">Something went wrong</p>
+			<p className="text-muted-foreground text-sm">{error.message}</p>
+		</div>
+	);
+}
+
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	component: RootComponent,
+	errorComponent: RootErrorComponent,
 	head: () => ({
 		meta: [
 			{
@@ -44,11 +56,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	}),
 });
 
+const HEADERLESS_ROUTES = ["/login", "/sign-up", "/onboarding"] as const;
+
 function RootComponent() {
 	const { i18n } = useTranslation();
 	const matches = useMatches();
-	const hideHeader = matches.some(
-		(m) => m.routeId === "/login" || m.routeId === "/onboarding",
+	const hideHeader = matches.some((m) =>
+		(HEADERLESS_ROUTES as readonly string[]).includes(m.routeId),
 	);
 
 	useEffect(() => {
@@ -68,7 +82,7 @@ function RootComponent() {
 	}, [i18n]);
 
 	return (
-		<>
+		<AuthClientProvider client={authClient}>
 			<HeadContent />
 			<ThemeProvider
 				attribute="class"
@@ -84,6 +98,6 @@ function RootComponent() {
 			</ThemeProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 			<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
-		</>
+		</AuthClientProvider>
 	);
 }

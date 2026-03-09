@@ -6,10 +6,12 @@
 		"noOrgs": "Chưa có tổ chức nào",
 		"switchTo": "Chuyển sang {{name}}",
 		"back": "Quay lại",
-		"close": "Đóng"
+		"close": "Đóng",
+		"switchError": "Không thể chuyển tổ chức. Vui lòng thử lại."
 	},
 	"create": {
 		"title": "Tạo tổ chức",
+		"description": "Tạo một tổ chức mới để bắt đầu.",
 		"name": "Tên tổ chức",
 		"slug": "Slug",
 		"logo": "URL logo",
@@ -43,6 +45,9 @@
 		"leaveSuccess": "Đã rời tổ chức",
 		"updateRoleSuccess": "Đã cập nhật vai trò",
 		"error": "Không thể quản lý thành viên",
+		"updateRoleError": "Không thể cập nhật vai trò",
+		"removeError": "Không thể xóa thành viên",
+		"leaveError": "Không thể rời tổ chức",
 		"noMembers": "Không có thành viên"
 	},
 	"invitations": {
@@ -76,7 +81,8 @@
 		"invitedAs": "Bạn đã được mời tham gia {{org}} với vai trò {{role}}.",
 		"invitedBy": "Được mời bởi: {{email}}",
 		"fetchError": "Đã xảy ra lỗi khi tải lời mời",
-		"retry": "Thử lại"
+		"retry": "Thử lại",
+		"unknownError": "Đã xảy ra lỗi không mong muốn"
 	},
 	"teams": {
 		"title": "Nhóm",
@@ -95,7 +101,10 @@
 		"noTeams": "Chưa có nhóm nào",
 		"noMembers": "Không có thành viên trong nhóm",
 		"updateName": "Cập nhật tên nhóm",
-		"updateNameSuccess": "Đã cập nhật tên nhóm"
+		"updateNameSuccess": "Đã cập nhật tên nhóm",
+		"memberNotFound": "Không tìm thấy thành viên tổ chức nào với địa chỉ email đó",
+		"notFound": "Không tìm thấy nhóm",
+		"rename": "Đổi tên nhóm"
 	},
 	"roles": {
 		"title": "Vai trò",
@@ -114,6 +123,10 @@
 		"invitations": "Lời mời",
 		"teams": "Nhóm",
 		"roles": "Vai trò"
+	},
+	"notifications": {
+		"markReadError": "Không thể đánh dấu thông báo là đã đọc",
+		"markAllReadError": "Không thể đánh dấu tất cả thông báo là đã đọc"
 	},
 	"noActiveOrg": "Không có tổ chức đang hoạt động. Chọn hoặc tạo một tổ chức để bắt đầu."
 }

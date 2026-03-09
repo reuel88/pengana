@@ -1,10 +1,9 @@
+import { fetchUserLifecycleData } from "@pengana/auth/user-lifecycle";
 import { env } from "@pengana/env/web";
 import { polarClient } from "@polar-sh/better-auth";
 import { redirect } from "@tanstack/react-router";
 import { organizationClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-
-import { fetchUserLifecycleData } from "./user-lifecycle";
 
 export const authClient = createAuthClient({
 	baseURL: env.VITE_SERVER_URL,
@@ -25,7 +24,7 @@ export async function requireAuth() {
 
 export async function requireAuthAndOrg() {
 	const { session } = await requireAuth();
-	const { hasOrganization } = await fetchUserLifecycleData();
+	const { hasOrganization } = await fetchUserLifecycleData(authClient);
 	if (!hasOrganization) {
 		throw redirect({ to: "/onboarding" });
 	}

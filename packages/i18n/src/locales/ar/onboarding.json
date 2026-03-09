@@ -1,5 +1,5 @@
 {
-	"title": "مرحبًا بك في pengana",
+	"title": "مرحبًا بك في Pengana، {{name}}",
 	"description": "للبدء، انضم إلى مؤسسة أو أنشئ واحدة.",
 	"invitations": {
 		"title": "الدعوات المعلقة",

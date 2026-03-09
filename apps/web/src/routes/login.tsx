@@ -1,19 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { SignInForm } from "@/components/sign-in-form";
-import { SignUpForm } from "@/components/sign-up-form";
 
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
+	head: () => ({
+		meta: [
+			{ title: "Sign In | pengana" },
+			{
+				name: "description",
+				content: "Sign in to your pengana account.",
+			},
+		],
+	}),
 });
 
 function LoginPage() {
-	const [showSignIn, setShowSignIn] = useState(true);
-
-	return showSignIn ? (
-		<SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
-	) : (
-		<SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
+	return (
+		<>
+			<header className="flex w-full justify-end p-2">
+				<LanguageSwitcher />
+			</header>
+			<SignInForm />
+		</>
 	);
 }

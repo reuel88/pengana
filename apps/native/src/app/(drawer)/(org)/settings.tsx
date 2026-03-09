@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSettings } from "@pengana/org-client";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -12,87 +13,56 @@ import {
 } from "react-native";
 
 import { Container } from "@/components/container";
+import { EmptyOrgScreen } from "@/components/empty-org-screen";
+import { LoadingScreen } from "@/components/loading-screen";
+import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
 
 export default function OrgSettingsScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const router = useRouter();
-	const { data: activeOrg, isPending } = authClient.useActiveOrganization();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
-	const [initialized, setInitialized] = useState(false);
-	const [loading, setLoading] = useState(false);
+	const { data: activeOrg, isPending } = useActiveOrg();
 	const { isOwner, isAdmin } = useOrgRole();
 
-	if (isPending) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16 }}>
-					{t("common:status.loading")}
-				</Text>
-			</Container>
-		);
-	}
+	const {
+		name,
+		setName,
+		slug,
+		setSlug,
+		logo,
+		setLogo,
+		syncFromOrg,
+		loading,
+		handleUpdate,
+		handleDelete,
+	} = useOrgSettings({
+		onUpdateSuccess: () => Alert.alert("", t("settings.updateSuccess")),
+		onDeleteSuccess: async () => {
+			router.replace("/");
+		},
+		onError: (message) => Alert.alert("", message || t("settings.error")),
+	});
 
-	if (!activeOrg) {
-		return (
-			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
-					{t("noActiveOrg")}
-				</Text>
-			</Container>
-		);
-	}
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
+	useEffect(() => {
+		if (activeOrg) syncFromOrg(activeOrg);
+	}, [activeOrg?.id]);
 
-	if (!initialized) {
-		setName(activeOrg.name);
-		setSlug(activeOrg.slug);
-		setLogo(activeOrg.logo || "");
-		setInitialized(true);
-	}
+	if (isPending) return <LoadingScreen />;
+	if (!activeOrg) return <EmptyOrgScreen />;
 
-	const handleUpdate = async () => {
-		setLoading(true);
-		try {
-			const { error } = await authClient.organization.update({
-				data: { name, slug, logo: logo || undefined },
-			});
-			if (error) {
-				Alert.alert(t("settings.error"), error.message);
-				return;
-			}
-			Alert.alert(t("settings.updateSuccess"));
-		} catch {
-			Alert.alert(t("settings.error"));
-		} finally {
-			setLoading(false);
-		}
-	};
+	const trimmedName = name.trim();
 
-	const handleDelete = () => {
+	const onDelete = () => {
 		Alert.alert(t("settings.delete"), t("settings.deleteConfirm"), [
-			{ text: "Cancel", style: "cancel" },
+			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("settings.delete"),
 				style: "destructive",
-				onPress: async () => {
-					try {
-						const { error } = await authClient.organization.delete({
-							organizationId: activeOrg.id,
-						});
-						if (error) {
-							Alert.alert(t("settings.error"), error.message);
-							return;
-						}
-						router.replace("/");
-					} catch {
-						Alert.alert(t("settings.error"));
-					}
-				},
+				onPress: () => handleDelete(activeOrg.id),
 			},
 		]);
 	};
@@ -104,49 +74,41 @@ export default function OrgSettingsScreen() {
 					{isAdmin ? (
 						<>
 							<TextInput
-								style={[
-									styles.input,
-									{ color: theme.text, borderColor: theme.border },
-								]}
+								style={[sharedStyles.input, inputThemed(theme)]}
 								value={name}
 								onChangeText={setName}
 								placeholder={t("create.namePlaceholder")}
 								placeholderTextColor={theme.border}
 							/>
 							<TextInput
-								style={[
-									styles.input,
-									{ color: theme.text, borderColor: theme.border },
-								]}
+								style={[sharedStyles.input, inputThemed(theme)]}
 								value={slug}
 								onChangeText={setSlug}
 								placeholder={t("create.slugPlaceholder")}
 								placeholderTextColor={theme.border}
 							/>
 							<TextInput
-								style={[
-									styles.input,
-									{ color: theme.text, borderColor: theme.border },
-								]}
+								style={[sharedStyles.input, inputThemed(theme)]}
 								value={logo}
 								onChangeText={setLogo}
 								placeholder={t("create.logoPlaceholder")}
 								placeholderTextColor={theme.border}
 							/>
 							<TouchableOpacity
-								style={[styles.button, { backgroundColor: theme.primary }]}
-								onPress={handleUpdate}
-								disabled={loading}
+								style={[
+									sharedStyles.button,
+									{ backgroundColor: theme.primary },
+								]}
+								onPress={() => handleUpdate()}
+								disabled={loading || !trimmedName}
 							>
-								<Text style={styles.buttonText}>
+								<Text style={sharedStyles.buttonText}>
 									{loading ? t("common:submitting") : t("settings.update")}
 								</Text>
 							</TouchableOpacity>
 						</>
 					) : (
-						<Text style={{ color: theme.text, opacity: 0.5 }}>
-							{t("settings.title")}
-						</Text>
+						<Text style={mutedText(theme)}>{t("settings.title")}</Text>
 					)}
 
 					{isOwner && (
@@ -155,9 +117,12 @@ export default function OrgSettingsScreen() {
 								styles.deleteButton,
 								{ backgroundColor: theme.notification },
 							]}
-							onPress={handleDelete}
+							onPress={onDelete}
+							disabled={loading}
 						>
-							<Text style={styles.buttonText}>{t("settings.delete")}</Text>
+							<Text style={sharedStyles.buttonText}>
+								{t("settings.delete")}
+							</Text>
 						</TouchableOpacity>
 					)}
 				</View>
@@ -169,8 +134,5 @@ export default function OrgSettingsScreen() {
 const styles = StyleSheet.create({
 	scrollView: { flex: 1 },
 	content: { padding: 16, gap: 12 },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
-	button: { padding: 12, alignItems: "center" },
 	deleteButton: { padding: 12, alignItems: "center", marginTop: 24 },
-	buttonText: { color: "#fff", fontWeight: "bold" },
 });

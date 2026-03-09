@@ -11,6 +11,9 @@
 		"./web": {
 			"default": "./src/web.ts"
 		},
+		"./urls": {
+			"default": "./src/urls.ts"
+		},
 		"./native": {
 			"default": "./src/native.ts"
 		},

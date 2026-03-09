@@ -1,3 +1,4 @@
+import { getLogger } from "@logtape/logtape";
 import {
 	findTodoById,
 	getTodosUpdatedSince,
@@ -6,6 +7,8 @@ import {
 } from "@pengana/db/todo-queries";
 import type { SyncInput } from "@pengana/sync-engine";
 
+const logger = getLogger(["app", "sync"]);
+
 export async function handleSync(
 	input: SyncInput,
 	userId: string,
@@ -13,6 +16,8 @@ export async function handleSync(
 ) {
 	const conflicts: string[] = [];
 	const now = new Date();
+
+	logger.debug`Sync started for user ${userId} with ${String(input.changes.length)} change(s)`;
 
 	for (const change of input.changes) {
 		if (change.userId !== userId) continue;
@@ -54,9 +59,15 @@ export async function handleSync(
 
 	const serverChanges = await getTodosUpdatedSince(userId, lastSyncedAt);
 
+	if (conflicts.length > 0) {
+		logger.warn`Sync conflicts for user ${userId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
+	}
+
 	if (input.changes.length > 0) {
 		notifyUser?.(userId);
 	}
+
+	logger.debug`Sync completed for user ${userId}: ${String(serverChanges.length)} server change(s), ${String(conflicts.length)} conflict(s)`;
 
 	return {
 		serverChanges: serverChanges.map((t) => ({

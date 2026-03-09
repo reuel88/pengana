@@ -1,5 +1,5 @@
 {
-	"title": "Chào mừng đến với pengana",
+	"title": "Chào mừng đến với Pengana, {{name}}",
 	"description": "Để bắt đầu, hãy tham gia hoặc tạo một tổ chức.",
 	"invitations": {
 		"title": "Lời mời đang chờ",

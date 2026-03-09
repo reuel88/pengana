@@ -2,6 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { DrawerToggleButton } from "@react-navigation/drawer";
 import { Redirect, Stack } from "expo-router";
 
+import { useThemedScreenOptions } from "@/hooks/use-themed-screen-options";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 
@@ -9,6 +10,7 @@ export default function OrgLayout() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const { data: session, isPending } = authClient.useSession();
+	const screenOptions = useThemedScreenOptions();
 
 	if (isPending) {
 		return null;
@@ -19,13 +21,7 @@ export default function OrgLayout() {
 	}
 
 	return (
-		<Stack
-			screenOptions={{
-				headerStyle: { backgroundColor: theme.background },
-				headerTitleStyle: { color: theme.text },
-				headerTintColor: theme.text,
-			}}
-		>
+		<Stack screenOptions={screenOptions}>
 			<Stack.Screen
 				name="index"
 				options={{

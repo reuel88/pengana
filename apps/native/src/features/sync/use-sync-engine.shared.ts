@@ -4,18 +4,18 @@ import type {
 	SyncOutput,
 	UploadEvent,
 } from "@pengana/sync-engine";
-import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
+import { SyncEngine, UploadQueue, usePeriodicSync } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import { createSyncAdapter } from "@/entities/todo";
 import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/entities/upload-queue";
-import { MAX_EVENT_LOG_SIZE, WS_MAX_BACKOFF_MS } from "@/lib/design-tokens";
+
+import { MAX_EVENT_LOG_SIZE } from "@/lib/design-tokens";
 import { client } from "@/utils/orpc";
 
-const SYNC_INTERVAL_MS = 5 * 60_000;
+import { useWebSocket } from "./use-websocket";
 
 export interface SyncEnginePlatformDeps {
 	getWsUrl: () => string;
@@ -30,7 +30,6 @@ export function useSyncEngineCore(
 ) {
 	const engineRef = useRef<SyncEngine | null>(null);
 	const uploadQueueRef = useRef<UploadQueue | null>(null);
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const [simulateOffline, setSimulateOffline] = useState(false);
 	const [events, setEvents] = useState<SyncEvent[]>([]);
 	const [isSyncing, setIsSyncing] = useState(false);
@@ -99,77 +98,14 @@ export function useSyncEngineCore(
 		}
 	}, [effectiveOnline]);
 
-	// Periodic sync (fallback)
-	useEffect(() => {
-		if (intervalRef.current) {
-			clearInterval(intervalRef.current);
-			intervalRef.current = null;
-		}
-
-		if (effectiveOnline && engineRef.current) {
-			intervalRef.current = setInterval(() => {
-				engineRef.current?.sync();
-			}, SYNC_INTERVAL_MS);
-		}
-
-		return () => {
-			if (intervalRef.current) {
-				clearInterval(intervalRef.current);
-			}
-		};
-	}, [effectiveOnline]);
-
-	// WebSocket for instant sync notifications
-	useEffect(() => {
-		if (!userId || !effectiveOnline) return;
-
-		let ws: WebSocket | null = null;
-		let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
-		let backoff = 1000;
-		let unmounted = false;
-
-		function connect() {
-			if (unmounted) return;
-
-			ws = new WebSocket(deps.getWsUrl());
-
-			ws.onopen = () => {
-				backoff = 1000;
-			};
-
-			ws.onmessage = (event) => {
-				try {
-					const data = JSON.parse(event.data as string);
-					if (data.type === "sync-notify") {
-						engineRef.current?.sync();
-						deps.onSyncNotify?.();
-					}
-				} catch {
-					// ignore malformed messages
-				}
-			};
-
-			ws.onclose = () => {
-				if (unmounted) return;
-				reconnectTimeout = setTimeout(() => {
-					backoff = Math.min(backoff * 2, WS_MAX_BACKOFF_MS);
-					connect();
-				}, backoff);
-			};
-
-			ws.onerror = () => {
-				ws?.close();
-			};
-		}
-
-		connect();
-
-		return () => {
-			unmounted = true;
-			if (reconnectTimeout) clearTimeout(reconnectTimeout);
-			ws?.close();
-		};
-	}, [userId, effectiveOnline, deps]);
+	usePeriodicSync(effectiveOnline, engineRef);
+	useWebSocket(
+		userId,
+		effectiveOnline,
+		engineRef,
+		deps.getWsUrl,
+		deps.onSyncNotify,
+	);
 
 	/** Manually trigger a sync cycle (e.g. devtools or pull-to-refresh) */
 	const triggerSync = useCallback(() => {

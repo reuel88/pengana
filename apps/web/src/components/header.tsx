@@ -10,12 +10,12 @@ export function Header() {
 	const { t } = useTranslation();
 
 	const links = [
-		{ to: "/dashboard", label: t("nav.dashboard") },
+		{ to: "/", label: t("nav.dashboard") },
 		{ to: "/todos", label: t("nav.todos") },
 	] as const;
 
 	return (
-		<div>
+		<header>
 			<div className="flex flex-row items-center justify-between px-2 py-1">
 				<nav className="flex items-center gap-4 text-lg">
 					{links.map(({ to, label }) => {
@@ -35,6 +35,6 @@ export function Header() {
 				</div>
 			</div>
 			<hr />
-		</div>
+		</header>
 	);
 }

@@ -1,5 +1,5 @@
 {
-	"title": "Bem-vindo ao pengana",
+	"title": "Bem-vindo ao Pengana, {{name}}",
 	"description": "Para começar, entre em uma organização ou crie uma.",
 	"invitations": {
 		"title": "Convites pendentes",

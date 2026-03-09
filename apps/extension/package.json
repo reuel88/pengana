@@ -22,6 +22,7 @@
 		"@pengana/sync-engine": "workspace:*",
 		"@pengana/todo-client": "workspace:*",
 		"@pengana/ui": "workspace:*",
+		"zod": "catalog:",
 		"@orpc/client": "catalog:",
 		"better-auth": "catalog:",
 		"dexie": "^4.0.11",

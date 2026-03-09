@@ -26,13 +26,13 @@ export default function NotFoundScreen() {
 						</Text>
 						<Link href="/" asChild>
 							<Text
-								style={[
+								style={StyleSheet.flatten([
 									styles.link,
 									{
 										color: theme.primary,
 										backgroundColor: `${theme.primary}1a`,
 									},
-								]}
+								])}
 							>
 								{t("notFound.goHome")}
 							</Text>

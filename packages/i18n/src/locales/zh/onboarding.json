@@ -1,5 +1,5 @@
 {
-	"title": "欢迎使用 pengana",
+	"title": "欢迎使用 Pengana，{{name}}",
 	"description": "要开始使用，请加入或创建一个组织。",
 	"invitations": {
 		"title": "待处理的邀请",
