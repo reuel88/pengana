@@ -18,8 +18,14 @@ export function useInvitationMutations() {
 		};
 	};
 
-	const onError = (error: { message?: string }) => {
-		Alert.alert(t("invitations.error"), error.message);
+	const onError = (error: unknown) => {
+		const msg =
+			error instanceof Error
+				? error.message
+				: typeof error === "string"
+					? error
+					: t("invitations.unknownError");
+		Alert.alert(t("invitations.error"), msg);
 	};
 
 	const acceptMutation = useMutation({

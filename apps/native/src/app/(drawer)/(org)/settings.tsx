@@ -118,6 +118,7 @@ export default function OrgSettingsScreen() {
 								{ backgroundColor: theme.notification },
 							]}
 							onPress={onDelete}
+							disabled={loading}
 						>
 							<Text style={sharedStyles.buttonText}>
 								{t("settings.delete")}

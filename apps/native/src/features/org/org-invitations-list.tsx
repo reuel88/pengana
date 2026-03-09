@@ -52,6 +52,9 @@ export function OrgInvitationsList({
 							<TouchableOpacity
 								onPress={() => onCancel(inv.id)}
 								disabled={isPendingFor(inv.id)}
+								accessibilityRole="button"
+								accessibilityLabel={t("invitations.cancel")}
+								accessibilityState={{ disabled: isPendingFor(inv.id) }}
 								style={[
 									styles.cancelButton,
 									{ borderColor: theme.border },

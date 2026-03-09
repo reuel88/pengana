@@ -21,7 +21,7 @@ export function PlaceholderTab({
 					<Text style={[styles.title, { color: theme.text }]}>
 						{t(titleKey)}
 					</Text>
-					<Text style={[styles.subtitle, { color: theme.text, opacity: 0.7 }]}>
+					<Text style={[styles.subtitle, { color: theme.text }]}>
 						{t(subtitleKey)}
 					</Text>
 				</View>
@@ -45,5 +45,6 @@ const styles = StyleSheet.create({
 	},
 	subtitle: {
 		fontSize: 16,
+		opacity: 0.7,
 	},
 });

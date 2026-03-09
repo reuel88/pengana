@@ -83,7 +83,8 @@
 		"invitedAs": "You have been invited to join {{org}} as {{role}}.",
 		"invitedBy": "Invited by: {{email}}",
 		"fetchError": "Something went wrong loading invitations",
-		"retry": "Retry"
+		"retry": "Retry",
+		"unknownError": "An unexpected error occurred"
 	},
 	"teams": {
 		"title": "Teams",
@@ -103,7 +104,9 @@
 		"noMembers": "No team members",
 		"updateName": "Update Team Name",
 		"updateNameSuccess": "Team name updated",
-		"memberNotFound": "No organisation member found with that email address"
+		"memberNotFound": "No organisation member found with that email address",
+		"notFound": "Team not found",
+		"rename": "Rename team"
 	},
 	"roles": {
 		"title": "Roles",

@@ -109,7 +109,11 @@ export class UploadQueue {
 		if (newRetryCount >= this.maxRetries) {
 			await this.adapter.updateRetry(item.id, newRetryCount);
 			await this.adapter.markFailed(item.id);
-			await this.transport.onFailed?.(item.todoId, item.fileUri);
+			try {
+				await this.transport.onFailed?.(item.todoId, item.fileUri);
+			} catch (onFailedError) {
+				console.error("transport.onFailed threw:", onFailedError);
+			}
 
 			this.events.emit({
 				type: "upload:error",

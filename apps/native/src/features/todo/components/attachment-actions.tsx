@@ -29,8 +29,9 @@ export function RetryButton({ onPress }: { onPress: () => void }) {
 
 const styles = StyleSheet.create({
 	attachButton: {
-		paddingHorizontal: 8,
-		paddingVertical: 4,
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		minHeight: 44,
 	},
 	attachText: {
 		fontSize: 12,

@@ -81,7 +81,8 @@
 		"invitedAs": "Você foi convidado a participar de {{org}} como {{role}}.",
 		"invitedBy": "Convidado por: {{email}}",
 		"fetchError": "Algo deu errado ao carregar os convites",
-		"retry": "Tentar novamente"
+		"retry": "Tentar novamente",
+		"unknownError": "Ocorreu um erro inesperado"
 	},
 	"teams": {
 		"title": "Equipes",
@@ -101,7 +102,9 @@
 		"noMembers": "Nenhum membro na equipe",
 		"updateName": "Atualizar nome da equipe",
 		"updateNameSuccess": "Nome da equipe atualizado",
-		"memberNotFound": "Nenhum membro da organização encontrado com esse endereço de e-mail"
+		"memberNotFound": "Nenhum membro da organização encontrado com esse endereço de e-mail",
+		"notFound": "Equipe não encontrada",
+		"rename": "Renomear equipe"
 	},
 	"roles": {
 		"title": "Funções",

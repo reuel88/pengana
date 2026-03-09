@@ -65,7 +65,7 @@ export default function TeamDetailScreen() {
 		return (
 			<Container>
 				<Text style={[{ padding: 16 }, mutedText(theme)]}>
-					{t("teams.noTeams")}
+					{t("teams.notFound")}
 				</Text>
 			</Container>
 		);

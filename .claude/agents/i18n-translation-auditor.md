@@ -1,7 +1,7 @@
 ---
 name: i18n-translation-auditor
 description: "Use this agent when you need to audit, review, or fix translation files in the `packages/i18n` directory. This includes checking for incorrect translations, unnatural phrasing, missing keys, inconsistencies, or any quality issues across locale files.\\n\\nExamples:\\n\\n- User: \"Can you check our translations for quality?\"\\n  Assistant: \"I'll use the i18n translation auditor agent to audit all translation files across locales.\"\\n  (Use the Agent tool to launch the i18n-translation-auditor agent)\\n\\n- User: \"We just added Spanish translations, can someone review them?\"\\n  Assistant: \"Let me launch the translation auditor to review the Spanish locale files against the English base.\"\\n  (Use the Agent tool to launch the i18n-translation-auditor agent)\\n\\n- User: \"Some of our French translations sound robotic, can you fix them?\"\\n  Assistant: \"I'll use the translation auditor agent to review and fix the French translations for naturalness.\"\\n  (Use the Agent tool to launch the i18n-translation-auditor agent)\\n\\n- User: \"We added new keys to the English locale, make sure all other locales are up to date.\"\\n  Assistant: \"I'll launch the translation auditor to find missing keys across all locales and fill them in.\"\\n  (Use the Agent tool to launch the i18n-translation-auditor agent)"
-model: opus
+model: sonnet
 color: green
 memory: project
 ---

@@ -81,7 +81,8 @@
 		"invitedAs": "Inimbitahan kang sumali sa {{org}} bilang {{role}}.",
 		"invitedBy": "Inimbitahan ni: {{email}}",
 		"fetchError": "May nangyaring mali sa pagkarga ng mga imbitasyon",
-		"retry": "Subukan muli"
+		"retry": "Subukan muli",
+		"unknownError": "May naganap na hindi inaasahang error"
 	},
 	"teams": {
 		"title": "Mga Koponan",
@@ -101,7 +102,9 @@
 		"noMembers": "Walang mga miyembro sa koponan",
 		"updateName": "I-update ang Pangalan ng Koponan",
 		"updateNameSuccess": "Na-update ang pangalan ng koponan",
-		"memberNotFound": "Walang nahanap na miyembro ng organisasyon na may ganitong email address"
+		"memberNotFound": "Walang nahanap na miyembro ng organisasyon na may ganitong email address",
+		"notFound": "Hindi nahanap ang koponan",
+		"rename": "Palitan ang pangalan ng koponan"
 	},
 	"roles": {
 		"title": "Mga Tungkulin",

@@ -42,8 +42,11 @@ export function TeamMemberAddForm({
 			/>
 			<TouchableOpacity
 				style={[styles.addButton, { backgroundColor: theme.primary }]}
-				onPress={() => handleAdd(teamId, members ?? [])}
-				disabled={loading}
+				onPress={() => {
+					if (!email.trim()) return;
+					handleAdd(teamId, members ?? []);
+				}}
+				disabled={loading || !email.trim()}
 			>
 				{loading ? (
 					<ActivityIndicator color="#fff" size="small" />

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { ActionSheetIOS, Alert, Platform } from "react-native";
 
@@ -34,7 +35,13 @@ async function pickAsset(
 		Alert.alert(invalidTitle, invalidMessage);
 		return null;
 	}
-	const fileSize = asset.fileSize ?? asset.size;
+	let fileSize = asset.fileSize ?? asset.size;
+	if (fileSize == null) {
+		const info = await FileSystem.getInfoAsync(asset.uri);
+		if (info.exists && "size" in info) {
+			fileSize = info.size;
+		}
+	}
 	if (fileSize != null && fileSize > MAX_FILE_SIZE_BYTES) {
 		Alert.alert(invalidTitle, fileTooLargeMessage);
 		return null;

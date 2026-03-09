@@ -37,7 +37,9 @@ export function TodoPage({ userId }: { userId: string }) {
 		return (
 			<View style={styles.center}>
 				<Text style={{ color: STATUS_COLORS.error }}>
-					{t("migrationError", { message: error.message })}
+					{t("migrationError", {
+						message: String(error.message).slice(0, 200),
+					})}
 				</Text>
 			</View>
 		);

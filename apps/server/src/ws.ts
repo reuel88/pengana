@@ -9,6 +9,11 @@ const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
 const WS_CLOSE_TRY_AGAIN_LATER = 1013;
 
+function redactId(id: string): string {
+	if (id.length <= 8) return "***";
+	return `${id.slice(0, 4)}…${id.slice(-4)}`;
+}
+
 export function setupWebSocket(server: ServerType) {
 	const connections = new Map<string, Set<WebSocket>>();
 	const wss = new WebSocketServer({ noServer: true });
@@ -41,7 +46,7 @@ export function setupWebSocket(server: ServerType) {
 		(ws: WebSocket, _req: IncomingMessage, userId: string) => {
 			const userSockets = connections.get(userId);
 			if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
-				wsLogger.warn`Rejected connection for user ${userId} (max connections reached)`;
+				wsLogger.warn`Rejected connection for user ${redactId(userId)} (max connections reached)`;
 				ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
 				return;
 			}
@@ -50,7 +55,7 @@ export function setupWebSocket(server: ServerType) {
 			if (!userSockets) connections.set(userId, sockets);
 			sockets.add(ws);
 			aliveSet.add(ws);
-			wsLogger.info`Connection accepted for user ${userId} (${String(sockets.size)} total)`;
+			wsLogger.info`Connection accepted for user ${redactId(userId)} (${String(sockets.size)} total)`;
 
 			ws.on("pong", () => {
 				aliveSet.add(ws);
@@ -58,7 +63,7 @@ export function setupWebSocket(server: ServerType) {
 
 			ws.on("close", () => {
 				sockets.delete(ws);
-				wsLogger.info`Connection closed for user ${userId} (${String(sockets.size)} remaining)`;
+				wsLogger.info`Connection closed for user ${redactId(userId)} (${String(sockets.size)} remaining)`;
 				if (sockets.size === 0) {
 					connections.delete(userId);
 				}
@@ -93,7 +98,7 @@ export function setupWebSocket(server: ServerType) {
 	function notifyUser(userId: string) {
 		const sockets = connections.get(userId);
 		if (!sockets) {
-			wsLogger.debug`notifyUser(${userId}): no connections found`;
+			wsLogger.debug`notifyUser(${redactId(userId)}): no connections found`;
 			return;
 		}
 
@@ -106,7 +111,7 @@ export function setupWebSocket(server: ServerType) {
 				sentCount++;
 			}
 		}
-		wsLogger.debug`notifyUser(${userId}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
+		wsLogger.debug`notifyUser(${redactId(userId)}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
 	return { notifyUser };

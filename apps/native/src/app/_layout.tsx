@@ -152,7 +152,7 @@ function RootLayoutInner() {
 	}, [isPending, session, orgError]);
 
 	useEffect(() => {
-		if (isPending) return;
+		if (isPending || orgError) return;
 
 		const target = resolveRoute(
 			session,
@@ -163,7 +163,15 @@ function RootLayoutInner() {
 		if (target) {
 			router.replace(target);
 		}
-	}, [session, isPending, segments, router, lifecycleChecked, needsOnboarding]);
+	}, [
+		session,
+		isPending,
+		segments,
+		router,
+		lifecycleChecked,
+		needsOnboarding,
+		orgError,
+	]);
 
 	const retryLifecycleCheck = useCallback(() => {
 		setOrgError(false);

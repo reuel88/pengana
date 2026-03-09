@@ -215,7 +215,7 @@ function TeamDetailPage() {
 				}
 
 				if (!team) {
-					return <p className="text-muted-foreground">{t("noActiveOrg")}</p>;
+					return <p className="text-muted-foreground">{t("teams.notFound")}</p>;
 				}
 
 				const onDelete = async () => {

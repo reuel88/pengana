@@ -81,7 +81,8 @@
 		"invitedAs": "{{org}}에 {{role}}(으)로 초대되었습니다.",
 		"invitedBy": "초대한 사람: {{email}}",
 		"fetchError": "초대를 불러오는 중 오류가 발생했습니다",
-		"retry": "다시 시도"
+		"retry": "다시 시도",
+		"unknownError": "예기치 않은 오류가 발생했습니다"
 	},
 	"teams": {
 		"title": "팀",
@@ -101,7 +102,9 @@
 		"noMembers": "팀 멤버가 없습니다",
 		"updateName": "팀 이름 변경",
 		"updateNameSuccess": "팀 이름이 변경되었습니다",
-		"memberNotFound": "해당 이메일 주소를 가진 조직 멤버를 찾을 수 없습니다"
+		"memberNotFound": "해당 이메일 주소를 가진 조직 멤버를 찾을 수 없습니다",
+		"notFound": "팀을 찾을 수 없습니다",
+		"rename": "팀 이름 변경"
 	},
 	"roles": {
 		"title": "역할",

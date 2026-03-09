@@ -17,6 +17,8 @@ import {
 } from "./rate-limit";
 import { setupWebSocket } from "./ws";
 
+await initLogger();
+
 const app = new Hono();
 
 app.use(requestLogger);
@@ -68,7 +70,6 @@ app.get("/", (c) => {
 
 app.use("/uploads/*", serveStatic({ root: "./" }));
 
-await initLogger();
 await initServerI18n();
 
 const server = serve(

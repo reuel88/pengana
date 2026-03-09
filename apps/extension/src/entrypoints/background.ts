@@ -185,7 +185,7 @@ function handleMessage(
 		}
 
 		case "status:get": {
-			if (!state.currentUserId) {
+			if (!state.currentUserId || !state.engine) {
 				ensureEngine()
 					.then(() => sendResponse(getStatus()))
 					.catch(() => sendResponse(getStatus()));

@@ -39,7 +39,7 @@ async function ensureErrorEnvelope(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
 	if (contentType.includes("application/json") && response.status >= 400) {
 		try {
-			const raw: unknown = await response.json();
+			const raw: unknown = await response.clone().json();
 			const body =
 				raw != null && typeof raw === "object" && !Array.isArray(raw)
 					? (raw as Record<string, unknown>)

@@ -19,10 +19,15 @@ export function useUploadQueue(
 	const [uploadEvents, setUploadEvents] = useState<UploadEvent[]>([]);
 
 	const syncRef = useStableSyncRef(engineRef);
+	const isOnlineRef = useRef(isOnline);
+	isOnlineRef.current = isOnline;
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref — its .current is reassigned every render, so listing it would cause infinite re-runs
 	useEffect(() => {
 		if (!userId) return;
+
+		setIsUploading(false);
+		setUploadEvents([]);
 
 		const uploadAdapter = createWebUploadAdapter();
 		const uploadTransport = createWebUploadTransport();
@@ -40,11 +45,15 @@ export function useUploadQueue(
 			}
 		});
 
-		queue.resume();
+		if (isOnlineRef.current) {
+			queue.resume();
+		}
 
 		return () => {
 			unsubscribe();
 			uploadQueueRef.current = null;
+			setIsUploading(false);
+			setUploadEvents([]);
 		};
 	}, [userId]);
 

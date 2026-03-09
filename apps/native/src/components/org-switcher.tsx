@@ -81,7 +81,7 @@ export function OrgSwitcher() {
 	const [showPicker, setShowPicker] = useState(false);
 	const [showCreate, setShowCreate] = useState(false);
 
-	const { handleSwitch } = useOrgSwitcher({
+	const { handleSwitch, switchingId } = useOrgSwitcher({
 		onSwitchSuccess: () => {
 			setShowPicker(false);
 			router.push("/(drawer)/(org)");
@@ -172,6 +172,7 @@ export function OrgSwitcher() {
 
 						<TouchableOpacity
 							style={styles.closeButton}
+							disabled={switchingId !== null}
 							onPress={() => {
 								setShowPicker(false);
 								setShowCreate(false);

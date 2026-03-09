@@ -3,7 +3,6 @@ import { Button } from "@pengana/ui/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
@@ -29,10 +28,7 @@ function InvitationItem({
 	const { t } = useTranslation("notifications");
 
 	return (
-		<DropdownMenuItem
-			onSelect={(e) => e.preventDefault()}
-			className="flex flex-col items-start gap-2 p-2"
-		>
+		<div className="flex flex-col items-start gap-2 p-2">
 			<div className="flex w-full items-center justify-between">
 				<div className="flex flex-col gap-0.5">
 					<span className="font-medium text-sm">
@@ -61,27 +57,26 @@ function InvitationItem({
 					</Button>
 				</div>
 			</div>
-		</DropdownMenuItem>
+		</div>
 	);
 }
 
 function NotificationItem({
 	notification,
 	onMarkRead,
+	locale,
 }: {
 	notification: { id: string; body: string; createdAt: Date };
 	onMarkRead: (id: string) => void;
+	locale: string;
 }) {
 	const { t } = useTranslation("notifications");
 	return (
-		<DropdownMenuItem
-			onSelect={(e) => e.preventDefault()}
-			className="flex items-center justify-between gap-2 p-2"
-		>
+		<div className="flex items-center justify-between gap-2 p-2">
 			<div className="flex flex-col gap-0.5">
 				<span className="text-sm">{notification.body}</span>
 				<span className="text-muted-foreground text-xs">
-					{notification.createdAt.toLocaleDateString()}
+					{notification.createdAt.toLocaleDateString(locale)}
 				</span>
 			</div>
 			<Button
@@ -92,12 +87,12 @@ function NotificationItem({
 			>
 				&times;
 			</Button>
-		</DropdownMenuItem>
+		</div>
 	);
 }
 
 export function NotificationCenter() {
-	const { t } = useTranslation("notifications");
+	const { t, i18n } = useTranslation("notifications");
 
 	const {
 		pending,
@@ -156,6 +151,7 @@ export function NotificationCenter() {
 										key={n.id}
 										notification={n}
 										onMarkRead={handleMarkRead}
+										locale={i18n.language}
 									/>
 								))}
 								<div className="border-t px-2 py-1.5">

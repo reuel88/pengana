@@ -66,7 +66,7 @@ export function OnboardingInvitations({
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => handleAccept(invitation.id)}
-						disabled={actingId === invitation.id}
+						disabled={actingId !== null}
 					>
 						{actingId === invitation.id ? (
 							<ActivityIndicator size="small" color="#fff" />
@@ -82,6 +82,7 @@ export function OnboardingInvitations({
 			<TouchableOpacity
 				style={onboardingStyles.ghostButton}
 				onPress={onSkipToCreate}
+				disabled={actingId !== null}
 			>
 				<Text
 					style={[onboardingStyles.ghostButtonText, { color: theme.primary }]}

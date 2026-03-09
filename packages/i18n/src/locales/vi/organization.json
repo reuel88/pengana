@@ -81,7 +81,8 @@
 		"invitedAs": "Bạn đã được mời tham gia {{org}} với vai trò {{role}}.",
 		"invitedBy": "Được mời bởi: {{email}}",
 		"fetchError": "Đã xảy ra lỗi khi tải lời mời",
-		"retry": "Thử lại"
+		"retry": "Thử lại",
+		"unknownError": "Đã xảy ra lỗi không mong muốn"
 	},
 	"teams": {
 		"title": "Nhóm",
@@ -101,7 +102,9 @@
 		"noMembers": "Không có thành viên trong nhóm",
 		"updateName": "Cập nhật tên nhóm",
 		"updateNameSuccess": "Đã cập nhật tên nhóm",
-		"memberNotFound": "Không tìm thấy thành viên tổ chức nào với địa chỉ email đó"
+		"memberNotFound": "Không tìm thấy thành viên tổ chức nào với địa chỉ email đó",
+		"notFound": "Không tìm thấy nhóm",
+		"rename": "Đổi tên nhóm"
 	},
 	"roles": {
 		"title": "Vai trò",

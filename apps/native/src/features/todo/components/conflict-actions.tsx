@@ -16,6 +16,8 @@ export function ConflictActions({
 			<TouchableOpacity
 				style={[styles.smallButton, { borderColor: theme.border }]}
 				onPress={() => onResolve("local")}
+				accessibilityRole="button"
+				accessibilityLabel={t("actions.keepLocal")}
 			>
 				<Text style={[styles.smallButtonText, { color: theme.text }]}>
 					{t("actions.keepLocal")}
@@ -24,6 +26,8 @@ export function ConflictActions({
 			<TouchableOpacity
 				style={[styles.smallButton, { borderColor: theme.border }]}
 				onPress={() => onResolve("server")}
+				accessibilityRole="button"
+				accessibilityLabel={t("actions.useServer")}
 			>
 				<Text style={[styles.smallButtonText, { color: theme.text }]}>
 					{t("actions.useServer")}

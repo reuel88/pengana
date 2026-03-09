@@ -39,9 +39,10 @@ function DashboardPage() {
 			{hasProSubscription ? (
 				<Button
 					onClick={() => {
-						authClient.customer
-							.portal()
-							.catch(() => toast.error(t("errors:paymentError")));
+						authClient.customer.portal().catch((err: unknown) => {
+							console.error("Payment error:", err);
+							toast.error(t("errors:paymentError"));
+						});
 					}}
 				>
 					{t("manageSubscription")}
@@ -49,9 +50,10 @@ function DashboardPage() {
 			) : (
 				<Button
 					onClick={() => {
-						authClient
-							.checkout({ slug: "pro" })
-							.catch(() => toast.error(t("errors:paymentError")));
+						authClient.checkout({ slug: "pro" }).catch((err: unknown) => {
+							console.error("Payment error:", err);
+							toast.error(t("errors:paymentError"));
+						});
 					}}
 				>
 					{t("upgradeToPro")}

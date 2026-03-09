@@ -74,6 +74,7 @@ export function TeamNameEditor({
 						setNewName(teamName);
 						setEditing(true);
 					}}
+					hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
 					accessibilityLabel={t("teams.rename")}
 					accessibilityRole="button"
 				>

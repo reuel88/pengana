@@ -30,9 +30,14 @@ export function useFilePicker(todoId: string) {
 			}
 
 			const localUri = URL.createObjectURL(file);
-			await attachFile(todoId, localUri);
-			storeFileInMemory(todoId, file);
-			enqueueUpload(todoId, localUri, file.type);
+			try {
+				await attachFile(todoId, localUri);
+				storeFileInMemory(todoId, file);
+				enqueueUpload(todoId, localUri, file.type);
+			} catch {
+				URL.revokeObjectURL(localUri);
+				window.alert(t("errors:failedToAttachFile"));
+			}
 		};
 
 		input.click();
