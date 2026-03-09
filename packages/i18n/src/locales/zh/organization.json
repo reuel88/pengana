@@ -97,7 +97,8 @@
 		"noTeams": "暂无团队",
 		"noMembers": "暂无团队成员",
 		"updateName": "更新团队名称",
-		"updateNameSuccess": "团队名称已更新"
+		"updateNameSuccess": "团队名称已更新",
+		"memberNotFound": "未找到使用该电子邮件地址的组织成员"
 	},
 	"roles": {
 		"title": "角色",

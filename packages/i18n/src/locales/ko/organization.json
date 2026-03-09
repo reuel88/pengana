@@ -97,7 +97,8 @@
 		"noTeams": "아직 팀이 없습니다",
 		"noMembers": "팀 멤버가 없습니다",
 		"updateName": "팀 이름 변경",
-		"updateNameSuccess": "팀 이름이 변경되었습니다"
+		"updateNameSuccess": "팀 이름이 변경되었습니다",
+		"memberNotFound": "해당 이메일 주소를 가진 조직 멤버를 찾을 수 없습니다"
 	},
 	"roles": {
 		"title": "역할",

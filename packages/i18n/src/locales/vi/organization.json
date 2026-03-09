@@ -97,7 +97,8 @@
 		"noTeams": "Chưa có nhóm nào",
 		"noMembers": "Không có thành viên trong nhóm",
 		"updateName": "Cập nhật tên nhóm",
-		"updateNameSuccess": "Đã cập nhật tên nhóm"
+		"updateNameSuccess": "Đã cập nhật tên nhóm",
+		"memberNotFound": "Không tìm thấy thành viên tổ chức nào với địa chỉ email đó"
 	},
 	"roles": {
 		"title": "Vai trò",

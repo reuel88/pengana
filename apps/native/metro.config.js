@@ -5,5 +5,6 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.sourceExts.push("sql");
 config.resolver.assetExts.push("wasm");
+config.resolver.platforms.push("web");
 
 module.exports = config;

@@ -97,7 +97,8 @@
 		"noTeams": "Wala pang mga koponan",
 		"noMembers": "Walang mga miyembro sa koponan",
 		"updateName": "I-update ang Pangalan ng Koponan",
-		"updateNameSuccess": "Na-update ang pangalan ng koponan"
+		"updateNameSuccess": "Na-update ang pangalan ng koponan",
+		"memberNotFound": "Walang nahanap na miyembro ng organisasyon na may ganitong email address"
 	},
 	"roles": {
 		"title": "Mga Tungkulin",

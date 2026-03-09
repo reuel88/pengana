@@ -99,7 +99,8 @@
 		"noTeams": "No teams yet",
 		"noMembers": "No team members",
 		"updateName": "Update Team Name",
-		"updateNameSuccess": "Team name updated"
+		"updateNameSuccess": "Team name updated",
+		"memberNotFound": "No organisation member found with that email address"
 	},
 	"roles": {
 		"title": "Roles",

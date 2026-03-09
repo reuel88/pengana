@@ -97,7 +97,8 @@
 		"noTeams": "Aún no hay equipos",
 		"noMembers": "No hay miembros en el equipo",
 		"updateName": "Actualizar nombre del equipo",
-		"updateNameSuccess": "Nombre del equipo actualizado"
+		"updateNameSuccess": "Nombre del equipo actualizado",
+		"memberNotFound": "No se encontró ningún miembro de la organización con esa dirección de correo electrónico"
 	},
 	"roles": {
 		"title": "Roles",

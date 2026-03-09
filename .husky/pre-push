@@ -1,5 +1,5 @@
 pnpm test
 pnpm check
-pnpm check:i18n
 pnpm check-types
+pnpm check:i18n
 pnpm build
