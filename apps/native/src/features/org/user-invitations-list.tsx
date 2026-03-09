@@ -1,19 +1,18 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import type { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useUserInvitations } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
 import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
 export function UserInvitationsList({
 	isPendingFor,
-	acceptMutation,
-	rejectMutation,
+	onAccept,
+	onReject,
 }: {
 	isPendingFor: (id: string) => boolean;
-	acceptMutation: ReturnType<typeof useInvitationMutations>["acceptMutation"];
-	rejectMutation: ReturnType<typeof useInvitationMutations>["rejectMutation"];
+	onAccept: (id: string) => void;
+	onReject: (id: string) => void;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
@@ -64,7 +63,7 @@ export function UserInvitationsList({
 						</View>
 						<View style={styles.actionRow}>
 							<TouchableOpacity
-								onPress={() => acceptMutation.mutate(inv.id)}
+								onPress={() => onAccept(inv.id)}
 								disabled={isPendingFor(inv.id)}
 								style={[
 									styles.acceptButton,
@@ -77,7 +76,7 @@ export function UserInvitationsList({
 								</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								onPress={() => rejectMutation.mutate(inv.id)}
+								onPress={() => onReject(inv.id)}
 								disabled={isPendingFor(inv.id)}
 								style={[
 									styles.cancelButton,

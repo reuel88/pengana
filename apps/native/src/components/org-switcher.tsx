@@ -62,7 +62,7 @@ function CreateOrgModal({
 					<Text style={sharedStyles.buttonText}>{t("create.submit")}</Text>
 				)}
 			</TouchableOpacity>
-			<TouchableOpacity onPress={onBack}>
+			<TouchableOpacity onPress={onBack} disabled={loading}>
 				<Text style={[styles.linkText, { color: theme.primary }]}>
 					{t("switcher.back")}
 				</Text>
@@ -172,7 +172,7 @@ export function OrgSwitcher() {
 
 						<TouchableOpacity
 							style={styles.closeButton}
-							disabled={switchingId !== null}
+							disabled={switchingId !== null || showCreate}
 							onPress={() => {
 								setShowPicker(false);
 								setShowCreate(false);

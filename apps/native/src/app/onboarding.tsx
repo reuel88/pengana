@@ -48,7 +48,9 @@ function OnboardingContent({
 	const { t } = useTranslation("onboarding");
 	const { t: tCommon } = useTranslation("common");
 	const { theme } = useTheme();
-	const { state, send } = useOnboarding(lifecycleData.hasPendingInvitations);
+	const [state, send] = useOnboarding({
+		hasPendingInvitations: lifecycleData.hasPendingInvitations,
+	});
 
 	const handleSignOut = async () => {
 		await authClient.signOut();

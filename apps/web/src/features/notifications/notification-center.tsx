@@ -90,7 +90,7 @@ function NotificationItem({
 }
 
 export function NotificationCenter() {
-	const { t, i18n } = useTranslation("notifications");
+	const { t } = useTranslation("notifications");
 
 	const {
 		pending,

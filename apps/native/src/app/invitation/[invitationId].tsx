@@ -1,9 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
+import { useInvitationActions } from "@pengana/org-client";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Container } from "@/components/container";
-import { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useInvitation } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
@@ -15,8 +15,12 @@ export default function InvitationScreen() {
 	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
 	const router = useRouter();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
-	const { acceptMutation, rejectMutation, isPendingFor } =
-		useInvitationMutations();
+
+	const { actingId, handleAccept, handleReject } = useInvitationActions({
+		onAcceptSuccess: () => router.replace("/(drawer)/(org)"),
+		onRejectSuccess: () => router.replace("/"),
+		onError: (msg) => Alert.alert(t("invitations.error"), msg),
+	});
 
 	const {
 		data: invitation,
@@ -25,7 +29,7 @@ export default function InvitationScreen() {
 		refetch,
 	} = useInvitation(invitationId ?? "");
 
-	const acting = invitation ? isPendingFor(invitation.id) : false;
+	const acting = invitation ? actingId === invitation.id : false;
 
 	if (sessionPending) {
 		return null;
@@ -104,11 +108,7 @@ export default function InvitationScreen() {
 									styles.acceptButton,
 									{ backgroundColor: theme.primary },
 								]}
-								onPress={() =>
-									acceptMutation.mutate(invitation.id, {
-										onSuccess: () => router.replace("/(drawer)/(org)"),
-									})
-								}
+								onPress={() => handleAccept(invitation.id)}
 								disabled={acting}
 							>
 								<Text style={sharedStyles.buttonText}>
@@ -117,11 +117,7 @@ export default function InvitationScreen() {
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={[styles.rejectButton, { borderColor: theme.border }]}
-								onPress={() =>
-									rejectMutation.mutate(invitation.id, {
-										onSuccess: () => router.replace("/"),
-									})
-								}
+								onPress={() => handleReject(invitation.id)}
 								disabled={acting}
 							>
 								<Text style={{ color: theme.text }}>

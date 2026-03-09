@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useCancelInvitation, useInvitationActions } from "@pengana/org-client";
 import { Alert, ScrollView } from "react-native";
 
 import { Container } from "@/components/container";
@@ -6,7 +7,6 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { InviteForm } from "@/features/org/invite-form";
 import { OrgInvitationsList } from "@/features/org/org-invitations-list";
 import { UserInvitationsList } from "@/features/org/user-invitations-list";
-import { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { sharedStyles } from "@/styles/shared";
@@ -15,8 +15,16 @@ export default function InvitationsScreen() {
 	const { t } = useTranslation("organization");
 	const { data: activeOrg, isPending } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
-	const { acceptMutation, rejectMutation, cancelMutation, isPendingFor } =
-		useInvitationMutations();
+
+	const { actingId, handleAccept, handleReject } = useInvitationActions({
+		onError: (msg) => Alert.alert(t("invitations.error"), msg),
+	});
+
+	const { cancellingId, handleCancel: cancelInvitation } = useCancelInvitation({
+		onError: (msg) => Alert.alert(t("invitations.error"), msg),
+	});
+
+	const isPendingFor = (id: string) => actingId === id || cancellingId === id;
 
 	if (isPending) return <LoadingScreen />;
 
@@ -28,7 +36,7 @@ export default function InvitationsScreen() {
 			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("common:confirm.yes"),
-				onPress: () => cancelMutation.mutate(invitationId),
+				onPress: () => cancelInvitation(invitationId),
 			},
 		]);
 	};
@@ -49,8 +57,8 @@ export default function InvitationsScreen() {
 
 				<UserInvitationsList
 					isPendingFor={isPendingFor}
-					acceptMutation={acceptMutation}
-					rejectMutation={rejectMutation}
+					onAccept={handleAccept}
+					onReject={handleReject}
 				/>
 			</ScrollView>
 		</Container>

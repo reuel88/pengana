@@ -20,9 +20,14 @@ export function UserInvitationsTable({
 	});
 
 	const columns: Column<UserInvitation>[] = [
-		{ header: t("create.name"), cell: (inv) => inv.organizationName },
-		{ header: t("invitations.role"), cell: (inv) => inv.role },
 		{
+			id: "org",
+			header: t("create.name"),
+			cell: (inv) => inv.organizationName,
+		},
+		{ id: "role", header: t("invitations.role"), cell: (inv) => inv.role },
+		{
+			id: "actions",
 			header: "",
 			cellClassName: "py-2 text-right",
 			cell: (inv) => (

@@ -25,8 +25,18 @@ export interface RouterAppContext {
 	queryClient: QueryClient;
 }
 
+function RootErrorComponent({ error }: { error: Error }) {
+	return (
+		<div className="flex h-svh flex-col items-center justify-center gap-4 p-8">
+			<p className="font-medium text-destructive">Something went wrong</p>
+			<p className="text-muted-foreground text-sm">{error.message}</p>
+		</div>
+	);
+}
+
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	component: RootComponent,
+	errorComponent: RootErrorComponent,
 	head: () => ({
 		meta: [
 			{

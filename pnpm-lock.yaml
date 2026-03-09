@@ -9,6 +9,9 @@ catalogs:
     '@better-auth/expo':
       specifier: 1.5.2
       version: 1.5.2
+    '@logtape/logtape':
+      specifier: ^2.0.4
+      version: 2.0.4
     '@orpc/client':
       specifier: ^1.12.2
       version: 1.13.6
@@ -559,6 +562,9 @@ importers:
 
   packages/api:
     dependencies:
+      '@logtape/logtape':
+        specifier: 'catalog:'
+        version: 2.0.4
       '@orpc/client':
         specifier: 'catalog:'
         version: 1.13.6
@@ -753,6 +759,9 @@ importers:
 
   packages/sync-engine:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -760,6 +769,9 @@ importers:
       '@pengana/config':
         specifier: workspace:*
         version: link:../config
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.14
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

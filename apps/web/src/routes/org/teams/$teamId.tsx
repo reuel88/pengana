@@ -6,6 +6,7 @@ import {
 } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
+import { cn } from "@pengana/ui/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -69,15 +70,26 @@ function TeamNameEditor({
 		);
 	}
 
+	function enterEdit() {
+		setNewName(team.name);
+		setEditing(true);
+	}
+
 	return (
 		<h2
-			className="font-medium text-sm"
-			onDoubleClick={() => {
-				if (isAdmin) {
-					setNewName(team.name);
-					setEditing(true);
-				}
-			}}
+			className={cn("font-medium text-sm", isAdmin && "cursor-pointer")}
+			{...(isAdmin && {
+				role: "button",
+				tabIndex: 0,
+				"aria-label": `Edit team name: ${team.name}`,
+				onDoubleClick: enterEdit,
+				onKeyDown: (e: React.KeyboardEvent) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						enterEdit();
+					}
+				},
+			})}
 		>
 			{team.name}
 		</h2>
@@ -155,6 +167,7 @@ function TeamMembersTable({
 
 	const columns: Column<TeamMember>[] = [
 		{
+			id: "name",
 			header: t("members.name"),
 			cell: (tm) => {
 				const orgMember = membersByUserId.get(tm.userId);
@@ -162,6 +175,7 @@ function TeamMembersTable({
 			},
 		},
 		{
+			id: "email",
 			header: t("members.email"),
 			cell: (tm) => {
 				const orgMember = membersByUserId.get(tm.userId);
@@ -169,6 +183,7 @@ function TeamMembersTable({
 			},
 		},
 		{
+			id: "actions",
 			header: "",
 			cellClassName: "py-2 text-right",
 			cell: (tm) =>
@@ -195,9 +210,16 @@ function TeamDetailPage() {
 	const navigate = useNavigate();
 	const { data: activeOrg } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
-	const { data: teams, isPending: teamsLoading } = useTeams(activeOrg?.id);
-	const { data: teamMembers, isPending: membersLoading } =
-		useTeamMembers(teamId);
+	const {
+		data: teams,
+		isPending: teamsLoading,
+		isError: teamsError,
+	} = useTeams(activeOrg?.id);
+	const {
+		data: teamMembers,
+		isPending: membersLoading,
+		isError: membersError,
+	} = useTeamMembers(teamId);
 
 	const { handleDeleteTeam } = useTeamActions({
 		onDeleteSuccess: () => {
@@ -214,6 +236,14 @@ function TeamDetailPage() {
 			{(org) => {
 				if (teamsLoading || membersLoading) {
 					return <p>{t("common:status.loading")}</p>;
+				}
+
+				if (teamsError || membersError) {
+					return (
+						<p className="text-destructive text-sm">
+							{t("common:error.generic")}
+						</p>
+					);
 				}
 
 				if (!team) {

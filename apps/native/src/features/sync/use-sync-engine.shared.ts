@@ -4,18 +4,17 @@ import type {
 	SyncOutput,
 	UploadEvent,
 } from "@pengana/sync-engine";
-import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
+import { SyncEngine, UploadQueue, usePeriodicSync } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import { createSyncAdapter } from "@/entities/todo";
 import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/entities/upload-queue";
+
 import { MAX_EVENT_LOG_SIZE } from "@/lib/design-tokens";
 import { client } from "@/utils/orpc";
 
-import { usePeriodicSync } from "./use-periodic-sync";
 import { useWebSocket } from "./use-websocket";
 
 export interface SyncEnginePlatformDeps {

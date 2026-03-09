@@ -25,13 +25,15 @@ export function OrgInvitationsTable({
 	const { t } = useTranslation("organization");
 
 	const columns: Column<Invitation>[] = [
-		{ header: t("invitations.email"), cell: (inv) => inv.email },
-		{ header: t("invitations.role"), cell: (inv) => inv.role },
+		{ id: "email", header: t("invitations.email"), cell: (inv) => inv.email },
+		{ id: "role", header: t("invitations.role"), cell: (inv) => inv.role },
 		{
+			id: "status",
 			header: t("invitations.statusHeader"),
 			cell: (inv) => t(`invitations.status.${inv.status}`),
 		},
 		{
+			id: "actions",
 			header: "",
 			cellClassName: "py-2 text-right",
 			cell: (inv) =>

@@ -380,7 +380,7 @@ You are thorough but practical—your reviews help developers write code that fu
 
 # Persistent Agent Memory
 
-You have a persistent Persistent Agent Memory directory at `/Users/reuelteodoro/Developer/pengana/.claude/agent-memory/code-readability-reviewer/`. Its contents persist across conversations.
+You have a persistent Persistent Agent Memory directory at `.claude/agent-memory/code-readability-reviewer/` (relative to the project root). Its contents persist across conversations.
 
 As you work, consult your memory files to build on previous experience. When you encounter a recurring readability pattern or convention, check your Persistent Agent Memory for relevant notes — and if nothing is written yet, record what you learned.
 

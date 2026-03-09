@@ -19,3 +19,4 @@ catalog:
   "@tanstack/react-query": ^5.85.5
   vite: ^6.4.1
   vitest: ^3.2.1
+  "@logtape/logtape": ^2.0.4

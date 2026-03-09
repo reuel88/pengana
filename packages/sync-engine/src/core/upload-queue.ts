@@ -1,10 +1,10 @@
-import { createEventEmitter } from "./event-emitter";
 import type {
 	UploadAdapter,
 	UploadEvent,
 	UploadItem,
 	UploadTransport,
-} from "./types";
+} from "../types";
+import { createEventEmitter } from "./event-emitter";
 
 export interface UploadQueueConfig {
 	maxRetries?: number;

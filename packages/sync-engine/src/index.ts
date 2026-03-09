@@ -1,16 +1,24 @@
-import type { SyncEvent, UploadEvent } from "./types";
-
-export type { AllowedMimeType } from "./allowed-mime-types";
+export type { AllowedMimeType } from "./constants/allowed-mime-types";
 export {
 	ALLOWED_MIME_TYPES,
 	INDEXEDDB_URI_PREFIX,
 	isAllowedMimeType,
 	MAX_FILE_SIZE_BYTES,
 	MIME_TO_EXT,
-} from "./allowed-mime-types";
-export { SyncEngine } from "./engine";
-export type { EventEmitter } from "./event-emitter";
-export { createEventEmitter } from "./event-emitter";
+} from "./constants/allowed-mime-types";
+export {
+	SyncContext,
+	SyncDevtoolsContext,
+	useSync,
+	useSyncDevtools,
+} from "./context/sync-context";
+export { SyncEngine } from "./core/engine";
+export type { EventEmitter } from "./core/event-emitter";
+export { createEventEmitter } from "./core/event-emitter";
+export type { UploadQueueConfig } from "./core/upload-queue";
+export { UploadQueue } from "./core/upload-queue";
+export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
+export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
 export {
 	syncInputSchema,
 	syncOutputSchema,
@@ -21,6 +29,8 @@ export {
 } from "./schemas";
 export type {
 	SyncAdapter,
+	SyncContextValue,
+	SyncDevtoolsValue,
 	SyncEvent,
 	SyncEventType,
 	SyncInput,
@@ -35,22 +45,5 @@ export type {
 	UploadStatus,
 	UploadTransport,
 } from "./types";
-export type { UploadQueueConfig } from "./upload-queue";
 
-/** Core sync context shape shared by all apps (web, native, extension). */
-export interface SyncContextValue {
-	isOnline: boolean;
-	isSyncing: boolean;
-	isUploading: boolean;
-	triggerSync: () => void;
-	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
-}
-
-/** Devtools-only sync state (web/native only, not exposed via useSync). */
-export interface SyncDevtoolsValue {
-	events: SyncEvent[];
-	uploadEvents: UploadEvent[];
-	simulateOffline: boolean;
-	setSimulateOffline: (value: boolean) => void;
-}
-export { UploadQueue } from "./upload-queue";
+export const WS_MAX_BACKOFF_MS = 30_000;

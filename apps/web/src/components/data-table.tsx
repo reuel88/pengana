@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 export interface Column<T> {
+	id: string;
 	header: string;
 	cell: (item: T) => ReactNode;
 	headerClassName?: string;
@@ -20,11 +21,8 @@ export function DataTable<T>({
 		<table className="w-full text-xs">
 			<thead>
 				<tr className="border-b text-left text-muted-foreground">
-					{columns.map((col, index) => (
-						<th
-							key={col.header || `col-${index}`}
-							className={col.headerClassName ?? "pb-2"}
-						>
+					{columns.map((col) => (
+						<th key={col.id} className={col.headerClassName ?? "pb-2"}>
 							{col.header}
 						</th>
 					))}
@@ -33,11 +31,8 @@ export function DataTable<T>({
 			<tbody>
 				{data.map((item) => (
 					<tr key={keyFn(item)} className="border-b">
-						{columns.map((col, index) => (
-							<td
-								key={col.header || `col-${index}`}
-								className={col.cellClassName ?? "py-2"}
-							>
+						{columns.map((col) => (
+							<td key={col.id} className={col.cellClassName ?? "py-2"}>
 								{col.cell(item)}
 							</td>
 						))}

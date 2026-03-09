@@ -53,7 +53,8 @@ export function useWebSocket(
 				}, backoff);
 			};
 
-			ws.onerror = () => {
+			ws.onerror = (event) => {
+				console.error("[ws] error:", event);
 				ws?.close();
 			};
 		}

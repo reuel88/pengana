@@ -1,14 +1,14 @@
-import type { SyncEngine } from "@pengana/sync-engine";
-
+import type { MutableRefObject } from "react";
 import { useEffect, useRef } from "react";
 
+import type { SyncEngine } from "../core/engine";
 import { useStableSyncRef } from "./use-stable-sync-ref";
 
-const SYNC_INTERVAL_MS = 5 * 60_000;
+export const SYNC_INTERVAL_MS = 5 * 60_000;
 
 export function usePeriodicSync(
 	isOnline: boolean,
-	engineRef: React.RefObject<SyncEngine | null>,
+	engineRef: MutableRefObject<SyncEngine | null>,
 ) {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const syncRef = useStableSyncRef(engineRef);

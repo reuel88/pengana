@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { useBatchInvite } from "@pengana/org-client";
-import { useEffect, useRef } from "react";
+import { randomUUID } from "expo-crypto";
+import { useEffect } from "react";
 import {
 	ActivityIndicator,
 	Alert,
@@ -27,11 +28,7 @@ export function OnboardingInviteMembers({
 	const { t } = useTranslation("onboarding");
 	const { theme } = useTheme();
 	const { data: activeOrg } = useActiveOrg();
-	const entryCounter = useRef(0);
-
-	const generateId = () => {
-		return `entry-${++entryCounter.current}-${Date.now()}`;
-	};
+	const generateId = () => randomUUID();
 
 	const {
 		entries,
@@ -124,11 +121,12 @@ export function OnboardingInviteMembers({
 					onboardingStyles.submitButton,
 					{
 						backgroundColor: theme.primary,
-						opacity: loading || validEntries.length === 0 ? 0.5 : 1,
+						opacity:
+							loading || !activeOrg?.id || validEntries.length === 0 ? 0.5 : 1,
 					},
 				]}
 				onPress={handleSubmit}
-				disabled={loading || validEntries.length === 0}
+				disabled={loading || !activeOrg?.id || validEntries.length === 0}
 			>
 				{loading ? (
 					<ActivityIndicator size="small" color="#fff" />

@@ -1,13 +1,11 @@
 import type { SyncEngine, UploadEvent } from "@pengana/sync-engine";
-import { UploadQueue } from "@pengana/sync-engine";
+import { UploadQueue, useStableSyncRef } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,
 } from "@/entities/upload-queue";
-
-import { useStableSyncRef } from "./use-stable-sync-ref";
 
 export function useUploadQueue(
 	userId: string | undefined,

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SyncAdapter, SyncEvent, SyncTransport, Todo } from "../types";
 import { SyncEngine } from "./engine";
-import type { SyncAdapter, SyncEvent, SyncTransport, Todo } from "./types";
 
 function makeTodo(overrides: Partial<Todo> = {}): Todo {
 	return {

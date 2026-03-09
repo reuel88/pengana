@@ -1,5 +1,5 @@
+import type { SyncAdapter, SyncEvent, SyncTransport } from "../types";
 import { createEventEmitter } from "./event-emitter";
-import type { SyncAdapter, SyncEvent, SyncTransport } from "./types";
 
 export class SyncEngine {
 	private adapter: SyncAdapter;

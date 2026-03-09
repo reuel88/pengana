@@ -1,7 +1,6 @@
 import type { SyncEngine } from "@pengana/sync-engine";
+import { useStableSyncRef } from "@pengana/sync-engine";
 import { useEffect } from "react";
-
-import { useStableSyncRef } from "./use-stable-sync-ref";
 
 export function useSyncOnFocus(
 	engineRef: React.RefObject<SyncEngine | null>,
@@ -14,10 +13,7 @@ export function useSyncOnFocus(
 		if (!isOnline) return;
 
 		function onVisibilityChange() {
-			if (
-				typeof document !== "undefined" &&
-				document.visibilityState === "visible"
-			) {
+			if (document.visibilityState === "visible") {
 				syncRef.current();
 			}
 		}

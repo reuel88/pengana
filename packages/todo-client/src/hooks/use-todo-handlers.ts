@@ -81,11 +81,20 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				const fileRef = createFileRef(id, file);
 				await attachFile(id, fileRef);
 				enqueueUpload(id, fileRef, file.type);
+				triggerSync();
 			} catch {
 				onError(id, t("errors:failedToStoreFile"));
 			}
 		},
-		[clearError, storeFile, createFileRef, enqueueUpload, onError, t],
+		[
+			clearError,
+			storeFile,
+			createFileRef,
+			enqueueUpload,
+			triggerSync,
+			onError,
+			t,
+		],
 	);
 
 	return useMemo(

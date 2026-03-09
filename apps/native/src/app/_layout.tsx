@@ -3,10 +3,6 @@ import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
-import {
-	fetchUserLifecycleData,
-	type UserLifecycleData,
-} from "@pengana/org-client/lib/user-lifecycle";
 
 import {
 	DarkTheme,
@@ -19,7 +15,7 @@ import { getLocales } from "expo-localization";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	I18nManager,
 	Platform,
@@ -30,6 +26,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { useLifecycleCheck } from "@/hooks/use-lifecycle-check";
 import { authClient } from "@/lib/auth-client";
 import { NAV_THEME } from "@/lib/constants";
 import { LifecycleContext } from "@/lib/lifecycle-context";
@@ -112,43 +109,13 @@ function RootLayoutInner() {
 	const { data: session, isPending } = authClient.useSession();
 	const segments = useSegments();
 	const router = useRouter();
-	const [lifecycleChecked, setLifecycleChecked] = useState(false);
-	const [needsOnboarding, setNeedsOnboarding] = useState(false);
-	const [lifecycleData, setLifecycleData] = useState<UserLifecycleData | null>(
-		null,
-	);
-	const [orgError, setOrgError] = useState(false);
-
-	useEffect(() => {
-		if (isPending || !session) {
-			setLifecycleChecked(false);
-			setNeedsOnboarding(false);
-			setLifecycleData(null);
-			setOrgError(false);
-			return;
-		}
-		if (orgError) return; // hold error UI; don't re-fetch
-
-		let cancelled = false;
-		(async () => {
-			try {
-				const data = await fetchUserLifecycleData(authClient);
-				if (cancelled) return;
-				setLifecycleData(data);
-				setNeedsOnboarding(!data.hasOrganization);
-				setLifecycleChecked(true);
-			} catch (err) {
-				if (!cancelled) {
-					console.error("Failed to check org lifecycle:", err);
-					setOrgError(true);
-					setLifecycleChecked(true);
-				}
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [isPending, session, orgError]);
+	const {
+		lifecycleChecked,
+		needsOnboarding,
+		lifecycleData,
+		orgError,
+		retryLifecycleCheck,
+	} = useLifecycleCheck({ isPending, session });
 
 	useEffect(() => {
 		if (isPending || orgError) return;
@@ -171,11 +138,6 @@ function RootLayoutInner() {
 		needsOnboarding,
 		orgError,
 	]);
-
-	const retryLifecycleCheck = useCallback(() => {
-		setOrgError(false);
-		setLifecycleChecked(false);
-	}, []);
 
 	if (isPending || (!lifecycleChecked && session && !orgError)) return null;
 

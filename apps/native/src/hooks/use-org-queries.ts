@@ -5,6 +5,8 @@ export {
 	useInvalidateOrg,
 	useInvitation,
 	useListOrgs,
+	useOrgRole,
+	useOrgSettings,
 	useTeamMembers,
 	useTeams,
 	useUserInvitations,

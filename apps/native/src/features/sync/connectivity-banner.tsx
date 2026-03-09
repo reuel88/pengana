@@ -4,10 +4,13 @@ import { StyleSheet, Text, View } from "react-native";
 import { BANNER_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
-import { useSync } from "./sync-context";
-
-export function ConnectivityBanner() {
-	const { isOnline, isSyncing } = useSync();
+export function ConnectivityBanner({
+	isOnline,
+	isSyncing,
+}: {
+	isOnline: boolean;
+	isSyncing: boolean;
+}) {
 	const { colorScheme } = useTheme();
 	const { t } = useTranslation("sync");
 

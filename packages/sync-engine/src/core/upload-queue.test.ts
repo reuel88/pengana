@@ -4,7 +4,7 @@ import type {
 	UploadEvent,
 	UploadItem,
 	UploadTransport,
-} from "./types";
+} from "../types";
 import { UploadQueue } from "./upload-queue";
 
 function makeUploadItem(overrides: Partial<UploadItem> = {}): UploadItem {

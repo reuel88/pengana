@@ -55,12 +55,22 @@ async function ensureErrorEnvelope(c: Context, response: Response) {
 		return c.newResponse(response.body, response);
 	}
 	const body = await parseJsonBody(response);
+	const VALID_ERROR_CODES = new Set([
+		"UNAUTHORIZED",
+		"NOT_FOUND",
+		"BAD_REQUEST",
+		"FORBIDDEN",
+		"INTERNAL_SERVER_ERROR",
+		"TOO_MANY_REQUESTS",
+	]);
+	const rawCode = typeof body.code === "string" ? body.code : "";
 	return c.json(
 		{
 			success: false,
 			error: {
-				code:
-					typeof body.code === "string" ? body.code : "INTERNAL_SERVER_ERROR",
+				code: VALID_ERROR_CODES.has(rawCode)
+					? rawCode
+					: "INTERNAL_SERVER_ERROR",
 				message:
 					typeof body.message === "string" ? body.message : "Unknown error",
 			},

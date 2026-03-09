@@ -5,8 +5,23 @@
 		".": {
 			"default": "./src/index.ts"
 		},
-		"./*": {
-			"default": "./src/*.ts"
+		"./types": {
+			"default": "./src/types/index.ts"
+		},
+		"./schemas": {
+			"default": "./src/schemas/index.ts"
+		},
+		"./core/*": {
+			"default": "./src/core/*.ts"
+		},
+		"./context/*": {
+			"default": "./src/context/*.ts"
+		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
+		},
+		"./constants/*": {
+			"default": "./src/constants/*.ts"
 		}
 	},
 	"scripts": {
@@ -15,8 +30,12 @@
 	"dependencies": {
 		"zod": "catalog:"
 	},
+	"peerDependencies": {
+		"react": "^19.0.0"
+	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.7",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

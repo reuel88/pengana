@@ -37,11 +37,13 @@ function RolesPage() {
 
 	const columns: Column<Role>[] = [
 		{
+			id: "title",
 			header: t("roles.title"),
 			cellClassName: "py-2 font-medium",
 			cell: (role) => role.label,
 		},
 		{
+			id: "permissions",
 			header: t("roles.permissions"),
 			cell: (role) => role.description,
 		},

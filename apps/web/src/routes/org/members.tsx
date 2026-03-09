@@ -49,9 +49,10 @@ function MembersPage() {
 	};
 
 	const columns: Column<Member>[] = [
-		{ header: t("members.name"), cell: (m) => m.user.name },
-		{ header: t("members.email"), cell: (m) => m.user.email },
+		{ id: "name", header: t("members.name"), cell: (m) => m.user.name },
+		{ id: "email", header: t("members.email"), cell: (m) => m.user.email },
 		{
+			id: "role",
 			header: t("members.role"),
 			cell: (m) =>
 				m.role === "owner" ? (
@@ -72,6 +73,7 @@ function MembersPage() {
 				),
 		},
 		{
+			id: "actions",
 			header: "",
 			cellClassName: "py-2 text-right",
 			cell: (m) =>
