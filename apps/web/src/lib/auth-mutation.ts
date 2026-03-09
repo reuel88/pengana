@@ -1,5 +1,8 @@
-import type { NotifyFn } from "@pengana/org-client/auth-mutation";
-import { authMutation as coreAuthMutation } from "@pengana/org-client/auth-mutation";
+import type {
+	AuthMutationOptions,
+	NotifyFn,
+} from "@pengana/org-client/lib/auth-mutation";
+import { authMutation as coreAuthMutation } from "@pengana/org-client/lib/auth-mutation";
 import { toast } from "sonner";
 
 const notify: NotifyFn = {
@@ -8,9 +11,7 @@ const notify: NotifyFn = {
 };
 
 export async function authMutation<T>(
-	opts: Parameters<typeof coreAuthMutation<T>>[0] extends infer O
-		? Omit<O, "notify">
-		: never,
+	opts: Omit<AuthMutationOptions<T>, "notify">,
 ) {
 	return coreAuthMutation<T>({ ...opts, notify });
 }

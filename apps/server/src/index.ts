@@ -85,7 +85,8 @@ export const rpcHandler = new RPCHandler(appRouter, {
 });
 
 // Initialized after server starts — WebSocket needs the HTTP server instance.
-// The middleware closure captures this reference so it always uses the live function.
+// handleOrpcRoutes captures this ref in its closure, so when notifyRef.current
+// is later assigned the real notifyUser function, all subsequent requests use it.
 const notifyRef: { current: (userId: string) => void } = {
 	current: () => {},
 };
@@ -93,22 +94,41 @@ const notifyRef: { current: (userId: string) => void } = {
 async function wrapApiErrorResponse(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
 	if (contentType.includes("application/json") && response.status >= 400) {
-		const body = (await response.json()) as Record<string, unknown>;
-		return c.json(
-			{
-				success: false,
-				error: {
-					code: body.code ?? "INTERNAL_SERVER_ERROR",
-					message: body.message ?? "Unknown error",
+		try {
+			const raw: unknown = await response.json();
+			const body =
+				raw != null && typeof raw === "object" && !Array.isArray(raw)
+					? (raw as Record<string, unknown>)
+					: {};
+			return c.json(
+				{
+					success: false,
+					error: {
+						code:
+							typeof body.code === "string"
+								? body.code
+								: "INTERNAL_SERVER_ERROR",
+						message:
+							typeof body.message === "string" ? body.message : "Unknown error",
+					},
 				},
-			},
-			response.status as ContentfulStatusCode,
-		);
+				response.status as ContentfulStatusCode,
+			);
+		} catch {
+			return c.newResponse(response.body, response);
+		}
 	}
 	return c.newResponse(response.body, response);
 }
 
 async function handleOrpcRoutes(c: Context, next: Next) {
+	if (
+		!c.req.path.startsWith("/rpc") &&
+		!c.req.path.startsWith("/api-reference")
+	) {
+		return next();
+	}
+
 	const appContext = await createContext({ context: c });
 	const fullContext = { ...appContext, notifyUser: notifyRef.current };
 

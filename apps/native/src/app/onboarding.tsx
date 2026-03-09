@@ -1,4 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
+import {
+	fetchUserLifecycleData,
+	type UserLifecycleData,
+} from "@pengana/org-client/lib/user-lifecycle";
 import { useEffect, useState } from "react";
 import {
 	ActivityIndicator,
@@ -16,24 +20,6 @@ import { useOnboarding } from "@/features/onboarding/use-onboarding";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 
-interface UserLifecycleData {
-	hasOrganization: boolean;
-	hasPendingInvitations: boolean;
-}
-
-async function fetchUserLifecycleData(): Promise<UserLifecycleData> {
-	const [orgs, invitations] = await Promise.all([
-		authClient.organization.list(),
-		authClient.organization.listUserInvitations(),
-	]);
-	const pendingInvitations =
-		invitations.data?.filter((inv) => inv.status === "pending") ?? [];
-	return {
-		hasOrganization: (orgs.data?.length ?? 0) > 0,
-		hasPendingInvitations: pendingInvitations.length > 0,
-	};
-}
-
 export default function OnboardingScreen() {
 	const { t } = useTranslation();
 	const { theme } = useTheme();
@@ -46,7 +32,7 @@ export default function OnboardingScreen() {
 
 	const loadLifecycleData = () => {
 		setError(false);
-		fetchUserLifecycleData()
+		fetchUserLifecycleData(authClient)
 			.then(setLifecycleData)
 			.catch((err: unknown) => {
 				console.error("Failed to fetch lifecycle data:", err);

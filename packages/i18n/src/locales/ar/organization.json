@@ -97,7 +97,8 @@
 		"noTeams": "لا توجد فرق بعد",
 		"noMembers": "لا يوجد أعضاء في الفريق",
 		"updateName": "تحديث اسم الفريق",
-		"updateNameSuccess": "تم تحديث اسم الفريق"
+		"updateNameSuccess": "تم تحديث اسم الفريق",
+		"memberNotFound": "لم يتم العثور على عضو في المنظمة بهذا البريد الإلكتروني"
 	},
 	"roles": {
 		"title": "الأدوار",

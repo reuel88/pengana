@@ -1,4 +1,4 @@
-import { onboardingMachine } from "@pengana/org-client/onboarding-machine";
+import { onboardingMachine } from "@pengana/org-client/machines/onboarding-machine";
 import { useMachine } from "@xstate/react";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";

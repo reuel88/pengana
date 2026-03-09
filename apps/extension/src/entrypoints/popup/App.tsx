@@ -19,8 +19,8 @@ function ActionPrompt({
 	buttonKey,
 	url,
 }: {
-	messageKey: string;
-	buttonKey: string;
+	messageKey: "loginPrompt" | "onboardingPrompt" | "common:error.generic";
+	buttonKey: "loginButton" | "onboardingButton" | "common:error.retry";
 	url: string;
 }) {
 	const { t } = useTranslation();
@@ -41,8 +41,11 @@ function ActionPrompt({
 
 function App() {
 	const { data: session, isPending } = authClient.useSession();
-	const { data: orgs, isPending: isOrgsPending } =
-		authClient.useListOrganizations();
+	const {
+		data: orgs,
+		isPending: isOrgsPending,
+		error: orgsError,
+	} = authClient.useListOrganizations();
 
 	if (isPending) return <LoadingState />;
 
@@ -57,6 +60,16 @@ function App() {
 	}
 
 	if (isOrgsPending) return <LoadingState />;
+
+	if (orgsError) {
+		return (
+			<ActionPrompt
+				messageKey="common:error.generic"
+				buttonKey="common:error.retry"
+				url={`${env.VITE_WEB_URL}`}
+			/>
+		);
+	}
 
 	if (!Array.isArray(orgs) || orgs.length === 0) {
 		return (

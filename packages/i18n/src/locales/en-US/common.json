@@ -33,7 +33,7 @@
 	"modal": "Modal",
 	"submitting": "Submitting...",
 	"loginPrompt": "Please log in at the web app first.",
-	"loginButton": "Log In",
+	"loginButton": "Sign In",
 	"onboardingPrompt": "Please finish setting up your account in the web app.",
 	"onboardingButton": "Complete Setup",
 	"notFound": {

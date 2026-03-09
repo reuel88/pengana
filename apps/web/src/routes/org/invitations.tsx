@@ -1,5 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
+import { useCancelInvitation } from "@pengana/org-client";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { InviteMemberForm } from "@/features/org-management/invite-member-form";
 import { OrgInvitationsTable } from "@/features/org-management/org-invitations-table";
 import { UserInvitationsTable } from "@/features/org-management/user-invitations-table";
@@ -15,6 +17,11 @@ function InvitationsPage() {
 	const { data: activeOrg, isPending } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
 	const { data: myInvitations } = useUserInvitations();
+
+	const { handleCancel, cancellingId } = useCancelInvitation({
+		onSuccess: () => toast.success(t("invitations.cancelSuccess")),
+		onError: (message) => toast.error(message || t("invitations.error")),
+	});
 
 	if (isPending) {
 		return <p>{t("common:status.loading")}</p>;
@@ -32,7 +39,12 @@ function InvitationsPage() {
 	return (
 		<div className="flex flex-col gap-6">
 			{isAdmin && <InviteMemberForm organizationId={activeOrg.id} />}
-			<OrgInvitationsTable invitations={invitations} isAdmin={isAdmin} />
+			<OrgInvitationsTable
+				invitations={invitations}
+				isAdmin={isAdmin}
+				onCancel={handleCancel}
+				cancellingId={cancellingId}
+			/>
 			<UserInvitationsTable invitations={pendingUserInvitations} />
 		</div>
 	);

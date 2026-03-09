@@ -1,18 +1,16 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
 import {
 	ActivityIndicator,
-	Alert,
-	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
+import { useCreateOrg } from "@/hooks/use-create-org";
 import { useTheme } from "@/lib/theme";
+
+import { onboardingStyles as styles } from "./onboarding-styles";
 
 export function OnboardingCreateOrg({
 	onCreated,
@@ -24,48 +22,12 @@ export function OnboardingCreateOrg({
 	const { t } = useTranslation("onboarding");
 	const { t: tOrg } = useTranslation("organization");
 	const { theme } = useTheme();
-	const { invalidateAll } = useInvalidateOrg();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
-	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = async () => {
-		const trimmedName = name.trim();
-		const trimmedSlug = slug.trim();
-		if (!trimmedName) return;
-
-		setLoading(true);
-		try {
-			const { data: org, error: createError } =
-				await authClient.organization.create({
-					name: trimmedName,
-					slug: trimmedSlug || trimmedName.toLowerCase().replace(/\s+/g, "-"),
-					logo: logo.trim() || undefined,
-				});
-			if (createError || !org) {
-				Alert.alert(createError?.message || t("create.error"));
-				return;
-			}
-
-			const { error: setActiveError } = await authClient.organization.setActive(
-				{
-					organizationId: org.id,
-				},
-			);
-			if (setActiveError) {
-				Alert.alert(setActiveError.message || t("create.error"));
-				return;
-			}
-
-			await invalidateAll();
-			onCreated();
-		} catch {
-			Alert.alert(t("create.error"));
-		} finally {
-			setLoading(false);
-		}
-	};
+	const { name, setName, slug, setSlug, logo, setLogo, loading, handleSubmit } =
+		useCreateOrg({
+			errorMessage: t("create.error"),
+			onSuccess: () => onCreated(),
+		});
 
 	return (
 		<View
@@ -166,49 +128,3 @@ export function OnboardingCreateOrg({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	card: {
-		padding: 16,
-		borderWidth: 1,
-		width: "100%",
-	},
-	title: {
-		fontSize: 18,
-		fontWeight: "bold",
-		marginBottom: 4,
-	},
-	description: {
-		fontSize: 14,
-		marginBottom: 16,
-	},
-	label: {
-		fontSize: 14,
-		fontWeight: "500",
-		marginBottom: 4,
-	},
-	input: {
-		borderWidth: 1,
-		padding: 12,
-		fontSize: 16,
-		marginBottom: 12,
-	},
-	submitButton: {
-		padding: 12,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	submitButtonText: {
-		color: "#fff",
-		fontSize: 16,
-		fontWeight: "500",
-	},
-	ghostButton: {
-		padding: 12,
-		alignItems: "center",
-		marginTop: 8,
-	},
-	ghostButtonText: {
-		fontSize: 14,
-	},
-});

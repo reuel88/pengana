@@ -6,9 +6,12 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-import { Input } from "@pengana/ui/components/input";
-import { Label } from "@pengana/ui/components/label";
 
+import {
+	OrgLogoField,
+	OrgNameField,
+	OrgSlugField,
+} from "@/components/org-form-fields";
 import { useCreateOrg } from "@/hooks/use-create-org";
 
 export function OnboardingCreateOrg({
@@ -37,40 +40,9 @@ export function OnboardingCreateOrg({
 			</CardHeader>
 			<CardContent>
 				<form onSubmit={handleSubmit} className="flex flex-col gap-3">
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="onboard-org-name">
-							{t("organization:create.name")}
-						</Label>
-						<Input
-							id="onboard-org-name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							placeholder={t("organization:create.namePlaceholder")}
-							required
-						/>
-					</div>
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="onboard-org-slug">
-							{t("organization:create.slug")}
-						</Label>
-						<Input
-							id="onboard-org-slug"
-							value={slug}
-							onChange={(e) => setSlug(e.target.value)}
-							placeholder={t("organization:create.slugPlaceholder")}
-						/>
-					</div>
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="onboard-org-logo">
-							{t("organization:create.logo")}
-						</Label>
-						<Input
-							id="onboard-org-logo"
-							value={logo}
-							onChange={(e) => setLogo(e.target.value)}
-							placeholder={t("organization:create.logoPlaceholder")}
-						/>
-					</div>
+					<OrgNameField value={name} onChange={setName} id="onboard-org-name" />
+					<OrgSlugField value={slug} onChange={setSlug} id="onboard-org-slug" />
+					<OrgLogoField value={logo} onChange={setLogo} id="onboard-org-logo" />
 					<Button type="submit" disabled={loading || !name}>
 						{loading ? t("common:submitting") : t("organization:create.submit")}
 					</Button>

@@ -1,7 +1,7 @@
 import type { UploadAdapter, UploadItem } from "@pengana/sync-engine";
 
-import { todoDb } from "./db";
-import { uploadQueueDb } from "./upload-queue-db";
+import { todoDb } from "../lib/db";
+import { uploadQueueDb } from "../lib/upload-queue-db";
 
 export function createWebUploadAdapter(): UploadAdapter {
 	return {
@@ -30,8 +30,10 @@ export function createWebUploadAdapter(): UploadAdapter {
 		},
 
 		// Cross-database write: uploadQueueDb and todoDb are separate Dexie databases,
-		// so these updates are NOT atomic. If the second write fails, the databases
-		// may be inconsistent. Dexie does not support cross-database transactions.
+		// so these updates are NOT atomic. Dexie does not support cross-database transactions.
+		// Write ordering: uploadQueueDb is updated first so that if the todoDb write
+		// fails, the upload is still marked as done and won't be retried. The worst
+		// case is the todo row keeps stale attachment metadata until the next sync.
 		async markCompleted(id: string, attachmentUrl: string): Promise<void> {
 			const item = await uploadQueueDb.uploadQueue.get(id);
 			if (!item) return;

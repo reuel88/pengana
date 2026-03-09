@@ -6,11 +6,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-import { useState } from "react";
 
-import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
+import { useInvitationActions } from "@/hooks/use-invitation-actions";
+import { useUserInvitations } from "@/hooks/use-org-queries";
 
 export function OnboardingInvitations({
 	onAccepted,
@@ -21,26 +19,12 @@ export function OnboardingInvitations({
 }) {
 	const { t } = useTranslation("onboarding");
 	const { data: invitations } = useUserInvitations();
-	const { invalidateAll } = useInvalidateOrg();
-	const [acting, setActing] = useState(false);
 
-	const handleAccept = async (invitationId: string) => {
-		setActing(true);
-		try {
-			await authMutation({
-				mutationFn: () =>
-					authClient.organization.acceptInvitation({ invitationId }),
-				successMessage: t("invitations.accepted"),
-				errorMessage: t("invitations.error"),
-				onSuccess: async () => {
-					await invalidateAll();
-					onAccepted();
-				},
-			});
-		} finally {
-			setActing(false);
-		}
-	};
+	const { actingId, handleAccept } = useInvitationActions({
+		successMessage: t("invitations.accepted"),
+		errorMessage: t("invitations.error"),
+		onAcceptSuccess: onAccepted,
+	});
 
 	return (
 		<Card className="w-full max-w-md">
@@ -67,7 +51,7 @@ export function OnboardingInvitations({
 						<Button
 							size="sm"
 							onClick={() => handleAccept(invitation.id)}
-							disabled={acting}
+							disabled={actingId !== null}
 						>
 							{t("invitations.accept")}
 						</Button>

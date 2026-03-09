@@ -1,6 +1,6 @@
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 
-import { todoDb } from "./db";
+import { todoDb } from "../lib/db";
 
 export function createDexieSyncAdapter(userId: string): SyncAdapter {
 	return {
@@ -10,6 +10,8 @@ export function createDexieSyncAdapter(userId: string): SyncAdapter {
 				.toArray();
 			return rows.map(({ attachmentLocalUri, attachmentStatus, ...todo }) => ({
 				...todo,
+				// Coalesce undefined → null so the sync-engine Todo type is satisfied
+				// (Todo.attachmentUrl is `string | null`, not optional)
 				attachmentUrl: todo.attachmentUrl ?? null,
 			}));
 		},

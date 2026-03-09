@@ -6,6 +6,7 @@
 	"accepted": "Invitation acceptée",
 	"rejected": "Invitation refusée",
 	"error": "Une erreur est survenue",
+	"markRead": "Marquer comme lu",
 	"markAllRead": "Tout marquer comme lu",
 	"invitations": "Invitations",
 	"notifications": "Notifications"

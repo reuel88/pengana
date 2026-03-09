@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { useInvitationActions } from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
@@ -9,9 +9,10 @@ import {
 	View,
 } from "react-native";
 
-import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
+import { useUserInvitations } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
+
+import { onboardingStyles } from "./onboarding-styles";
 
 export function OnboardingInvitations({
 	onAccepted,
@@ -23,39 +24,28 @@ export function OnboardingInvitations({
 	const { t } = useTranslation("onboarding");
 	const { theme } = useTheme();
 	const { data: invitations } = useUserInvitations();
-	const { invalidateAll } = useInvalidateOrg();
-	const [acting, setActing] = useState(false);
 
-	const handleAccept = async (invitationId: string) => {
-		setActing(true);
-		try {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
-			});
-			if (error) {
-				Alert.alert(t("invitations.error"), error.message);
-				return;
-			}
-			await invalidateAll();
-			onAccepted();
-		} catch {
-			Alert.alert(t("invitations.error"));
-		} finally {
-			setActing(false);
-		}
-	};
+	const { actingId, handleAccept } = useInvitationActions({
+		onAcceptSuccess: () => onAccepted(),
+		onError: (message) => Alert.alert(t("invitations.error"), message),
+	});
 
 	return (
 		<View
 			style={[
-				styles.card,
+				onboardingStyles.card,
 				{ backgroundColor: theme.card, borderColor: theme.border },
 			]}
 		>
-			<Text style={[styles.title, { color: theme.text }]}>
+			<Text style={[onboardingStyles.title, { color: theme.text }]}>
 				{t("invitations.title")}
 			</Text>
-			<Text style={[styles.description, { color: theme.text, opacity: 0.6 }]}>
+			<Text
+				style={[
+					onboardingStyles.description,
+					{ color: theme.text, opacity: 0.6 },
+				]}
+			>
 				{t("invitations.description")}
 			</Text>
 
@@ -75,9 +65,9 @@ export function OnboardingInvitations({
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => handleAccept(invitation.id)}
-						disabled={acting}
+						disabled={actingId === invitation.id}
 					>
-						{acting ? (
+						{actingId === invitation.id ? (
 							<ActivityIndicator size="small" color="#fff" />
 						) : (
 							<Text style={styles.acceptButtonText}>
@@ -88,8 +78,13 @@ export function OnboardingInvitations({
 				</View>
 			))}
 
-			<TouchableOpacity style={styles.ghostButton} onPress={onSkipToCreate}>
-				<Text style={[styles.ghostButtonText, { color: theme.primary }]}>
+			<TouchableOpacity
+				style={onboardingStyles.ghostButton}
+				onPress={onSkipToCreate}
+			>
+				<Text
+					style={[onboardingStyles.ghostButtonText, { color: theme.primary }]}
+				>
 					{t("invitations.createInstead")}
 				</Text>
 			</TouchableOpacity>
@@ -98,20 +93,6 @@ export function OnboardingInvitations({
 }
 
 const styles = StyleSheet.create({
-	card: {
-		padding: 16,
-		borderWidth: 1,
-		width: "100%",
-	},
-	title: {
-		fontSize: 18,
-		fontWeight: "bold",
-		marginBottom: 4,
-	},
-	description: {
-		fontSize: 14,
-		marginBottom: 16,
-	},
 	invitationRow: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -138,13 +119,5 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontSize: 14,
 		fontWeight: "500",
-	},
-	ghostButton: {
-		padding: 12,
-		alignItems: "center",
-		marginTop: 8,
-	},
-	ghostButtonText: {
-		fontSize: 14,
 	},
 });

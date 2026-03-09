@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { useTeamNameEditor } from "@pengana/org-client";
 import {
+	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -8,10 +9,7 @@ import {
 	View,
 } from "react-native";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export function TeamNameEditor({
@@ -26,26 +24,14 @@ export function TeamNameEditor({
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
 	const { isAdmin } = useOrgRole();
-	const { invalidateTeams } = useInvalidateOrg();
-	const [editing, setEditing] = useState(false);
-	const [newName, setNewName] = useState("");
-	const [saving, setSaving] = useState(false);
 
-	const handleUpdateName = () =>
-		authMutation({
-			mutationFn: () =>
-				authClient.organization.updateTeam({
-					teamId,
-					data: { name: newName },
-				}),
-			successMessage: t("teams.updateNameSuccess"),
-			errorMessage: t("teams.error"),
-			onSuccess: () => {
-				invalidateTeams(orgId);
-				setEditing(false);
-			},
-			setLoading: setSaving,
+	const { editing, setEditing, newName, setNewName, handleSave, loading } =
+		useTeamNameEditor({
+			onSuccess: () => Alert.alert("", t("teams.updateNameSuccess")),
+			onError: (message) => Alert.alert("", message || t("teams.error")),
 		});
+
+	const trimmedName = newName.trim();
 
 	if (isAdmin && editing) {
 		return (
@@ -60,8 +46,8 @@ export function TeamNameEditor({
 				/>
 				<TouchableOpacity
 					style={[styles.addButton, { backgroundColor: theme.primary }]}
-					onPress={handleUpdateName}
-					disabled={saving}
+					onPress={() => handleSave(teamId, orgId)}
+					disabled={loading || !trimmedName}
 				>
 					<Text style={{ color: "#fff", fontSize: 12 }}>
 						{t("teams.updateName")}

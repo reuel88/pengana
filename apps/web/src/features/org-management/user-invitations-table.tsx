@@ -1,17 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
+import type { UserInvitation } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
-import { useState } from "react";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
-
-interface UserInvitation {
-	id: string;
-	organizationName: string;
-	role: string;
-	status: string;
-}
+import { useInvitationActions } from "@/hooks/use-invitation-actions";
 
 export function UserInvitationsTable({
 	invitations,
@@ -19,49 +10,12 @@ export function UserInvitationsTable({
 	invitations: UserInvitation[];
 }) {
 	const { t } = useTranslation("organization");
-	const { invalidateUserInvitations, invalidateActiveOrg, invalidateListOrgs } =
-		useInvalidateOrg();
-	const [actingId, setActingId] = useState<string | null>(null);
 
-	const handleAccept = async (invitationId: string) => {
-		setActingId(invitationId);
-		try {
-			await authMutation({
-				mutationFn: () =>
-					authClient.organization.acceptInvitation({ invitationId }),
-				successMessage: t("invitations.acceptSuccess"),
-				errorMessage: t("invitations.error"),
-				onSuccess: () =>
-					Promise.all([
-						invalidateUserInvitations(),
-						invalidateActiveOrg(),
-						invalidateListOrgs(),
-					]),
-			});
-		} finally {
-			setActingId(null);
-		}
-	};
-
-	const handleReject = async (invitationId: string) => {
-		setActingId(invitationId);
-		try {
-			await authMutation({
-				mutationFn: () =>
-					authClient.organization.rejectInvitation({ invitationId }),
-				successMessage: t("invitations.rejectSuccess"),
-				errorMessage: t("invitations.error"),
-				onSuccess: () =>
-					Promise.all([
-						invalidateUserInvitations(),
-						invalidateActiveOrg(),
-						invalidateListOrgs(),
-					]),
-			});
-		} finally {
-			setActingId(null);
-		}
-	};
+	const { actingId, handleAccept, handleReject } = useInvitationActions({
+		successMessage: t("invitations.acceptSuccess"),
+		errorMessage: t("invitations.error"),
+		rejectSuccessMessage: t("invitations.rejectSuccess"),
+	});
 
 	return (
 		<div className="flex flex-col gap-3">

@@ -1,8 +1,5 @@
-import { useState } from "react";
-
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
+import { useCreateOrg as useCreateOrgBase } from "@pengana/org-client";
+import { toast } from "sonner";
 
 export function useCreateOrg({
 	successMessage,
@@ -13,51 +10,18 @@ export function useCreateOrg({
 	errorMessage: string;
 	onSuccess?: () => void | Promise<void>;
 }) {
-	const { invalidateAll } = useInvalidateOrg();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
-	const [loading, setLoading] = useState(false);
+	const base = useCreateOrgBase({
+		onSuccess: async () => {
+			if (successMessage) toast.success(successMessage);
+			await onSuccess?.();
+		},
+		onError: (message) => toast.error(message || errorMessage),
+	});
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.create({
-					name,
-					slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
-					logo: logo || undefined,
-				}),
-			successMessage,
-			errorMessage,
-			setLoading,
-			onSuccess: async (data) => {
-				if (!data) return;
-				const { error } = await authClient.organization.setActive({
-					organizationId: data.id,
-				});
-				if (error) throw error;
-				await invalidateAll();
-				await onSuccess?.();
-			},
-		});
+		await base.handleSubmit();
 	};
 
-	const resetForm = () => {
-		setName("");
-		setSlug("");
-		setLogo("");
-	};
-
-	return {
-		name,
-		setName,
-		slug,
-		setSlug,
-		logo,
-		setLogo,
-		loading,
-		handleSubmit,
-		resetForm,
-	};
+	return { ...base, handleSubmit };
 }

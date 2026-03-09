@@ -7,10 +7,13 @@ import {
 	DialogPopup,
 	DialogTitle,
 } from "@pengana/ui/components/dialog";
-import { Input } from "@pengana/ui/components/input";
-import { Label } from "@pengana/ui/components/label";
 import { useNavigate } from "@tanstack/react-router";
 
+import {
+	OrgLogoField,
+	OrgNameField,
+	OrgSlugField,
+} from "@/components/org-form-fields";
 import { useCreateOrg } from "@/hooks/use-create-org";
 
 export function CreateOrgDialog({
@@ -52,34 +55,9 @@ export function CreateOrgDialog({
 					{t("create.description")}
 				</DialogDescription>
 				<form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="dialog-org-name">{t("create.name")}</Label>
-						<Input
-							id="dialog-org-name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							placeholder={t("create.namePlaceholder")}
-							required
-						/>
-					</div>
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="dialog-org-slug">{t("create.slug")}</Label>
-						<Input
-							id="dialog-org-slug"
-							value={slug}
-							onChange={(e) => setSlug(e.target.value)}
-							placeholder={t("create.slugPlaceholder")}
-						/>
-					</div>
-					<div className="flex flex-col gap-1">
-						<Label htmlFor="dialog-org-logo">{t("create.logo")}</Label>
-						<Input
-							id="dialog-org-logo"
-							value={logo}
-							onChange={(e) => setLogo(e.target.value)}
-							placeholder={t("create.logoPlaceholder")}
-						/>
-					</div>
+					<OrgNameField value={name} onChange={setName} id="dialog-org-name" />
+					<OrgSlugField value={slug} onChange={setSlug} id="dialog-org-slug" />
+					<OrgLogoField value={logo} onChange={setLogo} id="dialog-org-logo" />
 					<Button type="submit" disabled={loading || !name}>
 						{loading ? t("common:submitting") : t("create.submit")}
 					</Button>

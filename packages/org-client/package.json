@@ -7,8 +7,23 @@
 		".": {
 			"default": "./src/index.ts"
 		},
-		"./*": {
-			"default": "./src/*.ts"
+		"./types": {
+			"default": "./src/types/index.ts"
+		},
+		"./lib/*": {
+			"default": "./src/lib/*.ts"
+		},
+		"./context/*": {
+			"default": "./src/context/*.tsx"
+		},
+		"./machines/*": {
+			"default": "./src/machines/*.ts"
+		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
+		},
+		"./auth-client-context": {
+			"default": "./src/context/auth-client-context.tsx"
 		}
 	},
 	"peerDependencies": {

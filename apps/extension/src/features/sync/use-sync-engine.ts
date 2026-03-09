@@ -44,24 +44,30 @@ export function useSyncEngine(userId: string) {
 		const listener = (message: BackgroundBroadcast) => {
 			if (!message?.type || !KNOWN_BROADCAST_TYPES.has(message.type)) return;
 
-			if (message.type === "sync:event") {
-				if (message.event.type === "sync:start") setIsSyncing(true);
-				if (
-					message.event.type === "sync:complete" ||
-					message.event.type === "sync:error"
-				)
-					setIsSyncing(false);
-			} else if (message.type === "upload:event") {
-				if (message.event.type === "upload:start") setIsUploading(true);
-				if (
-					message.event.type === "upload:complete" ||
-					message.event.type === "upload:error"
-				)
-					setIsUploading(false);
-			} else if (message.type === "status:update") {
-				setIsOnline(message.status.isOnline);
-				setIsSyncing(message.status.isSyncing);
-				setIsUploading(message.status.isUploading);
+			switch (message.type) {
+				case "sync:event":
+					if (message.event.type === "sync:start") setIsSyncing(true);
+					if (
+						message.event.type === "sync:complete" ||
+						message.event.type === "sync:error"
+					) {
+						setIsSyncing(false);
+					}
+					break;
+				case "upload:event":
+					if (message.event.type === "upload:start") setIsUploading(true);
+					if (
+						message.event.type === "upload:complete" ||
+						message.event.type === "upload:error"
+					) {
+						setIsUploading(false);
+					}
+					break;
+				case "status:update":
+					setIsOnline(message.status.isOnline);
+					setIsSyncing(message.status.isSyncing);
+					setIsUploading(message.status.isUploading);
+					break;
 			}
 		};
 

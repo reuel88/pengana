@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSwitcher } from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,9 +14,9 @@ import {
 	View,
 } from "react-native";
 
+import { useCreateOrg } from "@/hooks/use-create-org";
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 function CreateOrgModal({
@@ -27,27 +28,11 @@ function CreateOrgModal({
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [loading, setLoading] = useState(false);
 
-	const handleCreate = () => {
-		const trimmedName = name.trim();
-		const trimmedSlug = slug.trim();
-		if (!trimmedName) return;
-		return authMutation({
-			mutationFn: () =>
-				authClient.organization.create({
-					name: trimmedName,
-					slug: trimmedSlug || trimmedName.toLowerCase().replace(/\s+/g, "-"),
-				}),
-			errorMessage: t("create.error"),
-			onSuccess: (data) => {
-				if (data) onCreated(data.id);
-			},
-			setLoading,
-		});
-	};
+	const { name, setName, slug, setSlug, loading, handleSubmit } = useCreateOrg({
+		errorMessage: t("create.error"),
+		onSuccess: (orgId) => onCreated(orgId),
+	});
 
 	return (
 		<View style={styles.createForm}>
@@ -67,7 +52,7 @@ function CreateOrgModal({
 			/>
 			<TouchableOpacity
 				style={[styles.button, { backgroundColor: theme.primary }]}
-				onPress={handleCreate}
+				onPress={handleSubmit}
 				disabled={loading}
 			>
 				{loading ? (
@@ -95,28 +80,21 @@ export function OrgSwitcher() {
 	const [showPicker, setShowPicker] = useState(false);
 	const [showCreate, setShowCreate] = useState(false);
 
+	const { handleSwitch } = useOrgSwitcher({
+		onSwitchSuccess: () => {
+			setShowPicker(false);
+			router.push("/(drawer)/(org)");
+		},
+		onError: (message) =>
+			Alert.alert(
+				t("common:error.title"),
+				message || t("switcher.switchError"),
+			),
+	});
+
 	if (!session) return null;
 
-	const handleSwitch = async (orgId: string) => {
-		const { error } = await authClient.organization.setActive({
-			organizationId: orgId,
-		});
-		if (error) {
-			Alert.alert(error.message || t("switcher.switchError"));
-			return;
-		}
-		setShowPicker(false);
-		router.push("/(drawer)/(org)");
-	};
-
-	const handleCreated = async (orgId: string) => {
-		const { error } = await authClient.organization.setActive({
-			organizationId: orgId,
-		});
-		if (error) {
-			Alert.alert(error.message || t("switcher.switchError"));
-			return;
-		}
+	const handleCreated = (_orgId: string) => {
 		setShowCreate(false);
 		setShowPicker(false);
 		router.push("/(drawer)/(org)");

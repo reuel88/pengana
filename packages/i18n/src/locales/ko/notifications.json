@@ -6,6 +6,7 @@
 	"accepted": "초대가 수락되었습니다",
 	"rejected": "초대가 거절되었습니다",
 	"error": "문제가 발생했습니다",
+	"markRead": "읽음으로 표시",
 	"markAllRead": "모두 읽음으로 표시",
 	"invitations": "초대",
 	"notifications": "알림"

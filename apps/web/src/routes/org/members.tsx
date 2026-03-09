@@ -1,11 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
+import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
-import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
+import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
@@ -17,8 +17,16 @@ function MembersPage() {
 	const { session } = Route.useRouteContext();
 	const { data: activeOrg, isPending } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
-	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
-		useInvalidateOrg();
+
+	const { handleUpdateRole, handleRemove, handleLeave } = useMemberActions({
+		onUpdateRoleSuccess: () => toast.success(t("members.updateRoleSuccess")),
+		onRemoveSuccess: () => toast.success(t("members.removeSuccess")),
+		onLeaveSuccess: async () => {
+			toast.success(t("members.leaveSuccess"));
+			navigate({ to: "/" });
+		},
+		onError: (message) => toast.error(message || t("members.error")),
+	});
 
 	if (isPending) {
 		return <p>{t("common:status.loading")}</p>;
@@ -31,55 +39,22 @@ function MembersPage() {
 	const members = activeOrg.members || [];
 	const currentUserId = session.data.user.id;
 
-	const handleUpdateRole = async (
-		memberId: string,
-		role: "member" | "admin",
-	) => {
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.updateMemberRole({ memberId, role }),
-			successMessage: t("members.updateRoleSuccess"),
-			errorMessage: t("members.error"),
-			onSuccess: () =>
-				Promise.all([invalidateActiveOrg(), invalidateActiveMember()]),
-		});
-	};
-
-	const handleRemove = async (memberIdOrEmail: string) => {
+	const onRemove = async (memberIdOrEmail: string) => {
 		if (!confirm(t("members.removeConfirm"))) return;
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.removeMember({ memberIdOrEmail }),
-			successMessage: t("members.removeSuccess"),
-			errorMessage: t("members.error"),
-			onSuccess: () => invalidateActiveOrg(),
-		});
+		await handleRemove(memberIdOrEmail);
 	};
 
-	const handleLeave = async () => {
-		if (!currentUserId) {
-			return;
-		}
+	const onLeave = async () => {
+		if (!currentUserId) return;
 		if (!confirm(t("members.leaveConfirm"))) return;
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.removeMember({
-					memberIdOrEmail: currentUserId,
-				}),
-			successMessage: t("members.leaveSuccess"),
-			errorMessage: t("members.error"),
-			onSuccess: async () => {
-				await invalidateAll();
-				navigate({ to: "/" });
-			},
-		});
+		await handleLeave(currentUserId);
 	};
 
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex items-center justify-between">
 				<h2 className="font-medium text-sm">{t("members.title")}</h2>
-				<Button variant="outline" size="sm" onClick={handleLeave}>
+				<Button variant="outline" size="sm" onClick={onLeave}>
 					{t("members.leave")}
 				</Button>
 			</div>
@@ -132,7 +107,7 @@ function MembersPage() {
 											<Button
 												variant="destructive"
 												size="xs"
-												onClick={() => handleRemove(member.id)}
+												onClick={() => onRemove(member.id)}
 											>
 												{t("members.remove")}
 											</Button>

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSettings } from "@pengana/org-client";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -14,10 +15,8 @@ import {
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
-import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
+import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function OrgSettingsScreen() {
@@ -25,54 +24,44 @@ export default function OrgSettingsScreen() {
 	const { t } = useTranslation("organization");
 	const router = useRouter();
 	const { data: activeOrg, isPending } = useActiveOrg();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
-	const [loading, setLoading] = useState(false);
 	const { isOwner, isAdmin } = useOrgRole();
-	const { invalidateActiveOrg, invalidateAll } = useInvalidateOrg();
+
+	const {
+		name,
+		setName,
+		slug,
+		setSlug,
+		logo,
+		setLogo,
+		syncFromOrg,
+		loading,
+		handleUpdate,
+		handleDelete,
+	} = useOrgSettings({
+		onUpdateSuccess: () => Alert.alert("", t("settings.updateSuccess")),
+		onDeleteSuccess: async () => {
+			router.replace("/");
+		},
+		onError: (message) => Alert.alert("", message || t("settings.error")),
+	});
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
-		if (!activeOrg) return;
-		setName(activeOrg.name);
-		setSlug(activeOrg.slug);
-		setLogo(activeOrg.logo || "");
+		if (activeOrg) syncFromOrg(activeOrg);
 	}, [activeOrg?.id]);
 
 	if (isPending) return <LoadingScreen />;
 	if (!activeOrg) return <EmptyOrgScreen />;
 
-	const handleUpdate = () =>
-		authMutation({
-			mutationFn: () =>
-				authClient.organization.update({
-					data: { name, slug, logo: logo || undefined },
-				}),
-			successMessage: t("settings.updateSuccess"),
-			errorMessage: t("settings.error"),
-			onSuccess: () => invalidateActiveOrg(),
-			setLoading,
-		});
+	const trimmedName = name.trim();
 
-	const handleDelete = () => {
+	const onDelete = () => {
 		Alert.alert(t("settings.delete"), t("settings.deleteConfirm"), [
 			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("settings.delete"),
 				style: "destructive",
-				onPress: () =>
-					authMutation({
-						mutationFn: () =>
-							authClient.organization.delete({
-								organizationId: activeOrg.id,
-							}),
-						errorMessage: t("settings.error"),
-						onSuccess: async () => {
-							await invalidateAll();
-							router.replace("/");
-						},
-					}),
+				onPress: () => handleDelete(activeOrg.id),
 			},
 		]);
 	};
@@ -115,8 +104,8 @@ export default function OrgSettingsScreen() {
 							/>
 							<TouchableOpacity
 								style={[styles.button, { backgroundColor: theme.primary }]}
-								onPress={handleUpdate}
-								disabled={loading}
+								onPress={() => handleUpdate()}
+								disabled={loading || !trimmedName}
 							>
 								<Text style={styles.buttonText}>
 									{loading ? t("common:submitting") : t("settings.update")}
@@ -135,7 +124,7 @@ export default function OrgSettingsScreen() {
 								styles.deleteButton,
 								{ backgroundColor: theme.notification },
 							]}
-							onPress={handleDelete}
+							onPress={onDelete}
 						>
 							<Text style={styles.buttonText}>{t("settings.delete")}</Text>
 						</TouchableOpacity>

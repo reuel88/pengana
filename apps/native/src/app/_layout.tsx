@@ -3,6 +3,7 @@ import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
+import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 
 import {
 	DarkTheme,
@@ -124,10 +125,9 @@ function RootLayoutInner() {
 		let cancelled = false;
 		(async () => {
 			try {
-				const orgs = await authClient.organization.list();
+				const data = await fetchUserLifecycleData(authClient);
 				if (cancelled) return;
-				const hasOrg = (orgs.data?.length ?? 0) > 0;
-				setNeedsOnboarding(!hasOrg);
+				setNeedsOnboarding(!data.hasOrganization);
 				setLifecycleChecked(true);
 			} catch (err) {
 				if (!cancelled) {
@@ -161,7 +161,7 @@ function RootLayoutInner() {
 		setLifecycleChecked(false);
 	}, []);
 
-	if (isPending) return null;
+	if (isPending || (!lifecycleChecked && session && !orgError)) return null;
 
 	if (orgError) {
 		return (

@@ -1,5 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
+import { useTeamActions } from "@pengana/org-client";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
 import {
 	Alert,
 	FlatList,
@@ -16,13 +18,10 @@ import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
 import { TeamNameEditor } from "@/features/org/team-name-editor";
 import {
 	useActiveOrg,
-	useInvalidateOrg,
 	useTeamMembers,
 	useTeams,
 } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function TeamDetailScreen() {
@@ -30,51 +29,56 @@ export default function TeamDetailScreen() {
 	const { t } = useTranslation("organization");
 	const { teamId } = useLocalSearchParams<{ teamId: string }>();
 	const router = useRouter();
-	const { data: activeOrg } = useActiveOrg();
+	const { data: activeOrg, isPending: isOrgPending } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
-	const { invalidateTeams, invalidateTeamMembers } = useInvalidateOrg();
 
-	const { data: teams = [] } = useTeams(activeOrg?.id);
-	const { data: teamMembers = [], isPending: loading } = useTeamMembers(teamId);
+	const { data: teams = [], isPending: isTeamsPending } = useTeams(
+		activeOrg?.id,
+	);
+	const { data: teamMembers = [], isPending: isMembersPending } =
+		useTeamMembers(teamId);
+
+	const { handleDeleteTeam, handleRemoveMember } = useTeamActions({
+		onDeleteSuccess: () => router.back(),
+		onRemoveMemberSuccess: () =>
+			Alert.alert("", t("teams.removeMemberSuccess")),
+		onError: (message) => Alert.alert("", message || t("teams.error")),
+	});
 
 	const team = teams.find((item) => item.id === teamId);
 	const teamName = team?.name ?? "";
 
-	if (loading) return <LoadingScreen />;
+	const membersByUserId = useMemo(() => {
+		const members = activeOrg?.members ?? [];
+		const map = new Map<string, (typeof members)[number]>();
+		for (const m of members) {
+			map.set(m.userId, m);
+		}
+		return map;
+	}, [activeOrg?.members]);
+
+	if (isOrgPending || isTeamsPending || isMembersPending)
+		return <LoadingScreen />;
 	if (!teamId || !teamName || !activeOrg) return <EmptyOrgScreen />;
 
-	const handleRemoveMember = (userId: string) => {
+	const onRemoveMember = (userId: string) => {
 		Alert.alert(t("teams.removeMember"), "", [
 			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("teams.removeMember"),
 				style: "destructive",
-				onPress: () =>
-					authMutation({
-						mutationFn: () =>
-							authClient.organization.removeTeamMember({ teamId, userId }),
-						errorMessage: t("teams.error"),
-						onSuccess: () => invalidateTeamMembers(teamId),
-					}),
+				onPress: () => handleRemoveMember(teamId, userId),
 			},
 		]);
 	};
 
-	const handleDelete = () => {
+	const onDelete = () => {
 		Alert.alert(t("teams.delete"), t("teams.deleteConfirm"), [
 			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("teams.delete"),
 				style: "destructive",
-				onPress: () =>
-					authMutation({
-						mutationFn: () => authClient.organization.removeTeam({ teamId }),
-						errorMessage: t("teams.error"),
-						onSuccess: () => {
-							invalidateTeams(activeOrg.id);
-							router.back();
-						},
-					}),
+				onPress: () => handleDeleteTeam(teamId, activeOrg.id),
 			},
 		]);
 	};
@@ -99,7 +103,7 @@ export default function TeamDetailScreen() {
 										styles.deleteButton,
 										{ backgroundColor: theme.notification },
 									]}
-									onPress={handleDelete}
+									onPress={onDelete}
 								>
 									<Text style={{ color: "#fff", fontSize: 12 }}>
 										{t("teams.delete")}
@@ -118,10 +122,7 @@ export default function TeamDetailScreen() {
 					</Text>
 				}
 				renderItem={({ item }) => {
-					const orgMember = activeOrg.members?.find(
-						(m: { userId: string; user: { name?: string } }) =>
-							m.userId === item.userId,
-					);
+					const orgMember = membersByUserId.get(item.userId);
 					return (
 						<View
 							style={[
@@ -139,7 +140,7 @@ export default function TeamDetailScreen() {
 							</View>
 							{isAdmin && (
 								<TouchableOpacity
-									onPress={() => handleRemoveMember(item.userId)}
+									onPress={() => onRemoveMember(item.userId)}
 									style={[
 										styles.removeButton,
 										{ backgroundColor: theme.notification },

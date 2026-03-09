@@ -5,8 +5,8 @@ export {
 	uploadQueueDb,
 } from "@pengana/todo-client";
 export {
-	getFileForUpload,
-	removeFileForUpload,
-	storeFileForUpload,
-} from "@pengana/todo-client/dexie-file-store";
+	getFileFromIndexedDB,
+	removeFileFromIndexedDB,
+	storeFileInIndexedDB,
+} from "@pengana/todo-client/adapters/dexie-file-store";
 export { createWebUploadTransport } from "./transport";

@@ -1,10 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
-
 interface Invitation {
 	id: string;
 	email: string;
@@ -15,22 +11,15 @@ interface Invitation {
 export function OrgInvitationsTable({
 	invitations,
 	isAdmin,
+	onCancel,
+	cancellingId,
 }: {
 	invitations: Invitation[];
 	isAdmin: boolean;
+	onCancel: (invitationId: string) => void;
+	cancellingId: string | null;
 }) {
 	const { t } = useTranslation("organization");
-	const { invalidateActiveOrg } = useInvalidateOrg();
-
-	const handleCancel = async (invitationId: string) => {
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.cancelInvitation({ invitationId }),
-			successMessage: t("invitations.cancelSuccess"),
-			errorMessage: t("invitations.error"),
-			onSuccess: () => invalidateActiveOrg(),
-		});
-	};
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -62,7 +51,8 @@ export function OrgInvitationsTable({
 										<Button
 											variant="outline"
 											size="xs"
-											onClick={() => handleCancel(inv.id)}
+											onClick={() => onCancel(inv.id)}
+											disabled={cancellingId === inv.id}
 										>
 											{t("invitations.cancel")}
 										</Button>

@@ -3,9 +3,9 @@ export {
 	createWebUploadAdapter as createUploadAdapter,
 } from "./adapter.web";
 export {
-	getFileForUpload,
-	removeFileForUpload,
-	storeFileForUpload,
+	getFileFromMemory,
+	removeFileFromMemory,
+	storeFileInMemory,
 } from "./file-store.web";
 export {
 	createWebUploadTransport,

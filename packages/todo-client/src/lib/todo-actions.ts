@@ -1,4 +1,4 @@
-import { todoDb } from "./db";
+import { todoDb } from "../lib/db";
 
 export async function addTodo(userId: string, title: string): Promise<void> {
 	await todoDb.todos.add({

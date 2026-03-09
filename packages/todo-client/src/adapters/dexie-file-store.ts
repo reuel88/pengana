@@ -1,7 +1,7 @@
-import { readFileAsBase64 } from "./file-utils";
-import { uploadQueueDb } from "./upload-queue-db";
+import { readFileAsBase64 } from "../lib/file-utils";
+import { uploadQueueDb } from "../lib/upload-queue-db";
 
-export async function storeFileForUpload(
+export async function storeFileInIndexedDB(
 	todoId: string,
 	file: File,
 ): Promise<void> {
@@ -14,12 +14,12 @@ export async function storeFileForUpload(
 	});
 }
 
-export async function getFileForUpload(
+export async function getFileFromIndexedDB(
 	todoId: string,
 ): Promise<{ base64: string; mimeType: string; fileName: string } | undefined> {
 	return uploadQueueDb.fileData.get(todoId);
 }
 
-export async function removeFileForUpload(todoId: string): Promise<void> {
+export async function removeFileFromIndexedDB(todoId: string): Promise<void> {
 	await uploadQueueDb.fileData.delete(todoId);
 }

@@ -7,12 +7,17 @@ export type {
 	Team,
 	TeamMember,
 	UserInvitation,
-} from "./auth-client-context";
-export { AuthClientProvider, useAuthClient } from "./auth-client-context";
-export type { NotifyFn } from "./auth-mutation";
-export { authMutation } from "./auth-mutation";
-export { onboardingMachine } from "./onboarding-machine";
-export { orgQueryKeys } from "./org-query-keys";
+} from "./context/auth-client-context";
+export {
+	AuthClientProvider,
+	useAuthClient,
+} from "./context/auth-client-context";
+export { useBatchInvite } from "./hooks/use-batch-invite";
+export { useCancelInvitation } from "./hooks/use-cancel-invitation";
+export { useCreateOrg } from "./hooks/use-create-org";
+export { useInvitationActions } from "./hooks/use-invitation-actions";
+export { useInviteMember } from "./hooks/use-invite-member";
+export { useMemberActions } from "./hooks/use-member-actions";
 export {
 	useActiveMember,
 	useActiveOrg,
@@ -22,5 +27,17 @@ export {
 	useTeamMembers,
 	useTeams,
 	useUserInvitations,
-} from "./use-org-queries";
-export { useOrgRole } from "./use-org-role";
+} from "./hooks/use-org-queries";
+export { useOrgRole } from "./hooks/use-org-role";
+export { useOrgSettings } from "./hooks/use-org-settings";
+export { useOrgSwitcher } from "./hooks/use-org-switcher";
+export {
+	useTeamActions,
+	useTeamMemberAdd,
+	useTeamNameEditor,
+} from "./hooks/use-team-actions";
+export type { AuthMutationOptions, NotifyFn } from "./lib/auth-mutation";
+export { authMutation } from "./lib/auth-mutation";
+export { orgQueryKeys } from "./lib/org-query-keys";
+export { slugify } from "./lib/slugify";
+export { onboardingMachine } from "./machines/onboarding-machine";

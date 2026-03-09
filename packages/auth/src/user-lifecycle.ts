@@ -1,7 +1,13 @@
 interface AuthClientWithOrg {
 	organization: {
-		list: () => Promise<{ data: { id: string }[] | null }>;
-		listUserInvitations: () => Promise<{ data: { status: string }[] | null }>;
+		list: () => Promise<{
+			data: { id: string }[] | null;
+			error?: { message?: string } | null;
+		}>;
+		listUserInvitations: () => Promise<{
+			data: { status: string }[] | null;
+			error?: { message?: string } | null;
+		}>;
 	};
 }
 
@@ -17,6 +23,12 @@ export async function fetchUserLifecycleData(
 		authClient.organization.list(),
 		authClient.organization.listUserInvitations(),
 	]);
+	if (orgs.error) {
+		throw new Error(orgs.error.message ?? "Failed to fetch organizations");
+	}
+	if (invitations.error) {
+		throw new Error(invitations.error.message ?? "Failed to fetch invitations");
+	}
 	const pendingInvitations =
 		invitations.data?.filter((inv) => inv.status === "pending") ?? [];
 	return {

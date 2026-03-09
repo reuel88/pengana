@@ -1,4 +1,4 @@
-import { onboardingMachine } from "@pengana/org-client/onboarding-machine";
+import { onboardingMachine } from "@pengana/org-client/machines/onboarding-machine";
 import { useNavigate } from "@tanstack/react-router";
 import { useMachine } from "@xstate/react";
 import { useEffect } from "react";

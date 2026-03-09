@@ -40,6 +40,7 @@ export default function InvitationsScreen() {
 				{activeOrg && (
 					<OrgInvitationsList
 						invitations={invitations}
+						isAdmin={isAdmin}
 						isPendingFor={isPendingFor}
 						onCancel={handleCancel}
 					/>

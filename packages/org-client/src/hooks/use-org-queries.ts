@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { useAuthClient } from "./auth-client-context";
-import { orgQueryKeys } from "./org-query-keys";
+import { useAuthClient } from "../context/auth-client-context";
+import { orgQueryKeys } from "../lib/org-query-keys";
 
 const STALE_TIME = 30_000;
 

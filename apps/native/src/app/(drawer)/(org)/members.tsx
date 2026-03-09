@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useMemberActions } from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import {
 	Alert,
@@ -12,10 +13,9 @@ import {
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
-import { useActiveOrg, useInvalidateOrg } from "@/hooks/use-org-queries";
+import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export default function MembersScreen() {
@@ -26,52 +26,39 @@ export default function MembersScreen() {
 	const { data: session } = authClient.useSession();
 	const currentUserId = session?.user?.id;
 	const { isAdmin } = useOrgRole();
-	const { invalidateActiveOrg } = useInvalidateOrg();
+
+	const { handleRemove, handleLeave } = useMemberActions({
+		onRemoveSuccess: () => Alert.alert("", t("members.removeSuccess")),
+		onLeaveSuccess: async () => {
+			router.replace("/");
+		},
+		onError: (message) => Alert.alert("", message || t("members.error")),
+	});
 
 	if (isPending) return <LoadingScreen />;
 	if (!activeOrg) return <EmptyOrgScreen />;
 
 	const members = activeOrg.members || [];
 
-	const handleRemove = (memberId: string) => {
+	const onRemove = (memberId: string) => {
 		Alert.alert(t("members.remove"), t("members.removeConfirm"), [
 			{ text: t("common:confirm.no"), style: "cancel" },
 			{
 				text: t("members.remove"),
 				style: "destructive",
-				onPress: () =>
-					authMutation({
-						mutationFn: () =>
-							authClient.organization.removeMember({
-								memberIdOrEmail: memberId,
-							}),
-						errorMessage: t("members.error"),
-						onSuccess: () => invalidateActiveOrg(),
-					}),
+				onPress: () => handleRemove(memberId),
 			},
 		]);
 	};
 
-	const handleLeave = () => {
-		if (!currentUserId) {
-			return;
-		}
+	const onLeave = () => {
+		if (!currentUserId) return;
 		Alert.alert(t("members.leave"), t("members.leaveConfirm"), [
 			{ text: t("common:confirm.no"), style: "cancel" },
 			{
 				text: t("members.leave"),
 				style: "destructive",
-				onPress: () =>
-					authMutation({
-						mutationFn: () =>
-							authClient.organization.removeMember({
-								memberIdOrEmail: currentUserId,
-							}),
-						errorMessage: t("members.error"),
-						onSuccess: () => {
-							router.replace("/");
-						},
-					}),
+				onPress: () => handleLeave(currentUserId),
 			},
 		]);
 	};
@@ -88,7 +75,7 @@ export default function MembersScreen() {
 							styles.leaveButton,
 							{ backgroundColor: theme.notification },
 						]}
-						onPress={handleLeave}
+						onPress={onLeave}
 					>
 						<Text style={styles.leaveText}>{t("members.leave")}</Text>
 					</TouchableOpacity>
@@ -120,7 +107,7 @@ export default function MembersScreen() {
 							member.userId !== currentUserId &&
 							member.role !== "owner" && (
 								<TouchableOpacity
-									onPress={() => handleRemove(member.id)}
+									onPress={() => onRemove(member.id)}
 									style={[
 										styles.removeButton,
 										{ backgroundColor: theme.notification },

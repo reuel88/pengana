@@ -1,12 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
+import { useInviteMember } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
-import { useState } from "react";
-
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
+import { toast } from "sonner";
 
 export function InviteMemberForm({
 	organizationId,
@@ -14,34 +11,22 @@ export function InviteMemberForm({
 	organizationId: string;
 }) {
 	const { t } = useTranslation("organization");
-	const [email, setEmail] = useState("");
-	const [role, setRole] = useState<"member" | "admin">("member");
-	const [loading, setLoading] = useState(false);
-	const { invalidateActiveOrg } = useInvalidateOrg();
 
-	const handleInvite = async (e: React.FormEvent) => {
-		e.preventDefault();
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.inviteMember({
-					email,
-					role,
-					organizationId,
-				}),
-			successMessage: t("invitations.sendSuccess"),
-			errorMessage: t("invitations.error"),
-			setLoading,
-			onSuccess: () => {
-				setEmail("");
-				return invalidateActiveOrg();
-			},
+	const { email, setEmail, role, setRole, handleInvite, loading } =
+		useInviteMember({
+			onSuccess: () => toast.success(t("invitations.sendSuccess")),
+			onError: (message) => toast.error(message || t("invitations.error")),
 		});
+
+	const onSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		await handleInvite(organizationId);
 	};
 
 	return (
 		<div className="flex max-w-md flex-col gap-3">
 			<h2 className="font-medium text-sm">{t("invitations.invite")}</h2>
-			<form onSubmit={handleInvite} className="flex flex-col gap-3">
+			<form onSubmit={onSubmit} className="flex flex-col gap-3">
 				<div className="flex flex-col gap-1">
 					<Label htmlFor="invite-email">{t("invitations.email")}</Label>
 					<Input

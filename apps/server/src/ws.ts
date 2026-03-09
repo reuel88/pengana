@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import type { ServerType } from "@hono/node-server";
-import type { WsMessage } from "@pengana/api/ws-types";
+import { WS_PATH, type WsMessage } from "@pengana/api/ws-types";
 import { auth } from "@pengana/auth";
 import { WebSocket, WebSocketServer } from "ws";
 import { wsLogger } from "./logger";
@@ -16,7 +16,7 @@ export function setupWebSocket(server: ServerType) {
 	server.on("upgrade", async (req, socket, head) => {
 		const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
 
-		if (url.pathname !== "/ws") {
+		if (url.pathname !== WS_PATH) {
 			socket.destroy();
 			return;
 		}
@@ -37,22 +37,22 @@ export function setupWebSocket(server: ServerType) {
 	wss.on(
 		"connection",
 		(ws: WebSocket, _req: IncomingMessage, userId: string) => {
-			const userSockets = connections.get(userId) ?? new Set<WebSocket>();
-			connections.set(userId, userSockets);
-
-			if (userSockets.size >= MAX_CONNECTIONS_PER_USER) {
+			const userSockets = connections.get(userId);
+			if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
 				wsLogger.warn`Rejected connection for user ${userId} (max connections reached)`;
 				ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
 				return;
 			}
 
-			userSockets.add(ws);
-			wsLogger.info`Connection accepted for user ${userId} (${String(userSockets.size)} total)`;
+			const sockets = userSockets ?? new Set<WebSocket>();
+			if (!userSockets) connections.set(userId, sockets);
+			sockets.add(ws);
+			wsLogger.info`Connection accepted for user ${userId} (${String(sockets.size)} total)`;
 
 			ws.on("close", () => {
-				userSockets.delete(ws);
-				wsLogger.info`Connection closed for user ${userId} (${String(userSockets.size)} remaining)`;
-				if (userSockets.size === 0) {
+				sockets.delete(ws);
+				wsLogger.info`Connection closed for user ${userId} (${String(sockets.size)} remaining)`;
+				if (sockets.size === 0) {
 					connections.delete(userId);
 				}
 			});

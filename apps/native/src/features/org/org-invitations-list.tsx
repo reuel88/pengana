@@ -1,11 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
 
 export function OrgInvitationsList({
 	invitations,
+	isAdmin,
 	isPendingFor,
 	onCancel,
 }: {
@@ -15,12 +15,12 @@ export function OrgInvitationsList({
 		role: string;
 		status: string;
 	}>;
+	isAdmin: boolean;
 	isPendingFor: (id: string) => boolean;
 	onCancel: (id: string) => void;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { isAdmin } = useOrgRole();
 
 	return (
 		<>
@@ -43,8 +43,10 @@ export function OrgInvitationsList({
 						<View style={{ flex: 1 }}>
 							<Text style={{ color: theme.text }}>{inv.email}</Text>
 							<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-								{t(`roles.${inv.role}`)} -{" "}
-								{t(`invitations.status.${inv.status}`)}
+								{t(`roles.${inv.role}`, { defaultValue: inv.role })} -{" "}
+								{t(`invitations.status.${inv.status}`, {
+									defaultValue: inv.status,
+								})}
 							</Text>
 						</View>
 						{isAdmin && inv.status === "pending" && (

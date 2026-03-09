@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSwitcher } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import {
 	DropdownMenu,
@@ -14,11 +15,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 
-import {
-	useActiveOrg,
-	useInvalidateOrg,
-	useListOrgs,
-} from "@/hooks/use-org-queries";
+import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 
 import { CreateOrgDialog } from "./create-org-dialog";
@@ -29,9 +26,12 @@ export function OrgSwitcher() {
 	const navigate = useNavigate();
 	const { data: orgs, isPending: orgsPending } = useListOrgs();
 	const { data: activeOrg } = useActiveOrg();
-	const { invalidateActiveOrg, invalidateActiveMember, invalidateListOrgs } =
-		useInvalidateOrg();
 	const [createOpen, setCreateOpen] = useState(false);
+
+	const { handleSwitch } = useOrgSwitcher({
+		onSwitchSuccess: () => navigate({ to: "/org" }),
+		onError: (message) => console.error(message),
+	});
 
 	if (sessionPending) {
 		return <Skeleton className="h-8 w-24" />;
@@ -40,16 +40,6 @@ export function OrgSwitcher() {
 	if (!session) {
 		return null;
 	}
-
-	const handleSwitch = async (orgId: string) => {
-		await authClient.organization.setActive({ organizationId: orgId });
-		await Promise.all([
-			invalidateActiveOrg(),
-			invalidateActiveMember(),
-			invalidateListOrgs(),
-		]);
-		navigate({ to: "/org" });
-	};
 
 	return (
 		<>

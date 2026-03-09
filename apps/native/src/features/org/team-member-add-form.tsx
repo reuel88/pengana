@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { useTeamMemberAdd } from "@pengana/org-client";
 import {
+	ActivityIndicator,
 	Alert,
 	StyleSheet,
 	Text,
@@ -9,9 +10,6 @@ import {
 	View,
 } from "react-native";
 
-import { useInvalidateOrg } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
 
 export function TeamMemberAddForm({
@@ -23,30 +21,12 @@ export function TeamMemberAddForm({
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { invalidateTeamMembers } = useInvalidateOrg();
-	const [memberEmail, setMemberEmail] = useState("");
 
-	const handleAddMember = async () => {
-		if (!memberEmail) return;
-		const member = members?.find((m) => m.user.email === memberEmail);
-		if (!member) {
-			Alert.alert(t("teams.error"));
-			return;
-		}
-		await authMutation({
-			mutationFn: () =>
-				authClient.organization.addTeamMember({
-					teamId,
-					userId: member.userId,
-				}),
-			successMessage: t("teams.addMemberSuccess"),
-			errorMessage: t("teams.error"),
-			onSuccess: () => {
-				setMemberEmail("");
-				invalidateTeamMembers(teamId);
-			},
-		});
-	};
+	const { email, setEmail, handleAdd, loading } = useTeamMemberAdd({
+		onSuccess: () => Alert.alert("", t("teams.addMemberSuccess")),
+		onError: (message) =>
+			Alert.alert(t("common:error.title"), message || t("teams.error")),
+	});
 
 	return (
 		<View style={styles.addRow}>
@@ -55,8 +35,8 @@ export function TeamMemberAddForm({
 					styles.input,
 					{ flex: 1, color: theme.text, borderColor: theme.border },
 				]}
-				value={memberEmail}
-				onChangeText={setMemberEmail}
+				value={email}
+				onChangeText={setEmail}
 				placeholder={t("invitations.emailPlaceholder")}
 				placeholderTextColor={theme.border}
 				keyboardType="email-address"
@@ -64,9 +44,14 @@ export function TeamMemberAddForm({
 			/>
 			<TouchableOpacity
 				style={[styles.addButton, { backgroundColor: theme.primary }]}
-				onPress={handleAddMember}
+				onPress={() => handleAdd(teamId, members ?? [])}
+				disabled={loading}
 			>
-				<Text style={{ color: "#fff" }}>{t("teams.addMember")}</Text>
+				{loading ? (
+					<ActivityIndicator color="#fff" size="small" />
+				) : (
+					<Text style={{ color: "#fff" }}>{t("teams.addMember")}</Text>
+				)}
 			</TouchableOpacity>
 		</View>
 	);

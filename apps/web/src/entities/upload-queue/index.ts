@@ -1,9 +1,9 @@
 export type { FileDataRecord } from "@pengana/todo-client";
 export {
 	createWebUploadAdapter,
-	getFileForUpload,
-	removeFileForUpload,
-	storeFileForUpload,
+	getFileFromMemory,
+	removeFileFromMemory,
+	storeFileInMemory,
 	UploadQueueDatabase,
 	uploadQueueDb,
 } from "@pengana/todo-client";

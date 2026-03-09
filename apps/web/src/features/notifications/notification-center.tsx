@@ -7,16 +7,8 @@ import {
 	DropdownMenuTrigger,
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import {
-	useInvalidateNotifications,
-	useNotifications,
-} from "@/features/notifications/use-notification-queries";
-import { useInvalidateOrg, useUserInvitations } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
-import { client } from "@/utils/orpc";
+
+import { useNotificationCenter } from "./use-notification-center";
 
 function InvitationItem({
 	invitation,
@@ -31,7 +23,7 @@ function InvitationItem({
 		role: string;
 	};
 	disabled: boolean;
-	onAccept: (id: string, orgId: string) => void;
+	onAccept: (id: string) => void;
 	onReject: (id: string) => void;
 }) {
 	const { t } = useTranslation("notifications");
@@ -55,7 +47,7 @@ function InvitationItem({
 						size="sm"
 						variant="default"
 						disabled={disabled}
-						onClick={() => onAccept(invitation.id, invitation.organizationId)}
+						onClick={() => onAccept(invitation.id)}
 					>
 						{t("accept")}
 					</Button>
@@ -80,6 +72,7 @@ function NotificationItem({
 	notification: { id: string; body: string; createdAt: Date };
 	onMarkRead: (id: string) => void;
 }) {
+	const { t } = useTranslation("notifications");
 	return (
 		<DropdownMenuItem
 			onSelect={(e) => e.preventDefault()}
@@ -95,6 +88,7 @@ function NotificationItem({
 				size="sm"
 				variant="ghost"
 				onClick={() => onMarkRead(notification.id)}
+				aria-label={t("markRead")}
 			>
 				&times;
 			</Button>
@@ -104,74 +98,17 @@ function NotificationItem({
 
 export function NotificationCenter() {
 	const { t } = useTranslation("notifications");
-	const { data: invitations } = useUserInvitations();
-	const { data: notifications } = useNotifications();
-	const { invalidateUserInvitations, invalidateActiveOrg, invalidateListOrgs } =
-		useInvalidateOrg();
-	const { invalidateNotifications } = useInvalidateNotifications();
-	const [actingId, setActingId] = useState<string | null>(null);
 
-	const pending = invitations?.filter((i) => i.status === "pending") ?? [];
-	const unreadNotifications = notifications ?? [];
-	const badgeCount = pending.length + unreadNotifications.length;
+	const {
+		pending,
+		notifications,
+		badgeCount,
+		handleMarkRead,
+		handleMarkAllRead,
+		invitationActions,
+	} = useNotificationCenter({});
 
-	const handleAccept = async (invitationId: string, organizationId: string) => {
-		setActingId(invitationId);
-		try {
-			await authMutation({
-				mutationFn: () =>
-					authClient.organization.acceptInvitation({ invitationId }),
-				successMessage: t("accepted"),
-				errorMessage: t("error"),
-				onSuccess: async () => {
-					await authClient.organization.setActive({ organizationId });
-					await Promise.all([
-						invalidateUserInvitations(),
-						invalidateActiveOrg(),
-						invalidateListOrgs(),
-					]);
-					client.notification
-						.onInvitationAccepted({ invitationId })
-						.catch(() => {});
-				},
-			});
-		} finally {
-			setActingId(null);
-		}
-	};
-
-	const handleReject = async (invitationId: string) => {
-		setActingId(invitationId);
-		try {
-			await authMutation({
-				mutationFn: () =>
-					authClient.organization.rejectInvitation({ invitationId }),
-				successMessage: t("rejected"),
-				errorMessage: t("error"),
-				onSuccess: () => invalidateUserInvitations(),
-			});
-		} finally {
-			setActingId(null);
-		}
-	};
-
-	const handleMarkRead = async (id: string) => {
-		try {
-			await client.notification.markRead({ id });
-			await invalidateNotifications();
-		} catch {
-			toast.error(t("error"));
-		}
-	};
-
-	const handleMarkAllRead = async () => {
-		try {
-			await client.notification.markAllRead();
-			await invalidateNotifications();
-		} catch {
-			toast.error(t("error"));
-		}
-	};
+	const { actingId, handleAccept, handleReject } = invitationActions;
 
 	return (
 		<DropdownMenu>
@@ -209,12 +146,12 @@ export function NotificationCenter() {
 								))}
 							</>
 						)}
-						{unreadNotifications.length > 0 && (
+						{notifications.length > 0 && (
 							<>
 								<div className="px-2 py-1 font-medium text-muted-foreground text-xs">
 									{t("notifications")}
 								</div>
-								{unreadNotifications.map((n) => (
+								{notifications.map((n) => (
 									<NotificationItem
 										key={n.id}
 										notification={n}

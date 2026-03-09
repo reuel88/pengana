@@ -21,12 +21,7 @@ export function createUploadTransport(
 	options: UploadTransportOptions,
 ): UploadTransport {
 	return {
-		async upload(input: {
-			todoId: string;
-			fileUri: string;
-			mimeType: string;
-			idempotencyKey: string;
-		}): Promise<{ attachmentUrl: string }> {
+		async upload(input) {
 			const data = await options.getBase64(input.todoId);
 			if (!data) {
 				throw new Error(

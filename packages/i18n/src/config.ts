@@ -35,3 +35,7 @@ export type Namespace = (typeof NAMESPACES)[number];
 export function isSupportedLocale(locale: string): locale is SupportedLocale {
 	return (SUPPORTED_LOCALES as readonly string[]).includes(locale);
 }
+
+export function resolveLocale(lang: string): SupportedLocale {
+	return isSupportedLocale(lang) ? lang : DEFAULT_LOCALE;
+}

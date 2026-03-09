@@ -5,8 +5,14 @@
 		".": {
 			"default": "./src/index.ts"
 		},
-		"./*": {
-			"default": "./src/*.ts"
+		"./lib/*": {
+			"default": "./src/lib/*.ts"
+		},
+		"./adapters/*": {
+			"default": "./src/adapters/*.ts"
+		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
 		}
 	},
 	"scripts": {},
@@ -20,6 +26,7 @@
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.13",
 		"typescript": "catalog:"
 	}
 }

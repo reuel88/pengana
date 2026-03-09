@@ -15,7 +15,20 @@ import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { client } from "@/utils/orpc";
 
-export function SyncDevtools() {
+function getLogEntryStyle(
+	eventType: string,
+	textColor: string,
+): { color: string; opacity: number } {
+	if (eventType === "sync:error") {
+		return { color: STATUS_COLORS.error, opacity: 1 };
+	}
+	if (eventType === "sync:conflict") {
+		return { color: STATUS_COLORS.warning, opacity: 1 };
+	}
+	return { color: textColor, opacity: 0.5 };
+}
+
+function SyncDevtoolsContent() {
 	const { isOnline, isSyncing, triggerSync } = useSync();
 	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
 	const [isOpen, setIsOpen] = useState(false);
@@ -145,19 +158,7 @@ export function SyncDevtools() {
 									<Text
 										style={[
 											styles.logText,
-											{
-												color:
-													event.type === "sync:error"
-														? STATUS_COLORS.error
-														: event.type === "sync:conflict"
-															? STATUS_COLORS.warning
-															: theme.text,
-												opacity:
-													event.type === "sync:error" ||
-													event.type === "sync:conflict"
-														? 1
-														: 0.5,
-											},
+											getLogEntryStyle(event.type, theme.text),
 										]}
 									>
 										{new Date(event.timestamp).toLocaleTimeString()} [
@@ -171,6 +172,11 @@ export function SyncDevtools() {
 			)}
 		</View>
 	);
+}
+
+export function SyncDevtools() {
+	if (!__DEV__) return null;
+	return <SyncDevtoolsContent />;
 }
 
 const styles = StyleSheet.create({
