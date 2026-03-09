@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";

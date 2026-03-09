@@ -1,7 +1,7 @@
 import { env } from "@pengana/env/web";
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { authClient } from "@/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
