@@ -18,6 +18,8 @@ export function useUploadQueue(
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadEvents, setUploadEvents] = useState<UploadEvent[]>([]);
 
+	const MAX_UPLOAD_EVENT_HISTORY = 100;
+
 	const syncRef = useStableSyncRef(engineRef);
 	const isOnlineRef = useRef(isOnline);
 	isOnlineRef.current = isOnline;
@@ -35,7 +37,10 @@ export function useUploadQueue(
 		uploadQueueRef.current = queue;
 
 		const unsubscribe = queue.onEvent((event) => {
-			setUploadEvents((prev) => [...prev.slice(-99), event]);
+			setUploadEvents((prev) => [
+				...prev.slice(-(MAX_UPLOAD_EVENT_HISTORY - 1)),
+				event,
+			]);
 			if (event.type === "upload:start") setIsUploading(true);
 			if (event.type === "upload:complete" || event.type === "upload:error") {
 				setIsUploading(false);

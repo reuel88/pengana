@@ -27,7 +27,7 @@ export function OnboardingInvitations({
 	const { data: invitations } = useUserInvitations();
 
 	const { actingId, handleAccept } = useInvitationActions({
-		onAcceptSuccess: () => onAccepted(),
+		onAcceptSuccess: onAccepted,
 		onError: (message) => Alert.alert(t("invitations.error"), message),
 	});
 

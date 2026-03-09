@@ -14,17 +14,17 @@ function LoadingState() {
 	);
 }
 
+type ActionPromptProps = {
+	messageKey: "loginPrompt" | "onboardingPrompt" | "common:error.generic";
+	buttonKey: "loginButton" | "onboardingButton" | "common:error.retry";
+} & ({ url: string; onAction?: never } | { onAction: () => void; url?: never });
+
 function ActionPrompt({
 	messageKey,
 	buttonKey,
 	url,
 	onAction,
-}: {
-	messageKey: "loginPrompt" | "onboardingPrompt" | "common:error.generic";
-	buttonKey: "loginButton" | "onboardingButton" | "common:error.retry";
-	url?: string;
-	onAction?: () => void;
-}) {
+}: ActionPromptProps) {
 	const { t } = useTranslation();
 	return (
 		<>

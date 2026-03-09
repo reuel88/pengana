@@ -11,7 +11,6 @@ import {
 	View,
 } from "react-native";
 
-import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
 
@@ -19,14 +18,15 @@ export function TeamNameEditor({
 	teamId,
 	teamName,
 	orgId,
+	isAdmin,
 }: {
 	teamId: string;
 	teamName: string;
 	orgId: string;
+	isAdmin: boolean;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { isAdmin } = useOrgRole();
 
 	const { editing, setEditing, newName, setNewName, handleSave, loading } =
 		useTeamNameEditor({

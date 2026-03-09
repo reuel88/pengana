@@ -64,19 +64,17 @@ function InvitationItem({
 function NotificationItem({
 	notification,
 	onMarkRead,
-	locale,
 }: {
 	notification: { id: string; body: string; createdAt: Date };
 	onMarkRead: (id: string) => void;
-	locale: string;
 }) {
-	const { t } = useTranslation("notifications");
+	const { t, i18n } = useTranslation("notifications");
 	return (
 		<div className="flex items-center justify-between gap-2 p-2">
 			<div className="flex flex-col gap-0.5">
 				<span className="text-sm">{notification.body}</span>
 				<span className="text-muted-foreground text-xs">
-					{notification.createdAt.toLocaleDateString(locale)}
+					{notification.createdAt.toLocaleDateString(i18n.language)}
 				</span>
 			</div>
 			<Button
@@ -151,7 +149,6 @@ export function NotificationCenter() {
 										key={n.id}
 										notification={n}
 										onMarkRead={handleMarkRead}
-										locale={i18n.language}
 									/>
 								))}
 								<div className="border-t px-2 py-1.5">

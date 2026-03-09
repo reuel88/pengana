@@ -8,8 +8,8 @@ import type {
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
 import { createDexieSyncAdapter } from "@pengana/todo-client";
 import {
+	createIndexedDbUploadTransport,
 	createWebUploadAdapter,
-	createWebUploadTransport,
 } from "@/entities/upload-queue";
 import type {
 	BackgroundBroadcast,
@@ -103,7 +103,7 @@ function createSyncEngine(userId: string): SyncEngine {
 
 function createUploadQueueForEngine(engine: SyncEngine): UploadQueue {
 	const uploadAdapter = createWebUploadAdapter();
-	const uploadTransport = createWebUploadTransport();
+	const uploadTransport = createIndexedDbUploadTransport();
 	const queue = new UploadQueue(uploadAdapter, uploadTransport);
 
 	queue.onEvent((event: UploadEvent) => {

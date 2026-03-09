@@ -14,6 +14,33 @@ function redactId(id: string): string {
 	return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
+async function authenticateRequest(
+	req: IncomingMessage,
+	url: URL,
+): Promise<string | null> {
+	try {
+		const headers = new Headers();
+		for (const [key, value] of Object.entries(req.headers)) {
+			if (value) {
+				headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+			}
+		}
+
+		// Native clients pass cookies as a query param since WebSocket
+		// on React Native doesn't send cookies automatically
+		const cookieParam = url.searchParams.get("cookie");
+		if (cookieParam) {
+			headers.set("cookie", cookieParam);
+		}
+
+		const session = await auth.api.getSession({ headers });
+		return session?.user?.id ?? null;
+	} catch (error) {
+		wsLogger.debug`authenticateRequest failed: ${error}`;
+		return null;
+	}
+}
+
 export function setupWebSocket(server: ServerType) {
 	const connections = new Map<string, Set<WebSocket>>();
 	const wss = new WebSocketServer({ noServer: true });
@@ -115,31 +142,4 @@ export function setupWebSocket(server: ServerType) {
 	}
 
 	return { notifyUser };
-}
-
-async function authenticateRequest(
-	req: IncomingMessage,
-	url: URL,
-): Promise<string | null> {
-	try {
-		const headers = new Headers();
-		for (const [key, value] of Object.entries(req.headers)) {
-			if (value) {
-				headers.set(key, Array.isArray(value) ? value.join(", ") : value);
-			}
-		}
-
-		// Native clients pass cookies as a query param since WebSocket
-		// on React Native doesn't send cookies automatically
-		const cookieParam = url.searchParams.get("cookie");
-		if (cookieParam) {
-			headers.set("cookie", cookieParam);
-		}
-
-		const session = await auth.api.getSession({ headers });
-		return session?.user?.id ?? null;
-	} catch (error) {
-		wsLogger.debug`authenticateRequest failed: ${error}`;
-		return null;
-	}
 }

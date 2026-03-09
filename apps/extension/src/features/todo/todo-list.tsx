@@ -15,14 +15,14 @@ const fileStorage = {
 export function TodoList({ todos }: { todos: WebTodo[] }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const { t } = useTranslation();
-	const [errors, setErrors] = useState<Record<string, string | null>>({});
+	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	const onError = useCallback((id: string, message: string) => {
 		setErrors((prev) => ({ ...prev, [id]: message }));
 	}, []);
 
 	const clearError = useCallback((id: string) => {
-		setErrors((prev) => ({ ...prev, [id]: null }));
+		setErrors(({ [id]: _, ...rest }) => rest);
 	}, []);
 
 	const onDeleteSuccess = useCallback((id: string) => {

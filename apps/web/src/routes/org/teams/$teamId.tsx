@@ -151,18 +151,20 @@ function TeamMembersTable({
 		);
 	}
 
+	const membersByUserId = new Map(orgMembers.map((m) => [m.userId, m]));
+
 	const columns: Column<TeamMember>[] = [
 		{
 			header: t("members.name"),
 			cell: (tm) => {
-				const orgMember = orgMembers.find((m) => m.userId === tm.userId);
+				const orgMember = membersByUserId.get(tm.userId);
 				return orgMember?.user.name ?? tm.userId;
 			},
 		},
 		{
 			header: t("members.email"),
 			cell: (tm) => {
-				const orgMember = orgMembers.find((m) => m.userId === tm.userId);
+				const orgMember = membersByUserId.get(tm.userId);
 				return orgMember?.user.email ?? "";
 			},
 		},

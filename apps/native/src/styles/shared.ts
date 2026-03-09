@@ -14,6 +14,10 @@ export function mutedText(theme: { text: string }) {
 	return { color: theme.text, opacity: 0.5 } as const;
 }
 
+export function primaryText(theme: { text: string }) {
+	return { color: theme.text } as const;
+}
+
 export function secondaryText(theme: { text: string }) {
 	return { color: theme.text, opacity: 0.7, fontSize: 12 } as const;
 }

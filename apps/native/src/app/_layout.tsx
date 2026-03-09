@@ -120,15 +120,14 @@ function RootLayoutInner() {
 	const [orgError, setOrgError] = useState(false);
 
 	useEffect(() => {
-		if (isPending || !session || orgError) {
-			if (isPending || !session) {
-				setLifecycleChecked(false);
-				setNeedsOnboarding(false);
-				setLifecycleData(null);
-				setOrgError(false);
-			}
+		if (isPending || !session) {
+			setLifecycleChecked(false);
+			setNeedsOnboarding(false);
+			setLifecycleData(null);
+			setOrgError(false);
 			return;
 		}
+		if (orgError) return; // hold error UI; don't re-fetch
 
 		let cancelled = false;
 		(async () => {

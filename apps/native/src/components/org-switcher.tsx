@@ -32,7 +32,7 @@ function CreateOrgModal({
 
 	const { name, setName, slug, setSlug, loading, handleSubmit } = useCreateOrg({
 		errorMessage: t("create.error"),
-		onSuccess: (orgId) => onCreated(orgId),
+		onSuccess: onCreated,
 	});
 
 	return (

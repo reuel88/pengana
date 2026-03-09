@@ -7,12 +7,6 @@ import type {
 import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
 
-const KNOWN_BROADCAST_TYPES = new Set([
-	"sync:event",
-	"upload:event",
-	"status:update",
-]);
-
 export function useSyncEngine(userId: string) {
 	const [isOnline, setIsOnline] = useState(navigator.onLine);
 	const [isSyncing, setIsSyncing] = useState(false);
@@ -43,7 +37,7 @@ export function useSyncEngine(userId: string) {
 	// Listen for broadcasts from background
 	useEffect(() => {
 		const listener = (message: BackgroundBroadcast) => {
-			if (!message?.type || !KNOWN_BROADCAST_TYPES.has(message.type)) return;
+			if (!message?.type) return;
 
 			switch (message.type) {
 				case "sync:event": {

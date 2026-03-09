@@ -9,4 +9,4 @@ export {
 	removeFileFromIndexedDB,
 	storeFileInIndexedDB,
 } from "@pengana/todo-client/adapters/dexie-file-store";
-export { createWebUploadTransport } from "./transport";
+export { createIndexedDbUploadTransport } from "./transport";

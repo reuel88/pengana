@@ -62,6 +62,7 @@ app.use("/rpc/todo.*", syncLimiter);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
+// handleOrpcRoutes only matches /rpc and /api-reference; all other paths fall through
 app.use("/*", handleOrpcRoutes);
 
 app.get("/", (c) => {
@@ -83,5 +84,7 @@ const server = serve(
 	},
 );
 
-notifyRef.current = setupWebSocket(server).notifyUser;
-setNotifyUser(notifyRef.current);
+// Wire WebSocket notifications into ORPC context and auth hooks
+const { notifyUser } = setupWebSocket(server);
+notifyRef.current = notifyUser;
+setNotifyUser(notifyUser);

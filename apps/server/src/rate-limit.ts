@@ -3,6 +3,7 @@ import { env } from "@pengana/env/server";
 import type { Context } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 
+const HTTP_TOO_MANY_REQUESTS = 429;
 const isDev = env.NODE_ENV === "development";
 const DEV_MULTIPLIER = 10;
 
@@ -17,7 +18,7 @@ const rateLimitExceededHandler = (c: Context) =>
 				message: "Rate limit exceeded. Try again later.",
 			},
 		},
-		429,
+		HTTP_TOO_MANY_REQUESTS,
 	);
 
 function createLimiter(windowMs: number, prodLimit: number) {

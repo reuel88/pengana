@@ -6,7 +6,7 @@ import {
 } from "@pengana/todo-client/adapters/dexie-file-store";
 import { client } from "@/utils/orpc";
 
-export function createWebUploadTransport(): UploadTransport {
+export function createIndexedDbUploadTransport(): UploadTransport {
 	return createUploadTransport({
 		rpc: client.upload,
 		async getBase64(todoId) {

@@ -35,34 +35,38 @@ export const notifyRef: { current: (userId: string) => void } = {
 	},
 };
 
+async function parseJsonBody(
+	response: Response,
+): Promise<Record<string, unknown>> {
+	try {
+		const raw: unknown = await response.clone().json();
+		if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
+			return raw as Record<string, unknown>;
+		}
+		return {};
+	} catch {
+		return {};
+	}
+}
+
 async function ensureErrorEnvelope(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
-	if (contentType.includes("application/json") && response.status >= 400) {
-		try {
-			const raw: unknown = await response.clone().json();
-			const body =
-				raw != null && typeof raw === "object" && !Array.isArray(raw)
-					? (raw as Record<string, unknown>)
-					: {};
-			return c.json(
-				{
-					success: false,
-					error: {
-						code:
-							typeof body.code === "string"
-								? body.code
-								: "INTERNAL_SERVER_ERROR",
-						message:
-							typeof body.message === "string" ? body.message : "Unknown error",
-					},
-				},
-				response.status as ContentfulStatusCode,
-			);
-		} catch {
-			return c.newResponse(response.body, response);
-		}
+	if (!contentType.includes("application/json") || response.status < 400) {
+		return c.newResponse(response.body, response);
 	}
-	return c.newResponse(response.body, response);
+	const body = await parseJsonBody(response);
+	return c.json(
+		{
+			success: false,
+			error: {
+				code:
+					typeof body.code === "string" ? body.code : "INTERNAL_SERVER_ERROR",
+				message:
+					typeof body.message === "string" ? body.message : "Unknown error",
+			},
+		},
+		response.status as ContentfulStatusCode,
+	);
 }
 
 export async function handleOrpcRoutes(c: Context, next: Next) {
@@ -74,11 +78,11 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 	}
 
 	const appContext = await createContext({ context: c });
-	const fullContext = { ...appContext, notifyUser: notifyRef.current };
+	const orpcContext = { ...appContext, notifyUser: notifyRef.current };
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",
-		context: fullContext,
+		context: orpcContext,
 	});
 	if (rpcResult.matched) {
 		return c.newResponse(rpcResult.response.body, rpcResult.response);
@@ -86,7 +90,7 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 
 	const apiResult = await apiHandler.handle(c.req.raw, {
 		prefix: "/api-reference",
-		context: fullContext,
+		context: orpcContext,
 	});
 	if (apiResult.matched) {
 		return ensureErrorEnvelope(c, apiResult.response);

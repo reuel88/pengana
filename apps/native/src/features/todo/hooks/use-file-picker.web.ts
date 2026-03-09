@@ -29,6 +29,7 @@ export function useFilePicker(todoId: string) {
 				return;
 			}
 
+			// URL is retained for display after success; caller is responsible for revocation.
 			const localUri = URL.createObjectURL(file);
 			try {
 				await attachFile(todoId, localUri);

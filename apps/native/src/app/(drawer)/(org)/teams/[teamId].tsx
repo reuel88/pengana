@@ -106,6 +106,7 @@ export default function TeamDetailScreen() {
 								teamId={teamId}
 								teamName={teamName}
 								orgId={activeOrg.id}
+								isAdmin={isAdmin}
 							/>
 							{isAdmin && (
 								<TouchableOpacity
