@@ -1,0 +1,10 @@
+{
+	"extends": "@pengana/config/tsconfig.base.json",
+	"compilerOptions": {
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"verbatimModuleSyntax": false,
+		"outDir": "dist"
+	},
+	"include": ["**/*.ts"]
+}

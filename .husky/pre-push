@@ -3,3 +3,4 @@ pnpm check
 pnpm check-types
 pnpm check:i18n
 pnpm build
+pnpm e2e

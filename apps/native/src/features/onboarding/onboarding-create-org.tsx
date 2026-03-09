@@ -1,16 +1,25 @@
 import { useTranslation } from "@pengana/i18n";
+import { useCreateOrg } from "@pengana/org-client";
 import {
 	ActivityIndicator,
+	Alert,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { z } from "zod";
 
-import { useCreateOrg } from "@/hooks/use-create-org";
+import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 
 import { onboardingStyles as styles } from "./onboarding-styles";
+
+const createOrgSchema = z.object({
+	name: z.string().min(1),
+	slug: z.string(),
+	logo: z.string(),
+});
 
 export function OnboardingCreateOrg({
 	onCreated,
@@ -23,11 +32,18 @@ export function OnboardingCreateOrg({
 	const { t: tOrg } = useTranslation("organization");
 	const { theme } = useTheme();
 
-	const { name, setName, slug, setSlug, logo, setLogo, loading, handleSubmit } =
-		useCreateOrg({
-			errorMessage: t("create.error"),
-			onSuccess: () => onCreated(),
-		});
+	const { createOrg, loading } = useCreateOrg({
+		onSuccess: () => onCreated(),
+		onError: (message) => Alert.alert("", message || t("create.error")),
+	});
+
+	const form = useZodForm({
+		schema: createOrgSchema,
+		defaultValues: { name: "", slug: "", logo: "" },
+		onSubmit: async ({ value }) => {
+			await createOrg(value);
+		},
+	});
 
 	return (
 		<View
@@ -46,74 +62,100 @@ export function OnboardingCreateOrg({
 			<Text style={[styles.label, { color: theme.text }]}>
 				{tOrg("create.name")}
 			</Text>
-			<TextInput
-				style={[
-					styles.input,
-					{
-						color: theme.text,
-						borderColor: theme.border,
-						backgroundColor: theme.background,
-					},
-				]}
-				value={name}
-				onChangeText={setName}
-				placeholder={tOrg("create.namePlaceholder")}
-				placeholderTextColor={theme.border}
-			/>
+			<form.Field name="name">
+				{(field) => (
+					<TextInput
+						style={[
+							styles.input,
+							{
+								color: theme.text,
+								borderColor: theme.border,
+								backgroundColor: theme.background,
+							},
+						]}
+						value={field.state.value}
+						onChangeText={field.handleChange}
+						onBlur={field.handleBlur}
+						placeholder={tOrg("create.namePlaceholder")}
+						placeholderTextColor={theme.border}
+					/>
+				)}
+			</form.Field>
 
 			<Text style={[styles.label, { color: theme.text }]}>
 				{tOrg("create.slug")}
 			</Text>
-			<TextInput
-				style={[
-					styles.input,
-					{
-						color: theme.text,
-						borderColor: theme.border,
-						backgroundColor: theme.background,
-					},
-				]}
-				value={slug}
-				onChangeText={setSlug}
-				placeholder={tOrg("create.slugPlaceholder")}
-				placeholderTextColor={theme.border}
-			/>
+			<form.Field name="slug">
+				{(field) => (
+					<TextInput
+						style={[
+							styles.input,
+							{
+								color: theme.text,
+								borderColor: theme.border,
+								backgroundColor: theme.background,
+							},
+						]}
+						value={field.state.value}
+						onChangeText={field.handleChange}
+						onBlur={field.handleBlur}
+						placeholder={tOrg("create.slugPlaceholder")}
+						placeholderTextColor={theme.border}
+					/>
+				)}
+			</form.Field>
 
 			<Text style={[styles.label, { color: theme.text }]}>
 				{tOrg("create.logo")}
 			</Text>
-			<TextInput
-				style={[
-					styles.input,
-					{
-						color: theme.text,
-						borderColor: theme.border,
-						backgroundColor: theme.background,
-					},
-				]}
-				value={logo}
-				onChangeText={setLogo}
-				placeholder={tOrg("create.logoPlaceholder")}
-				placeholderTextColor={theme.border}
-			/>
-
-			<TouchableOpacity
-				style={[
-					styles.submitButton,
-					{
-						backgroundColor: theme.primary,
-						opacity: loading || !name.trim() ? 0.5 : 1,
-					},
-				]}
-				onPress={handleSubmit}
-				disabled={loading || !name.trim()}
-			>
-				{loading ? (
-					<ActivityIndicator size="small" color="#fff" />
-				) : (
-					<Text style={styles.submitButtonText}>{tOrg("create.submit")}</Text>
+			<form.Field name="logo">
+				{(field) => (
+					<TextInput
+						style={[
+							styles.input,
+							{
+								color: theme.text,
+								borderColor: theme.border,
+								backgroundColor: theme.background,
+							},
+						]}
+						value={field.state.value}
+						onChangeText={field.handleChange}
+						onBlur={field.handleBlur}
+						placeholder={tOrg("create.logoPlaceholder")}
+						placeholderTextColor={theme.border}
+					/>
 				)}
-			</TouchableOpacity>
+			</form.Field>
+
+			<form.Subscribe
+				selector={(s) => ({
+					isSubmitting: s.isSubmitting,
+					name: s.values.name,
+				})}
+			>
+				{({ isSubmitting, name }) => (
+					<TouchableOpacity
+						style={[
+							styles.submitButton,
+							{
+								backgroundColor: theme.primary,
+								opacity: isSubmitting || loading || !name.trim() ? 0.5 : 1,
+							},
+						]}
+						onPress={form.handleSubmit}
+						disabled={isSubmitting || loading || !name.trim()}
+					>
+						{loading ? (
+							<ActivityIndicator size="small" color="#fff" />
+						) : (
+							<Text style={styles.submitButtonText}>
+								{tOrg("create.submit")}
+							</Text>
+						)}
+					</TouchableOpacity>
+				)}
+			</form.Subscribe>
 
 			{onBackToInvitations && (
 				<TouchableOpacity

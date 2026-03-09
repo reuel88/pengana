@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignInSchema } from "@pengana/i18n/zod";
-import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 
+import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/utils/form-helpers";
 import { queryClient } from "@/utils/orpc";
@@ -13,10 +13,10 @@ function SignIn() {
 	const [error, setError] = useState<string | null>(null);
 	const { t } = useTranslation();
 
-	const form = useForm({
+	const form = useZodForm({
+		schema: makeNativeSignInSchema(t),
 		defaultValues: { email: "", password: "" },
-		validators: { onSubmit: makeNativeSignInSchema(t) },
-		onSubmit: async ({ value, formApi }) => {
+		onSubmit: async ({ value }) => {
 			await authClient.signIn.email(
 				{ email: value.email.trim(), password: value.password },
 				{
@@ -25,7 +25,7 @@ function SignIn() {
 					},
 					onSuccess() {
 						setError(null);
-						formApi.reset();
+						form.reset();
 						queryClient.refetchQueries();
 					},
 				},

@@ -16,24 +16,14 @@ export function useOrgSettings({
 	const authClient = useAuthClient();
 	const { invalidateActiveOrg, invalidateListOrgs, invalidateAll } =
 		useInvalidateOrg();
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [logo, setLogo] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const syncFromOrg = (org: {
-		id: string;
+	const updateOrg = async (data: {
 		name: string;
 		slug: string;
-		logo?: string | null;
+		logo: string;
 	}) => {
-		setName(org.name);
-		setSlug(org.slug);
-		setLogo(org.logo || "");
-	};
-
-	const handleUpdate = async () => {
-		const trimmedName = name.trim();
+		const trimmedName = data.name.trim();
 		if (!trimmedName) return;
 
 		await authMutation({
@@ -41,8 +31,8 @@ export function useOrgSettings({
 				authClient.organization.update({
 					data: {
 						name: trimmedName,
-						slug: slug.trim(),
-						logo: logo.trim() || undefined,
+						slug: data.slug.trim(),
+						logo: data.logo.trim() || undefined,
 					},
 				}),
 			errorMessage: "Failed to update organization",
@@ -55,7 +45,7 @@ export function useOrgSettings({
 		});
 	};
 
-	const handleDelete = async (organizationId: string) => {
+	const deleteOrg = async (organizationId: string) => {
 		await authMutation({
 			mutationFn: () => authClient.organization.delete({ organizationId }),
 			errorMessage: "Failed to delete organization",
@@ -68,16 +58,5 @@ export function useOrgSettings({
 		});
 	};
 
-	return {
-		name,
-		setName,
-		slug,
-		setSlug,
-		logo,
-		setLogo,
-		syncFromOrg,
-		loading,
-		handleUpdate,
-		handleDelete,
-	};
+	return { updateOrg, deleteOrg, loading };
 }

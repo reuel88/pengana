@@ -9,7 +9,9 @@
 			"default": "./src/*.ts"
 		}
 	},
-	"scripts": {},
+	"scripts": {
+		"test": "vitest run"
+	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:",
 		"@logtape/logtape": "^2.0.4",
@@ -23,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

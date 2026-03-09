@@ -13,12 +13,10 @@ export function useTeamNameEditor({
 }) {
 	const authClient = useAuthClient();
 	const { invalidateTeams } = useInvalidateOrg();
-	const [editing, setEditing] = useState(false);
-	const [newName, setNewName] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const handleSave = async (teamId: string, orgId: string) => {
-		const trimmed = newName.trim();
+	const handleSave = async (teamId: string, orgId: string, name: string) => {
+		const trimmed = name.trim();
 		if (!trimmed) return;
 
 		await authMutation({
@@ -30,7 +28,6 @@ export function useTeamNameEditor({
 			errorMessage: "Failed to update team name",
 			onSuccess: async () => {
 				await invalidateTeams(orgId);
-				setEditing(false);
 				await onSuccess?.();
 			},
 			setLoading,
@@ -38,7 +35,7 @@ export function useTeamNameEditor({
 		});
 	};
 
-	return { editing, setEditing, newName, setNewName, handleSave, loading };
+	return { handleSave, loading };
 }
 
 export function useTeamMemberAdd({
@@ -50,12 +47,12 @@ export function useTeamMemberAdd({
 }) {
 	const authClient = useAuthClient();
 	const { invalidateTeamMembers } = useInvalidateOrg();
-	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 
 	const handleAdd = async (
 		teamId: string,
 		members: Array<{ userId: string; user: { email: string } }>,
+		email: string,
 	) => {
 		const member = members.find((m) => m.user.email === email);
 		if (!member) {
@@ -71,7 +68,6 @@ export function useTeamMemberAdd({
 				}),
 			errorMessage: "Failed to add team member",
 			onSuccess: async () => {
-				setEmail("");
 				await invalidateTeamMembers(teamId);
 				await onSuccess?.();
 			},
@@ -80,7 +76,7 @@ export function useTeamMemberAdd({
 		});
 	};
 
-	return { email, setEmail, handleAdd, loading };
+	return { handleAdd, loading };
 }
 
 export function useTeamActions({

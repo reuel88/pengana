@@ -1,9 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignInSchema } from "@pengana/i18n/zod";
-import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-
+import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 
 import { AuthFormField } from "./auth-form-field";
@@ -13,7 +12,8 @@ export function SignInForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 
-	const form = useForm({
+	const form = useZodForm({
+		schema: makeSignInSchema(t),
 		defaultValues: {
 			email: "",
 			password: "",
@@ -36,9 +36,6 @@ export function SignInForm() {
 					},
 				},
 			);
-		},
-		validators: {
-			onSubmit: makeSignInSchema(t),
 		},
 	});
 

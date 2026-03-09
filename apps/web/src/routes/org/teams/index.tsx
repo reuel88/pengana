@@ -11,6 +11,8 @@ import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { OrgGuard } from "@/components/org-guard";
 import {
@@ -19,11 +21,15 @@ import {
 	useOrgRole,
 	useTeams,
 } from "@/hooks/use-org-queries";
+import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
 
 export const Route = createFileRoute("/org/teams/")({
 	component: TeamsIndexPage,
+});
+
+const createTeamSchema = z.object({
+	teamName: z.string().min(1),
 });
 
 function TeamsIndexPage() {
@@ -32,35 +38,34 @@ function TeamsIndexPage() {
 	const { data: teams, isPending: teamsLoading } = useTeams(activeOrg?.id);
 	const { invalidateTeams } = useInvalidateOrg();
 	const [createOpen, setCreateOpen] = useState(false);
-	const [teamName, setTeamName] = useState("");
-	const [loading, setLoading] = useState(false);
 	const { isAdmin } = useOrgRole();
+
+	const form = useZodForm({
+		schema: createTeamSchema,
+		defaultValues: { teamName: "" },
+		onSubmit: async ({ value }) => {
+			if (!activeOrg?.id) return;
+			const { error } = await authClient.organization.createTeam({
+				name: value.teamName,
+				organizationId: activeOrg.id,
+			});
+			if (error) {
+				toast.error(t("teams.error"));
+				return;
+			}
+			toast.success(t("teams.createSuccess"));
+			await invalidateTeams(activeOrg.id);
+			setCreateOpen(false);
+			form.reset();
+		},
+	});
 
 	return (
 		<OrgGuard>
-			{(org) => {
+			{(_org) => {
 				if (teamsLoading) {
 					return <p>{t("common:status.loading")}</p>;
 				}
-
-				const handleCreate = async (e: React.FormEvent) => {
-					e.preventDefault();
-					await authMutation({
-						mutationFn: () =>
-							authClient.organization.createTeam({
-								name: teamName,
-								organizationId: org.id,
-							}),
-						successMessage: t("teams.createSuccess"),
-						errorMessage: t("teams.error"),
-						setLoading,
-						onSuccess: async () => {
-							await invalidateTeams(org.id);
-							setCreateOpen(false);
-							setTeamName("");
-						},
-					});
-				};
 
 				return (
 					<div className="flex flex-col gap-4">
@@ -75,22 +80,46 @@ function TeamsIndexPage() {
 										<DialogCloseButton />
 										<DialogTitle>{t("teams.create")}</DialogTitle>
 										<form
-											onSubmit={handleCreate}
+											onSubmit={(e) => {
+												e.preventDefault();
+												form.handleSubmit();
+											}}
 											className="mt-4 flex flex-col gap-3"
 										>
-											<div className="flex flex-col gap-1">
-												<Label htmlFor="team-name">{t("teams.name")}</Label>
-												<Input
-													id="team-name"
-													value={teamName}
-													onChange={(e) => setTeamName(e.target.value)}
-													placeholder={t("teams.namePlaceholder")}
-													required
-												/>
-											</div>
-											<Button type="submit" disabled={loading || !teamName}>
-												{loading ? t("common:submitting") : t("teams.create")}
-											</Button>
+											<form.Field name="teamName">
+												{(field) => (
+													<div className="flex flex-col gap-1">
+														<Label htmlFor="team-name">{t("teams.name")}</Label>
+														<Input
+															id="team-name"
+															value={field.state.value}
+															onBlur={field.handleBlur}
+															onChange={(e) =>
+																field.handleChange(e.target.value)
+															}
+															placeholder={t("teams.namePlaceholder")}
+															required
+														/>
+													</div>
+												)}
+											</form.Field>
+											<form.Subscribe
+												selector={(s): [boolean, boolean] => [
+													s.isSubmitting,
+													!s.values.teamName,
+												]}
+											>
+												{([isSubmitting, nameEmpty]) => (
+													<Button
+														type="submit"
+														disabled={isSubmitting || nameEmpty}
+													>
+														{isSubmitting
+															? t("common:submitting")
+															: t("teams.create")}
+													</Button>
+												)}
+											</form.Subscribe>
 										</form>
 									</DialogPopup>
 								</Dialog>

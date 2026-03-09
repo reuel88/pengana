@@ -13,23 +13,24 @@ export function useInviteMember({
 }) {
 	const authClient = useAuthClient();
 	const { invalidateActiveOrg } = useInvalidateOrg();
-	const [email, setEmail] = useState("");
-	const [role, setRole] = useState<"member" | "admin">("member");
 	const [loading, setLoading] = useState(false);
 
-	const handleInvite = async (organizationId: string) => {
-		if (!email) return;
+	const inviteMember = async (data: {
+		email: string;
+		role: "member" | "admin";
+		organizationId: string;
+	}) => {
+		if (!data.email) return;
 
 		await authMutation({
 			mutationFn: () =>
 				authClient.organization.inviteMember({
-					email,
-					role,
-					organizationId,
+					email: data.email,
+					role: data.role,
+					organizationId: data.organizationId,
 				}),
 			errorMessage: "Failed to send invitation",
 			onSuccess: async () => {
-				setEmail("");
 				await invalidateActiveOrg();
 				await onSuccess?.();
 			},
@@ -38,10 +39,5 @@ export function useInviteMember({
 		});
 	};
 
-	const resetForm = () => {
-		setEmail("");
-		setRole("member");
-	};
-
-	return { email, setEmail, role, setRole, handleInvite, loading, resetForm };
+	return { inviteMember, loading };
 }
