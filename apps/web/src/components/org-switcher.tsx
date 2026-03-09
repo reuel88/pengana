@@ -14,6 +14,7 @@ import { Skeleton } from "@pengana/ui/components/skeleton";
 import { useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
@@ -30,7 +31,7 @@ export function OrgSwitcher() {
 
 	const { handleSwitch } = useOrgSwitcher({
 		onSwitchSuccess: () => navigate({ to: "/org" }),
-		onError: (message) => console.error(message),
+		onError: (message) => toast.error(message || t("switcher.switchError")),
 	});
 
 	if (sessionPending) {

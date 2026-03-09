@@ -17,6 +17,7 @@ import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
 export default function MembersScreen() {
 	const { theme } = useTheme();
@@ -33,6 +34,10 @@ export default function MembersScreen() {
 			router.replace("/");
 		},
 		onError: (message) => Alert.alert("", message || t("members.error")),
+		errorMessages: {
+			remove: t("members.removeError"),
+			leave: t("members.leaveError"),
+		},
 	});
 
 	if (isPending) return <LoadingScreen />;
@@ -42,7 +47,7 @@ export default function MembersScreen() {
 
 	const onRemove = (memberId: string) => {
 		Alert.alert(t("members.remove"), t("members.removeConfirm"), [
-			{ text: t("common:confirm.no"), style: "cancel" },
+			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("members.remove"),
 				style: "destructive",
@@ -53,12 +58,14 @@ export default function MembersScreen() {
 
 	const onLeave = () => {
 		if (!currentUserId) return;
+		const currentMember = members.find((m) => m.userId === currentUserId);
+		if (!currentMember) return;
 		Alert.alert(t("members.leave"), t("members.leaveConfirm"), [
-			{ text: t("common:confirm.no"), style: "cancel" },
+			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("members.leave"),
 				style: "destructive",
-				onPress: () => handleLeave(currentUserId),
+				onPress: () => handleLeave(currentMember.id),
 			},
 		]);
 	};
@@ -68,7 +75,7 @@ export default function MembersScreen() {
 			<FlatList
 				data={members}
 				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.list}
+				contentContainerStyle={sharedStyles.listContainer}
 				ListHeaderComponent={
 					<TouchableOpacity
 						style={[
@@ -77,13 +84,11 @@ export default function MembersScreen() {
 						]}
 						onPress={onLeave}
 					>
-						<Text style={styles.leaveText}>{t("members.leave")}</Text>
+						<Text style={sharedStyles.buttonText}>{t("members.leave")}</Text>
 					</TouchableOpacity>
 				}
 				ListEmptyComponent={
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("members.noMembers")}
-					</Text>
+					<Text style={mutedText(theme)}>{t("members.noMembers")}</Text>
 				}
 				renderItem={({ item: member }) => (
 					<View
@@ -96,9 +101,7 @@ export default function MembersScreen() {
 							<Text style={[styles.memberName, { color: theme.text }]}>
 								{member.user.name}
 							</Text>
-							<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-								{member.user.email}
-							</Text>
+							<Text style={secondaryText(theme)}>{member.user.email}</Text>
 							<Text style={{ color: theme.primary, fontSize: 12 }}>
 								{t(`roles.${member.role}`)}
 							</Text>
@@ -113,7 +116,7 @@ export default function MembersScreen() {
 										{ backgroundColor: theme.notification },
 									]}
 								>
-									<Text style={{ color: "#fff", fontSize: 12 }}>
+									<Text style={sharedStyles.smallButtonText}>
 										{t("members.remove")}
 									</Text>
 								</TouchableOpacity>
@@ -126,7 +129,6 @@ export default function MembersScreen() {
 }
 
 const styles = StyleSheet.create({
-	list: { padding: 16, gap: 8 },
 	memberItem: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -137,5 +139,4 @@ const styles = StyleSheet.create({
 	memberName: { fontSize: 14, fontWeight: "bold" },
 	removeButton: { paddingHorizontal: 12, paddingVertical: 6 },
 	leaveButton: { padding: 12, alignItems: "center", marginBottom: 12 },
-	leaveText: { color: "#fff", fontWeight: "bold" },
 });

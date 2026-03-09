@@ -1,39 +1,7 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-
-import { Container } from "@/components/container";
-import { useTheme } from "@/lib/theme";
+import { PlaceholderTab } from "@/components/placeholder-tab";
 
 export default function TabOne() {
-	const { theme } = useTheme();
-
 	return (
-		<Container>
-			<ScrollView style={styles.scrollView}>
-				<View style={styles.content}>
-					<Text style={[styles.title, { color: theme.text }]}>Tab One</Text>
-					<Text style={[styles.subtitle, { color: theme.text, opacity: 0.7 }]}>
-						Explore the first section of your app
-					</Text>
-				</View>
-			</ScrollView>
-		</Container>
+		<PlaceholderTab titleKey="tabs.one.title" subtitleKey="tabs.one.subtitle" />
 	);
 }
-
-const styles = StyleSheet.create({
-	scrollView: {
-		flex: 1,
-		padding: 16,
-	},
-	content: {
-		paddingVertical: 16,
-	},
-	title: {
-		fontSize: 24,
-		fontWeight: "bold",
-		marginBottom: 8,
-	},
-	subtitle: {
-		fontSize: 16,
-	},
-});

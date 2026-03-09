@@ -27,6 +27,7 @@ function DashboardPage() {
 		<div>
 			<h1>{t("title")}</h1>
 			<p>{t("welcome", { name: session.data.user.name })}</p>
+			{/* First .data is React Query's, second .data is the API envelope */}
 			{privateData.isLoading ? (
 				<p>{t("common:status.loading")}</p>
 			) : privateData.isError ? (

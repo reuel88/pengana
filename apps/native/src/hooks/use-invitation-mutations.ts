@@ -9,52 +9,44 @@ export function useInvitationMutations() {
 	const { t } = useTranslation("organization");
 	const { invalidateUserInvitations, invalidateActiveOrg } = useInvalidateOrg();
 
-	const acceptMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.acceptInvitation({
-				invitationId,
-			});
+	const makeMutationFn = (
+		action: (params: { invitationId: string }) => Promise<{ error: unknown }>,
+	) => {
+		return async (invitationId: string) => {
+			const { error } = await action({ invitationId });
 			if (error) throw error;
-		},
+		};
+	};
+
+	const onError = (error: { message?: string }) => {
+		Alert.alert(t("invitations.error"), error.message);
+	};
+
+	const acceptMutation = useMutation({
+		mutationFn: makeMutationFn(authClient.organization.acceptInvitation),
 		onSuccess: () => {
 			Alert.alert(t("invitations.acceptSuccess"));
 			invalidateUserInvitations();
 		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
+		onError,
 	});
 
 	const rejectMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.rejectInvitation({
-				invitationId,
-			});
-			if (error) throw error;
-		},
+		mutationFn: makeMutationFn(authClient.organization.rejectInvitation),
 		onSuccess: () => {
 			Alert.alert(t("invitations.rejectSuccess"));
 			invalidateUserInvitations();
 		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
+		onError,
 	});
 
 	const cancelMutation = useMutation({
-		mutationFn: async (invitationId: string) => {
-			const { error } = await authClient.organization.cancelInvitation({
-				invitationId,
-			});
-			if (error) throw error;
-		},
+		mutationFn: makeMutationFn(authClient.organization.cancelInvitation),
 		onSuccess: () => {
 			Alert.alert(t("invitations.cancelSuccess"));
 			invalidateActiveOrg();
 		},
-		onError: (error: { message?: string }) => {
-			Alert.alert(t("invitations.error"), error.message);
-		},
+		onError,
 	});
 
 	const getMutatingId = (mutation: typeof acceptMutation) =>

@@ -45,6 +45,9 @@
 		"leaveSuccess": "Organisation quittée",
 		"updateRoleSuccess": "Rôle mis à jour",
 		"error": "Échec de la gestion du membre",
+		"updateRoleError": "Échec de la mise à jour du rôle",
+		"removeError": "Échec du retrait du membre",
+		"leaveError": "Échec du départ de l'organisation",
 		"noMembers": "Aucun membre"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Invitations",
 		"teams": "Équipes",
 		"roles": "Rôles"
+	},
+	"notifications": {
+		"markReadError": "Échec du marquage de la notification comme lue",
+		"markAllReadError": "Échec du marquage de toutes les notifications comme lues"
 	},
 	"noActiveOrg": "Aucune organisation active. Sélectionnez ou créez-en une pour commencer."
 }

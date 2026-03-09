@@ -4,6 +4,7 @@ import type {
 	BackgroundBroadcast,
 	SyncStatus,
 } from "@/utils/background-messages";
+import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
 
 const KNOWN_BROADCAST_TYPES = new Set([
@@ -45,24 +46,16 @@ export function useSyncEngine(userId: string) {
 			if (!message?.type || !KNOWN_BROADCAST_TYPES.has(message.type)) return;
 
 			switch (message.type) {
-				case "sync:event":
-					if (message.event.type === "sync:start") setIsSyncing(true);
-					if (
-						message.event.type === "sync:complete" ||
-						message.event.type === "sync:error"
-					) {
-						setIsSyncing(false);
-					}
+				case "sync:event": {
+					const active = isSyncActive(message.event);
+					if (active !== null) setIsSyncing(active);
 					break;
-				case "upload:event":
-					if (message.event.type === "upload:start") setIsUploading(true);
-					if (
-						message.event.type === "upload:complete" ||
-						message.event.type === "upload:error"
-					) {
-						setIsUploading(false);
-					}
+				}
+				case "upload:event": {
+					const active = isUploadActive(message.event);
+					if (active !== null) setIsUploading(active);
 					break;
+				}
 				case "status:update":
 					setIsOnline(message.status.isOnline);
 					setIsSyncing(message.status.isSyncing);

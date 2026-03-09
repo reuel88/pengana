@@ -11,5 +11,6 @@
 	"failedToStoreFile": "Nabigong i-store ang file. Maaaring puno na ang storage.",
 	"todoNotFound": "Hindi nahanap ang gawain",
 	"unauthorized": "Hindi awtorisado",
-	"paymentError": "May problema sa pagbabayad. Pakisubukan muli."
+	"paymentError": "May problema sa pagbabayad. Pakisubukan muli.",
+	"migrationError": "Error sa migration: {{message}}. Subukang i-restart ang app."
 }

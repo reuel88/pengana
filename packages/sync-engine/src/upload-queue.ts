@@ -109,6 +109,7 @@ export class UploadQueue {
 		if (newRetryCount >= this.maxRetries) {
 			await this.adapter.updateRetry(item.id, newRetryCount);
 			await this.adapter.markFailed(item.id);
+			await this.transport.onFailed?.(item.todoId, item.fileUri);
 
 			this.events.emit({
 				type: "upload:error",

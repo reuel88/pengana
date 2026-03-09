@@ -2,11 +2,11 @@ import { useTranslation } from "@pengana/i18n";
 import { useCancelInvitation } from "@pengana/org-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { OrgGuard } from "@/components/org-guard";
 import { InviteMemberForm } from "@/features/org-management/invite-member-form";
 import { OrgInvitationsTable } from "@/features/org-management/org-invitations-table";
 import { UserInvitationsTable } from "@/features/org-management/user-invitations-table";
-import { useActiveOrg, useUserInvitations } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
+import { useOrgRole, useUserInvitations } from "@/hooks/use-org-queries";
 
 export const Route = createFileRoute("/org/invitations")({
 	component: InvitationsPage,
@@ -14,7 +14,6 @@ export const Route = createFileRoute("/org/invitations")({
 
 function InvitationsPage() {
 	const { t } = useTranslation("organization");
-	const { data: activeOrg, isPending } = useActiveOrg();
 	const { isAdmin } = useOrgRole();
 	const { data: myInvitations } = useUserInvitations();
 
@@ -23,29 +22,28 @@ function InvitationsPage() {
 		onError: (message) => toast.error(message || t("invitations.error")),
 	});
 
-	if (isPending) {
-		return <p>{t("common:status.loading")}</p>;
-	}
-
-	if (!activeOrg) {
-		return <p className="text-muted-foreground">{t("noActiveOrg")}</p>;
-	}
-
-	const invitations = activeOrg.invitations || [];
 	const pendingUserInvitations = (myInvitations ?? []).filter(
 		(i) => i.status === "pending",
 	);
 
 	return (
-		<div className="flex flex-col gap-6">
-			{isAdmin && <InviteMemberForm organizationId={activeOrg.id} />}
-			<OrgInvitationsTable
-				invitations={invitations}
-				isAdmin={isAdmin}
-				onCancel={handleCancel}
-				cancellingId={cancellingId}
-			/>
-			<UserInvitationsTable invitations={pendingUserInvitations} />
-		</div>
+		<OrgGuard>
+			{(activeOrg) => {
+				const invitations = activeOrg.invitations || [];
+
+				return (
+					<div className="flex flex-col gap-6">
+						{isAdmin && <InviteMemberForm organizationId={activeOrg.id} />}
+						<OrgInvitationsTable
+							invitations={invitations}
+							isAdmin={isAdmin}
+							onCancel={handleCancel}
+							cancellingId={cancellingId}
+						/>
+						<UserInvitationsTable invitations={pendingUserInvitations} />
+					</div>
+				);
+			}}
+		</OrgGuard>
 	);
 }

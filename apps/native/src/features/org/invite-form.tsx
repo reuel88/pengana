@@ -11,6 +11,7 @@ import {
 
 import { RoleToggle } from "@/components/role-toggle";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, sharedStyles } from "@/styles/shared";
 
 export function InviteForm({ orgId }: { orgId: string }) {
 	const { theme } = useTheme();
@@ -25,7 +26,7 @@ export function InviteForm({ orgId }: { orgId: string }) {
 	return (
 		<View style={styles.inviteForm}>
 			<TextInput
-				style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+				style={[sharedStyles.input, inputThemed(theme)]}
 				value={email}
 				onChangeText={setEmail}
 				placeholder={t("invitations.emailPlaceholder")}
@@ -35,11 +36,11 @@ export function InviteForm({ orgId }: { orgId: string }) {
 			/>
 			<RoleToggle role={role} onChange={setRole} disabled={loading} />
 			<TouchableOpacity
-				style={[styles.button, { backgroundColor: theme.primary }]}
+				style={[sharedStyles.button, { backgroundColor: theme.primary }]}
 				onPress={() => handleInvite(orgId)}
 				disabled={loading || !email}
 			>
-				<Text style={styles.buttonText}>
+				<Text style={sharedStyles.buttonText}>
 					{loading ? t("common:submitting") : t("invitations.send")}
 				</Text>
 			</TouchableOpacity>
@@ -49,7 +50,4 @@ export function InviteForm({ orgId }: { orgId: string }) {
 
 const styles = StyleSheet.create({
 	inviteForm: { gap: 12, marginBottom: 16 },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
-	button: { padding: 12, alignItems: "center" },
-	buttonText: { color: "#fff", fontWeight: "bold" },
 });

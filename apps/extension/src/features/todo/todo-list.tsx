@@ -7,6 +7,11 @@ import { useCallback, useMemo, useState } from "react";
 import { storeFileInIndexedDB } from "@/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
 
+const fileStorage = {
+	storeFile: storeFileInIndexedDB,
+	createFileRef: (id: string) => `${INDEXEDDB_URI_PREFIX}${id}`,
+};
+
 export function TodoList({ todos }: { todos: WebTodo[] }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const { t } = useTranslation();
@@ -27,14 +32,6 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 		});
 	}, []);
 
-	const fileStorage = useMemo(
-		() => ({
-			storeFile: (id: string, file: File) => storeFileInIndexedDB(id, file),
-			createFileRef: (id: string) => `${INDEXEDDB_URI_PREFIX}${id}`,
-		}),
-		[],
-	);
-
 	const deps = useMemo(
 		() => ({
 			triggerSync,
@@ -45,15 +42,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 			t,
 			onDeleteSuccess,
 		}),
-		[
-			triggerSync,
-			enqueueUpload,
-			onError,
-			clearError,
-			fileStorage,
-			t,
-			onDeleteSuccess,
-		],
+		[triggerSync, enqueueUpload, onError, clearError, t, onDeleteSuccess],
 	);
 
 	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
@@ -66,7 +55,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 			onDelete={handleDelete}
 			onResolve={handleResolve}
 			onFileSelected={handleFileSelected}
-			onValidationError={(id, msg) => onError(id, msg)}
+			onValidationError={onError}
 			errors={errors}
 		/>
 	);

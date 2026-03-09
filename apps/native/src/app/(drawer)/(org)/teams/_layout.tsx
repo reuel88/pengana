@@ -1,17 +1,9 @@
 import { Stack } from "expo-router";
 
-import { useTheme } from "@/lib/theme";
+import { useThemedScreenOptions } from "@/hooks/use-themed-screen-options";
 
 export default function TeamsLayout() {
-	const { theme } = useTheme();
+	const screenOptions = useThemedScreenOptions();
 
-	return (
-		<Stack
-			screenOptions={{
-				headerStyle: { backgroundColor: theme.background },
-				headerTitleStyle: { color: theme.text },
-				headerTintColor: theme.text,
-			}}
-		/>
-	);
+	return <Stack screenOptions={screenOptions} />;
 }

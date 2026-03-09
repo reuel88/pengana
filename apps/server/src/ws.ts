@@ -34,6 +34,8 @@ export function setupWebSocket(server: ServerType) {
 		});
 	});
 
+	const aliveSet = new WeakSet<WebSocket>();
+
 	wss.on(
 		"connection",
 		(ws: WebSocket, _req: IncomingMessage, userId: string) => {
@@ -47,7 +49,12 @@ export function setupWebSocket(server: ServerType) {
 			const sockets = userSockets ?? new Set<WebSocket>();
 			if (!userSockets) connections.set(userId, sockets);
 			sockets.add(ws);
+			aliveSet.add(ws);
 			wsLogger.info`Connection accepted for user ${userId} (${String(sockets.size)} total)`;
+
+			ws.on("pong", () => {
+				aliveSet.add(ws);
+			});
 
 			ws.on("close", () => {
 				sockets.delete(ws);
@@ -66,6 +73,12 @@ export function setupWebSocket(server: ServerType) {
 	const pingInterval = setInterval(() => {
 		for (const sockets of connections.values()) {
 			for (const ws of sockets) {
+				if (!aliveSet.has(ws)) {
+					wsLogger.debug`Terminating dead connection`;
+					ws.terminate();
+					continue;
+				}
+				aliveSet.delete(ws);
 				if (ws.readyState === WebSocket.OPEN) {
 					ws.ping();
 				}

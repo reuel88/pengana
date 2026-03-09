@@ -106,7 +106,7 @@ export function NotificationCenter() {
 		handleMarkRead,
 		handleMarkAllRead,
 		invitationActions,
-	} = useNotificationCenter({});
+	} = useNotificationCenter();
 
 	const { actingId, handleAccept, handleReject } = invitationActions;
 

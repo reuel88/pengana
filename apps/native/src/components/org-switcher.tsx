@@ -18,6 +18,7 @@ import { useCreateOrg } from "@/hooks/use-create-org";
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
 
 function CreateOrgModal({
 	onCreated,
@@ -37,28 +38,28 @@ function CreateOrgModal({
 	return (
 		<View style={styles.createForm}>
 			<TextInput
-				style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+				style={[sharedStyles.input, inputThemed(theme)]}
 				value={name}
 				onChangeText={setName}
 				placeholder={t("create.namePlaceholder")}
 				placeholderTextColor={theme.border}
 			/>
 			<TextInput
-				style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+				style={[sharedStyles.input, inputThemed(theme)]}
 				value={slug}
 				onChangeText={setSlug}
 				placeholder={t("create.slugPlaceholder")}
 				placeholderTextColor={theme.border}
 			/>
 			<TouchableOpacity
-				style={[styles.button, { backgroundColor: theme.primary }]}
+				style={[sharedStyles.button, { backgroundColor: theme.primary }]}
 				onPress={handleSubmit}
 				disabled={loading}
 			>
 				{loading ? (
 					<ActivityIndicator color="#fff" />
 				) : (
-					<Text style={styles.buttonText}>{t("create.submit")}</Text>
+					<Text style={sharedStyles.buttonText}>{t("create.submit")}</Text>
 				)}
 			</TouchableOpacity>
 			<TouchableOpacity onPress={onBack}>
@@ -154,9 +155,7 @@ export function OrgSwitcher() {
 										</TouchableOpacity>
 									))
 								) : (
-									<Text
-										style={{ color: theme.text, opacity: 0.5, padding: 16 }}
-									>
+									<Text style={[mutedText(theme), { padding: 16 }]}>
 										{t("switcher.noOrgs")}
 									</Text>
 								)}
@@ -220,19 +219,6 @@ const styles = StyleSheet.create({
 	},
 	createForm: {
 		gap: 12,
-	},
-	input: {
-		borderWidth: 1,
-		padding: 12,
-		fontSize: 14,
-	},
-	button: {
-		padding: 12,
-		alignItems: "center",
-	},
-	buttonText: {
-		color: "#fff",
-		fontWeight: "bold",
 	},
 	linkText: {
 		textAlign: "center",

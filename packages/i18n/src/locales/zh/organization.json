@@ -45,6 +45,9 @@
 		"leaveSuccess": "已离开组织",
 		"updateRoleSuccess": "角色已更新",
 		"error": "管理成员失败",
+		"updateRoleError": "更新角色失败",
+		"removeError": "移除成员失败",
+		"leaveError": "离开组织失败",
 		"noMembers": "暂无成员"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "邀请",
 		"teams": "团队",
 		"roles": "角色"
+	},
+	"notifications": {
+		"markReadError": "无法将通知标记为已读",
+		"markAllReadError": "无法将所有通知标记为已读"
 	},
 	"noActiveOrg": "没有活跃的组织。选择或创建一个以开始使用。"
 }

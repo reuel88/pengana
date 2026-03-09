@@ -45,6 +45,9 @@
 		"leaveSuccess": "Umalis sa organisasyon",
 		"updateRoleSuccess": "Na-update ang tungkulin",
 		"error": "Nabigong pamahalaan ang miyembro",
+		"updateRoleError": "Nabigong i-update ang tungkulin",
+		"removeError": "Nabigong alisin ang miyembro",
+		"leaveError": "Nabigong umalis sa organisasyon",
 		"noMembers": "Walang mga miyembro"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Mga Imbitasyon",
 		"teams": "Mga Koponan",
 		"roles": "Mga Tungkulin"
+	},
+	"notifications": {
+		"markReadError": "Nabigong markahan ang notipikasyon bilang nabasa",
+		"markAllReadError": "Nabigong markahan ang lahat ng notipikasyon bilang nabasa"
 	},
 	"noActiveOrg": "Walang aktibong organisasyon. Pumili o lumikha ng isa para magsimula."
 }

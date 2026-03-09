@@ -1,21 +1,14 @@
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
-import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { createContext } from "@pengana/api/context";
-import { appRouter } from "@pengana/api/routers/index";
 import { auth, setNotifyUser } from "@pengana/auth";
 import { env } from "@pengana/env/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
 import { initServerI18n } from "@pengana/i18n/server";
-import { type Context, Hono, type Next } from "hono";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
-import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { initLogger, logger, orpcLogger, requestLogger } from "./logger";
+import { initLogger, logger, requestLogger } from "./logger";
+import { handleOrpcRoutes, notifyRef } from "./orpc";
 import {
 	authLimiter,
 	globalLimiter,
@@ -66,90 +59,6 @@ app.use("/rpc/upload.*", uploadLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-function logUnhandledError(error: unknown) {
-	orpcLogger.error`Unhandled error: ${error}`;
-}
-
-export const apiHandler = new OpenAPIHandler(appRouter, {
-	plugins: [
-		new OpenAPIReferencePlugin({
-			schemaConverters: [new ZodToJsonSchemaConverter()],
-		}),
-	],
-	interceptors: [onError(logUnhandledError)],
-});
-
-export const rpcHandler = new RPCHandler(appRouter, {
-	interceptors: [onError(logUnhandledError)],
-});
-
-// Initialized after server starts — WebSocket needs the HTTP server instance.
-// handleOrpcRoutes captures this ref in its closure, so when notifyRef.current
-// is later assigned the real notifyUser function, all subsequent requests use it.
-const notifyRef: { current: (userId: string) => void } = {
-	current: () => {},
-};
-
-async function wrapApiErrorResponse(c: Context, response: Response) {
-	const contentType = response.headers.get("content-type") ?? "";
-	if (contentType.includes("application/json") && response.status >= 400) {
-		try {
-			const raw: unknown = await response.json();
-			const body =
-				raw != null && typeof raw === "object" && !Array.isArray(raw)
-					? (raw as Record<string, unknown>)
-					: {};
-			return c.json(
-				{
-					success: false,
-					error: {
-						code:
-							typeof body.code === "string"
-								? body.code
-								: "INTERNAL_SERVER_ERROR",
-						message:
-							typeof body.message === "string" ? body.message : "Unknown error",
-					},
-				},
-				response.status as ContentfulStatusCode,
-			);
-		} catch {
-			return c.newResponse(response.body, response);
-		}
-	}
-	return c.newResponse(response.body, response);
-}
-
-async function handleOrpcRoutes(c: Context, next: Next) {
-	if (
-		!c.req.path.startsWith("/rpc") &&
-		!c.req.path.startsWith("/api-reference")
-	) {
-		return next();
-	}
-
-	const appContext = await createContext({ context: c });
-	const fullContext = { ...appContext, notifyUser: notifyRef.current };
-
-	const rpcResult = await rpcHandler.handle(c.req.raw, {
-		prefix: "/rpc",
-		context: fullContext,
-	});
-	if (rpcResult.matched) {
-		return c.newResponse(rpcResult.response.body, rpcResult.response);
-	}
-
-	const apiResult = await apiHandler.handle(c.req.raw, {
-		prefix: "/api-reference",
-		context: fullContext,
-	});
-	if (apiResult.matched) {
-		return wrapApiErrorResponse(c, apiResult.response);
-	}
-
-	await next();
-}
 
 app.use("/*", handleOrpcRoutes);
 

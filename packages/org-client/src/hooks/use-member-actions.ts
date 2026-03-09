@@ -9,11 +9,17 @@ export function useMemberActions({
 	onRemoveSuccess,
 	onLeaveSuccess,
 	onError,
+	errorMessages,
 }: {
 	onUpdateRoleSuccess?: () => void;
 	onRemoveSuccess?: () => void;
 	onLeaveSuccess?: () => void;
 	onError?: (message: string) => void;
+	errorMessages?: {
+		updateRole?: string;
+		remove?: string;
+		leave?: string;
+	};
 }) {
 	const authClient = useAuthClient();
 	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
@@ -25,7 +31,7 @@ export function useMemberActions({
 		await authMutation({
 			mutationFn: () =>
 				authClient.organization.updateMemberRole({ memberId, role }),
-			errorMessage: "Failed to update role",
+			errorMessage: errorMessages?.updateRole ?? "Failed to update role",
 			onSuccess: async () => {
 				await Promise.all([invalidateActiveOrg(), invalidateActiveMember()]);
 				await onUpdateRoleSuccess?.();
@@ -42,7 +48,7 @@ export function useMemberActions({
 		await authMutation({
 			mutationFn: () =>
 				authClient.organization.removeMember({ memberIdOrEmail }),
-			errorMessage: "Failed to remove member",
+			errorMessage: errorMessages?.remove ?? "Failed to remove member",
 			onSuccess: async () => {
 				await invalidateActiveOrg();
 				await onRemoveSuccess?.();
@@ -54,14 +60,14 @@ export function useMemberActions({
 		});
 	};
 
-	const handleLeave = async (currentUserId: string) => {
-		setActingId(currentUserId);
+	const handleLeave = async (memberId: string) => {
+		setActingId(memberId);
 		await authMutation({
 			mutationFn: () =>
 				authClient.organization.removeMember({
-					memberIdOrEmail: currentUserId,
+					memberIdOrEmail: memberId,
 				}),
-			errorMessage: "Failed to leave organization",
+			errorMessage: errorMessages?.leave ?? "Failed to leave organization",
 			onSuccess: async () => {
 				await invalidateAll();
 				await onLeaveSuccess?.();

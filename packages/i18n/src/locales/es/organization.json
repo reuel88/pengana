@@ -45,6 +45,9 @@
 		"leaveSuccess": "Has abandonado la organización",
 		"updateRoleSuccess": "Rol actualizado",
 		"error": "Error al gestionar miembro",
+		"updateRoleError": "Error al actualizar el rol",
+		"removeError": "Error al eliminar miembro",
+		"leaveError": "Error al abandonar la organización",
 		"noMembers": "No hay miembros"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Invitaciones",
 		"teams": "Equipos",
 		"roles": "Roles"
+	},
+	"notifications": {
+		"markReadError": "Error al marcar la notificación como leída",
+		"markAllReadError": "Error al marcar todas las notificaciones como leídas"
 	},
 	"noActiveOrg": "No hay organización activa. Selecciona o crea una para comenzar."
 }

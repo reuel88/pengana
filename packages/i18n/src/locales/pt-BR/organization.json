@@ -45,6 +45,9 @@
 		"leaveSuccess": "Saiu da organização",
 		"updateRoleSuccess": "Função atualizada",
 		"error": "Falha ao gerenciar membro",
+		"updateRoleError": "Falha ao atualizar a função",
+		"removeError": "Falha ao remover membro",
+		"leaveError": "Falha ao sair da organização",
 		"noMembers": "Nenhum membro"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Convites",
 		"teams": "Equipes",
 		"roles": "Funções"
+	},
+	"notifications": {
+		"markReadError": "Falha ao marcar notificação como lida",
+		"markAllReadError": "Falha ao marcar todas as notificações como lidas"
 	},
 	"noActiveOrg": "Nenhuma organização ativa. Selecione ou crie uma para começar."
 }

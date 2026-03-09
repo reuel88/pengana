@@ -21,5 +21,8 @@ export function createWebUploadTransport(): UploadTransport {
 		onUploaded(todoId) {
 			void removeFileFromIndexedDB(todoId);
 		},
+		onFailed(todoId) {
+			void removeFileFromIndexedDB(todoId);
+		},
 	});
 }

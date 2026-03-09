@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { isAllowedMimeType } from "@pengana/sync-engine";
+import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { ActionSheetIOS, Alert, Platform } from "react-native";
@@ -11,11 +11,19 @@ import { attachFile } from "../todo-actions";
 async function pickAsset(
 	picker: () => Promise<{
 		canceled: boolean;
-		assets: { uri: string; mimeType?: string | null }[] | null;
+		assets:
+			| {
+					uri: string;
+					mimeType?: string | null;
+					fileSize?: number | null;
+					size?: number | null;
+			  }[]
+			| null;
 	}>,
 	defaultMimeType: string,
 	invalidTitle: string,
 	invalidMessage: string,
+	fileTooLargeMessage: string,
 ): Promise<{ uri: string; mimeType: string } | null> {
 	const result = await picker();
 	if (result.canceled || !result.assets || result.assets.length === 0)
@@ -24,6 +32,11 @@ async function pickAsset(
 	const mimeType = asset.mimeType ?? defaultMimeType;
 	if (!isAllowedMimeType(mimeType)) {
 		Alert.alert(invalidTitle, invalidMessage);
+		return null;
+	}
+	const fileSize = asset.fileSize ?? asset.size;
+	if (fileSize != null && fileSize > MAX_FILE_SIZE_BYTES) {
+		Alert.alert(invalidTitle, fileTooLargeMessage);
 		return null;
 	}
 	return { uri: asset.uri, mimeType };
@@ -40,6 +53,7 @@ export function useFilePicker(todoId: string) {
 
 	const invalidFileTitle = t("todos:attachment.invalidFile");
 	const invalidFileMessage = t("errors:invalidFileType");
+	const fileTooLargeMessage = t("errors:fileTooLarge");
 
 	const pickFromCamera = async () => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -54,6 +68,7 @@ export function useFilePicker(todoId: string) {
 				"image/jpeg",
 				invalidFileTitle,
 				invalidFileMessage,
+				fileTooLargeMessage,
 			);
 			if (asset) await attachAsset(asset.uri, asset.mimeType);
 		} catch {
@@ -74,6 +89,7 @@ export function useFilePicker(todoId: string) {
 			"image/jpeg",
 			invalidFileTitle,
 			invalidFileMessage,
+			fileTooLargeMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};
@@ -88,6 +104,7 @@ export function useFilePicker(todoId: string) {
 			"application/pdf",
 			invalidFileTitle,
 			invalidFileMessage,
+			fileTooLargeMessage,
 		);
 		if (asset) await attachAsset(asset.uri, asset.mimeType);
 	};

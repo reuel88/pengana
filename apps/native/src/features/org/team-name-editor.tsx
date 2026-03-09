@@ -1,7 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
 import { useTeamNameEditor } from "@pengana/org-client";
 import {
 	Alert,
+	Pressable,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -11,6 +13,7 @@ import {
 
 import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, sharedStyles } from "@/styles/shared";
 
 export function TeamNameEditor({
 	teamId,
@@ -37,10 +40,7 @@ export function TeamNameEditor({
 		return (
 			<View style={styles.editNameRow}>
 				<TextInput
-					style={[
-						styles.input,
-						{ flex: 1, color: theme.text, borderColor: theme.border },
-					]}
+					style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
 					value={newName}
 					onChangeText={setNewName}
 				/>
@@ -49,7 +49,7 @@ export function TeamNameEditor({
 					onPress={() => handleSave(teamId, orgId)}
 					disabled={loading || !trimmedName}
 				>
-					<Text style={{ color: "#fff", fontSize: 12 }}>
+					<Text style={sharedStyles.smallButtonText}>
 						{t("teams.updateName")}
 					</Text>
 				</TouchableOpacity>
@@ -65,23 +65,31 @@ export function TeamNameEditor({
 		);
 	}
 
-	return (
-		<TouchableOpacity
-			onLongPress={() => {
-				if (isAdmin) {
-					setNewName(teamName);
-					setEditing(true);
-				}
-			}}
-		>
-			<Text style={[styles.title, { color: theme.text }]}>{teamName}</Text>
-		</TouchableOpacity>
-	);
+	if (isAdmin) {
+		return (
+			<View style={styles.nameRow}>
+				<Text style={[styles.title, { color: theme.text }]}>{teamName}</Text>
+				<Pressable
+					onPress={() => {
+						setNewName(teamName);
+						setEditing(true);
+					}}
+					accessibilityLabel={t("teams.rename")}
+					accessibilityRole="button"
+				>
+					<View style={{ opacity: 0.5 }}>
+						<Ionicons name="create-outline" size={20} color={theme.text} />
+					</View>
+				</Pressable>
+			</View>
+		);
+	}
+
+	return <Text style={[styles.title, { color: theme.text }]}>{teamName}</Text>;
 }
 
 const styles = StyleSheet.create({
 	title: { fontSize: 18, fontWeight: "bold" },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
 	addButton: { paddingHorizontal: 16, justifyContent: "center" },
 	editNameRow: {
 		flex: 1,
@@ -91,4 +99,5 @@ const styles = StyleSheet.create({
 		marginRight: 8,
 	},
 	cancelBtn: { paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
+	nameRow: { flexDirection: "row", alignItems: "center", gap: 8 },
 });

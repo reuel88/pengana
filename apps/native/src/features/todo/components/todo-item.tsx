@@ -15,7 +15,9 @@ import { useTheme } from "@/lib/theme";
 import { useFilePicker } from "../hooks/use-file-picker";
 import { deleteTodo, resolveConflict, toggleTodo } from "../todo-actions";
 
+import { AttachButton, RetryButton } from "./attachment-actions";
 import { AttachmentIndicator } from "./attachment-indicator";
+import { ConflictActions } from "./conflict-actions";
 import { SyncDot } from "./sync-dot";
 
 export interface TodoItemRow extends Todo {
@@ -79,36 +81,13 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 				attachmentUrl={todo.attachmentUrl}
 			/>
 			{todo.syncStatus === "conflict" && (
-				<View style={styles.conflictButtons}>
-					<TouchableOpacity
-						style={[styles.smallButton, { borderColor: theme.border }]}
-						onPress={() => handleResolve("local")}
-					>
-						<Text style={[styles.smallButtonText, { color: theme.text }]}>
-							{t("todos:actions.keepLocal")}
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.smallButton, { borderColor: theme.border }]}
-						onPress={() => handleResolve("server")}
-					>
-						<Text style={[styles.smallButtonText, { color: theme.text }]}>
-							{t("todos:actions.useServer")}
-						</Text>
-					</TouchableOpacity>
-				</View>
+				<ConflictActions onResolve={handleResolve} />
 			)}
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
-				<TouchableOpacity onPress={showPicker} style={styles.attachButton}>
-					<Text style={[styles.attachText, { color: theme.primary }]}>
-						{t("todos:actions.attach")}
-					</Text>
-				</TouchableOpacity>
+				<AttachButton onPress={showPicker} />
 			)}
 			{todo.attachmentStatus === "failed" && (
-				<TouchableOpacity onPress={showPicker} style={styles.attachButton}>
-					<Text style={styles.retryText}>{t("todos:actions.retry")}</Text>
-				</TouchableOpacity>
+				<RetryButton onPress={showPicker} />
 			)}
 			<TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
 				<Text style={styles.deleteText}>{t("todos:actions.delete")}</Text>
@@ -136,30 +115,6 @@ const styles = StyleSheet.create({
 	todoCompleted: {
 		textDecorationLine: "line-through",
 		opacity: 0.5,
-	},
-	conflictButtons: {
-		flexDirection: "row",
-		gap: 4,
-	},
-	smallButton: {
-		borderWidth: 1,
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-		borderRadius: 4,
-	},
-	smallButtonText: {
-		fontSize: 11,
-	},
-	attachButton: {
-		paddingHorizontal: 8,
-		paddingVertical: 4,
-	},
-	attachText: {
-		fontSize: 12,
-	},
-	retryText: {
-		fontSize: 12,
-		color: STATUS_COLORS.warning,
 	},
 	deleteButton: {
 		paddingHorizontal: 8,

@@ -1,5 +1,5 @@
+import { useTranslation } from "@pengana/i18n";
 import { toast } from "sonner";
-
 import {
 	useInvalidateNotifications,
 	useNotifications,
@@ -9,22 +9,17 @@ import { useUserInvitations } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { client } from "@/utils/orpc";
 
-export function useNotificationCenter({
-	onAcceptSuccess,
-	onError,
-}: {
-	onAcceptSuccess?: (invitationId: string) => void | Promise<void>;
-	onError?: (message: string) => void;
-}) {
+export function useNotificationCenter() {
+	const { t } = useTranslation("organization");
 	const { data: invitations } = useUserInvitations();
 	const { data: notifications } = useNotifications();
 	const { invalidateNotifications } = useInvalidateNotifications();
 
-	const errorHandler = onError ?? ((message: string) => toast.error(message));
-
 	const invitationActions = useInvitationActions({
-		successMessage: "",
-		errorMessage: "",
+		successMessage: t("invitations.acceptSuccess"),
+		errorMessage: t("invitations.error"),
+		rejectSuccessMessage: t("invitations.rejectSuccess"),
+		rejectErrorMessage: t("invitations.error"),
 		onAcceptSuccess: async (invitationId) => {
 			const invitation = invitations?.find((i) => i.id === invitationId);
 			if (invitation) {
@@ -33,9 +28,10 @@ export function useNotificationCenter({
 				});
 				client.notification
 					.onInvitationAccepted({ invitationId })
-					.catch(() => {});
+					.catch((err) =>
+						console.error("Failed to notify invitation accepted", err),
+					);
 			}
-			await onAcceptSuccess?.(invitationId);
 		},
 	});
 
@@ -48,7 +44,7 @@ export function useNotificationCenter({
 			await client.notification.markRead({ id });
 			await invalidateNotifications();
 		} catch {
-			errorHandler("Failed to mark notification as read");
+			toast.error(t("notifications.markReadError"));
 		}
 	};
 
@@ -57,7 +53,7 @@ export function useNotificationCenter({
 			await client.notification.markAllRead();
 			await invalidateNotifications();
 		} catch {
-			errorHandler("Failed to mark all notifications as read");
+			toast.error(t("notifications.markAllReadError"));
 		}
 	};
 

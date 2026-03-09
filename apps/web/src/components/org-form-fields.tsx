@@ -6,64 +6,60 @@ interface OrgFieldProps {
 	value: string;
 	onChange: (value: string) => void;
 	id?: string;
+	required?: boolean;
 }
 
-export function OrgNameField({
-	value,
-	onChange,
-	id = "org-name",
-}: OrgFieldProps) {
-	const { t } = useTranslation("organization");
-	return (
-		<div className="flex flex-col gap-1">
-			<Label htmlFor={id}>{t("create.name")}</Label>
-			<Input
-				id={id}
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				placeholder={t("create.namePlaceholder")}
-				required
-			/>
-		</div>
-	);
-}
+const fieldConfig = {
+	name: {
+		defaultId: "org-name",
+		labelKey: "create.name",
+		placeholderKey: "create.namePlaceholder",
+	},
+	slug: {
+		defaultId: "org-slug",
+		labelKey: "create.slug",
+		placeholderKey: "create.slugPlaceholder",
+	},
+	logo: {
+		defaultId: "org-logo",
+		labelKey: "create.logo",
+		placeholderKey: "create.logoPlaceholder",
+	},
+} as const;
 
-export function OrgSlugField({
+function OrgFormField({
+	field,
 	value,
 	onChange,
-	id = "org-slug",
+	id,
 	required,
-}: OrgFieldProps & { required?: boolean }) {
+}: OrgFieldProps & { field: keyof typeof fieldConfig }) {
 	const { t } = useTranslation("organization");
+	const config = fieldConfig[field];
+	const fieldId = id ?? config.defaultId;
+
 	return (
 		<div className="flex flex-col gap-1">
-			<Label htmlFor={id}>{t("create.slug")}</Label>
+			<Label htmlFor={fieldId}>{t(config.labelKey)}</Label>
 			<Input
-				id={id}
+				id={fieldId}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
-				placeholder={t("create.slugPlaceholder")}
+				placeholder={t(config.placeholderKey)}
 				required={required}
 			/>
 		</div>
 	);
 }
 
-export function OrgLogoField({
-	value,
-	onChange,
-	id = "org-logo",
-}: OrgFieldProps) {
-	const { t } = useTranslation("organization");
-	return (
-		<div className="flex flex-col gap-1">
-			<Label htmlFor={id}>{t("create.logo")}</Label>
-			<Input
-				id={id}
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				placeholder={t("create.logoPlaceholder")}
-			/>
-		</div>
-	);
+export function OrgNameField(props: OrgFieldProps) {
+	return <OrgFormField field="name" {...props} />;
+}
+
+export function OrgSlugField(props: OrgFieldProps & { required?: boolean }) {
+	return <OrgFormField field="slug" {...props} />;
+}
+
+export function OrgLogoField(props: OrgFieldProps) {
+	return <OrgFormField field="logo" {...props} />;
 }

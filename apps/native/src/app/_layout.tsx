@@ -3,7 +3,10 @@ import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
-import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
+import {
+	fetchUserLifecycleData,
+	type UserLifecycleData,
+} from "@pengana/org-client/lib/user-lifecycle";
 
 import {
 	DarkTheme,
@@ -29,6 +32,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { authClient } from "@/lib/auth-client";
 import { NAV_THEME } from "@/lib/constants";
+import { LifecycleContext } from "@/lib/lifecycle-context";
 import { useColorScheme } from "@/lib/use-color-scheme";
 import { queryClient } from "@/utils/orpc";
 
@@ -110,6 +114,9 @@ function RootLayoutInner() {
 	const router = useRouter();
 	const [lifecycleChecked, setLifecycleChecked] = useState(false);
 	const [needsOnboarding, setNeedsOnboarding] = useState(false);
+	const [lifecycleData, setLifecycleData] = useState<UserLifecycleData | null>(
+		null,
+	);
 	const [orgError, setOrgError] = useState(false);
 
 	useEffect(() => {
@@ -117,6 +124,7 @@ function RootLayoutInner() {
 			if (isPending || !session) {
 				setLifecycleChecked(false);
 				setNeedsOnboarding(false);
+				setLifecycleData(null);
 				setOrgError(false);
 			}
 			return;
@@ -127,6 +135,7 @@ function RootLayoutInner() {
 			try {
 				const data = await fetchUserLifecycleData(authClient);
 				if (cancelled) return;
+				setLifecycleData(data);
 				setNeedsOnboarding(!data.hasOrganization);
 				setLifecycleChecked(true);
 			} catch (err) {
@@ -177,21 +186,23 @@ function RootLayoutInner() {
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
 			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-			<GestureHandlerRootView style={styles.container}>
-				<Stack>
-					<Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-					<Stack.Screen name="onboarding" options={{ headerShown: false }} />
-					<Stack.Screen
-						name="invitation/[invitationId]"
-						options={{ headerShown: false }}
-					/>
-					<Stack.Screen
-						name="modal"
-						options={{ title: "Modal", presentation: "modal" }}
-					/>
-				</Stack>
-			</GestureHandlerRootView>
+			<LifecycleContext.Provider value={lifecycleData}>
+				<GestureHandlerRootView style={styles.container}>
+					<Stack>
+						<Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+						<Stack.Screen name="onboarding" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="invitation/[invitationId]"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="modal"
+							options={{ title: "Modal", presentation: "modal" }}
+						/>
+					</Stack>
+				</GestureHandlerRootView>
+			</LifecycleContext.Provider>
 		</ThemeProvider>
 	);
 }

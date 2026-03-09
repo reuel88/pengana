@@ -42,6 +42,16 @@
 		"description": "抱歉，您要查找的页面不存在。",
 		"goHome": "返回首页"
 	},
+	"tabs": {
+		"one": {
+			"title": "标签一",
+			"subtitle": "探索应用的第一个部分"
+		},
+		"two": {
+			"title": "标签二",
+			"subtitle": "发现更多功能和内容"
+		}
+	},
 	"confirm": {
 		"yes": "是",
 		"no": "否",

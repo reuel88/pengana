@@ -42,6 +42,16 @@
 		"description": "Paumanhin, ang pahina na hinahanap mo ay hindi umiiral.",
 		"goHome": "Pumunta sa Home"
 	},
+	"tabs": {
+		"one": {
+			"title": "Tab Isa",
+			"subtitle": "I-explore ang unang seksyon ng iyong app"
+		},
+		"two": {
+			"title": "Tab Dalawa",
+			"subtitle": "Tuklasin ang higit pang mga tampok at nilalaman"
+		}
+	},
 	"confirm": {
 		"yes": "Oo",
 		"no": "Hindi",

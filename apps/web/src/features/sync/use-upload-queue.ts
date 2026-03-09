@@ -20,6 +20,7 @@ export function useUploadQueue(
 
 	const syncRef = useStableSyncRef(engineRef);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref — its .current is reassigned every render, so listing it would cause infinite re-runs
 	useEffect(() => {
 		if (!userId) return;
 
@@ -45,7 +46,7 @@ export function useUploadQueue(
 			unsubscribe();
 			uploadQueueRef.current = null;
 		};
-	}, [userId, syncRef.current]);
+	}, [userId]);
 
 	useEffect(() => {
 		if (isOnline) {

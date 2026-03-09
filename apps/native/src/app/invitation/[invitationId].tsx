@@ -7,6 +7,7 @@ import { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useInvitation } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
 export default function InvitationScreen() {
 	const { theme } = useTheme();
@@ -48,14 +49,12 @@ export default function InvitationScreen() {
 		return (
 			<Container>
 				<View style={{ padding: 16, gap: 12 }}>
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("invitations.fetchError")}
-					</Text>
+					<Text style={mutedText(theme)}>{t("invitations.fetchError")}</Text>
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => refetch()}
 					>
-						<Text style={{ color: "#fff", fontWeight: "bold" }}>
+						<Text style={sharedStyles.buttonText}>
 							{t("invitations.retry")}
 						</Text>
 					</TouchableOpacity>
@@ -67,7 +66,7 @@ export default function InvitationScreen() {
 	if (!invitation) {
 		return (
 			<Container>
-				<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
+				<Text style={[{ padding: 16 }, mutedText(theme)]}>
 					{t("invitations.noInvitations")}
 				</Text>
 			</Container>
@@ -94,14 +93,7 @@ export default function InvitationScreen() {
 							role: t(`roles.${invitation.role}`),
 						})}
 					</Text>
-					<Text
-						style={{
-							color: theme.text,
-							opacity: 0.7,
-							marginTop: 4,
-							fontSize: 12,
-						}}
-					>
+					<Text style={[secondaryText(theme), { marginTop: 4 }]}>
 						{t("invitations.invitedBy", { email: invitation.inviterEmail })}
 					</Text>
 
@@ -119,7 +111,7 @@ export default function InvitationScreen() {
 								}
 								disabled={acting}
 							>
-								<Text style={{ color: "#fff", fontWeight: "bold" }}>
+								<Text style={sharedStyles.buttonText}>
 									{t("invitations.accept")}
 								</Text>
 							</TouchableOpacity>
@@ -138,7 +130,7 @@ export default function InvitationScreen() {
 							</TouchableOpacity>
 						</View>
 					) : (
-						<Text style={{ color: theme.text, opacity: 0.5, marginTop: 12 }}>
+						<Text style={[mutedText(theme), { marginTop: 12 }]}>
 							{t(`invitations.status.${invitation.status}`)}
 						</Text>
 					)}

@@ -23,6 +23,7 @@ import {
 } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
 export default function TeamDetailScreen() {
 	const { theme } = useTheme();
@@ -59,7 +60,16 @@ export default function TeamDetailScreen() {
 
 	if (isOrgPending || isTeamsPending || isMembersPending)
 		return <LoadingScreen />;
-	if (!teamId || !teamName || !activeOrg) return <EmptyOrgScreen />;
+	if (!activeOrg) return <EmptyOrgScreen />;
+	if (!teamId || !teamName) {
+		return (
+			<Container>
+				<Text style={[{ padding: 16 }, mutedText(theme)]}>
+					{t("teams.noTeams")}
+				</Text>
+			</Container>
+		);
+	}
 
 	const onRemoveMember = (userId: string) => {
 		Alert.alert(t("teams.removeMember"), "", [
@@ -88,7 +98,7 @@ export default function TeamDetailScreen() {
 			<FlatList
 				data={teamMembers}
 				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.list}
+				contentContainerStyle={sharedStyles.listContainer}
 				ListHeaderComponent={
 					<>
 						<View style={styles.header}>
@@ -105,7 +115,7 @@ export default function TeamDetailScreen() {
 									]}
 									onPress={onDelete}
 								>
-									<Text style={{ color: "#fff", fontSize: 12 }}>
+									<Text style={sharedStyles.smallButtonText}>
 										{t("teams.delete")}
 									</Text>
 								</TouchableOpacity>
@@ -117,9 +127,7 @@ export default function TeamDetailScreen() {
 					</>
 				}
 				ListEmptyComponent={
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("teams.noMembers")}
-					</Text>
+					<Text style={mutedText(theme)}>{t("teams.noMembers")}</Text>
 				}
 				renderItem={({ item }) => {
 					const orgMember = membersByUserId.get(item.userId);
@@ -134,7 +142,7 @@ export default function TeamDetailScreen() {
 								<Text style={{ color: theme.text }}>
 									{orgMember?.user.name ?? item.userId}
 								</Text>
-								<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
+								<Text style={secondaryText(theme)}>
 									{orgMember?.user.email ?? ""}
 								</Text>
 							</View>
@@ -146,7 +154,7 @@ export default function TeamDetailScreen() {
 										{ backgroundColor: theme.notification },
 									]}
 								>
-									<Text style={{ color: "#fff", fontSize: 12 }}>
+									<Text style={sharedStyles.smallButtonText}>
 										{t("teams.removeMember")}
 									</Text>
 								</TouchableOpacity>
@@ -160,7 +168,6 @@ export default function TeamDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-	list: { padding: 16, gap: 8 },
 	header: {
 		flexDirection: "row",
 		justifyContent: "space-between",

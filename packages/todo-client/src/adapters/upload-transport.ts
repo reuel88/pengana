@@ -15,12 +15,16 @@ interface UploadTransportOptions {
 	rpc: UploadRpc;
 	getBase64(todoId: string): Promise<string>;
 	onUploaded?(todoId: string, fileUri: string): void | Promise<void>;
+	onFailed?(todoId: string, fileUri: string): void | Promise<void>;
 }
 
 export function createUploadTransport(
 	options: UploadTransportOptions,
 ): UploadTransport {
 	return {
+		async onFailed(todoId, fileUri) {
+			await options.onFailed?.(todoId, fileUri);
+		},
 		async upload(input) {
 			const data = await options.getBase64(input.todoId);
 			if (!data) {

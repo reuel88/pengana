@@ -26,6 +26,7 @@ export interface UploadTransport {
 		mimeType: string;
 		idempotencyKey: string;
 	}): Promise<{ attachmentUrl: string }>;
+	onFailed?(todoId: string, fileUri: string): void | Promise<void>;
 }
 
 export interface SyncAdapter {

@@ -11,6 +11,7 @@ import {
 
 import { useUserInvitations } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
+import { mutedText } from "@/styles/shared";
 
 import { onboardingStyles } from "./onboarding-styles";
 
@@ -58,7 +59,7 @@ export function OnboardingInvitations({
 						<Text style={[styles.orgName, { color: theme.text }]}>
 							{invitation.organizationName}
 						</Text>
-						<Text style={[styles.role, { color: theme.text, opacity: 0.5 }]}>
+						<Text style={[styles.role, mutedText(theme)]}>
 							{invitation.role}
 						</Text>
 					</View>

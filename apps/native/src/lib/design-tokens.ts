@@ -25,12 +25,6 @@ export const SYNC_STATUS_COLORS = {
 	conflict: STATUS_COLORS.error,
 } as const;
 
-export const SYNC_STATUS_LABELS = {
-	synced: "Synced",
-	pending: "Pending sync",
-	conflict: "Conflict",
-} as const;
-
 /** Max number of sync/upload events kept in devtools log */
 export const MAX_EVENT_LOG_SIZE = 99;
 

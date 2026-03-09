@@ -31,12 +31,13 @@ function TodoContent({ userId }: { userId: string }) {
 export function TodoPage({ userId }: { userId: string }) {
 	const { success, error } = useMigrations(db, migrations);
 	const { theme } = useTheme();
+	const { t } = useTranslation("errors");
 
 	if (error) {
 		return (
 			<View style={styles.center}>
 				<Text style={{ color: STATUS_COLORS.error }}>
-					Migration error: {error.message}. Try restarting the app.
+					{t("migrationError", { message: error.message })}
 				</Text>
 			</View>
 		);

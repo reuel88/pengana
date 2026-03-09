@@ -42,6 +42,16 @@
 		"description": "Desculpe, a página que você procura não existe.",
 		"goHome": "Ir para o início"
 	},
+	"tabs": {
+		"one": {
+			"title": "Aba Um",
+			"subtitle": "Explore a primeira seção do seu aplicativo"
+		},
+		"two": {
+			"title": "Aba Dois",
+			"subtitle": "Descubra mais recursos e conteúdo"
+		}
+	},
 	"confirm": {
 		"yes": "Sim",
 		"no": "Não",

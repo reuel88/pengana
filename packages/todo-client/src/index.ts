@@ -10,6 +10,7 @@ export {
 	removeFileFromMemory,
 	storeFileInMemory,
 } from "./adapters/memory-file-store";
+export { createMemoryUploadTransport } from "./adapters/memory-upload-transport";
 export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
 export { createUploadTransport } from "./adapters/upload-transport";
 export type {

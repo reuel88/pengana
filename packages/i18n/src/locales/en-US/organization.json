@@ -45,6 +45,9 @@
 		"leaveSuccess": "Left organization",
 		"updateRoleSuccess": "Role updated",
 		"error": "Failed to manage member",
+		"updateRoleError": "Failed to update role",
+		"removeError": "Failed to remove member",
+		"leaveError": "Failed to leave organization",
 		"noMembers": "No members"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Invitations",
 		"teams": "Teams",
 		"roles": "Roles"
+	},
+	"notifications": {
+		"markReadError": "Failed to mark notification as read",
+		"markAllReadError": "Failed to mark all notifications as read"
 	},
 	"noActiveOrg": "No active organization. Select or create one to get started."
 }

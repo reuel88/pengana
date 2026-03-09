@@ -6,8 +6,7 @@ import { rateLimiter } from "hono-rate-limiter";
 const isDev = env.NODE_ENV === "development";
 const DEV_MULTIPLIER = 10;
 
-const keyGenerator = (c: Parameters<typeof getConnInfo>[0]) =>
-	getConnInfo(c).remote.address ?? "unknown";
+const keyGenerator = (c: Context) => getConnInfo(c).remote.address ?? "unknown";
 
 const rateLimitExceededHandler = (c: Context) =>
 	c.json(

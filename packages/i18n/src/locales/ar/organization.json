@@ -45,6 +45,9 @@
 		"leaveSuccess": "تمت المغادرة من المنظمة",
 		"updateRoleSuccess": "تم تحديث الدور",
 		"error": "فشل في إدارة العضو",
+		"updateRoleError": "فشل في تحديث الدور",
+		"removeError": "فشل في إزالة العضو",
+		"leaveError": "فشل في مغادرة المنظمة",
 		"noMembers": "لا يوجد أعضاء"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "الدعوات",
 		"teams": "الفرق",
 		"roles": "الأدوار"
+	},
+	"notifications": {
+		"markReadError": "فشل في تحديد الإشعار كمقروء",
+		"markAllReadError": "فشل في تحديد جميع الإشعارات كمقروءة"
 	},
 	"noActiveOrg": "لا توجد منظمة نشطة. اختر أو أنشئ واحدة للبدء."
 }

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/lib/theme";
+import { inputThemed, sharedStyles } from "@/styles/shared";
 
 export function TeamMemberAddForm({
 	teamId,
@@ -31,10 +32,7 @@ export function TeamMemberAddForm({
 	return (
 		<View style={styles.addRow}>
 			<TextInput
-				style={[
-					styles.input,
-					{ flex: 1, color: theme.text, borderColor: theme.border },
-				]}
+				style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
 				value={email}
 				onChangeText={setEmail}
 				placeholder={t("invitations.emailPlaceholder")}
@@ -59,6 +57,5 @@ export function TeamMemberAddForm({
 
 const styles = StyleSheet.create({
 	addRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
 	addButton: { paddingHorizontal: 16, justifyContent: "center" },
 });

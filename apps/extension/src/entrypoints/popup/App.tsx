@@ -18,10 +18,12 @@ function ActionPrompt({
 	messageKey,
 	buttonKey,
 	url,
+	onAction,
 }: {
 	messageKey: "loginPrompt" | "onboardingPrompt" | "common:error.generic";
 	buttonKey: "loginButton" | "onboardingButton" | "common:error.retry";
-	url: string;
+	url?: string;
+	onAction?: () => void;
 }) {
 	const { t } = useTranslation();
 	return (
@@ -31,7 +33,7 @@ function ActionPrompt({
 			</header>
 			<div className="flex flex-col items-center justify-center gap-4 p-8">
 				<p className="text-muted-foreground text-sm">{t(messageKey)}</p>
-				<Button onClick={() => browser.tabs.create({ url })}>
+				<Button onClick={onAction ?? (() => browser.tabs.create({ url }))}>
 					{t(buttonKey)}
 				</Button>
 			</div>
@@ -45,6 +47,7 @@ function App() {
 		data: orgs,
 		isPending: isOrgsPending,
 		error: orgsError,
+		refetch: refetchOrgs,
 	} = authClient.useListOrganizations();
 
 	if (isPending) return <LoadingState />;
@@ -66,7 +69,7 @@ function App() {
 			<ActionPrompt
 				messageKey="common:error.generic"
 				buttonKey="common:error.retry"
-				url={`${env.VITE_WEB_URL}`}
+				onAction={() => refetchOrgs()}
 			/>
 		);
 	}

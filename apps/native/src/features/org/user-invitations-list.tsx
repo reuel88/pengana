@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import type { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useUserInvitations } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
 export function UserInvitationsList({
 	isPendingFor,
@@ -33,27 +34,21 @@ export function UserInvitationsList({
 				{t("invitations.myInvitations")}
 			</Text>
 			{myInvitationsLoading ? (
-				<Text style={{ color: theme.text, opacity: 0.5 }}>
-					{t("common:status.loading")}
-				</Text>
+				<Text style={mutedText(theme)}>{t("common:status.loading")}</Text>
 			) : myInvitationsError ? (
 				<View style={{ gap: 8 }}>
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("invitations.fetchError")}
-					</Text>
+					<Text style={mutedText(theme)}>{t("invitations.fetchError")}</Text>
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => refetchMyInvitations()}
 					>
-						<Text style={{ color: "#fff", fontSize: 12 }}>
+						<Text style={sharedStyles.smallButtonText}>
 							{t("invitations.retry")}
 						</Text>
 					</TouchableOpacity>
 				</View>
 			) : pendingUserInvitations.length === 0 ? (
-				<Text style={{ color: theme.text, opacity: 0.5 }}>
-					{t("invitations.noInvitations")}
-				</Text>
+				<Text style={mutedText(theme)}>{t("invitations.noInvitations")}</Text>
 			) : (
 				pendingUserInvitations.map((inv) => (
 					<View
@@ -65,9 +60,7 @@ export function UserInvitationsList({
 					>
 						<View style={{ flex: 1 }}>
 							<Text style={{ color: theme.text }}>{inv.organizationName}</Text>
-							<Text style={{ color: theme.text, opacity: 0.7, fontSize: 12 }}>
-								{t(`roles.${inv.role}`)}
-							</Text>
+							<Text style={secondaryText(theme)}>{t(`roles.${inv.role}`)}</Text>
 						</View>
 						<View style={styles.actionRow}>
 							<TouchableOpacity
@@ -79,7 +72,7 @@ export function UserInvitationsList({
 									isPendingFor(inv.id) && { opacity: 0.5 },
 								]}
 							>
-								<Text style={{ color: "#fff", fontSize: 12 }}>
+								<Text style={sharedStyles.smallButtonText}>
 									{t("invitations.accept")}
 								</Text>
 							</TouchableOpacity>

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { Alert, ScrollView, StyleSheet } from "react-native";
+import { Alert, ScrollView } from "react-native";
 
 import { Container } from "@/components/container";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -9,6 +9,7 @@ import { UserInvitationsList } from "@/features/org/user-invitations-list";
 import { useInvitationMutations } from "@/hooks/use-invitation-mutations";
 import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
+import { sharedStyles } from "@/styles/shared";
 
 export default function InvitationsScreen() {
 	const { t } = useTranslation("organization");
@@ -24,7 +25,7 @@ export default function InvitationsScreen() {
 	const handleCancel = (invitationId: string) => {
 		if (isPendingFor(invitationId)) return;
 		Alert.alert(t("invitations.cancel"), "", [
-			{ text: t("common:confirm.no"), style: "cancel" },
+			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("common:confirm.yes"),
 				onPress: () => cancelMutation.mutate(invitationId),
@@ -34,7 +35,7 @@ export default function InvitationsScreen() {
 
 	return (
 		<Container>
-			<ScrollView contentContainerStyle={styles.list}>
+			<ScrollView contentContainerStyle={sharedStyles.listContainer}>
 				{activeOrg && isAdmin && <InviteForm orgId={activeOrg.id} />}
 
 				{activeOrg && (
@@ -55,7 +56,3 @@ export default function InvitationsScreen() {
 		</Container>
 	);
 }
-
-const styles = StyleSheet.create({
-	list: { padding: 16, gap: 8 },
-});

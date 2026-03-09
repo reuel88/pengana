@@ -16,6 +16,7 @@ import type {
 	BackgroundMessage,
 	SyncStatus,
 } from "@/utils/background-messages";
+import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { client } from "@/utils/orpc";
 import { sessionResponseSchema } from "@/utils/session-schema";
 
@@ -66,6 +67,7 @@ async function fetchUserId(): Promise<string | null> {
 		if (!res.ok) return null;
 		const parsed = sessionResponseSchema.safeParse(await res.json());
 		if (!parsed.success) return null;
+		// Better Auth returns session.userId for cookie sessions, user.id for token responses
 		return parsed.data.session?.userId ?? parsed.data.user?.id ?? null;
 	} catch {
 		return null;
@@ -91,9 +93,8 @@ function createSyncEngine(userId: string): SyncEngine {
 	const engine = new SyncEngine(adapter, transport);
 
 	engine.onEvent((event: SyncEvent) => {
-		if (event.type === "sync:start") state.isSyncing = true;
-		if (event.type === "sync:complete" || event.type === "sync:error")
-			state.isSyncing = false;
+		const active = isSyncActive(event);
+		if (active !== null) state.isSyncing = active;
 		broadcast({ type: "sync:event", event });
 	});
 
@@ -106,9 +107,8 @@ function createUploadQueueForEngine(engine: SyncEngine): UploadQueue {
 	const queue = new UploadQueue(uploadAdapter, uploadTransport);
 
 	queue.onEvent((event: UploadEvent) => {
-		if (event.type === "upload:start") state.isUploading = true;
-		if (event.type === "upload:complete" || event.type === "upload:error")
-			state.isUploading = false;
+		const active = isUploadActive(event);
+		if (active !== null) state.isUploading = active;
 		if (event.type === "upload:complete") {
 			engine.sync();
 		}

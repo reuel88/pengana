@@ -11,5 +11,6 @@
 	"failedToStoreFile": "Impossible de stocker le fichier. Le stockage est peut-être plein.",
 	"todoNotFound": "Tâche non trouvée",
 	"unauthorized": "Non autorisé",
-	"paymentError": "Une erreur est survenue lors du paiement. Veuillez réessayer."
+	"paymentError": "Une erreur est survenue lors du paiement. Veuillez réessayer.",
+	"migrationError": "Erreur de migration : {{message}}. Essayez de redémarrer l'application."
 }

@@ -45,6 +45,9 @@
 		"leaveSuccess": "Đã rời tổ chức",
 		"updateRoleSuccess": "Đã cập nhật vai trò",
 		"error": "Không thể quản lý thành viên",
+		"updateRoleError": "Không thể cập nhật vai trò",
+		"removeError": "Không thể xóa thành viên",
+		"leaveError": "Không thể rời tổ chức",
 		"noMembers": "Không có thành viên"
 	},
 	"invitations": {
@@ -117,6 +120,10 @@
 		"invitations": "Lời mời",
 		"teams": "Nhóm",
 		"roles": "Vai trò"
+	},
+	"notifications": {
+		"markReadError": "Không thể đánh dấu thông báo là đã đọc",
+		"markAllReadError": "Không thể đánh dấu tất cả thông báo là đã đọc"
 	},
 	"noActiveOrg": "Không có tổ chức đang hoạt động. Chọn hoặc tạo một tổ chức để bắt đầu."
 }

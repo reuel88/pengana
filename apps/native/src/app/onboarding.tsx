@@ -1,9 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	fetchUserLifecycleData,
-	type UserLifecycleData,
-} from "@pengana/org-client/lib/user-lifecycle";
-import { useEffect, useState } from "react";
+import type { UserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 import {
 	ActivityIndicator,
 	ScrollView,
@@ -18,47 +14,13 @@ import { OnboardingInvitations } from "@/features/onboarding/onboarding-invitati
 import { OnboardingInviteMembers } from "@/features/onboarding/onboarding-invite-members";
 import { useOnboarding } from "@/features/onboarding/use-onboarding";
 import { authClient } from "@/lib/auth-client";
+import { useLifecycleData } from "@/lib/lifecycle-context";
 import { useTheme } from "@/lib/theme";
 
 export default function OnboardingScreen() {
-	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
-	const [lifecycleData, setLifecycleData] = useState<UserLifecycleData | null>(
-		null,
-	);
-
-	const [error, setError] = useState(false);
-
-	const loadLifecycleData = () => {
-		setError(false);
-		fetchUserLifecycleData(authClient)
-			.then(setLifecycleData)
-			.catch((err: unknown) => {
-				console.error("Failed to fetch lifecycle data:", err);
-				setError(true);
-			});
-	};
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount
-	useEffect(() => {
-		loadLifecycleData();
-	}, []);
-
-	if (error) {
-		return (
-			<View style={[styles.container, { backgroundColor: theme.background }]}>
-				<Text style={{ color: theme.text, marginBottom: 12 }}>
-					{t("common:error.generic")}
-				</Text>
-				<TouchableOpacity onPress={loadLifecycleData}>
-					<Text style={{ color: theme.primary }}>
-						{t("common:error.retry")}
-					</Text>
-				</TouchableOpacity>
-			</View>
-		);
-	}
+	const lifecycleData = useLifecycleData();
 
 	if (!lifecycleData) {
 		return (

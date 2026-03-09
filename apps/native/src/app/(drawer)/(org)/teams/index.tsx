@@ -22,6 +22,7 @@ import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { authMutation } from "@/lib/auth-mutation";
 import { useTheme } from "@/lib/theme";
+import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
 
 export default function TeamsIndexScreen() {
 	const { theme } = useTheme();
@@ -60,15 +61,12 @@ export default function TeamsIndexScreen() {
 			<FlatList
 				data={teams}
 				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.list}
+				contentContainerStyle={sharedStyles.listContainer}
 				ListHeaderComponent={
 					isAdmin ? (
 						<View style={styles.createRow}>
 							<TextInput
-								style={[
-									styles.input,
-									{ flex: 1, color: theme.text, borderColor: theme.border },
-								]}
+								style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
 								value={teamName}
 								onChangeText={setTeamName}
 								placeholder={t("teams.namePlaceholder")}
@@ -88,9 +86,7 @@ export default function TeamsIndexScreen() {
 					) : null
 				}
 				ListEmptyComponent={
-					<Text style={{ color: theme.text, opacity: 0.5 }}>
-						{t("teams.noTeams")}
-					</Text>
+					<Text style={mutedText(theme)}>{t("teams.noTeams")}</Text>
 				}
 				renderItem={({ item: team }) => (
 					<TouchableOpacity
@@ -111,9 +107,7 @@ export default function TeamsIndexScreen() {
 }
 
 const styles = StyleSheet.create({
-	list: { padding: 16, gap: 8 },
 	createRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
-	input: { borderWidth: 1, padding: 12, fontSize: 14 },
 	createButton: { paddingHorizontal: 16, justifyContent: "center" },
 	teamItem: { padding: 14, borderWidth: 1 },
 });
