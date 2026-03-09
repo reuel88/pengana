@@ -80,3 +80,32 @@ pengana/
 - `pnpm run check` - Run Biome formatting and linting
 - `cd apps/web && pnpm run desktop:dev` - Start Tauri desktop app
 - `cd apps/web && pnpm run desktop:build` - Build Tauri desktop app
+
+## E2E Testing
+
+E2E tests use Playwright and run against a live dev environment.
+
+### One-time setup
+
+Install Playwright browsers (required once per machine):
+
+```bash
+pnpm --filter @pengana/e2e exec playwright install
+```
+
+### Running tests
+
+Ensure the PostgreSQL container is running before starting tests:
+
+```bash
+pnpm db:start
+```
+
+Then run:
+
+```bash
+pnpm e2e          # run all E2E tests
+pnpm e2e:ui       # open Playwright UI (interactive)
+```
+
+Playwright automatically starts the API server and web app before running tests.

@@ -30,6 +30,8 @@
 		"db:destroy": "turbo -F @pengana/db db:destroy",
 
 		"test": "turbo test",
+		"e2e": "turbo e2e",
+		"e2e:ui": "pnpm --filter @pengana/e2e e2e:ui",
 
 		"prepare": "husky"
 	},

@@ -1,8 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
+import { useOrgSettings } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import {
 	OrgLogoField,
@@ -10,14 +12,17 @@ import {
 	OrgSlugField,
 } from "@/components/org-form-fields";
 import { OrgGuard } from "@/components/org-guard";
-import {
-	useActiveOrg,
-	useOrgRole,
-	useOrgSettings,
-} from "@/hooks/use-org-queries";
+import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
+import { useZodForm } from "@/hooks/use-zod-form";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,
+});
+
+const updateOrgSchema = z.object({
+	name: z.string().min(1),
+	slug: z.string().min(1),
+	logo: z.string(),
 });
 
 function OrgSettingsPage() {
@@ -25,57 +30,74 @@ function OrgSettingsPage() {
 	const { data: activeOrg } = useActiveOrg();
 	const { isOwner, isAdmin } = useOrgRole();
 
-	const {
-		name,
-		setName,
-		slug,
-		setSlug,
-		logo,
-		setLogo,
-		syncFromOrg,
-		loading,
-		handleUpdate,
-		handleDelete,
-	} = useOrgSettings({
+	const { updateOrg, deleteOrg, loading } = useOrgSettings({
 		onUpdateSuccess: () => toast.success(t("settings.updateSuccess")),
 		onDeleteSuccess: () => toast.success(t("settings.deleteSuccess")),
 		onError: (message) => toast.error(message || t("settings.error")),
 	});
 
+	const form = useZodForm({
+		schema: updateOrgSchema,
+		defaultValues: {
+			name: activeOrg?.name ?? "",
+			slug: activeOrg?.slug ?? "",
+			logo: activeOrg?.logo ?? "",
+		},
+		onSubmit: async ({ value }) => {
+			await updateOrg(value);
+		},
+	});
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
-		if (activeOrg) syncFromOrg(activeOrg);
+		if (activeOrg) {
+			form.reset({
+				name: activeOrg.name,
+				slug: activeOrg.slug,
+				logo: activeOrg.logo ?? "",
+			});
+		}
 	}, [activeOrg?.id]);
-
-	const onSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		await handleUpdate();
-	};
 
 	return (
 		<OrgGuard>
 			{(org) => {
 				const onDelete = async () => {
 					if (!confirm(t("settings.deleteConfirm"))) return;
-					await handleDelete(org.id);
+					await deleteOrg(org.id);
 				};
 
 				return (
 					<div className="flex max-w-md flex-col gap-6">
 						{isAdmin ? (
-							<form onSubmit={onSubmit} className="flex flex-col gap-3">
+							<form
+								onSubmit={(e) => {
+									e.preventDefault();
+									form.handleSubmit();
+								}}
+								className="flex flex-col gap-3"
+							>
 								<h2 className="font-medium text-sm">{t("settings.update")}</h2>
-								<OrgNameField value={name} onChange={setName} id="org-name" />
-								<OrgSlugField
-									value={slug}
-									onChange={setSlug}
-									id="org-slug"
-									required
-								/>
-								<OrgLogoField value={logo} onChange={setLogo} id="org-logo" />
-								<Button type="submit" disabled={loading}>
-									{loading ? t("common:submitting") : t("settings.update")}
-								</Button>
+								<form.Field name="name">
+									{(field) => <OrgNameField field={field} id="org-name" />}
+								</form.Field>
+								<form.Field name="slug">
+									{(field) => (
+										<OrgSlugField field={field} id="org-slug" required />
+									)}
+								</form.Field>
+								<form.Field name="logo">
+									{(field) => <OrgLogoField field={field} id="org-logo" />}
+								</form.Field>
+								<form.Subscribe selector={(s) => s.isSubmitting}>
+									{(isSubmitting) => (
+										<Button type="submit" disabled={isSubmitting || loading}>
+											{isSubmitting || loading
+												? t("common:submitting")
+												: t("settings.update")}
+										</Button>
+									)}
+								</form.Subscribe>
 							</form>
 						) : (
 							<p className="text-muted-foreground text-sm">

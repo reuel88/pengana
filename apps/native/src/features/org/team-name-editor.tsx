@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
 import { useTeamNameEditor } from "@pengana/org-client";
+import { useState } from "react";
 import {
 	Alert,
 	Pressable,
@@ -10,9 +11,15 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { z } from "zod";
 
+import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
+
+const teamNameSchema = z.object({
+	name: z.string().min(1),
+});
 
 export function TeamNameEditor({
 	teamId,
@@ -27,32 +34,53 @@ export function TeamNameEditor({
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
+	const [editing, setEditing] = useState(false);
 
-	const { editing, setEditing, newName, setNewName, handleSave, loading } =
-		useTeamNameEditor({
-			onSuccess: () => Alert.alert("", t("teams.updateNameSuccess")),
-			onError: (message) => Alert.alert("", message || t("teams.error")),
-		});
+	const { handleSave, loading } = useTeamNameEditor({
+		onSuccess: () => Alert.alert("", t("teams.updateNameSuccess")),
+		onError: (message) => Alert.alert("", message || t("teams.error")),
+	});
 
-	const trimmedName = newName.trim();
+	const form = useZodForm({
+		schema: teamNameSchema,
+		defaultValues: { name: teamName },
+		onSubmit: async ({ value }) => {
+			await handleSave(teamId, orgId, value.name);
+			setEditing(false);
+		},
+	});
 
 	if (isAdmin && editing) {
 		return (
 			<View style={styles.editNameRow}>
-				<TextInput
-					style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
-					value={newName}
-					onChangeText={setNewName}
-				/>
-				<TouchableOpacity
-					style={[styles.addButton, { backgroundColor: theme.primary }]}
-					onPress={() => handleSave(teamId, orgId)}
-					disabled={loading || !trimmedName}
+				<form.Field name="name">
+					{(field) => (
+						<TextInput
+							style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
+							value={field.state.value}
+							onChangeText={field.handleChange}
+							onBlur={field.handleBlur}
+						/>
+					)}
+				</form.Field>
+				<form.Subscribe
+					selector={(s) => ({
+						isSubmitting: s.isSubmitting,
+						name: s.values.name,
+					})}
 				>
-					<Text style={sharedStyles.smallButtonText}>
-						{t("teams.updateName")}
-					</Text>
-				</TouchableOpacity>
+					{({ isSubmitting, name }) => (
+						<TouchableOpacity
+							style={[styles.addButton, { backgroundColor: theme.primary }]}
+							onPress={form.handleSubmit}
+							disabled={loading || isSubmitting || !name.trim()}
+						>
+							<Text style={sharedStyles.smallButtonText}>
+								{t("teams.updateName")}
+							</Text>
+						</TouchableOpacity>
+					)}
+				</form.Subscribe>
 				<TouchableOpacity
 					style={[styles.cancelBtn, { borderColor: theme.border }]}
 					onPress={() => setEditing(false)}
@@ -71,7 +99,7 @@ export function TeamNameEditor({
 				<Text style={[styles.title, { color: theme.text }]}>{teamName}</Text>
 				<Pressable
 					onPress={() => {
-						setNewName(teamName);
+						form.reset({ name: teamName });
 						setEditing(true);
 					}}
 					hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}

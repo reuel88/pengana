@@ -1,7 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
 import { useBatchInvite } from "@pengana/org-client";
-import { randomUUID } from "expo-crypto";
-import { useEffect } from "react";
 import {
 	ActivityIndicator,
 	Alert,
@@ -11,12 +9,23 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { z } from "zod";
 
 import { RoleToggle } from "@/components/role-toggle";
 import { useActiveOrg } from "@/hooks/use-org-queries";
+import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 
 import { onboardingStyles } from "./onboarding-styles";
+
+const inviteMembersSchema = z.object({
+	members: z.array(
+		z.object({
+			email: z.string(),
+			role: z.enum(["member", "admin"]),
+		}),
+	),
+});
 
 export function OnboardingInviteMembers({
 	onInvited,
@@ -28,29 +37,24 @@ export function OnboardingInviteMembers({
 	const { t } = useTranslation("onboarding");
 	const { theme } = useTheme();
 	const { data: activeOrg } = useActiveOrg();
-	const generateId = () => randomUUID();
 
-	const {
-		entries,
-		addEntry,
-		removeEntry,
-		updateEntry,
-		validEntries,
-		handleSubmit,
-		loading,
-	} = useBatchInvite({
+	const { batchInvite, loading } = useBatchInvite({
 		organizationId: activeOrg?.id,
 		onSuccess: () => onInvited(),
 		onPartialFailure: () => Alert.alert(t("invite.error")),
 		onError: () => Alert.alert(t("invite.error")),
 	});
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: seed the first entry on mount
-	useEffect(() => {
-		if (entries.length === 0) {
-			addEntry(generateId());
-		}
-	}, []);
+	const form = useZodForm({
+		schema: inviteMembersSchema,
+		defaultValues: {
+			members: [{ email: "", role: "member" as "member" | "admin" }],
+		},
+		onSubmit: async ({ value }) => {
+			const valid = value.members.filter((m) => m.email.trim());
+			await batchInvite(valid);
+		},
+	});
 
 	return (
 		<View
@@ -71,71 +75,102 @@ export function OnboardingInviteMembers({
 				{t("invite.description")}
 			</Text>
 
-			{entries.map((entry, index) => (
-				<View key={entry.id} style={styles.entryRow}>
-					<TextInput
-						style={[
-							styles.emailInput,
-							{
-								color: theme.text,
-								borderColor: theme.border,
-								backgroundColor: theme.background,
-							},
-						]}
-						value={entry.email}
-						onChangeText={(text) => updateEntry(index, { email: text })}
-						placeholder={t("invite.emailPlaceholder")}
-						placeholderTextColor={theme.border}
-						keyboardType="email-address"
-						autoCapitalize="none"
-					/>
-					<RoleToggle
-						role={entry.role}
-						onChange={(role) => updateEntry(index, { role })}
-						disabled={loading}
-					/>
-					{entries.length > 1 && (
-						<TouchableOpacity
-							style={styles.removeButton}
-							onPress={() => removeEntry(index)}
-						>
-							<Text style={{ color: theme.notification, fontSize: 12 }}>
-								{t("invite.remove")}
-							</Text>
-						</TouchableOpacity>
-					)}
-				</View>
-			))}
+			<form.Field name="members" mode="array">
+				{(membersField) => (
+					<>
+						{membersField.state.value.map((_entry, index) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: array index is stable for invite rows
+							<View key={index} style={styles.entryRow}>
+								<form.Field name={`members[${index}].email`}>
+									{(emailField) => (
+										<TextInput
+											style={[
+												styles.emailInput,
+												{
+													color: theme.text,
+													borderColor: theme.border,
+													backgroundColor: theme.background,
+												},
+											]}
+											value={emailField.state.value as string}
+											onChangeText={emailField.handleChange}
+											placeholder={t("invite.emailPlaceholder")}
+											placeholderTextColor={theme.border}
+											keyboardType="email-address"
+											autoCapitalize="none"
+										/>
+									)}
+								</form.Field>
+								<form.Field name={`members[${index}].role`}>
+									{(roleField) => (
+										<RoleToggle
+											role={roleField.state.value as "member" | "admin"}
+											onChange={(role) => roleField.handleChange(role)}
+											disabled={loading}
+										/>
+									)}
+								</form.Field>
+								{membersField.state.value.length > 1 && (
+									<TouchableOpacity
+										style={styles.removeButton}
+										onPress={() => form.removeFieldValue("members", index)}
+									>
+										<Text style={{ color: theme.notification, fontSize: 12 }}>
+											{t("invite.remove")}
+										</Text>
+									</TouchableOpacity>
+								)}
+							</View>
+						))}
+					</>
+				)}
+			</form.Field>
 
 			<TouchableOpacity
 				style={[styles.outlineButton, { borderColor: theme.border }]}
-				onPress={() => addEntry(generateId())}
+				onPress={() =>
+					form.pushFieldValue("members", {
+						email: "",
+						role: "member" as const,
+					})
+				}
 			>
 				<Text style={[styles.outlineButtonText, { color: theme.text }]}>
 					{t("invite.addAnother")}
 				</Text>
 			</TouchableOpacity>
 
-			<TouchableOpacity
-				style={[
-					onboardingStyles.submitButton,
-					{
-						backgroundColor: theme.primary,
-						opacity:
-							loading || !activeOrg?.id || validEntries.length === 0 ? 0.5 : 1,
-					},
+			<form.Subscribe
+				selector={(s): [boolean, boolean] => [
+					s.isSubmitting,
+					!s.values.members.some((m) => m.email.trim()),
 				]}
-				onPress={handleSubmit}
-				disabled={loading || !activeOrg?.id || validEntries.length === 0}
 			>
-				{loading ? (
-					<ActivityIndicator size="small" color="#fff" />
-				) : (
-					<Text style={onboardingStyles.submitButtonText}>
-						{t("invite.send")}
-					</Text>
+				{([isSubmitting, noValid]) => (
+					<TouchableOpacity
+						style={[
+							onboardingStyles.submitButton,
+							{
+								backgroundColor: theme.primary,
+								opacity:
+									isSubmitting || loading || !activeOrg?.id || noValid
+										? 0.5
+										: 1,
+							},
+						]}
+						onPress={form.handleSubmit}
+						disabled={isSubmitting || loading || !activeOrg?.id || noValid}
+					>
+						{loading ? (
+							<ActivityIndicator size="small" color="#fff" />
+						) : (
+							<Text style={onboardingStyles.submitButtonText}>
+								{t("invite.send")}
+							</Text>
+						)}
+					</TouchableOpacity>
 				)}
-			</TouchableOpacity>
+			</form.Subscribe>
 
 			<TouchableOpacity style={onboardingStyles.ghostButton} onPress={onSkip}>
 				<Text

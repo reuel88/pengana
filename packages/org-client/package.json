@@ -26,6 +26,9 @@
 			"default": "./src/context/auth-client-context.tsx"
 		}
 	},
+	"scripts": {
+		"test": "vitest run"
+	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5",
 		"react": "^19.0.0",
@@ -34,6 +37,7 @@
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
 		"@types/react": "^19.2.7",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

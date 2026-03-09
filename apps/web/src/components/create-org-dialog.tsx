@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useCreateOrg } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Dialog,
@@ -8,13 +9,21 @@ import {
 	DialogTitle,
 } from "@pengana/ui/components/dialog";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import {
 	OrgLogoField,
 	OrgNameField,
 	OrgSlugField,
 } from "@/components/org-form-fields";
-import { useCreateOrg } from "@/hooks/use-create-org";
+import { useZodForm } from "@/hooks/use-zod-form";
+
+const createOrgSchema = z.object({
+	name: z.string().min(1),
+	slug: z.string(),
+	logo: z.string(),
+});
 
 export function CreateOrgDialog({
 	open,
@@ -26,23 +35,21 @@ export function CreateOrgDialog({
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
 
-	const {
-		name,
-		setName,
-		slug,
-		setSlug,
-		logo,
-		setLogo,
-		loading,
-		handleSubmit,
-		resetForm,
-	} = useCreateOrg({
-		successMessage: t("create.success"),
-		errorMessage: t("create.error"),
+	const { createOrg } = useCreateOrg({
 		onSuccess: () => {
-			onOpenChange(false);
-			resetForm();
+			toast.success(t("create.success"));
 			navigate({ to: "/org" });
+		},
+		onError: (message) => toast.error(message || t("create.error")),
+	});
+
+	const form = useZodForm({
+		schema: createOrgSchema,
+		defaultValues: { name: "", slug: "", logo: "" },
+		onSubmit: async ({ value }) => {
+			await createOrg(value);
+			form.reset();
+			onOpenChange(false);
 		},
 	});
 
@@ -54,13 +61,34 @@ export function CreateOrgDialog({
 				<DialogDescription className="mt-1">
 					{t("create.description")}
 				</DialogDescription>
-				<form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
-					<OrgNameField value={name} onChange={setName} id="dialog-org-name" />
-					<OrgSlugField value={slug} onChange={setSlug} id="dialog-org-slug" />
-					<OrgLogoField value={logo} onChange={setLogo} id="dialog-org-logo" />
-					<Button type="submit" disabled={loading || !name}>
-						{loading ? t("common:submitting") : t("create.submit")}
-					</Button>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+					className="mt-4 flex flex-col gap-3"
+				>
+					<form.Field name="name">
+						{(field) => <OrgNameField field={field} id="dialog-org-name" />}
+					</form.Field>
+					<form.Field name="slug">
+						{(field) => <OrgSlugField field={field} id="dialog-org-slug" />}
+					</form.Field>
+					<form.Field name="logo">
+						{(field) => <OrgLogoField field={field} id="dialog-org-logo" />}
+					</form.Field>
+					<form.Subscribe
+						selector={(s): [boolean, boolean] => [
+							s.isSubmitting,
+							!s.values.name,
+						]}
+					>
+						{([isSubmitting, nameEmpty]) => (
+							<Button type="submit" disabled={isSubmitting || nameEmpty}>
+								{isSubmitting ? t("common:submitting") : t("create.submit")}
+							</Button>
+						)}
+					</form.Subscribe>
 				</form>
 			</DialogPopup>
 		</Dialog>

@@ -8,7 +8,9 @@ import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { cn } from "@pengana/ui/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import type { Column } from "@/components/data-table";
 import { DataTable } from "@/components/data-table";
@@ -19,6 +21,7 @@ import {
 	useTeamMembers,
 	useTeams,
 } from "@/hooks/use-org-queries";
+import { useZodForm } from "@/hooks/use-zod-form";
 
 export const Route = createFileRoute("/org/teams/$teamId")({
 	component: TeamDetailPage,
@@ -33,31 +36,49 @@ function TeamNameEditor({
 }) {
 	const { t } = useTranslation("organization");
 	const { isAdmin } = useOrgRole();
+	const [editing, setEditing] = useState(false);
 
-	const { editing, setEditing, newName, setNewName, handleSave, loading } =
-		useTeamNameEditor({
-			onSuccess: () => toast.success(t("teams.updateNameSuccess")),
-			onError: (message) => toast.error(message || t("teams.error")),
-		});
+	const { handleSave, loading } = useTeamNameEditor({
+		onSuccess: () => toast.success(t("teams.updateNameSuccess")),
+		onError: (message) => toast.error(message || t("teams.error")),
+	});
+
+	const form = useZodForm({
+		schema: z.object({ name: z.string().min(1) }),
+		defaultValues: { name: team.name },
+		onSubmit: async ({ value }) => {
+			await handleSave(team.id, orgId, value.name);
+			setEditing(false);
+		},
+	});
 
 	if (isAdmin && editing) {
 		return (
 			<form
-				onSubmit={async (e) => {
+				onSubmit={(e) => {
 					e.preventDefault();
-					await handleSave(team.id, orgId);
+					form.handleSubmit();
 				}}
 				className="flex items-center gap-2"
 			>
-				<Input
-					value={newName}
-					onChange={(e) => setNewName(e.target.value)}
-					className="h-8 w-48 text-sm"
-					required
-				/>
-				<Button type="submit" size="xs" disabled={loading}>
-					{t("teams.updateName")}
-				</Button>
+				<form.Field name="name">
+					{(field) => (
+						<Input
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(e) => field.handleChange(e.target.value)}
+							className="h-8 w-48 text-sm"
+							required
+						/>
+					)}
+				</form.Field>
+				<form.Subscribe selector={(s) => s.isSubmitting}>
+					{(isSubmitting) => (
+						<Button type="submit" size="xs" disabled={isSubmitting || loading}>
+							{t("teams.updateName")}
+						</Button>
+					)}
+				</form.Subscribe>
 				<Button
 					type="button"
 					variant="outline"
@@ -71,7 +92,7 @@ function TeamNameEditor({
 	}
 
 	function enterEdit() {
-		setNewName(team.name);
+		form.reset({ name: team.name });
 		setEditing(true);
 	}
 
@@ -105,31 +126,49 @@ function TeamMemberAddForm({
 }) {
 	const { t } = useTranslation("organization");
 
-	const { email, setEmail, handleAdd, loading } = useTeamMemberAdd({
+	const { handleAdd, loading } = useTeamMemberAdd({
 		onSuccess: () => toast.success(t("teams.addMemberSuccess")),
 		onError: (message) => toast.error(message || t("teams.error")),
 	});
 
+	const form = useZodForm({
+		schema: z.object({ email: z.string().email() }),
+		defaultValues: { email: "" },
+		onSubmit: async ({ value }) => {
+			await handleAdd(teamId, members, value.email);
+			form.reset();
+		},
+	});
+
 	return (
 		<form
-			onSubmit={async (e) => {
+			onSubmit={(e) => {
 				e.preventDefault();
-				await handleAdd(teamId, members);
+				form.handleSubmit();
 			}}
 			className="flex max-w-md items-end gap-2"
 		>
-			<div className="flex flex-1 flex-col gap-1">
-				<Input
-					type="email"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					placeholder={t("invitations.emailPlaceholder")}
-					required
-				/>
-			</div>
-			<Button type="submit" size="sm" disabled={loading}>
-				{t("teams.addMember")}
-			</Button>
+			<form.Field name="email">
+				{(field) => (
+					<div className="flex flex-1 flex-col gap-1">
+						<Input
+							type="email"
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(e) => field.handleChange(e.target.value)}
+							placeholder={t("invitations.emailPlaceholder")}
+							required
+						/>
+					</div>
+				)}
+			</form.Field>
+			<form.Subscribe selector={(s) => s.isSubmitting}>
+				{(isSubmitting) => (
+					<Button type="submit" size="sm" disabled={isSubmitting || loading}>
+						{t("teams.addMember")}
+					</Button>
+				)}
+			</form.Subscribe>
 		</form>
 	);
 }
