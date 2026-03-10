@@ -15,6 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { FormRoot } from "@/components/form-root";
 import { OrgGuard } from "@/components/org-guard";
 import {
 	useActiveOrg,
@@ -65,13 +66,7 @@ function CreateTeamDialog({
 		<DialogPopup>
 			<DialogCloseButton />
 			<DialogTitle>{t("teams.create")}</DialogTitle>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					form.handleSubmit();
-				}}
-				className="mt-4 flex flex-col gap-3"
-			>
+			<FormRoot form={form} className="mt-4 flex flex-col gap-3">
 				<form.Field name="teamName">
 					{(field) => (
 						<div className="flex flex-col gap-1">
@@ -99,7 +94,7 @@ function CreateTeamDialog({
 						</Button>
 					)}
 				</form.Subscribe>
-			</form>
+			</FormRoot>
 		</DialogPopup>
 	);
 }
@@ -113,7 +108,7 @@ function TeamsIndexPage() {
 
 	return (
 		<OrgGuard>
-			{(_org) => {
+			{() => {
 				if (teamsLoading) {
 					return <p>{t("common:status.loading")}</p>;
 				}

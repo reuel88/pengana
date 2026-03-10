@@ -1,6 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import { createOrgSchema, useCreateOrg, useZodForm } from "@pengana/org-client";
-import { Button } from "@pengana/ui/components/button";
 import {
 	Dialog,
 	DialogCloseButton,
@@ -9,13 +7,8 @@ import {
 	DialogTitle,
 } from "@pengana/ui/components/dialog";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
-import {
-	OrgLogoField,
-	OrgNameField,
-	OrgSlugField,
-} from "@/components/org-form-fields";
+import { OrgCreateForm } from "@/components/org-create-form";
 
 export function CreateOrgDialog({
 	open,
@@ -27,26 +20,6 @@ export function CreateOrgDialog({
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
 
-	const { createOrg } = useCreateOrg({
-		onSuccess: () => {
-			toast.success(t("create.success"));
-			navigate({ to: "/org" });
-		},
-		onError: (message) => toast.error(message || t("create.error")),
-	});
-
-	const form = useZodForm({
-		schema: createOrgSchema,
-		defaultValues: { name: "", slug: "", logo: "" },
-		onSubmit: async ({ value }) => {
-			const success = await createOrg(value);
-			if (success) {
-				form.reset();
-				onOpenChange(false);
-			}
-		},
-	});
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogPopup>
@@ -55,35 +28,13 @@ export function CreateOrgDialog({
 				<DialogDescription className="mt-1">
 					{t("create.description")}
 				</DialogDescription>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						form.handleSubmit();
-					}}
-					className="mt-4 flex flex-col gap-3"
-				>
-					<form.Field name="name">
-						{(field) => <OrgNameField field={field} id="dialog-org-name" />}
-					</form.Field>
-					<form.Field name="slug">
-						{(field) => <OrgSlugField field={field} id="dialog-org-slug" />}
-					</form.Field>
-					<form.Field name="logo">
-						{(field) => <OrgLogoField field={field} id="dialog-org-logo" />}
-					</form.Field>
-					<form.Subscribe
-						selector={(s) => ({
-							isSubmitting: s.isSubmitting,
-							nameEmpty: !s.values.name.trim(),
-						})}
-					>
-						{({ isSubmitting, nameEmpty }) => (
-							<Button type="submit" disabled={isSubmitting || nameEmpty}>
-								{isSubmitting ? t("common:submitting") : t("create.submit")}
-							</Button>
-						)}
-					</form.Subscribe>
-				</form>
+				<div className="mt-4">
+					<OrgCreateForm
+						onSuccess={() => navigate({ to: "/org" })}
+						onCancel={() => onOpenChange(false)}
+						idPrefix="dialog"
+					/>
+				</div>
 			</DialogPopup>
 		</Dialog>
 	);

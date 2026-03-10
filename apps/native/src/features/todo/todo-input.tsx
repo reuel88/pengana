@@ -8,7 +8,7 @@ import {
 	View,
 } from "react-native";
 import { useSync } from "@/features/sync/sync-context";
-import { PLACEHOLDER_COLORS } from "@/lib/design-tokens";
+import { PLACEHOLDER_COLORS, TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
 import { addTodo } from "./todo-actions";
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	buttonText: {
-		color: "#fff",
+		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 		fontSize: 14,
 	},

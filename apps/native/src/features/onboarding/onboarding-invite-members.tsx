@@ -12,6 +12,7 @@ import {
 import { z } from "zod";
 import { RoleToggle } from "@/components/role-toggle";
 import { useActiveOrg } from "@/hooks/use-org-queries";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
 import { onboardingStyles } from "./onboarding-styles";
@@ -19,7 +20,7 @@ import { onboardingStyles } from "./onboarding-styles";
 const inviteMembersSchema = z.object({
 	members: z.array(
 		z.object({
-			email: z.email().trim(),
+			email: z.union([z.string().trim().email(), z.literal("")]),
 			role: z.enum(["member", "admin"]),
 		}),
 	),
@@ -173,7 +174,7 @@ export function OnboardingInviteMembers({
 						disabled={isSubmitting || loading || !activeOrg?.id || noValid}
 					>
 						{loading ? (
-							<ActivityIndicator size="small" color="#fff" />
+							<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
 						) : (
 							<Text style={onboardingStyles.submitButtonText}>
 								{t("invite.send")}

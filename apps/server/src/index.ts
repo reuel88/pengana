@@ -22,10 +22,12 @@ await initLogger();
 const app = new Hono();
 
 app.use(requestLogger);
+const allowedOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
+
 app.use(
 	"/*",
 	cors({
-		origin: env.CORS_ORIGIN.split(",").map((o) => o.trim()),
+		origin: allowedOrigins,
 		allowMethods: ["GET", "POST", "OPTIONS"],
 		allowHeaders: ["Content-Type", "Authorization", "Accept-Language"],
 		credentials: true,

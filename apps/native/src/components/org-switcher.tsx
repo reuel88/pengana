@@ -20,6 +20,7 @@ import {
 } from "react-native";
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
 
@@ -93,7 +94,7 @@ function CreateOrgModal({
 							disabled={isDisabled}
 						>
 							{loading ? (
-								<ActivityIndicator color="#fff" />
+								<ActivityIndicator color={TEXT_ON_PRIMARY} />
 							) : (
 								<Text style={sharedStyles.buttonText}>
 									{t("create.submit")}

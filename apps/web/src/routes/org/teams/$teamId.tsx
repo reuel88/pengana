@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 import type { Column } from "@/components/data-table";
 import { DataTable } from "@/components/data-table";
+import { FormRoot } from "@/components/form-root";
 import { OrgGuard } from "@/components/org-guard";
 import {
 	useActiveOrg,
@@ -57,13 +58,7 @@ function TeamNameEditor({
 
 	if (isAdmin && editing) {
 		return (
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					form.handleSubmit();
-				}}
-				className="flex items-center gap-2"
-			>
+			<FormRoot form={form} className="flex items-center gap-2">
 				<form.Field name="name">
 					{(field) => (
 						<Input
@@ -90,7 +85,7 @@ function TeamNameEditor({
 				>
 					{t("invitations.cancel")}
 				</Button>
-			</form>
+			</FormRoot>
 		);
 	}
 
@@ -144,13 +139,7 @@ function TeamMemberAddForm({
 	});
 
 	return (
-		<form
-			onSubmit={(e) => {
-				e.preventDefault();
-				form.handleSubmit();
-			}}
-			className="flex max-w-md items-end gap-2"
-		>
+		<FormRoot form={form} className="flex max-w-md items-end gap-2">
 			<form.Field name="email">
 				{(field) => (
 					<div className="flex flex-1 flex-col gap-1">
@@ -172,7 +161,7 @@ function TeamMemberAddForm({
 					</Button>
 				)}
 			</form.Subscribe>
-		</form>
+		</FormRoot>
 	);
 }
 
@@ -186,18 +175,15 @@ function TeamMembersTable({
 	teamId,
 	teamMembers,
 	orgMembers,
+	onRemoveMember,
 }: {
 	teamId: string;
 	teamMembers: TeamMember[];
 	orgMembers: OrgMember[];
+	onRemoveMember: (teamId: string, userId: string) => void;
 }) {
 	const { t } = useTranslation("organization");
 	const { isAdmin } = useOrgRole();
-
-	const { handleRemoveMember } = useTeamActions({
-		onRemoveMemberSuccess: () => toast.success(t("teams.removeMemberSuccess")),
-		onError: (message) => toast.error(message || t("teams.error")),
-	});
 
 	if (teamMembers.length === 0) {
 		return (
@@ -233,7 +219,7 @@ function TeamMembersTable({
 					<Button
 						variant="destructive"
 						size="xs"
-						onClick={() => handleRemoveMember(teamId, tm.userId)}
+						onClick={() => onRemoveMember(teamId, tm.userId)}
 					>
 						{t("teams.removeMember")}
 					</Button>
@@ -263,11 +249,12 @@ function TeamDetailPage() {
 		isError: membersError,
 	} = useTeamMembers(teamId);
 
-	const { handleDeleteTeam } = useTeamActions({
+	const { handleDeleteTeam, handleRemoveMember } = useTeamActions({
 		onDeleteSuccess: () => {
 			toast.success(t("teams.deleteSuccess"));
 			navigate({ to: "/org/teams" });
 		},
+		onRemoveMemberSuccess: () => toast.success(t("teams.removeMemberSuccess")),
 		onError: (message) => toast.error(message || t("teams.error")),
 	});
 
@@ -316,6 +303,7 @@ function TeamDetailPage() {
 							teamId={teamId}
 							teamMembers={teamMembers ?? []}
 							orgMembers={org.members ?? []}
+							onRemoveMember={handleRemoveMember}
 						/>
 					</div>
 				);

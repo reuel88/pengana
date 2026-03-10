@@ -21,6 +21,7 @@ import {
 import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { authMutation } from "@/lib/auth-mutation";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
 
@@ -80,7 +81,9 @@ export default function TeamsIndexScreen() {
 								onPress={handleCreate}
 								disabled={creating || !teamName.trim()}
 							>
-								<Text style={{ color: "#fff" }}>{t("teams.create")}</Text>
+								<Text style={{ color: TEXT_ON_PRIMARY }}>
+									{t("teams.create")}
+								</Text>
 							</TouchableOpacity>
 						</View>
 					) : null

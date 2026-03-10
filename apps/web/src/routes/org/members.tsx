@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
+import { Select } from "@pengana/ui/components/select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -12,6 +13,13 @@ import { useOrgRole } from "@/hooks/use-org-queries";
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
 });
+
+type Member = {
+	id: string;
+	userId: string;
+	role: string;
+	user: { name: string; email: string };
+};
 
 function MembersPage() {
 	const { t } = useTranslation("organization");
@@ -41,11 +49,12 @@ function MembersPage() {
 		await handleRemove(memberIdOrEmail);
 	};
 
-	type Member = {
-		id: string;
-		userId: string;
-		role: string;
-		user: { name: string; email: string };
+	const onLeave = async (members: Member[]) => {
+		if (!currentUserId) return;
+		const currentMember = members.find((m) => m.userId === currentUserId);
+		if (!currentMember) return;
+		if (!confirm(t("members.leaveConfirm"))) return;
+		await handleLeave(currentMember.id);
 	};
 
 	const columns: Column<Member>[] = [
@@ -58,16 +67,15 @@ function MembersPage() {
 				m.role === "owner" ? (
 					<span className="text-xs">{t("roles.owner")}</span>
 				) : isAdmin ? (
-					<select
+					<Select
 						value={m.role}
 						onChange={(e) =>
 							handleUpdateRole(m.id, e.target.value as "member" | "admin")
 						}
-						className="bg-transparent text-xs"
 					>
 						<option value="admin">{t("roles.admin")}</option>
 						<option value="member">{t("roles.member")}</option>
-					</select>
+					</Select>
 				) : (
 					<span className="text-xs">{t(`roles.${m.role}`)}</span>
 				),
@@ -97,19 +105,15 @@ function MembersPage() {
 			{(activeOrg) => {
 				const members = (activeOrg.members || []) as Member[];
 
-				const onLeave = async () => {
-					if (!currentUserId) return;
-					const currentMember = members.find((m) => m.userId === currentUserId);
-					if (!currentMember) return;
-					if (!confirm(t("members.leaveConfirm"))) return;
-					await handleLeave(currentMember.id);
-				};
-
 				return (
 					<div className="flex flex-col gap-4">
 						<div className="flex items-center justify-between">
 							<h2 className="font-medium text-sm">{t("members.title")}</h2>
-							<Button variant="outline" size="sm" onClick={onLeave}>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => onLeave(members)}
+							>
 								{t("members.leave")}
 							</Button>
 						</div>

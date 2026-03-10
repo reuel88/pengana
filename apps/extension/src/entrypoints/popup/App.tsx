@@ -26,6 +26,7 @@ function ActionPrompt({
 	onAction,
 }: ActionPromptProps) {
 	const { t } = useTranslation();
+	const handleClick = onAction ?? (() => browser.tabs.create({ url }));
 	return (
 		<>
 			<header className="flex w-full justify-end p-2">
@@ -33,9 +34,7 @@ function ActionPrompt({
 			</header>
 			<div className="flex flex-col items-center justify-center gap-4 p-8">
 				<p className="text-muted-foreground text-sm">{t(messageKey)}</p>
-				<Button onClick={onAction ?? (() => browser.tabs.create({ url }))}>
-					{t(buttonKey)}
-				</Button>
+				<Button onClick={handleClick}>{t(buttonKey)}</Button>
 			</div>
 		</>
 	);

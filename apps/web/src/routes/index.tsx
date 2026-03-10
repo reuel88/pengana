@@ -24,25 +24,27 @@ function DashboardPage() {
 	const hasProSubscription =
 		(customerState?.activeSubscriptions?.length ?? 0) > 0;
 
-	const handlePaymentAction = (action: () => Promise<unknown>) => {
-		action().catch((err: unknown) => {
+	const handlePaymentAction = async (action: () => Promise<unknown>) => {
+		try {
+			await action();
+		} catch (err: unknown) {
 			console.error("Payment error:", err);
 			toast.error(t("errors:paymentError"));
-		});
+		}
 	};
-
-	function renderPrivateData() {
-		if (privateData.isLoading) return <p>{t("common:status.loading")}</p>;
-		if (privateData.isError) return <p>{t("common:status.disconnected")}</p>;
-		return <p>API: {privateData.data?.data?.message}</p>;
-	}
 
 	return (
 		<div>
 			<h1>{t("title")}</h1>
 			<p>{t("welcome", { name: session.data.user.name })}</p>
 			{/* First .data is React Query's, second .data is the API envelope */}
-			{renderPrivateData()}
+			{privateData.isLoading ? (
+				<p>{t("common:status.loading")}</p>
+			) : privateData.isError ? (
+				<p>{t("common:status.disconnected")}</p>
+			) : (
+				<p>API: {privateData.data?.data?.message}</p>
+			)}
 			<p>{hasProSubscription ? t("planPro") : t("planFree")}</p>
 			{hasProSubscription ? (
 				<Button

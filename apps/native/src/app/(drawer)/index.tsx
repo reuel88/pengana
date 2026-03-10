@@ -9,6 +9,7 @@ import {
 
 import { Container } from "@/components/container";
 import { authClient } from "@/lib/auth-client";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { queryClient } from "@/utils/orpc";
 
@@ -42,8 +43,8 @@ export default function Home() {
 							styles.signOutButton,
 							{ backgroundColor: theme.notification },
 						]}
-						onPress={() => {
-							authClient.signOut();
+						onPress={async () => {
+							await authClient.signOut();
 							queryClient.invalidateQueries();
 						}}
 					>
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	signOutText: {
-		color: "#ffffff",
+		color: TEXT_ON_PRIMARY,
 		fontWeight: "bold",
 	},
 });

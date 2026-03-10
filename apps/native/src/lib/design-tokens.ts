@@ -14,6 +14,9 @@ export const BANNER_COLORS = {
 	offlineTextDark: "#f87171",
 } as const;
 
+/** Text color for use on primary/accent backgrounds (buttons, badges, etc.) */
+export const TEXT_ON_PRIMARY = "#ffffff";
+
 export const PLACEHOLDER_COLORS = {
 	light: "#999",
 	dark: "#666",

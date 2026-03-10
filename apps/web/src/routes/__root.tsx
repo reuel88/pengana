@@ -56,13 +56,14 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	}),
 });
 
-const HEADERLESS_ROUTES = ["/login", "/sign-up", "/onboarding"] as const;
+const HEADERLESS_PREFIXES = ["/login", "/sign-up", "/onboarding"] as const;
 
 function RootComponent() {
 	const { i18n } = useTranslation();
 	const matches = useMatches();
-	const hideHeader = matches.some((m) =>
-		(HEADERLESS_ROUTES as readonly string[]).includes(m.routeId),
+	const pathname = matches.at(-1)?.pathname ?? "";
+	const hideHeader = HEADERLESS_PREFIXES.some(
+		(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
 	);
 
 	useEffect(() => {

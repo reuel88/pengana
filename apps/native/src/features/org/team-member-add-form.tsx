@@ -14,6 +14,7 @@ import {
 	View,
 } from "react-native";
 
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
 
@@ -68,12 +69,14 @@ export function TeamMemberAddForm({
 					<TouchableOpacity
 						style={[styles.addButton, { backgroundColor: theme.primary }]}
 						onPress={form.handleSubmit}
-						disabled={loading || isSubmitting || !email.trim()}
+						disabled={loading || isSubmitting || !email.trim() || !members}
 					>
 						{loading ? (
-							<ActivityIndicator color="#fff" size="small" />
+							<ActivityIndicator color={TEXT_ON_PRIMARY} size="small" />
 						) : (
-							<Text style={{ color: "#fff" }}>{t("teams.addMember")}</Text>
+							<Text style={{ color: TEXT_ON_PRIMARY }}>
+								{t("teams.addMember")}
+							</Text>
 						)}
 					</TouchableOpacity>
 				)}

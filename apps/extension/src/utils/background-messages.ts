@@ -23,6 +23,13 @@ export interface SyncStatus {
 	userId: string | null;
 }
 
+export type MessageResponseMap = {
+	init: { ok: boolean };
+	"sync:trigger": { ok: boolean };
+	"status:get": SyncStatus;
+	"upload:enqueue": { ok: boolean } | { ok: false; error: string };
+};
+
 /** Returns `true` on start, `false` on complete/error, `null` for no state change. */
 export function isSyncActive(event: SyncEvent): boolean | null {
 	if (event.type === "sync:start") return true;

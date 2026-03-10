@@ -29,6 +29,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useLifecycleCheck } from "@/hooks/use-lifecycle-check";
 import { authClient } from "@/lib/auth-client";
 import { NAV_THEME } from "@/lib/constants";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { LifecycleContext } from "@/lib/lifecycle-context";
 import { useColorScheme } from "@/lib/use-color-scheme";
 import { queryClient } from "@/utils/orpc";
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#007AFF",
 	},
 	retryText: {
-		color: "#fff",
+		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 	},
 });
