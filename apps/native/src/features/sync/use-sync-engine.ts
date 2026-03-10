@@ -1,11 +1,11 @@
 import { env } from "@pengana/env/native";
 import { randomUUID } from "expo-crypto";
-import * as Network from "expo-network";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AppState, type AppStateStatus, Platform } from "react-native";
 
 import { authClient } from "@/lib/auth-client";
 
+import { useNetworkStatus } from "./use-network-status";
 import {
 	type SyncEnginePlatformDeps,
 	useSyncEngineCore,
@@ -30,22 +30,7 @@ const platformDeps: SyncEnginePlatformDeps = {
 };
 
 export function useSyncEngine(userId: string | undefined) {
-	const [isOnline, setIsOnline] = useState(true);
-
-	// Network connectivity listener
-	useEffect(() => {
-		Network.getNetworkStateAsync().then((state) => {
-			setIsOnline(state.isConnected ?? true);
-		});
-
-		const subscription = Network.addNetworkStateListener((state) => {
-			setIsOnline(state.isConnected ?? false);
-		});
-
-		return () => {
-			subscription.remove();
-		};
-	}, []);
+	const { isOnline } = useNetworkStatus();
 
 	const { core, devtools } = useSyncEngineCore(userId, isOnline, platformDeps);
 

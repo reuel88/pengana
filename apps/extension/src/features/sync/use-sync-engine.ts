@@ -1,23 +1,21 @@
+import { useNetworkStatus } from "@pengana/sync-engine";
 import { useCallback, useEffect, useState } from "react";
-
-import type {
-	BackgroundBroadcast,
-	SyncStatus,
-} from "@/utils/background-messages";
+import type { BackgroundBroadcast } from "@/utils/background-messages";
 import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
 
 export function useSyncEngine(userId: string) {
-	const [isOnline, setIsOnline] = useState(navigator.onLine);
 	const [isSyncing, setIsSyncing] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+
+	const { isOnline, setIsOnline } = useNetworkStatus();
 
 	// Initialize background engine and trigger sync on mount
 	useEffect(() => {
 		const init = async () => {
 			try {
 				await sendBackgroundMessage({ type: "init", userId });
-				const status = await sendBackgroundMessage<SyncStatus>({
+				const status = await sendBackgroundMessage({
 					type: "status:get",
 				});
 				if (status) {
@@ -60,18 +58,6 @@ export function useSyncEngine(userId: string) {
 
 		browser.runtime.onMessage.addListener(listener);
 		return () => browser.runtime.onMessage.removeListener(listener);
-	}, []);
-
-	// Local online/offline for UI responsiveness
-	useEffect(() => {
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-		};
 	}, []);
 
 	const triggerSync = useCallback(() => {

@@ -17,6 +17,7 @@ export function useNetworkStatus() {
 
 	return {
 		isOnline: isOnline && !simulateOffline,
+		setIsOnline,
 		simulateOffline,
 		setSimulateOffline,
 	};

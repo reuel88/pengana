@@ -51,7 +51,7 @@ This is handled automatically by the envelope middleware in `packages/api/src/in
 ## Current: Standalone Onboarding Machine
 - xState machine at `apps/web/src/machines/onboarding-machine.ts` manages onboarding flow
 - Route guard `requireAuthAndOrg()` in `apps/web/src/lib/auth-client.ts` redirects org-less users to `/onboarding`
-- Shared data fetching in `packages/auth/src/user-lifecycle.ts` — single source for lifecycle checks
+- Shared data fetching in `packages/org-client/src/lib/user-lifecycle.ts` — single source for lifecycle checks
 - Onboarding components in `apps/web/src/components/onboarding/`
 
 ## Future: Long-Lived User Actor

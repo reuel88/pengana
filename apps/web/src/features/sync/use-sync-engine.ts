@@ -1,17 +1,19 @@
 import type { SyncEvent, SyncInput, SyncOutput } from "@pengana/sync-engine";
-import { SyncEngine, usePeriodicSync } from "@pengana/sync-engine";
+import {
+	MAX_EVENT_LOG_SIZE,
+	SyncEngine,
+	useNetworkStatus,
+	usePeriodicSync,
+} from "@pengana/sync-engine";
 import { createDexieSyncAdapter } from "@pengana/todo-client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { notificationQueryKeys } from "@/features/notifications/use-notification-queries";
 import { orgQueryKeys } from "@/hooks/use-org-queries";
 import { client, queryClient } from "@/utils/orpc";
 
-import { useNetworkStatus } from "./use-network-status";
 import { useSyncOnFocus } from "./use-sync-on-focus";
 import { useUploadQueue } from "./use-upload-queue";
 import { useWebSocketSync } from "./use-websocket-sync";
-
-const MAX_EVENT_LOG_SIZE = 99;
 
 export function useSyncEngine(userId: string | undefined) {
 	const engineRef = useRef<SyncEngine | null>(null);
@@ -34,7 +36,7 @@ export function useSyncEngine(userId: string | undefined) {
 		const engine = new SyncEngine(adapter, transport);
 		engineRef.current = engine;
 
-		const unsubscribe = engine.onEvent((event) => {
+		const unsubscribeSyncEvents = engine.onEvent((event) => {
 			setEvents((prev) => [...prev.slice(-MAX_EVENT_LOG_SIZE), event]);
 			if (event.type === "sync:start") setIsSyncing(true);
 			if (event.type === "sync:complete" || event.type === "sync:error")
@@ -42,7 +44,7 @@ export function useSyncEngine(userId: string | undefined) {
 		});
 
 		return () => {
-			unsubscribe();
+			unsubscribeSyncEvents();
 			engineRef.current = null;
 		};
 	}, [userId]);

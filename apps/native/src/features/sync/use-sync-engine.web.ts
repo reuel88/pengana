@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-
+import { useNetworkStatus } from "@pengana/sync-engine";
 import { getServerUrl } from "@/lib/server-url";
 
 import {
@@ -17,21 +16,7 @@ const platformDeps: SyncEnginePlatformDeps = {
 };
 
 export function useSyncEngine(userId: string | undefined) {
-	const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-	// Network connectivity listener using browser APIs
-	useEffect(() => {
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-		};
-	}, []);
+	const { isOnline } = useNetworkStatus();
 
 	return useSyncEngineCore(userId, isOnline, platformDeps);
 }

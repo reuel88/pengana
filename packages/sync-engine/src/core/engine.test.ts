@@ -27,13 +27,44 @@ function createMockAdapter(): SyncAdapter {
 	};
 }
 
+function makeSyncResult(
+	overrides: Partial<{
+		serverChanges: Todo[];
+		conflicts: string[];
+		syncedAt: string;
+	}> = {},
+) {
+	return {
+		serverChanges: [] as Todo[],
+		conflicts: [] as string[],
+		syncedAt: new Date().toISOString(),
+		...overrides,
+	};
+}
+
 function createMockTransport(): SyncTransport {
 	return {
-		sync: vi.fn().mockResolvedValue({
-			serverChanges: [],
-			conflicts: [],
-			syncedAt: new Date().toISOString(),
-		}),
+		sync: vi.fn().mockResolvedValue(makeSyncResult()),
+	};
+}
+
+function collectEvents(engine: SyncEngine): SyncEvent[] {
+	const events: SyncEvent[] = [];
+	engine.onEvent((e) => events.push(e));
+	return events;
+}
+
+function mockTransportSyncDeferred(transport: SyncTransport) {
+	let resolveSync!: (value: ReturnType<typeof makeSyncResult>) => void;
+	vi.mocked(transport.sync).mockImplementation(
+		() =>
+			new Promise((resolve) => {
+				resolveSync = resolve;
+			}),
+	);
+	return {
+		resolve: (overrides?: Parameters<typeof makeSyncResult>[0]) =>
+			resolveSync(makeSyncResult(overrides)),
 	};
 }
 
@@ -49,8 +80,7 @@ describe("SyncEngine", () => {
 	});
 
 	it("emits sync:start, sync:push, sync:complete on successful sync with no changes", async () => {
-		const events: SyncEvent[] = [];
-		engine.onEvent((e) => events.push(e));
+		const events = collectEvents(engine);
 
 		await engine.sync();
 
@@ -76,14 +106,11 @@ describe("SyncEngine", () => {
 
 	it("applies server changes from transport", async () => {
 		const serverTodos = [makeTodo({ id: "s1", syncStatus: "synced" })];
-		vi.mocked(transport.sync).mockResolvedValue({
-			serverChanges: serverTodos,
-			conflicts: [],
-			syncedAt: new Date().toISOString(),
-		});
+		vi.mocked(transport.sync).mockResolvedValue(
+			makeSyncResult({ serverChanges: serverTodos }),
+		);
 
-		const events: SyncEvent[] = [];
-		engine.onEvent((e) => events.push(e));
+		const events = collectEvents(engine);
 
 		await engine.sync();
 
@@ -103,30 +130,25 @@ describe("SyncEngine", () => {
 			makeTodo({ id: "c" }),
 		];
 		vi.mocked(adapter.getPendingChanges).mockResolvedValue(pending);
-		vi.mocked(transport.sync).mockResolvedValue({
-			serverChanges: [],
-			conflicts: ["b"],
-			syncedAt: new Date().toISOString(),
-		});
+		vi.mocked(transport.sync).mockResolvedValue(
+			makeSyncResult({ conflicts: ["b"] }),
+		);
 
 		await engine.sync();
 
 		const syncedItems = vi.mocked(adapter.markAsSynced).mock.calls[0]?.[0];
 		expect(syncedItems).toHaveLength(2);
-		expect(syncedItems.map((t: Todo) => t.id)).toEqual(["a", "c"]);
+		expect((syncedItems || []).map((t: Todo) => t.id)).toEqual(["a", "c"]);
 	});
 
 	it("marks conflicting IDs and emits sync:conflict", async () => {
 		const pending = [makeTodo({ id: "id-1" })];
 		vi.mocked(adapter.getPendingChanges).mockResolvedValue(pending);
-		vi.mocked(transport.sync).mockResolvedValue({
-			serverChanges: [],
-			conflicts: ["id-1"],
-			syncedAt: new Date().toISOString(),
-		});
+		vi.mocked(transport.sync).mockResolvedValue(
+			makeSyncResult({ conflicts: ["id-1"] }),
+		);
 
-		const events: SyncEvent[] = [];
-		engine.onEvent((e) => events.push(e));
+		const events = collectEvents(engine);
 
 		await engine.sync();
 
@@ -137,8 +159,7 @@ describe("SyncEngine", () => {
 	it("emits sync:error when transport throws", async () => {
 		vi.mocked(transport.sync).mockRejectedValue(new Error("network down"));
 
-		const events: SyncEvent[] = [];
-		engine.onEvent((e) => events.push(e));
+		const events = collectEvents(engine);
 
 		await engine.sync();
 
@@ -151,8 +172,7 @@ describe("SyncEngine", () => {
 			new Error("db error"),
 		);
 
-		const events: SyncEvent[] = [];
-		engine.onEvent((e) => events.push(e));
+		const events = collectEvents(engine);
 
 		await engine.sync();
 
@@ -160,17 +180,7 @@ describe("SyncEngine", () => {
 	});
 
 	it("queues re-sync when called during active sync", async () => {
-		let resolveSync!: (value: {
-			serverChanges: Todo[];
-			conflicts: string[];
-			syncedAt: string;
-		}) => void;
-		vi.mocked(transport.sync).mockImplementation(
-			() =>
-				new Promise((resolve) => {
-					resolveSync = resolve;
-				}),
-		);
+		const deferred = mockTransportSyncDeferred(transport);
 
 		const firstSync = engine.sync();
 		// Wait for transport.sync to be called so resolveSync is assigned
@@ -182,18 +192,10 @@ describe("SyncEngine", () => {
 		engine.sync();
 
 		// Now reset mock to resolve immediately for the queued sync
-		vi.mocked(transport.sync).mockResolvedValue({
-			serverChanges: [],
-			conflicts: [],
-			syncedAt: new Date().toISOString(),
-		});
+		vi.mocked(transport.sync).mockResolvedValue(makeSyncResult());
 
 		// Resolve the first sync
-		resolveSync({
-			serverChanges: [],
-			conflicts: [],
-			syncedAt: new Date().toISOString(),
-		});
+		deferred.resolve();
 
 		await firstSync;
 		// Wait for the queued re-sync to complete
@@ -205,17 +207,7 @@ describe("SyncEngine", () => {
 	it("isSyncing reflects current state", async () => {
 		expect(engine.isSyncing).toBe(false);
 
-		let resolveSync!: (value: {
-			serverChanges: Todo[];
-			conflicts: string[];
-			syncedAt: string;
-		}) => void;
-		vi.mocked(transport.sync).mockImplementation(
-			() =>
-				new Promise((resolve) => {
-					resolveSync = resolve;
-				}),
-		);
+		const deferred = mockTransportSyncDeferred(transport);
 
 		const syncPromise = engine.sync();
 		// Wait for transport.sync to be called so we know we're mid-sync
@@ -224,11 +216,7 @@ describe("SyncEngine", () => {
 		});
 		expect(engine.isSyncing).toBe(true);
 
-		resolveSync({
-			serverChanges: [],
-			conflicts: [],
-			syncedAt: new Date().toISOString(),
-		});
+		deferred.resolve();
 
 		await syncPromise;
 		expect(engine.isSyncing).toBe(false);

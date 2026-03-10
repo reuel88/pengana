@@ -1,5 +1,5 @@
-import { fetchUserLifecycleData } from "@pengana/auth/user-lifecycle";
 import { useTranslation } from "@pengana/i18n";
+import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { LanguageSwitcher } from "@/components/language-switcher";
