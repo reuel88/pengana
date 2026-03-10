@@ -37,8 +37,8 @@ export function TeamMemberAddForm({
 		schema: addMemberSchema,
 		defaultValues: { email: "" },
 		onSubmit: async ({ value }) => {
-			await handleAdd(teamId, members ?? [], value.email);
-			form.reset();
+			const success = await handleAdd(teamId, members ?? [], value.email);
+			if (success) form.reset();
 		},
 	});
 

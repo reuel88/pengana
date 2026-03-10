@@ -39,9 +39,11 @@ export function CreateOrgDialog({
 		schema: createOrgSchema,
 		defaultValues: { name: "", slug: "", logo: "" },
 		onSubmit: async ({ value }) => {
-			await createOrg(value);
-			form.reset();
-			onOpenChange(false);
+			const success = await createOrg(value);
+			if (success) {
+				form.reset();
+				onOpenChange(false);
+			}
 		},
 	});
 

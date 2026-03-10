@@ -34,7 +34,7 @@
 		"@tanstack/react-query": "^5",
 		"react": "^19.0.0",
 		"xstate": "^5",
-		"zod": "^3"
+		"zod": "^4"
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
