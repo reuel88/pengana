@@ -67,7 +67,10 @@ export function TodoItem({
 	};
 
 	return (
-		<div className="flex flex-col border-border border-b">
+		<div
+			className="flex flex-col border-border border-b"
+			data-testid="todo-row"
+		>
 			<div className="flex items-center gap-3 px-3 py-2">
 				<input
 					ref={fileInputRef}

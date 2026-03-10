@@ -1,5 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
-import { useTeamMemberAdd } from "@pengana/org-client";
+import {
+	addMemberSchema,
+	useTeamMemberAdd,
+	useZodForm,
+} from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
@@ -9,15 +13,9 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
 
-import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
-
-const addMemberSchema = z.object({
-	email: z.string().email(),
-});
 
 export function TeamMemberAddForm({
 	teamId,

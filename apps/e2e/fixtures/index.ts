@@ -1,4 +1,5 @@
 import { test as base, type Page } from "@playwright/test";
+import { TEST_PASSWORD, TEST_USER_NAME } from "../constants.js";
 import { AuthPage } from "../page-objects/auth.page.js";
 import { OrgPage } from "../page-objects/org.page.js";
 
@@ -14,24 +15,19 @@ export const test = base.extend<TestFixtures>({
 	},
 
 	authenticatedPage: async ({ page }, use) => {
-		const ts = Date.now();
+		const ts = crypto.randomUUID();
 		const email = `test-${ts}@e2e.test`;
-		const password = "Password123!";
+		const password = TEST_PASSWORD;
 		const authPage = new AuthPage(page);
-		await authPage.signUp("Test User", email, password);
+		await authPage.signUp(TEST_USER_NAME, email, password);
 		await page.waitForURL(/onboarding/);
 		await use({ page, email, password });
 	},
 
-	authenticatedWithOrgPage: async ({ page }, use) => {
-		const ts = Date.now();
-		const email = `test-${ts}@e2e.test`;
-		const password = "Password123!";
-		const authPage = new AuthPage(page);
+	authenticatedWithOrgPage: async ({ authenticatedPage }, use) => {
+		const { page, email, password } = authenticatedPage;
 		const orgPage = new OrgPage(page);
-		await authPage.signUp("Test User", email, password);
-		await page.waitForURL(/onboarding/);
-		await orgPage.createOrg(`E2E Org ${ts}`);
+		await orgPage.createOrg(`E2E Org ${email}`);
 		await page.waitForURL(/onboarding/);
 		await orgPage.skipInvites();
 		await use({ page, email, password });

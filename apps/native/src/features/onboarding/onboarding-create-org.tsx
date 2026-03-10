@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCreateOrg } from "@pengana/org-client";
+import { useCreateOrg, useZodForm } from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
@@ -9,8 +9,6 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
-
-import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 
 import { onboardingStyles as styles } from "./onboarding-styles";

@@ -36,8 +36,15 @@ export {
 	useTeamMemberAdd,
 	useTeamNameEditor,
 } from "./hooks/use-team-actions";
+export type { UseZodFormOptions } from "./hooks/use-zod-form";
+export { useZodForm } from "./hooks/use-zod-form";
 export type { AuthMutationOptions, NotifyFn } from "./lib/auth-mutation";
 export { authMutation } from "./lib/auth-mutation";
 export { orgQueryKeys } from "./lib/org-query-keys";
+export {
+	addMemberSchema,
+	createOrgSchema,
+	teamNameSchema,
+} from "./lib/schemas";
 export { slugify } from "./lib/slugify";
 export { onboardingMachine } from "./machines/onboarding-machine";

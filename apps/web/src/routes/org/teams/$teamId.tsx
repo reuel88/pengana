@@ -1,8 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import {
+	addMemberSchema,
+	teamNameSchema,
 	useTeamActions,
 	useTeamMemberAdd,
 	useTeamNameEditor,
+	useZodForm,
 } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
@@ -10,7 +13,6 @@ import { cn } from "@pengana/ui/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import type { Column } from "@/components/data-table";
 import { DataTable } from "@/components/data-table";
@@ -21,7 +23,6 @@ import {
 	useTeamMembers,
 	useTeams,
 } from "@/hooks/use-org-queries";
-import { useZodForm } from "@/hooks/use-zod-form";
 
 export const Route = createFileRoute("/org/teams/$teamId")({
 	component: TeamDetailPage,
@@ -39,16 +40,18 @@ function TeamNameEditor({
 	const [editing, setEditing] = useState(false);
 
 	const { handleSave, loading } = useTeamNameEditor({
-		onSuccess: () => toast.success(t("teams.updateNameSuccess")),
+		onSuccess: () => {
+			setEditing(false);
+			toast.success(t("teams.updateNameSuccess"));
+		},
 		onError: (message) => toast.error(message || t("teams.error")),
 	});
 
 	const form = useZodForm({
-		schema: z.object({ name: z.string().min(1) }),
+		schema: teamNameSchema,
 		defaultValues: { name: team.name },
 		onSubmit: async ({ value }) => {
 			await handleSave(team.id, orgId, value.name);
-			setEditing(false);
 		},
 	});
 
@@ -132,7 +135,7 @@ function TeamMemberAddForm({
 	});
 
 	const form = useZodForm({
-		schema: z.object({ email: z.string().email() }),
+		schema: addMemberSchema,
 		defaultValues: { email: "" },
 		onSubmit: async ({ value }) => {
 			await handleAdd(teamId, members, value.email);

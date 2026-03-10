@@ -1,3 +1,4 @@
+import { TEST_PASSWORD } from "../../constants.js";
 import { expect, test } from "../../fixtures/index.js";
 import { AuthPage } from "../../page-objects/auth.page.js";
 import { OrgPage } from "../../page-objects/org.page.js";
@@ -18,7 +19,7 @@ test.describe("Onboarding", () => {
 	test("full flow: sign up → create org → skip invites → reach dashboard", async ({
 		page,
 	}) => {
-		const ts = Date.now();
+		const ts = crypto.randomUUID();
 		const authPage = new AuthPage(page);
 		const orgPage = new OrgPage(page);
 
@@ -26,7 +27,7 @@ test.describe("Onboarding", () => {
 		await authPage.signUp(
 			"Onboarding User",
 			`onboarding-${ts}@e2e.test`,
-			"Password123!",
+			TEST_PASSWORD,
 		);
 		await page.waitForURL(/onboarding/);
 
@@ -38,6 +39,6 @@ test.describe("Onboarding", () => {
 		await orgPage.skipInvites();
 
 		// Should land on dashboard (not onboarding)
-		await expect(page).not.toHaveURL(/onboarding/);
+		await expect(page).toHaveURL("/");
 	});
 });
