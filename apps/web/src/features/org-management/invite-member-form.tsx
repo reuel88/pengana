@@ -3,8 +3,11 @@ import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
+import { Select } from "@pengana/ui/components/select";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import { FormRoot } from "@/components/form-root";
 
 const inviteMemberSchema = z.object({
 	email: z.string().email(),
@@ -35,13 +38,7 @@ export function InviteMemberForm({
 	return (
 		<div className="flex max-w-md flex-col gap-3">
 			<h2 className="font-medium text-sm">{t("invitations.invite")}</h2>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					form.handleSubmit();
-				}}
-				className="flex flex-col gap-3"
-			>
+			<FormRoot form={form} className="flex flex-col gap-3">
 				<form.Field name="email">
 					{(field) => (
 						<div className="flex flex-col gap-1">
@@ -62,17 +59,16 @@ export function InviteMemberForm({
 					{(field) => (
 						<div className="flex flex-col gap-1">
 							<Label htmlFor="invite-role">{t("invitations.role")}</Label>
-							<select
+							<Select
 								id="invite-role"
 								value={field.state.value}
 								onChange={(e) =>
 									field.handleChange(e.target.value as "member" | "admin")
 								}
-								className="h-8 rounded-none border border-input bg-transparent px-2.5 text-xs"
 							>
 								<option value="admin">{t("roles.admin")}</option>
 								<option value="member">{t("roles.member")}</option>
-							</select>
+							</Select>
 						</div>
 					)}
 				</form.Field>
@@ -88,7 +84,7 @@ export function InviteMemberForm({
 						</Button>
 					)}
 				</form.Subscribe>
-			</form>
+			</FormRoot>
 		</div>
 	);
 }

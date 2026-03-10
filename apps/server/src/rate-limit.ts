@@ -2,6 +2,7 @@ import { getConnInfo } from "@hono/node-server/conninfo";
 import { env } from "@pengana/env/server";
 import type { Context } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
+import { errorEnvelope } from "./error-envelope";
 
 const HTTP_TOO_MANY_REQUESTS = 429;
 const isDev = env.NODE_ENV === "development";
@@ -11,13 +12,7 @@ const keyGenerator = (c: Context) => getConnInfo(c).remote.address ?? "unknown";
 
 const rateLimitExceededHandler = (c: Context) =>
 	c.json(
-		{
-			success: false,
-			error: {
-				code: "TOO_MANY_REQUESTS",
-				message: "Rate limit exceeded. Try again later.",
-			},
-		},
+		errorEnvelope("TOO_MANY_REQUESTS", "Rate limit exceeded. Try again later."),
 		HTTP_TOO_MANY_REQUESTS,
 	);
 

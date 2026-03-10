@@ -8,6 +8,7 @@ export async function initLogger() {
 	});
 }
 
+// Slice loggers — add new slices as getLogger(["app", "<slice-name>"])
 export const logger = getLogger(["app"]);
 export const httpLogger = getLogger(["app", "http"]);
 export const wsLogger = getLogger(["app", "ws"]);

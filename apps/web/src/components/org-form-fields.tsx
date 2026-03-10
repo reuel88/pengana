@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import { Input } from "@pengana/ui/components/input";
-import { Label } from "@pengana/ui/components/label";
 import type { AnyFieldApi } from "@tanstack/react-form";
+
+import { FormField } from "@/components/form-field";
 
 const fieldConfig = {
 	name: {
@@ -34,25 +34,15 @@ function OrgFormField({
 }) {
 	const { t } = useTranslation("organization");
 	const config = fieldConfig[fieldKey];
-	const fieldId = id ?? config.defaultId;
 
 	return (
-		<div className="flex flex-col gap-1">
-			<Label htmlFor={fieldId}>{t(config.labelKey)}</Label>
-			<Input
-				id={fieldId}
-				value={field.state.value as string}
-				onBlur={field.handleBlur}
-				onChange={(e) => field.handleChange(e.target.value)}
-				placeholder={t(config.placeholderKey)}
-				required={required}
-			/>
-			{field.state.meta.errors.map((error) => (
-				<p key={error?.message} className="text-red-500 text-xs">
-					{error?.message}
-				</p>
-			))}
-		</div>
+		<FormField
+			field={field}
+			label={t(config.labelKey)}
+			id={id ?? config.defaultId}
+			placeholder={t(config.placeholderKey)}
+			required={required}
+		/>
 	);
 }
 

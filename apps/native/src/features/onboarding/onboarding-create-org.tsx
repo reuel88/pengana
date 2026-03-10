@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCreateOrg, useZodForm } from "@pengana/org-client";
+import { createOrgSchema, useCreateOrg, useZodForm } from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
@@ -8,16 +8,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
 import { onboardingStyles as styles } from "./onboarding-styles";
-
-const createOrgSchema = z.object({
-	name: z.string().min(1),
-	slug: z.string(),
-	logo: z.string(),
-});
 
 export function OnboardingCreateOrg({
 	onCreated,
@@ -145,7 +139,7 @@ export function OnboardingCreateOrg({
 						disabled={isSubmitting || loading || !name.trim()}
 					>
 						{loading ? (
-							<ActivityIndicator size="small" color="#fff" />
+							<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
 						) : (
 							<Text style={styles.submitButtonText}>
 								{tOrg("create.submit")}

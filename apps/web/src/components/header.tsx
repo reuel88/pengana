@@ -34,7 +34,7 @@ export function Header() {
 					<UserMenu />
 				</div>
 			</div>
-			<hr />
+			<hr role="presentation" />
 		</header>
 	);
 }

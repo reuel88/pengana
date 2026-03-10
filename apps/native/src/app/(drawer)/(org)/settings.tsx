@@ -1,5 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgSettings, useZodForm } from "@pengana/org-client";
+import {
+	createOrgSchema,
+	useOrgSettings,
+	useZodForm,
+} from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
@@ -11,7 +15,6 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -19,12 +22,6 @@ import { useActiveOrg } from "@/hooks/use-org-queries";
 import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
-
-const updateOrgSchema = z.object({
-	name: z.string().min(1),
-	slug: z.string(),
-	logo: z.string(),
-});
 
 export default function OrgSettingsScreen() {
 	const { theme } = useTheme();
@@ -42,7 +39,7 @@ export default function OrgSettingsScreen() {
 	});
 
 	const form = useZodForm({
-		schema: updateOrgSchema,
+		schema: createOrgSchema,
 		defaultValues: {
 			name: activeOrg?.name ?? "",
 			slug: activeOrg?.slug ?? "",

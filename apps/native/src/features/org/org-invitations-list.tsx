@@ -2,7 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/lib/theme";
-import { mutedText, primaryText, secondaryText } from "@/styles/shared";
+import { bodyText, mutedText, secondaryText } from "@/styles/shared";
 
 export function OrgInvitationsList({
 	invitations,
@@ -25,7 +25,7 @@ export function OrgInvitationsList({
 
 	return (
 		<>
-			<Text style={[styles.sectionTitle, primaryText(theme)]}>
+			<Text style={[styles.sectionTitle, bodyText(theme)]}>
 				{t("invitations.pending")}
 			</Text>
 			{invitations.length === 0 ? (
@@ -40,7 +40,7 @@ export function OrgInvitationsList({
 						]}
 					>
 						<View style={{ flex: 1 }}>
-							<Text style={primaryText(theme)}>{inv.email}</Text>
+							<Text style={bodyText(theme)}>{inv.email}</Text>
 							<Text style={secondaryText(theme)}>
 								{t(`roles.${inv.role}`, { defaultValue: inv.role })} -{" "}
 								{t(`invitations.status.${inv.status}`, {
@@ -61,7 +61,7 @@ export function OrgInvitationsList({
 									isPendingFor(inv.id) && { opacity: 0.5 },
 								]}
 							>
-								<Text style={[primaryText(theme), { fontSize: 12 }]}>
+								<Text style={[bodyText(theme), { fontSize: 12 }]}>
 									{t("invitations.cancel")}
 								</Text>
 							</TouchableOpacity>

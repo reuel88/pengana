@@ -6,11 +6,11 @@ import type {
 	UploadEvent,
 } from "@pengana/sync-engine";
 import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
-import { createDexieSyncAdapter } from "@pengana/todo-client";
 import {
-	createIndexedDbUploadTransport,
+	createDexieSyncAdapter,
 	createWebUploadAdapter,
-} from "@/entities/upload-queue";
+} from "@pengana/todo-client";
+import { createIndexedDbUploadTransport } from "@/entities/upload-queue";
 import type {
 	BackgroundBroadcast,
 	BackgroundMessage,
@@ -21,7 +21,8 @@ import { client } from "@/utils/orpc";
 import { sessionResponseSchema } from "@/utils/session-schema";
 
 const SYNC_ALARM_NAME = "periodic-sync";
-const SYNC_INTERVAL_MINUTES = 0.5; // 30 seconds
+const SYNC_INTERVAL_SECONDS = 30;
+const SYNC_INTERVAL_MINUTES = SYNC_INTERVAL_SECONDS / 60;
 
 interface BackgroundState {
 	engine: SyncEngine | null;
@@ -153,7 +154,7 @@ function handleMessage(
 		case "init": {
 			setupEngine(message.userId);
 			sendResponse({ ok: true });
-			return false;
+			return false; // sync
 		}
 
 		case "sync:trigger": {
@@ -165,7 +166,7 @@ function handleMessage(
 					);
 			}
 			sendResponse({ ok: true });
-			return false;
+			return false; // sync
 		}
 
 		case "upload:enqueue": {
@@ -181,7 +182,7 @@ function handleMessage(
 				console.warn("[background] upload:enqueue dropped — queue not ready");
 				sendResponse({ ok: false, error: "Upload queue not ready" });
 			}
-			return false;
+			return false; // sync
 		}
 
 		case "status:get": {
@@ -189,15 +190,15 @@ function handleMessage(
 				ensureEngine()
 					.then(() => sendResponse(getStatus()))
 					.catch(() => sendResponse(getStatus()));
-				return true; // Keep message channel open for async response
+				return true; // async — keep channel open
 			}
 			sendResponse(getStatus());
-			return false;
+			return false; // sync
 		}
 
 		default: {
 			sendResponse({ ok: false, error: "Unknown message type" });
-			return false;
+			return false; // sync
 		}
 	}
 }

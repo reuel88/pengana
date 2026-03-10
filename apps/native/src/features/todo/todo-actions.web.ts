@@ -1,3 +1,7 @@
+// Web re-exports from the shared todo-client, except `updateTodoTitle` which
+// needs a local implementation because the web entity layer (`todoDb`) uses a
+// different update API than the native Drizzle layer. The native counterpart
+// in `todo-actions.ts` operates directly on SQLite via Drizzle.
 export {
 	addTodo,
 	attachFile,

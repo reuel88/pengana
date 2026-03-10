@@ -8,14 +8,16 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 import { Input } from "@pengana/ui/components/input";
+import { Select } from "@pengana/ui/components/select";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FormRoot } from "@/components/form-root";
 import { useActiveOrg } from "@/hooks/use-org-queries";
 
 const inviteMembersSchema = z.object({
 	members: z.array(
 		z.object({
-			email: z.email().trim(),
+			email: z.union([z.string().trim().email(), z.literal("")]),
 			role: z.enum(["member", "admin"]),
 		}),
 	),
@@ -61,13 +63,7 @@ export function OnboardingInviteMembers({
 				</p>
 			</CardHeader>
 			<CardContent>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						form.handleSubmit();
-					}}
-					className="flex flex-col gap-3"
-				>
+				<FormRoot form={form} className="flex flex-col gap-3">
 					<form.Field name="members" mode="array">
 						{(membersField) => (
 							<>
@@ -80,6 +76,7 @@ export function OnboardingInviteMembers({
 										<form.Field name={`members[${index}].email`}>
 											{(emailField) => (
 												<Input
+													aria-label={t("organization:invitations.email")}
 													type="email"
 													value={emailField.state.value as string}
 													onBlur={emailField.handleBlur}
@@ -93,14 +90,14 @@ export function OnboardingInviteMembers({
 										</form.Field>
 										<form.Field name={`members[${index}].role`}>
 											{(roleField) => (
-												<select
+												<Select
+													aria-label={t("organization:invitations.role")}
 													value={roleField.state.value as string}
 													onChange={(e) =>
 														roleField.handleChange(
 															e.target.value as "member" | "admin",
 														)
 													}
-													className="rounded-md border px-2 py-2 text-sm"
 												>
 													<option value="member">
 														{t("organization:roles.member")}
@@ -108,7 +105,7 @@ export function OnboardingInviteMembers({
 													<option value="admin">
 														{t("organization:roles.admin")}
 													</option>
-												</select>
+												</Select>
 											)}
 										</form.Field>
 										{membersField.state.value.length > 1 && (
@@ -153,7 +150,7 @@ export function OnboardingInviteMembers({
 					<Button type="button" variant="ghost" onClick={onSkip}>
 						{t("invite.skip")}
 					</Button>
-				</form>
+				</FormRoot>
 			</CardContent>
 		</Card>
 	);

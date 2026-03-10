@@ -41,6 +41,42 @@ async function authenticateRequest(
 	}
 }
 
+function handleConnection(
+	ws: WebSocket,
+	userId: string,
+	connections: Map<string, Set<WebSocket>>,
+	aliveSet: WeakSet<WebSocket>,
+) {
+	const userSockets = connections.get(userId);
+	if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
+		wsLogger.warn`Rejected connection for user ${redactId(userId)} (max connections reached)`;
+		ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
+		return;
+	}
+
+	const sockets = userSockets ?? new Set<WebSocket>();
+	if (!userSockets) connections.set(userId, sockets);
+	sockets.add(ws);
+	aliveSet.add(ws);
+	wsLogger.info`Connection accepted for user ${redactId(userId)} (${String(sockets.size)} total)`;
+
+	ws.on("pong", () => {
+		aliveSet.add(ws);
+	});
+
+	ws.on("close", () => {
+		sockets.delete(ws);
+		wsLogger.info`Connection closed for user ${redactId(userId)} (${String(sockets.size)} remaining)`;
+		if (sockets.size === 0) {
+			connections.delete(userId);
+		}
+	});
+
+	ws.on("error", () => {
+		ws.close();
+	});
+}
+
 export function setupWebSocket(server: ServerType) {
 	const connections = new Map<string, Set<WebSocket>>();
 	const wss = new WebSocketServer({ noServer: true });
@@ -71,34 +107,7 @@ export function setupWebSocket(server: ServerType) {
 	wss.on(
 		"connection",
 		(ws: WebSocket, _req: IncomingMessage, userId: string) => {
-			const userSockets = connections.get(userId);
-			if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
-				wsLogger.warn`Rejected connection for user ${redactId(userId)} (max connections reached)`;
-				ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
-				return;
-			}
-
-			const sockets = userSockets ?? new Set<WebSocket>();
-			if (!userSockets) connections.set(userId, sockets);
-			sockets.add(ws);
-			aliveSet.add(ws);
-			wsLogger.info`Connection accepted for user ${redactId(userId)} (${String(sockets.size)} total)`;
-
-			ws.on("pong", () => {
-				aliveSet.add(ws);
-			});
-
-			ws.on("close", () => {
-				sockets.delete(ws);
-				wsLogger.info`Connection closed for user ${redactId(userId)} (${String(sockets.size)} remaining)`;
-				if (sockets.size === 0) {
-					connections.delete(userId);
-				}
-			});
-
-			ws.on("error", () => {
-				ws.close();
-			});
+			handleConnection(ws, userId, connections, aliveSet);
 		},
 	);
 

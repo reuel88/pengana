@@ -1,13 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import type { WebTodo } from "@pengana/todo-client";
-import { useTodoHandlers } from "@pengana/todo-client";
+import { useTodoListWiring } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInMemory } from "@/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
-
-const noop = (_id: string) => {};
 
 export function TodoList({ todos }: { todos: WebTodo[] }) {
 	const { triggerSync, enqueueUpload } = useSync();
@@ -25,20 +23,15 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 		[],
 	);
 
-	const deps = useMemo(
-		() => ({
+	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
+		useTodoListWiring({
 			triggerSync,
 			enqueueUpload,
 			onError,
-			clearError: noop,
+			clearError: () => {},
 			fileStorage,
 			t,
-		}),
-		[triggerSync, enqueueUpload, onError, fileStorage, t],
-	);
-
-	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
-		useTodoHandlers(deps);
+		});
 
 	return (
 		<TodoListBase

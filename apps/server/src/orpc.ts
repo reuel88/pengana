@@ -7,6 +7,7 @@ import { createContext } from "@pengana/api/context";
 import { appRouter } from "@pengana/api/routers/index";
 import type { Context, Next } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { errorEnvelope } from "./error-envelope";
 import { logger, orpcLogger } from "./logger";
 
 function logUnhandledError(error: unknown) {
@@ -26,16 +27,17 @@ const rpcHandler = new RPCHandler(appRouter, {
 	interceptors: [onError(logUnhandledError)],
 });
 
-// Initialized after server starts — WebSocket needs the HTTP server instance.
-// handleOrpcRoutes captures this ref in its closure, so when notifyRef.current
-// is later assigned the real notifyUser function, all subsequent requests use it.
+// Initialized after server starts — WebSocket setup needs the HTTP server
+// instance, but this middleware is created before the server exists. We use a
+// mutable ref so that once the server starts and notifyUser is wired up, all
+// subsequent requests pick up the real implementation.
 export const notifyRef: { current: (userId: string) => void } = {
 	current: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
 	},
 };
 
-async function parseJsonBody(
+async function parseJsonObject(
 	response: Response,
 ): Promise<Record<string, unknown>> {
 	try {
@@ -49,32 +51,27 @@ async function parseJsonBody(
 	}
 }
 
+const VALID_ERROR_CODES = new Set([
+	"UNAUTHORIZED",
+	"NOT_FOUND",
+	"BAD_REQUEST",
+	"FORBIDDEN",
+	"INTERNAL_SERVER_ERROR",
+	"TOO_MANY_REQUESTS",
+]);
+
 async function ensureErrorEnvelope(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
 	if (!contentType.includes("application/json") || response.status < 400) {
 		return c.newResponse(response.body, response);
 	}
-	const body = await parseJsonBody(response);
-	const VALID_ERROR_CODES = new Set([
-		"UNAUTHORIZED",
-		"NOT_FOUND",
-		"BAD_REQUEST",
-		"FORBIDDEN",
-		"INTERNAL_SERVER_ERROR",
-		"TOO_MANY_REQUESTS",
-	]);
+	const body = await parseJsonObject(response);
 	const rawCode = typeof body.code === "string" ? body.code : "";
 	return c.json(
-		{
-			success: false,
-			error: {
-				code: VALID_ERROR_CODES.has(rawCode)
-					? rawCode
-					: "INTERNAL_SERVER_ERROR",
-				message:
-					typeof body.message === "string" ? body.message : "Unknown error",
-			},
-		},
+		errorEnvelope(
+			VALID_ERROR_CODES.has(rawCode) ? rawCode : "INTERNAL_SERVER_ERROR",
+			typeof body.message === "string" ? body.message : "Unknown error",
+		),
 		response.status as ContentfulStatusCode,
 	);
 }

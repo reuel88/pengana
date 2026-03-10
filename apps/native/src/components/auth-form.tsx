@@ -9,6 +9,7 @@ import {
 	View,
 } from "react-native";
 
+import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
 
 export function AuthFormCard({
@@ -99,7 +100,7 @@ export function AuthSubmitButton({
 			]}
 		>
 			{isSubmitting ? (
-				<ActivityIndicator size="small" color="#ffffff" />
+				<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
 			) : (
 				<Text style={styles.buttonText}>{label}</Text>
 			)}
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	buttonText: {
-		color: "#ffffff",
+		color: TEXT_ON_PRIMARY,
 		fontSize: 16,
 	},
 });

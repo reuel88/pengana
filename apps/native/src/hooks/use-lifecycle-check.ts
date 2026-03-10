@@ -2,9 +2,47 @@ import {
 	fetchUserLifecycleData,
 	type UserLifecycleData,
 } from "@pengana/org-client/lib/user-lifecycle";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 
 import { authClient } from "@/lib/auth-client";
+
+type State = {
+	lifecycleChecked: boolean;
+	needsOnboarding: boolean;
+	lifecycleData: UserLifecycleData | null;
+	orgError: boolean;
+};
+
+type Action =
+	| { type: "reset" }
+	| { type: "success"; data: UserLifecycleData }
+	| { type: "error" }
+	| { type: "retry" };
+
+const initialState: State = {
+	lifecycleChecked: false,
+	needsOnboarding: false,
+	lifecycleData: null,
+	orgError: false,
+};
+
+function reducer(state: State, action: Action): State {
+	switch (action.type) {
+		case "reset":
+			return initialState;
+		case "success":
+			return {
+				lifecycleChecked: true,
+				needsOnboarding: !action.data.hasOrganization,
+				lifecycleData: action.data,
+				orgError: false,
+			};
+		case "error":
+			return { ...state, orgError: true, lifecycleChecked: true };
+		case "retry":
+			return { ...state, orgError: false, lifecycleChecked: false };
+	}
+}
 
 export function useLifecycleCheck({
 	isPending,
@@ -13,54 +51,42 @@ export function useLifecycleCheck({
 	isPending: boolean;
 	session: unknown;
 }) {
-	const [lifecycleChecked, setLifecycleChecked] = useState(false);
-	const [needsOnboarding, setNeedsOnboarding] = useState(false);
-	const [lifecycleData, setLifecycleData] = useState<UserLifecycleData | null>(
-		null,
-	);
-	const [orgError, setOrgError] = useState(false);
+	const [state, dispatch] = useReducer(reducer, initialState);
 
 	useEffect(() => {
 		if (isPending || !session) {
-			setLifecycleChecked(false);
-			setNeedsOnboarding(false);
-			setLifecycleData(null);
-			setOrgError(false);
+			dispatch({ type: "reset" });
 			return;
 		}
-		if (orgError) return; // hold error UI; don't re-fetch
+		if (state.orgError) return; // hold error UI; don't re-fetch
 
 		let cancelled = false;
 		(async () => {
 			try {
 				const data = await fetchUserLifecycleData(authClient);
 				if (cancelled) return;
-				setLifecycleData(data);
-				setNeedsOnboarding(!data.hasOrganization);
-				setLifecycleChecked(true);
+				dispatch({ type: "success", data });
 			} catch (err) {
 				if (!cancelled) {
 					console.error("Failed to check org lifecycle:", err);
-					setOrgError(true);
-					setLifecycleChecked(true);
+					dispatch({ type: "error" });
 				}
 			}
 		})();
 		return () => {
 			cancelled = true;
 		};
-	}, [isPending, session, orgError]);
+	}, [isPending, session, state.orgError]);
 
 	const retryLifecycleCheck = useCallback(() => {
-		setOrgError(false);
-		setLifecycleChecked(false);
+		dispatch({ type: "retry" });
 	}, []);
 
 	return {
-		lifecycleChecked,
-		needsOnboarding,
-		lifecycleData,
-		orgError,
+		lifecycleChecked: state.lifecycleChecked,
+		needsOnboarding: state.needsOnboarding,
+		lifecycleData: state.lifecycleData,
+		orgError: state.orgError,
 		retryLifecycleCheck,
 	};
 }

@@ -18,6 +18,8 @@ export type {
 	TodoHandlerDeps,
 } from "./hooks/use-todo-handlers";
 export { useTodoHandlers } from "./hooks/use-todo-handlers";
+export type { UseTodoListWiringConfig } from "./hooks/use-todo-list-wiring";
+export { useTodoListWiring } from "./hooks/use-todo-list-wiring";
 export { useTodos } from "./hooks/use-todos";
 export type { WebTodo } from "./lib/db";
 export { TodoDatabase, todoDb } from "./lib/db";

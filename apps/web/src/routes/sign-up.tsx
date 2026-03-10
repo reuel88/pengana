@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { AuthLayout } from "@/components/auth-layout";
 import { SignUpForm } from "@/components/sign-up-form";
 
 export const Route = createFileRoute("/sign-up")({
@@ -17,11 +17,8 @@ export const Route = createFileRoute("/sign-up")({
 
 function SignUpPage() {
 	return (
-		<>
-			<header className="flex w-full justify-end p-2">
-				<LanguageSwitcher />
-			</header>
+		<AuthLayout>
 			<SignUpForm />
-		</>
+		</AuthLayout>
 	);
 }
