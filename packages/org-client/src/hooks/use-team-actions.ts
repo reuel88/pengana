@@ -53,14 +53,14 @@ export function useTeamMemberAdd({
 		teamId: string,
 		members: Array<{ userId: string; user: { email: string } }>,
 		email: string,
-	) => {
+	): Promise<boolean> => {
 		const member = members.find((m) => m.user.email === email);
 		if (!member) {
 			onError?.("Member not found");
-			return;
+			return false;
 		}
 
-		await authMutation({
+		return authMutation({
 			mutationFn: () =>
 				authClient.organization.addTeamMember({
 					teamId,

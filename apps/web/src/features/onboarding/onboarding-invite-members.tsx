@@ -15,7 +15,7 @@ import { useActiveOrg } from "@/hooks/use-org-queries";
 const inviteMembersSchema = z.object({
 	members: z.array(
 		z.object({
-			email: z.string(),
+			email: z.email().trim(),
 			role: z.enum(["member", "admin"]),
 		}),
 	),

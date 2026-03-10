@@ -46,6 +46,7 @@ export function useCreateOrg({
 			}
 			await invalidateAll();
 			await onSuccess?.(orgData.id);
+			return true;
 		} catch {
 			onError?.("Failed to create organization");
 		} finally {

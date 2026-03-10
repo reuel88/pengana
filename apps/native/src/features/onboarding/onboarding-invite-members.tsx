@@ -19,7 +19,7 @@ import { onboardingStyles } from "./onboarding-styles";
 const inviteMembersSchema = z.object({
 	members: z.array(
 		z.object({
-			email: z.string(),
+			email: z.email().trim(),
 			role: z.enum(["member", "admin"]),
 		}),
 	),
@@ -81,22 +81,35 @@ export function OnboardingInviteMembers({
 							<View key={index} style={styles.entryRow}>
 								<form.Field name={`members[${index}].email`}>
 									{(emailField) => (
-										<TextInput
-											style={[
-												styles.emailInput,
-												{
-													color: theme.text,
-													borderColor: theme.border,
-													backgroundColor: theme.background,
-												},
-											]}
-											value={emailField.state.value as string}
-											onChangeText={emailField.handleChange}
-											placeholder={t("invite.emailPlaceholder")}
-											placeholderTextColor={theme.border}
-											keyboardType="email-address"
-											autoCapitalize="none"
-										/>
+										<>
+											<TextInput
+												style={[
+													styles.emailInput,
+													{
+														color: theme.text,
+														borderColor: theme.border,
+														backgroundColor: theme.background,
+													},
+												]}
+												value={emailField.state.value as string}
+												onChangeText={emailField.handleChange}
+												placeholder={t("invite.emailPlaceholder")}
+												placeholderTextColor={theme.border}
+												keyboardType="email-address"
+												autoCapitalize="none"
+											/>
+											{emailField.state.meta.errors.length > 0 && (
+												<Text
+													style={{
+														color: theme.notification,
+														fontSize: 12,
+														marginTop: 4,
+													}}
+												>
+													{emailField.state.meta.errors[0]?.message}
+												</Text>
+											)}
+										</>
 									)}
 								</form.Field>
 								<form.Field name={`members[${index}].role`}>

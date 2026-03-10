@@ -10,21 +10,23 @@ export async function authMutation<T>({
 	setLoading,
 	notify,
 	onError,
-}: AuthMutationOptions<T>) {
+}: AuthMutationOptions<T>): Promise<boolean> {
 	setLoading?.(true);
 	try {
 		const { data, error } = await mutationFn();
 		if (error) {
 			const msg = error.message || errorMessage;
 			notify ? notify.error(msg) : onError?.(msg);
-			return;
+			return false;
 		}
 		if (successMessage) {
 			notify?.success(successMessage);
 		}
 		await onSuccess?.(data ?? null);
+		return true;
 	} catch {
 		notify ? notify.error(errorMessage) : onError?.(errorMessage);
+		return false;
 	} finally {
 		setLoading?.(false);
 	}

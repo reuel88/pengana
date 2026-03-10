@@ -119,6 +119,6 @@ describe("authMutation", () => {
 				mutationFn: async () => ({ data: null }),
 				errorMessage: "failed",
 			}),
-		).resolves.toBeUndefined();
+		).resolves.toBe(true);
 	});
 });
