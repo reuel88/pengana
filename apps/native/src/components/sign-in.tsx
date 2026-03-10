@@ -1,8 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignInSchema } from "@pengana/i18n/zod";
+import { useZodForm } from "@pengana/org-client";
 import { useState } from "react";
-
-import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/utils/form-helpers";
 import { queryClient } from "@/utils/orpc";

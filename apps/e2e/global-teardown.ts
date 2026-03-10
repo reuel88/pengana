@@ -8,6 +8,11 @@ config({ path: resolve(process.cwd(), "../server/.env") });
 const TEST_EMAIL_PATTERN = "%@e2e.test";
 
 export default async function globalTeardown() {
+	if (!process.env.DATABASE_URL) {
+		throw new Error(
+			"DATABASE_URL is not set. Aborting teardown to prevent connecting to an unintended database.",
+		);
+	}
 	const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 	try {

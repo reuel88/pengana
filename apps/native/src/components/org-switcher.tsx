@@ -1,5 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCreateOrg, useOrgSwitcher } from "@pengana/org-client";
+import {
+	createOrgSchema,
+	useCreateOrg,
+	useOrgSwitcher,
+	useZodForm,
+} from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,17 +18,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
-import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
-
-const createOrgSchema = z.object({
-	name: z.string().min(1),
-	slug: z.string(),
-});
 
 function CreateOrgModal({
 	onCreated,
@@ -42,9 +40,9 @@ function CreateOrgModal({
 
 	const form = useZodForm({
 		schema: createOrgSchema,
-		defaultValues: { name: "", slug: "" },
+		defaultValues: { name: "", slug: "", logo: "" },
 		onSubmit: async ({ value }) => {
-			await createOrg({ ...value, logo: "" });
+			await createOrg(value);
 		},
 	});
 
@@ -74,20 +72,36 @@ function CreateOrgModal({
 					/>
 				)}
 			</form.Field>
-			<form.Subscribe selector={(s) => ({ isSubmitting: s.isSubmitting })}>
-				{({ isSubmitting }) => (
-					<TouchableOpacity
-						style={[sharedStyles.button, { backgroundColor: theme.primary }]}
-						onPress={form.handleSubmit}
-						disabled={loading || isSubmitting}
-					>
-						{loading ? (
-							<ActivityIndicator color="#fff" />
-						) : (
-							<Text style={sharedStyles.buttonText}>{t("create.submit")}</Text>
-						)}
-					</TouchableOpacity>
-				)}
+			<form.Subscribe
+				selector={(s) => ({
+					isSubmitting: s.isSubmitting,
+					name: s.values.name,
+				})}
+			>
+				{({ isSubmitting, name }) => {
+					const isDisabled = loading || isSubmitting || !name.trim();
+					return (
+						<TouchableOpacity
+							style={[
+								sharedStyles.button,
+								{
+									backgroundColor: theme.primary,
+									opacity: isDisabled ? 0.5 : 1,
+								},
+							]}
+							onPress={form.handleSubmit}
+							disabled={isDisabled}
+						>
+							{loading ? (
+								<ActivityIndicator color="#fff" />
+							) : (
+								<Text style={sharedStyles.buttonText}>
+									{t("create.submit")}
+								</Text>
+							)}
+						</TouchableOpacity>
+					);
+				}}
 			</form.Subscribe>
 			<TouchableOpacity onPress={onBack} disabled={loading}>
 				<Text style={[styles.linkText, { color: theme.primary }]}>

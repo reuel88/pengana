@@ -30,14 +30,18 @@
 		"test": "vitest run"
 	},
 	"peerDependencies": {
+		"@tanstack/react-form": "^1",
 		"@tanstack/react-query": "^5",
 		"react": "^19.0.0",
-		"xstate": "^5"
+		"xstate": "^5",
+		"zod": "^3"
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
+		"@tanstack/react-form": "catalog:",
 		"@types/react": "^19.2.7",
 		"typescript": "catalog:",
-		"vitest": "catalog:"
+		"vitest": "catalog:",
+		"zod": "catalog:"
 	}
 }

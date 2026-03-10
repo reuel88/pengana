@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useInviteMember } from "@pengana/org-client";
+import { useInviteMember, useZodForm } from "@pengana/org-client";
 import {
 	Alert,
 	StyleSheet,
@@ -11,7 +11,6 @@ import {
 import { z } from "zod";
 
 import { RoleToggle } from "@/components/role-toggle";
-import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
 

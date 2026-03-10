@@ -1,3 +1,4 @@
+import { TEST_PASSWORD, TEST_USER_NAME } from "../../constants.js";
 import { expect, test } from "../../fixtures/index.js";
 import { AuthPage } from "../../page-objects/auth.page.js";
 
@@ -15,20 +16,24 @@ test.describe("Authentication", () => {
 	});
 
 	test("sign up succeeds", async ({ page }) => {
-		const ts = Date.now();
+		const ts = crypto.randomUUID();
 		const authPage = new AuthPage(page);
-		await authPage.signUp("Test User", `signup-${ts}@e2e.test`, "Password123!");
+		await authPage.signUp(
+			TEST_USER_NAME,
+			`signup-${ts}@e2e.test`,
+			TEST_PASSWORD,
+		);
 		await expect(page).toHaveURL(/onboarding/);
 	});
 
 	test("sign in succeeds", async ({ page }) => {
-		const ts = Date.now();
+		const ts = crypto.randomUUID();
 		const email = `signin-${ts}@e2e.test`;
-		const password = "Password123!";
+		const password = TEST_PASSWORD;
 		const authPage = new AuthPage(page);
 
 		// Create account via sign-up
-		await authPage.signUp("Test User", email, password);
+		await authPage.signUp(TEST_USER_NAME, email, password);
 		await page.waitForURL(/onboarding/);
 
 		// Sign out from onboarding page
@@ -49,6 +54,7 @@ test.describe("Authentication", () => {
 		await page.getByRole("button", { name: "Sign in" }).click();
 		// User should remain on the sign-in page
 		await expect(page).toHaveURL(/login/);
+		await expect(page.locator("[data-sonner-toast]")).toBeVisible();
 	});
 
 	test("sign out", async ({ authenticatedPage: { page } }) => {

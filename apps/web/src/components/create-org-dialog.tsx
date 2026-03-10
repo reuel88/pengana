@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCreateOrg } from "@pengana/org-client";
+import { createOrgSchema, useCreateOrg, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Dialog,
@@ -10,20 +10,12 @@ import {
 } from "@pengana/ui/components/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import {
 	OrgLogoField,
 	OrgNameField,
 	OrgSlugField,
 } from "@/components/org-form-fields";
-import { useZodForm } from "@/hooks/use-zod-form";
-
-const createOrgSchema = z.object({
-	name: z.string().min(1),
-	slug: z.string(),
-	logo: z.string(),
-});
 
 export function CreateOrgDialog({
 	open,
@@ -78,12 +70,12 @@ export function CreateOrgDialog({
 						{(field) => <OrgLogoField field={field} id="dialog-org-logo" />}
 					</form.Field>
 					<form.Subscribe
-						selector={(s): [boolean, boolean] => [
-							s.isSubmitting,
-							!s.values.name,
-						]}
+						selector={(s) => ({
+							isSubmitting: s.isSubmitting,
+							nameEmpty: !s.values.name.trim(),
+						})}
 					>
-						{([isSubmitting, nameEmpty]) => (
+						{({ isSubmitting, nameEmpty }) => (
 							<Button type="submit" disabled={isSubmitting || nameEmpty}>
 								{isSubmitting ? t("common:submitting") : t("create.submit")}
 							</Button>

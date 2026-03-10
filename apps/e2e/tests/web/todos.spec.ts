@@ -17,7 +17,7 @@ test.describe("Todos", () => {
 		const todoPage = new TodoPage(page);
 		await todoPage.navigate();
 		await todoPage.addTodo("Buy milk");
-		await expect(todoPage.todoVisible("Buy milk")).toBeVisible();
+		await expect(todoPage.todoLocator("Buy milk")).toBeVisible();
 	});
 
 	test("complete a todo", async ({ authenticatedWithOrgPage: { page } }) => {
@@ -25,7 +25,7 @@ test.describe("Todos", () => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Exercise");
 		await todoPage.toggleTodo("Exercise");
-		await expect(todoPage.isTodoCompleted("Exercise")).toHaveClass(
+		await expect(todoPage.completedTodoLocator("Exercise")).toHaveClass(
 			/line-through/,
 		);
 	});
@@ -35,7 +35,7 @@ test.describe("Todos", () => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Temporary task");
 		await todoPage.deleteTodo("Temporary task");
-		await expect(todoPage.todoVisible("Temporary task")).not.toBeVisible();
+		await expect(todoPage.todoLocator("Temporary task")).not.toBeVisible();
 	});
 
 	test("todos persist after page reload", async ({
@@ -43,11 +43,11 @@ test.describe("Todos", () => {
 	}) => {
 		const todoPage = new TodoPage(page);
 		await todoPage.navigate();
-		const title = `Persist-${Date.now()}`;
+		const title = `Persist-${crypto.randomUUID()}`;
 		await todoPage.addTodo(title);
-		await expect(todoPage.todoVisible(title)).toBeVisible();
+		await expect(todoPage.todoLocator(title)).toBeVisible();
 		await page.reload();
-		await expect(todoPage.todoVisible(title)).toBeVisible();
+		await expect(todoPage.todoLocator(title)).toBeVisible();
 	});
 
 	test("unauthenticated user visiting /todos is redirected to sign-in", async ({

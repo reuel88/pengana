@@ -1,12 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import { useInviteMember } from "@pengana/org-client";
+import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
 import { toast } from "sonner";
 import { z } from "zod";
-
-import { useZodForm } from "@/hooks/use-zod-form";
 
 const inviteMemberSchema = z.object({
 	email: z.string().email(),

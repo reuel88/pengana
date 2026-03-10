@@ -1,6 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
-import { useTeamNameEditor } from "@pengana/org-client";
+import {
+	teamNameSchema,
+	useTeamNameEditor,
+	useZodForm,
+} from "@pengana/org-client";
 import { useState } from "react";
 import {
 	Alert,
@@ -11,15 +15,9 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
 
-import { useZodForm } from "@/hooks/use-zod-form";
 import { useTheme } from "@/lib/theme";
 import { inputThemed, sharedStyles } from "@/styles/shared";
-
-const teamNameSchema = z.object({
-	name: z.string().min(1),
-});
 
 export function TeamNameEditor({
 	teamId,
@@ -37,7 +35,10 @@ export function TeamNameEditor({
 	const [editing, setEditing] = useState(false);
 
 	const { handleSave, loading } = useTeamNameEditor({
-		onSuccess: () => Alert.alert("", t("teams.updateNameSuccess")),
+		onSuccess: () => {
+			Alert.alert("", t("teams.updateNameSuccess"));
+			setEditing(false);
+		},
 		onError: (message) => Alert.alert("", message || t("teams.error")),
 	});
 
@@ -46,7 +47,6 @@ export function TeamNameEditor({
 		defaultValues: { name: teamName },
 		onSubmit: async ({ value }) => {
 			await handleSave(teamId, orgId, value.name);
-			setEditing(false);
 		},
 	});
 
@@ -71,7 +71,7 @@ export function TeamNameEditor({
 				>
 					{({ isSubmitting, name }) => (
 						<TouchableOpacity
-							style={[styles.addButton, { backgroundColor: theme.primary }]}
+							style={[styles.saveButton, { backgroundColor: theme.primary }]}
 							onPress={form.handleSubmit}
 							disabled={loading || isSubmitting || !name.trim()}
 						>
@@ -119,7 +119,7 @@ export function TeamNameEditor({
 
 const styles = StyleSheet.create({
 	title: { fontSize: 18, fontWeight: "bold" },
-	addButton: { paddingHorizontal: 16, justifyContent: "center" },
+	saveButton: { paddingHorizontal: 16, justifyContent: "center" },
 	editNameRow: {
 		flex: 1,
 		flexDirection: "row",

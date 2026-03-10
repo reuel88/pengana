@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignUpSchema } from "@pengana/i18n/zod";
+import { useZodForm } from "@pengana/org-client";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useZodForm } from "@/hooks/use-zod-form";
 import { authClient } from "@/lib/auth-client";
 
 import { AuthFormField } from "./auth-form-field";

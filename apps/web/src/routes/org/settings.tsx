@@ -1,11 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgSettings } from "@pengana/org-client";
+import { useOrgSettings, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-
 import {
 	OrgLogoField,
 	OrgNameField,
@@ -13,7 +12,6 @@ import {
 } from "@/components/org-form-fields";
 import { OrgGuard } from "@/components/org-guard";
 import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
-import { useZodForm } from "@/hooks/use-zod-form";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,

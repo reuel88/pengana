@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCreateOrg } from "@pengana/org-client";
+import { useCreateOrg, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Card,
@@ -9,13 +9,11 @@ import {
 } from "@pengana/ui/components/card";
 import { toast } from "sonner";
 import { z } from "zod";
-
 import {
 	OrgLogoField,
 	OrgNameField,
 	OrgSlugField,
 } from "@/components/org-form-fields";
-import { useZodForm } from "@/hooks/use-zod-form";
 
 const createOrgSchema = z.object({
 	name: z.string().min(1),

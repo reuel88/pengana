@@ -14,9 +14,8 @@ export class TodoPage {
 
 	private todoRow(title: string) {
 		return this.page
-			.locator("div")
-			.filter({ has: this.page.locator("span", { hasText: title }) })
-			.first();
+			.locator('[data-testid="todo-row"]')
+			.filter({ has: this.page.locator("span", { hasText: title }) });
 	}
 
 	async deleteTodo(title: string) {
@@ -27,11 +26,11 @@ export class TodoPage {
 		await this.todoRow(title).getByRole("checkbox").click();
 	}
 
-	isTodoCompleted(title: string) {
+	completedTodoLocator(title: string) {
 		return this.todoRow(title).locator("span", { hasText: title });
 	}
 
-	todoVisible(title: string) {
+	todoLocator(title: string) {
 		return this.page.getByText(title);
 	}
 }
