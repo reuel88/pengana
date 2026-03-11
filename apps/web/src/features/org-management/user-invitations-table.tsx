@@ -1,10 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
 import type { UserInvitation } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
-
-import type { Column } from "@/components/data-table";
-import { DataTable } from "@/components/data-table";
-import { useInvitationActions } from "@/hooks/use-invitation-actions";
+import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
+import type { Column } from "@/shared/ui/data-table";
+import { DataTable } from "@/shared/ui/data-table";
 
 export function UserInvitationsTable({
 	invitations,

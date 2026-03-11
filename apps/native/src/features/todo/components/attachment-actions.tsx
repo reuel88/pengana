@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-import { STATUS_COLORS } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
+import { STATUS_COLORS } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
 
 export function AttachButton({ onPress }: { onPress: () => void }) {
 	const { theme } = useTheme();

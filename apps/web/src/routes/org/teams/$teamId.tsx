@@ -13,12 +13,15 @@ import { cn } from "@pengana/ui/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-
-import type { Column } from "@/components/data-table";
-import { DataTable } from "@/components/data-table";
-import { FormRoot } from "@/components/form-root";
-import { useOrgGuard } from "@/components/org-guard";
-import { useOrgRole, useTeamMembers, useTeams } from "@/hooks/use-org-queries";
+import {
+	useOrgRole,
+	useTeamMembers,
+	useTeams,
+} from "@/shared/hooks/use-org-queries";
+import type { Column } from "@/shared/ui/data-table";
+import { DataTable } from "@/shared/ui/data-table";
+import { FormRoot } from "@/shared/ui/form-root";
+import { useOrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/teams/$teamId")({
 	component: TeamDetailPage,

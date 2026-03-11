@@ -10,9 +10,9 @@ import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/entities/upload-queue";
-import { authClient } from "@/lib/auth-client";
-import { createNativeStorageHealthProvider } from "@/lib/storage-health";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
+import { authClient } from "@/shared/lib/auth-client";
+import { createNativeStorageHealthProvider } from "@/shared/lib/storage-health";
 import { useNetworkStatus } from "./use-network-status";
 
 function getWsUrl() {

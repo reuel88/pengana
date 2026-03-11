@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageSwitcher } from "@/features/i18n/language-switcher";
 
 export default function AuthLayout() {
 	return (

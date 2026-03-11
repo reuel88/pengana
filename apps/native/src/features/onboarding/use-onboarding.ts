@@ -3,7 +3,7 @@ import { useMachine } from "@xstate/react";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 
-import { useCompleteOnboarding } from "@/lib/lifecycle-context";
+import { useCompleteOnboarding } from "@/shared/lib/lifecycle-context";
 
 export function useOnboarding({
 	hasPendingInvitations,

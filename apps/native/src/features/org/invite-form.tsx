@@ -2,11 +2,10 @@ import { useTranslation } from "@pengana/i18n";
 import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { z } from "zod";
-
-import { RoleToggle } from "@/components/role-toggle";
-import { ThemedTextInput } from "@/components/themed-text-input";
-import { useTheme } from "@/lib/theme";
-import { sharedStyles } from "@/styles/shared";
+import { useTheme } from "@/shared/lib/theme";
+import { sharedStyles } from "@/shared/styles/shared";
+import { RoleToggle } from "@/shared/ui/role-toggle";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 const inviteSchema = z.object({
 	email: z.string().email(),

@@ -2,12 +2,11 @@ import { useTranslation } from "@pengana/i18n";
 import { useInvitationActions } from "@pengana/org-client";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-import { Container } from "@/components/container";
-import { useInvitation } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { useTheme } from "@/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
+import { useInvitation } from "@/shared/hooks/use-org-queries";
+import { authClient } from "@/shared/lib/auth-client";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
 
 export default function InvitationScreen() {
 	const { theme } = useTheme();

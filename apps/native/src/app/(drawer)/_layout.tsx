@@ -2,11 +2,10 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
 import { Link } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-
-import { HeaderButton } from "@/components/header-button";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { useThemedScreenOptions } from "@/hooks/use-themed-screen-options";
-import { useTheme } from "@/lib/theme";
+import { LanguageSwitcher } from "@/features/i18n/language-switcher";
+import { useThemedScreenOptions } from "@/shared/hooks/use-themed-screen-options";
+import { useTheme } from "@/shared/lib/theme";
+import { HeaderButton } from "@/shared/ui/header-button";
 
 const DrawerLayout = () => {
 	const { theme } = useTheme();

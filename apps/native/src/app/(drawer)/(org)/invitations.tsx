@@ -1,14 +1,13 @@
 import { useTranslation } from "@pengana/i18n";
 import { useCancelInvitation, useInvitationActions } from "@pengana/org-client";
 import { Alert, ScrollView } from "react-native";
-
-import { Container } from "@/components/container";
-import { LoadingScreen } from "@/components/loading-screen";
 import { InviteForm } from "@/features/org/invite-form";
 import { OrgInvitationsList } from "@/features/org/org-invitations-list";
 import { UserInvitationsList } from "@/features/org/user-invitations-list";
-import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
-import { sharedStyles } from "@/styles/shared";
+import { useActiveOrg, useOrgRole } from "@/shared/hooks/use-org-queries";
+import { sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 
 export default function InvitationsScreen() {
 	const { t } = useTranslation("organization");

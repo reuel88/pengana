@@ -4,10 +4,10 @@ import {
 	useInvalidateNotifications,
 	useNotifications,
 } from "@/features/notifications/use-notification-queries";
-import { useInvitationActions } from "@/hooks/use-invitation-actions";
-import { useUserInvitations } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
+import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
+import { useUserInvitations } from "@/shared/hooks/use-org-queries";
+import { authClient } from "@/shared/lib/auth-client";
 
 export function useNotificationCenter() {
 	const { t } = useTranslation("organization");

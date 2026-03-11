@@ -10,13 +10,13 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { Container } from "@/components/container";
-import { EmptyOrgScreen } from "@/components/empty-org-screen";
-import { LoadingScreen } from "@/components/loading-screen";
 import { OrgForm } from "@/features/org/org-form";
-import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
-import { useTheme } from "@/lib/theme";
-import { mutedText, sharedStyles } from "@/styles/shared";
+import { useActiveOrg, useOrgRole } from "@/shared/hooks/use-org-queries";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
+import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 
 export default function OrgSettingsScreen() {
 	const { theme } = useTheme();

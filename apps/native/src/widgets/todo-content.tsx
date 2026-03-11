@@ -7,7 +7,7 @@ import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import { useTodos } from "@/features/todo/use-todos";
-import { useTheme } from "@/lib/theme";
+import { useTheme } from "@/shared/lib/theme";
 
 export function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(userId);

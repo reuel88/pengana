@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { sendBackgroundMessage } from "@/utils/send-background-message";
+import { sendBackgroundMessage } from "@/shared/api/send-background-message";
 
 export function useUploadQueue() {
 	const enqueueUpload = useCallback(

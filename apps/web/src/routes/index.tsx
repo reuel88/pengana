@@ -3,8 +3,8 @@ import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { authClient, requireAuthAndOrg } from "@/lib/auth-client";
-import { orpc } from "@/utils/orpc";
+import { orpc } from "@/shared/api/orpc";
+import { authClient, requireAuthAndOrg } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/")({
 	component: DashboardPage,

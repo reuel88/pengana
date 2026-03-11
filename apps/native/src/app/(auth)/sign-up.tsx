@@ -1,11 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
 import { Link } from "expo-router";
 import { ScrollView, Text } from "react-native";
-
-import { Container } from "@/components/container";
-import { SignUp } from "@/components/sign-up";
-import { useTheme } from "@/lib/theme";
-import { authScreenStyles as styles } from "@/styles/auth";
+import { SignUp } from "@/features/auth/sign-up";
+import { useTheme } from "@/shared/lib/theme";
+import { authScreenStyles as styles } from "@/shared/styles/auth";
+import { Container } from "@/shared/ui/container";
 
 export default function SignUpScreen() {
 	const { t } = useTranslation();

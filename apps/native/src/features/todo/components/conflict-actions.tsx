@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { useTheme } from "@/lib/theme";
+import { useTheme } from "@/shared/lib/theme";
 
 export function ConflictActions({
 	onResolve,

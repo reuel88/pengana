@@ -7,7 +7,7 @@ import {
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
 
-import { InvitationCard } from "@/components/invitation-card";
+import { InvitationCard } from "@/shared/ui/invitation-card";
 import { useNotificationCenter } from "./use-notification-center";
 
 function InvitationItem({

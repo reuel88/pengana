@@ -1,7 +1,6 @@
 import { Redirect } from "expo-router";
-
-import { Container } from "@/components/container";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/shared/lib/auth-client";
+import { Container } from "@/shared/ui/container";
 import { TodoPage } from "@/widgets/todo-page";
 
 export default function TodosScreen() {

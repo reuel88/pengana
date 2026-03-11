@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 
-import type { Column } from "@/components/data-table";
-import { DataTable } from "@/components/data-table";
+import type { Column } from "@/shared/ui/data-table";
+import { DataTable } from "@/shared/ui/data-table";
 
 interface Invitation {
 	id: string;

@@ -6,10 +6,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-
-import { InvitationCard } from "@/components/invitation-card";
-import { useInvitationActions } from "@/hooks/use-invitation-actions";
-import { useUserInvitations } from "@/hooks/use-org-queries";
+import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
+import { useUserInvitations } from "@/shared/hooks/use-org-queries";
+import { InvitationCard } from "@/shared/ui/invitation-card";
 
 export function OnboardingInvitations({
 	onAccepted,

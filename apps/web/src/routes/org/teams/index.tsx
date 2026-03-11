@@ -14,15 +14,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-
-import { FormRoot } from "@/components/form-root";
-import { useOrgGuard } from "@/components/org-guard";
 import {
 	useInvalidateOrg,
 	useOrgRole,
 	useTeams,
-} from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
+} from "@/shared/hooks/use-org-queries";
+import { authClient } from "@/shared/lib/auth-client";
+import { FormRoot } from "@/shared/ui/form-root";
+import { useOrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/teams/")({
 	component: TeamsIndexPage,

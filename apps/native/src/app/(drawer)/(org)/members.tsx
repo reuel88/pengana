@@ -9,14 +9,13 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { Container } from "@/components/container";
-import { EmptyOrgScreen } from "@/components/empty-org-screen";
-import { LoadingScreen } from "@/components/loading-screen";
-import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { useTheme } from "@/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
+import { useActiveOrg, useOrgRole } from "@/shared/hooks/use-org-queries";
+import { authClient } from "@/shared/lib/auth-client";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
+import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 
 export default function MembersScreen() {
 	const { theme } = useTheme();

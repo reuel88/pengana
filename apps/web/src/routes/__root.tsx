@@ -13,10 +13,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
-import { Header } from "@/components/header";
-import { ThemeProvider } from "@/components/theme-provider";
-import { authClient } from "@/lib/auth-client";
-import type { orpc } from "@/utils/orpc";
+import { ThemeProvider } from "@/features/theme/theme-provider";
+import type { orpc } from "@/shared/api/orpc";
+import { authClient } from "@/shared/lib/auth-client";
+import { Header } from "@/widgets/header";
 
 import "@pengana/ui/globals.css";
 

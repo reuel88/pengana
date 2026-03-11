@@ -1,8 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
-
-import { Container } from "@/components/container";
-import { useTheme } from "@/lib/theme";
+import { useTheme } from "@/shared/lib/theme";
+import { Container } from "@/shared/ui/container";
 
 export default function Modal() {
 	const { theme } = useTheme();

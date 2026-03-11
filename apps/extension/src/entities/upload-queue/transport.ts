@@ -4,7 +4,7 @@ import {
 	getFileFromIndexedDB,
 	removeFileFromIndexedDB,
 } from "@pengana/todo-client/adapters/dexie-file-store";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
 
 export function createIndexedDbUploadTransport(): UploadTransport {
 	return createUploadTransport({

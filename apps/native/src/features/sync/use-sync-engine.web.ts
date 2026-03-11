@@ -8,8 +8,8 @@ import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/entities/upload-queue";
-import { getServerUrl } from "@/lib/server-url";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
+import { getServerUrl } from "@/shared/lib/server-url";
 
 function getWsUrl() {
 	return `${getServerUrl().replace(/^http/, "ws")}/ws`;

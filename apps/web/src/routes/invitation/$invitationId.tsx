@@ -8,9 +8,12 @@ import {
 } from "@pengana/ui/components/card";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { useInvitationActions } from "@/hooks/use-invitation-actions";
-import { useInvalidateOrg, useInvitation } from "@/hooks/use-org-queries";
-import { requireAuth } from "@/lib/auth-client";
+import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
+import {
+	useInvalidateOrg,
+	useInvitation,
+} from "@/shared/hooks/use-org-queries";
+import { requireAuth } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/invitation/$invitationId")({
 	component: InvitationPage,

@@ -2,9 +2,9 @@ import { useTranslation } from "@pengana/i18n";
 import { DrawerToggleButton } from "@react-navigation/drawer";
 import { Redirect, Stack } from "expo-router";
 
-import { useThemedScreenOptions } from "@/hooks/use-themed-screen-options";
-import { authClient } from "@/lib/auth-client";
-import { useTheme } from "@/lib/theme";
+import { useThemedScreenOptions } from "@/shared/hooks/use-themed-screen-options";
+import { authClient } from "@/shared/lib/auth-client";
+import { useTheme } from "@/shared/lib/theme";
 
 export default function OrgLayout() {
 	const { theme } = useTheme();

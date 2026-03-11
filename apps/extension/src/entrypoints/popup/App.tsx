@@ -2,7 +2,7 @@ import { env } from "@pengana/env/web";
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/shared/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
 function LoadingState() {

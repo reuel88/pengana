@@ -7,7 +7,7 @@ import { Select } from "@pengana/ui/components/select";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { FormRoot } from "@/components/form-root";
+import { FormRoot } from "@/shared/ui/form-root";
 
 const inviteMemberSchema = z.object({
 	email: z.string().email(),

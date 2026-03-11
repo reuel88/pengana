@@ -1,9 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { useUserInvitations } from "@/hooks/use-org-queries";
-import { useTheme } from "@/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
+import { useUserInvitations } from "@/shared/hooks/use-org-queries";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
 
 export function UserInvitationsList({
 	isPendingFor,

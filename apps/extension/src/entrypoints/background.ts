@@ -24,10 +24,10 @@ import type {
 	BackgroundBroadcast,
 	BackgroundMessage,
 	SyncStatus,
-} from "@/utils/background-messages";
-import { isSyncActive, isUploadActive } from "@/utils/background-messages";
-import { client } from "@/utils/orpc";
-import { sessionResponseSchema } from "@/utils/session-schema";
+} from "@/shared/api/background-messages";
+import { isSyncActive, isUploadActive } from "@/shared/api/background-messages";
+import { client } from "@/shared/api/orpc";
+import { sessionResponseSchema } from "@/shared/api/session-schema";
 
 // --- Constants ---
 

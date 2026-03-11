@@ -4,11 +4,10 @@ import { Button } from "@pengana/ui/components/button";
 import { Select } from "@pengana/ui/components/select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-
-import type { Column } from "@/components/data-table";
-import { DataTable } from "@/components/data-table";
-import { useOrgGuard } from "@/components/org-guard";
-import { useOrgRole } from "@/hooks/use-org-queries";
+import { useOrgRole } from "@/shared/hooks/use-org-queries";
+import type { Column } from "@/shared/ui/data-table";
+import { DataTable } from "@/shared/ui/data-table";
+import { useOrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,

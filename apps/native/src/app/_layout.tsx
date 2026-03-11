@@ -25,14 +25,13 @@ import {
 	View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import { useLifecycleCheck } from "@/hooks/use-lifecycle-check";
-import { authClient } from "@/lib/auth-client";
-import { NAV_THEME } from "@/lib/constants";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { LifecycleContext } from "@/lib/lifecycle-context";
-import { useColorScheme } from "@/lib/use-color-scheme";
-import { queryClient } from "@/utils/orpc";
+import { queryClient } from "@/shared/api/orpc";
+import { useLifecycleCheck } from "@/shared/hooks/use-lifecycle-check";
+import { authClient } from "@/shared/lib/auth-client";
+import { NAV_THEME } from "@/shared/lib/constants";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { LifecycleContext } from "@/shared/lib/lifecycle-context";
+import { useColorScheme } from "@/shared/lib/use-color-scheme";
 
 type RouteTarget = "/(auth)/login" | "/onboarding" | "/(drawer)" | null;
 
@@ -208,12 +207,10 @@ export default function RootLayout() {
 		init();
 	}, []);
 
-	if (!i18nReady) return null;
-
 	return (
 		<QueryClientProvider client={queryClient}>
 			<AuthClientProvider client={authClient}>
-				<RootLayoutInner />
+				{i18nReady ? <RootLayoutInner /> : null}
 			</AuthClientProvider>
 		</QueryClientProvider>
 	);

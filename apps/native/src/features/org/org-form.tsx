@@ -3,10 +3,10 @@ import { createOrgSchema, useZodForm } from "@pengana/org-client";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
-import { ThemedTextInput } from "@/components/themed-text-input";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
-import { sharedStyles } from "@/styles/shared";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { sharedStyles } from "@/shared/styles/shared";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 interface OrgFormValues {
 	name: string;

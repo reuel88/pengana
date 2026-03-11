@@ -9,12 +9,12 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
-import { RoleToggle } from "@/components/role-toggle";
-import { ThemedTextInput } from "@/components/themed-text-input";
-import { useBatchInvite } from "@/hooks/use-batch-invite";
-import { useActiveOrg } from "@/hooks/use-org-queries";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
+import { useBatchInvite } from "@/shared/hooks/use-batch-invite";
+import { useActiveOrg } from "@/shared/hooks/use-org-queries";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { RoleToggle } from "@/shared/ui/role-toggle";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 import { onboardingStyles } from "./onboarding-styles";
 

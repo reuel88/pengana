@@ -11,8 +11,8 @@ import { Input } from "@pengana/ui/components/input";
 import { Select } from "@pengana/ui/components/select";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FormRoot } from "@/components/form-root";
-import { useActiveOrg } from "@/hooks/use-org-queries";
+import { useActiveOrg } from "@/shared/hooks/use-org-queries";
+import { FormRoot } from "@/shared/ui/form-root";
 
 const inviteMembersSchema = z.object({
 	members: z.array(

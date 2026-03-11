@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { OrgForm } from "@/features/org/org-form";
-import { useCreateOrg } from "@/hooks/use-create-org";
-import { useTheme } from "@/lib/theme";
+import { useCreateOrg } from "@/shared/hooks/use-create-org";
+import { useTheme } from "@/shared/lib/theme";
 
 import { onboardingStyles as styles } from "./onboarding-styles";
 

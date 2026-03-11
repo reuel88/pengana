@@ -12,10 +12,9 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { ThemedTextInput } from "@/components/themed-text-input";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 export function TeamMemberAddForm({
 	teamId,

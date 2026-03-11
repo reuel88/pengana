@@ -8,22 +8,21 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { Container } from "@/components/container";
-import { EmptyOrgScreen } from "@/components/empty-org-screen";
-import { LoadingScreen } from "@/components/loading-screen";
-import { ThemedTextInput } from "@/components/themed-text-input";
 import {
 	useActiveOrg,
 	useInvalidateOrg,
 	useOrgRole,
 	useTeams,
-} from "@/hooks/use-org-queries";
-import { authClient } from "@/lib/auth-client";
-import { authMutation } from "@/lib/auth-mutation";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
-import { mutedText, sharedStyles } from "@/styles/shared";
+} from "@/shared/hooks/use-org-queries";
+import { authClient } from "@/shared/lib/auth-client";
+import { authMutation } from "@/shared/lib/auth-mutation";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
+import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 export default function TeamsIndexScreen() {
 	const { theme } = useTheme();

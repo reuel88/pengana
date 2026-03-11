@@ -2,7 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import type { Todo } from "@pengana/sync-engine";
 import { StyleSheet, View } from "react-native";
 
-import { SYNC_STATUS_COLORS } from "@/lib/design-tokens";
+import { SYNC_STATUS_COLORS } from "@/shared/lib/design-tokens";
 
 export function SyncDot({ status }: { status: Todo["syncStatus"] }) {
 	const { t } = useTranslation("todos");

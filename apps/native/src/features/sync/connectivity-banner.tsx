@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
-import { BANNER_COLORS } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
+import { BANNER_COLORS } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
 
 export function ConnectivityBanner({
 	isOnline,
