@@ -14,8 +14,12 @@ export function useInvitationActions({
 	onError?: (message: string) => void;
 }) {
 	const authClient = useAuthClient();
-	const { invalidateUserInvitations, invalidateActiveOrg, invalidateListOrgs } =
-		useInvalidateOrg();
+	const {
+		invalidateUserInvitations,
+		invalidateActiveOrg,
+		invalidateActiveMember,
+		invalidateListOrgs,
+	} = useInvalidateOrg();
 	const [actingId, setActingId] = useState<string | null>(null);
 
 	const handleAccept = async (invitationId: string) => {
@@ -29,6 +33,7 @@ export function useInvitationActions({
 				await Promise.all([
 					invalidateUserInvitations(),
 					invalidateActiveOrg(),
+					invalidateActiveMember(),
 					invalidateListOrgs(),
 				]);
 			},

@@ -51,8 +51,9 @@ export function OnboardingCreateOrg({
 			>
 				{onBackToInvitations && (
 					<TouchableOpacity
-						style={styles.ghostButton}
+						style={[styles.ghostButton, loading && { opacity: 0.5 }]}
 						onPress={onBackToInvitations}
+						disabled={loading}
 					>
 						<Text style={[styles.ghostButtonText, { color: theme.primary }]}>
 							{t("create.backToInvitations")}

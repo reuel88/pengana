@@ -100,7 +100,11 @@ function CreateTeamDialog({
 function TeamsIndexPage() {
 	const { t } = useTranslation("organization");
 	const { activeOrg, guardElement } = useOrgGuard();
-	const { data: teams, isPending: teamsLoading } = useTeams(activeOrg?.id);
+	const {
+		data: teams,
+		isPending: teamsLoading,
+		isError: teamsError,
+	} = useTeams(activeOrg?.id);
 	const [createOpen, setCreateOpen] = useState(false);
 	const { isAdmin } = useOrgRole();
 
@@ -108,6 +112,12 @@ function TeamsIndexPage() {
 
 	if (teamsLoading) {
 		return <p>{t("common:status.loading")}</p>;
+	}
+
+	if (teamsError) {
+		return (
+			<p className="text-destructive text-sm">{t("common:error.generic")}</p>
+		);
 	}
 
 	return (

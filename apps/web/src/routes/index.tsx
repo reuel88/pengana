@@ -27,7 +27,8 @@ function DashboardPage() {
 	const handlePaymentAction = async (action: () => Promise<unknown>) => {
 		try {
 			await action();
-		} catch {
+		} catch (err) {
+			console.error("[payment]", err);
 			toast.error(t("errors:paymentError"));
 		}
 	};
