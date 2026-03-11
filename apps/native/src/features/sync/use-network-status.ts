@@ -2,16 +2,16 @@ import * as Network from "expo-network";
 import { useEffect, useState } from "react";
 
 export function useNetworkStatus() {
-	const [isOnline, setIsOnline] = useState(true);
+	const [isOnline, setIsOnline] = useState(false);
 	const [simulateOffline, setSimulateOffline] = useState(false);
 
 	useEffect(() => {
 		Network.getNetworkStateAsync().then((state) => {
-			setIsOnline(state.isConnected ?? true);
+			setIsOnline(state.isInternetReachable ?? state.isConnected ?? false);
 		});
 
 		const subscription = Network.addNetworkStateListener((state) => {
-			setIsOnline(state.isConnected ?? true);
+			setIsOnline(state.isInternetReachable ?? state.isConnected ?? false);
 		});
 
 		return () => {
