@@ -9,6 +9,7 @@
 		"ios": "expo run:ios",
 		"prebuild": "expo prebuild",
 		"web": "expo start --web",
+		"check-types": "tsc --noEmit",
 		"db:generate": "drizzle-kit generate"
 	},
 	"dependencies": {

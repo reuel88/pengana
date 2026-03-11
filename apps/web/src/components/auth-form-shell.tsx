@@ -5,17 +5,22 @@ import type { ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Loader } from "./loader";
 
-interface FormSubscribeProps {
-	children: (state: { canSubmit: boolean; isSubmitting: boolean }) => ReactNode;
-}
-
 interface AuthFormShellProps {
 	title: string;
 	submitLabel: string;
 	switchLabel: string;
 	switchTo: string;
 	onSubmit: () => void;
-	form: { Subscribe: React.ComponentType<FormSubscribeProps> };
+	form: {
+		Subscribe: React.ComponentType<{
+			// biome-ignore lint/suspicious/noExplicitAny: FormState generic varies per form
+			selector: (state: any) => { canSubmit: boolean; isSubmitting: boolean };
+			children: (state: {
+				canSubmit: boolean;
+				isSubmitting: boolean;
+			}) => ReactNode;
+		}>;
+	};
 	children: ReactNode;
 }
 
@@ -49,7 +54,12 @@ export function AuthFormShell({
 			>
 				{children}
 
-				<form.Subscribe>
+				<form.Subscribe
+					selector={(state) => ({
+						canSubmit: state.canSubmit,
+						isSubmitting: state.isSubmitting,
+					})}
+				>
 					{(state) => (
 						<Button
 							type="submit"
