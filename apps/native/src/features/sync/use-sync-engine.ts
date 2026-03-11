@@ -1,15 +1,18 @@
 import { env } from "@pengana/env/native";
-import { randomUUID } from "expo-crypto";
-import { useEffect } from "react";
-import { AppState, type AppStateStatus, Platform } from "react-native";
-
-import { authClient } from "@/lib/auth-client";
-
-import { useNetworkStatus } from "./use-network-status";
 import {
 	type SyncEnginePlatformDeps,
 	useSyncEngineCore,
-} from "./use-sync-engine.shared";
+} from "@pengana/sync-engine";
+import { randomUUID } from "expo-crypto";
+import { AppState, Platform } from "react-native";
+import { createSyncAdapter } from "@/entities/todo";
+import {
+	createUploadAdapter,
+	createUploadTransport,
+} from "@/entities/upload-queue";
+import { authClient } from "@/lib/auth-client";
+import { client } from "@/utils/orpc";
+import { useNetworkStatus } from "./use-network-status";
 
 function getWsUrl() {
 	const base = `${env.EXPO_PUBLIC_SERVER_URL.replace(/^http/, "ws")}/ws`;
@@ -27,27 +30,22 @@ function getWsUrl() {
 const platformDeps: SyncEnginePlatformDeps = {
 	getWsUrl,
 	generateUUID: randomUUID,
+	createSyncAdapter: (userId) => createSyncAdapter(userId),
+	createSyncTransport: () => ({
+		sync: async (input) => (await client.todo.sync(input)).data,
+	}),
+	createUploadAdapter,
+	createUploadTransport,
+	onFocusSubscribe: (triggerSync) => {
+		const subscription = AppState.addEventListener("change", (nextAppState) => {
+			if (nextAppState === "active") triggerSync();
+		});
+		return () => subscription.remove();
+	},
 };
 
 export function useSyncEngine(userId: string | undefined) {
 	const { isOnline } = useNetworkStatus();
 
-	const { core, devtools } = useSyncEngineCore(userId, isOnline, platformDeps);
-
-	// Sync when app comes to foreground (e.g. user returns from another device)
-	useEffect(() => {
-		if (!core.isOnline) return;
-
-		const subscription = AppState.addEventListener(
-			"change",
-			(nextAppState: AppStateStatus) => {
-				if (nextAppState === "active") {
-					core.triggerSync();
-				}
-			},
-		);
-		return () => subscription.remove();
-	}, [core.isOnline, core.triggerSync]);
-
-	return { core, devtools };
+	return useSyncEngineCore(userId, isOnline, platformDeps);
 }

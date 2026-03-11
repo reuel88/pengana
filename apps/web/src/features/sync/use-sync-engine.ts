@@ -1,92 +1,46 @@
-import type { SyncEvent, SyncInput, SyncOutput } from "@pengana/sync-engine";
+import { env } from "@pengana/env/web";
+import { orgQueryKeys } from "@pengana/org-client";
 import {
-	MAX_EVENT_LOG_SIZE,
-	SyncEngine,
+	type SyncEnginePlatformDeps,
 	useNetworkStatus,
-	usePeriodicSync,
+	useSyncEngineCore,
 } from "@pengana/sync-engine";
 import { createDexieSyncAdapter } from "@pengana/todo-client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	createWebUploadAdapter,
+	createWebUploadTransport,
+} from "@/entities/upload-queue";
 import { notificationQueryKeys } from "@/features/notifications/use-notification-queries";
-import { orgQueryKeys } from "@/hooks/use-org-queries";
 import { client, queryClient } from "@/utils/orpc";
 
-import { useSyncOnFocus } from "./use-sync-on-focus";
-import { useUploadQueue } from "./use-upload-queue";
-import { useWebSocketSync } from "./use-websocket-sync";
+function getWsUrl() {
+	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
+}
 
-export function useSyncEngine(userId: string | undefined) {
-	const engineRef = useRef<SyncEngine | null>(null);
-	const [events, setEvents] = useState<SyncEvent[]>([]);
-	const [isSyncing, setIsSyncing] = useState(false);
-
-	const { isOnline, simulateOffline, setSimulateOffline } = useNetworkStatus();
-
-	useEffect(() => {
-		if (!userId) return;
-
-		const adapter = createDexieSyncAdapter(userId);
-
-		const transport = {
-			async sync(input: SyncInput): Promise<SyncOutput> {
-				return (await client.todo.sync(input)).data;
-			},
-		};
-
-		const engine = new SyncEngine(adapter, transport);
-		engineRef.current = engine;
-
-		const unsubscribeSyncEvents = engine.onEvent((event) => {
-			setEvents((prev) => [...prev.slice(-MAX_EVENT_LOG_SIZE), event]);
-			if (event.type === "sync:start") setIsSyncing(true);
-			if (event.type === "sync:complete" || event.type === "sync:error")
-				setIsSyncing(false);
-		});
-
-		return () => {
-			unsubscribeSyncEvents();
-			engineRef.current = null;
-		};
-	}, [userId]);
-
-	useEffect(() => {
-		if (isOnline) {
-			engineRef.current?.sync();
-		}
-	}, [isOnline]);
-
-	usePeriodicSync(isOnline, engineRef);
-	useWebSocketSync(userId, isOnline, engineRef, () => {
+const platformDeps: SyncEnginePlatformDeps = {
+	getWsUrl,
+	generateUUID: () => crypto.randomUUID(),
+	onSyncNotify: () => {
 		queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list });
 		queryClient.invalidateQueries({ queryKey: orgQueryKeys.userInvitations });
-	});
-	useSyncOnFocus(engineRef, isOnline);
+	},
+	createSyncAdapter: (userId) => createDexieSyncAdapter(userId),
+	createSyncTransport: () => ({
+		sync: async (input) => (await client.todo.sync(input)).data,
+	}),
+	createUploadAdapter: createWebUploadAdapter,
+	createUploadTransport: createWebUploadTransport,
+	onFocusSubscribe: (triggerSync) => {
+		const handler = () => {
+			if (document.visibilityState === "visible") triggerSync();
+		};
+		document.addEventListener("visibilitychange", handler);
+		return () => document.removeEventListener("visibilitychange", handler);
+	},
+};
 
-	const { isUploading, uploadEvents, enqueueUpload } = useUploadQueue(
-		userId,
-		isOnline,
-		engineRef,
-	);
+export function useSyncEngine(userId: string | undefined) {
+	const { isOnline } = useNetworkStatus();
 
-	const triggerSync = useCallback(() => {
-		if (isOnline) {
-			engineRef.current?.sync();
-		}
-	}, [isOnline]);
-
-	return {
-		core: {
-			isOnline,
-			isSyncing,
-			isUploading,
-			triggerSync,
-			enqueueUpload,
-		},
-		devtools: {
-			events,
-			uploadEvents,
-			simulateOffline,
-			setSimulateOffline,
-		},
-	};
+	return useSyncEngineCore(userId, isOnline, platformDeps);
 }

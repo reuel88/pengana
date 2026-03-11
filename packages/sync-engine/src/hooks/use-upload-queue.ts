@@ -1,22 +1,23 @@
-import type { SyncEngine, UploadEvent } from "@pengana/sync-engine";
-import { UploadQueue, useStableSyncRef } from "@pengana/sync-engine";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-	createWebUploadAdapter,
-	createWebUploadTransport,
-} from "@/entities/upload-queue";
+import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
+import type { SyncEngine } from "../core/engine";
+import { UploadQueue } from "../core/upload-queue";
+import type { UploadAdapter, UploadEvent, UploadTransport } from "../types";
+import { useStableSyncRef } from "./use-stable-sync-ref";
 
 export function useUploadQueue(
 	userId: string | undefined,
 	isOnline: boolean,
 	engineRef: React.RefObject<SyncEngine | null>,
+	generateUUID: () => string,
+	createUploadAdapter: () => UploadAdapter,
+	createUploadTransport: () => UploadTransport,
 ) {
+	// --- State ---
 	const uploadQueueRef = useRef<UploadQueue | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadEvents, setUploadEvents] = useState<UploadEvent[]>([]);
-
-	const MAX_UPLOAD_EVENT_HISTORY = 100;
 
 	const syncRef = useStableSyncRef(engineRef);
 	const isOnlineRef = useRef(isOnline);
@@ -29,14 +30,14 @@ export function useUploadQueue(
 		setIsUploading(false);
 		setUploadEvents([]);
 
-		const uploadAdapter = createWebUploadAdapter();
-		const uploadTransport = createWebUploadTransport();
+		const uploadAdapter = createUploadAdapter();
+		const uploadTransport = createUploadTransport();
 		const queue = new UploadQueue(uploadAdapter, uploadTransport);
 		uploadQueueRef.current = queue;
 
 		const unsubscribe = queue.onEvent((event) => {
 			setUploadEvents((prev) => [
-				...prev.slice(-(MAX_UPLOAD_EVENT_HISTORY - 1)),
+				...prev.slice(-(MAX_EVENT_LOG_SIZE - 1)),
 				event,
 			]);
 			if (event.type === "upload:start") setIsUploading(true);
@@ -71,13 +72,13 @@ export function useUploadQueue(
 	const enqueueUpload = useCallback(
 		(todoId: string, fileUri: string, mimeType: string) => {
 			uploadQueueRef.current?.enqueue({
-				id: crypto.randomUUID(),
+				id: generateUUID(),
 				todoId,
 				fileUri,
 				mimeType,
 			});
 		},
-		[],
+		[generateUUID],
 	);
 
 	return {

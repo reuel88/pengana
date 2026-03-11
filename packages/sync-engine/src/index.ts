@@ -21,6 +21,8 @@ export { UploadQueue } from "./core/upload-queue";
 export { useNetworkStatus } from "./hooks/use-network-status";
 export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
 export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
+export type { SyncEnginePlatformDeps } from "./hooks/use-sync-engine-core";
+export { useSyncEngineCore } from "./hooks/use-sync-engine-core";
 export { useWebSocketReconnect } from "./hooks/use-websocket-reconnect";
 export {
 	syncInputSchema,
