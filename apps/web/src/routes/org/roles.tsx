@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { Column } from "@/components/data-table";
-import { DataTable } from "@/components/data-table";
+import type { Column } from "@/shared/ui/data-table";
+import { DataTable } from "@/shared/ui/data-table";
 
 export const Route = createFileRoute("/org/roles")({
 	component: RolesPage,

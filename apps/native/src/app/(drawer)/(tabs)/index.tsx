@@ -1,4 +1,4 @@
-import { PlaceholderTab } from "@/components/placeholder-tab";
+import { PlaceholderTab } from "@/shared/ui/placeholder-tab";
 
 export default function TabOne() {
 	return (

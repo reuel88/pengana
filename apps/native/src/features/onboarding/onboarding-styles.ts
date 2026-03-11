@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 
 export const onboardingStyles = StyleSheet.create({
 	card: {

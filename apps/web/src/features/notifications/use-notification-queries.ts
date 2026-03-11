@@ -1,13 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { client } from "@/utils/orpc";
+import { notificationQueryKeys } from "@/entities/notification/query-keys";
+import { client } from "@/shared/api/orpc";
 
 const STALE_TIME = 30_000;
-
-export const notificationQueryKeys = {
-	list: ["notifications", "list"] as const,
-};
 
 export function useNotifications() {
 	return useQuery({

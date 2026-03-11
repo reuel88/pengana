@@ -11,9 +11,9 @@ import {
 
 import { db, todos } from "@/entities/todo";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
-import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
+import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
 
 function getLogEntryStyle(
 	eventType: string,

@@ -2,12 +2,12 @@ import { useTranslation } from "@pengana/i18n";
 import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageSwitcher } from "@/features/i18n/language-switcher";
 import { OnboardingCreateOrg } from "@/features/onboarding/onboarding-create-org";
 import { OnboardingInvitations } from "@/features/onboarding/onboarding-invitations";
 import { OnboardingInviteMembers } from "@/features/onboarding/onboarding-invite-members";
 import { useOnboarding } from "@/features/onboarding/use-onboarding";
-import { authClient, requireAuth } from "@/lib/auth-client";
+import { authClient, requireAuth } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/onboarding")({
 	component: OnboardingPage,

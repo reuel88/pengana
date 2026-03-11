@@ -1,9 +1,9 @@
 import type { StorageLevel } from "@pengana/sync-engine";
 import { useNetworkStatus } from "@pengana/sync-engine";
 import { useCallback, useEffect, useState } from "react";
-import type { BackgroundBroadcast } from "@/utils/background-messages";
-import { isSyncActive, isUploadActive } from "@/utils/background-messages";
-import { sendBackgroundMessage } from "@/utils/send-background-message";
+import type { BackgroundBroadcast } from "@/shared/api/background-messages";
+import { isSyncActive, isUploadActive } from "@/shared/api/background-messages";
+import { sendBackgroundMessage } from "@/shared/api/send-background-message";
 import { useUploadQueue } from "./use-upload-queue";
 
 export function useSyncEngine(userId: string) {

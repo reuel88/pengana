@@ -10,12 +10,12 @@ import {
 	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
+import { notificationQueryKeys } from "@/entities/notification/query-keys";
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,
 } from "@/entities/upload-queue";
-import { notificationQueryKeys } from "@/features/notifications/use-notification-queries";
-import { client, queryClient } from "@/utils/orpc";
+import { client, queryClient } from "@/shared/api/orpc";
 
 function getWsUrl() {
 	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;

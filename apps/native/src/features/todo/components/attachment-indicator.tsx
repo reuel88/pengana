@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { ActivityIndicator, StyleSheet, Text } from "react-native";
 
-import { STATUS_COLORS } from "@/lib/design-tokens";
+import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 
 import type { TodoItemRow } from "./todo-item";
 

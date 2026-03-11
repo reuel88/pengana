@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { useTheme } from "@/lib/theme";
-import { bodyText, mutedText, secondaryText } from "@/styles/shared";
+import { useTheme } from "@/shared/lib/theme";
+import { bodyText, mutedText, secondaryText } from "@/shared/styles/shared";
 
 export function OrgInvitationsList({
 	invitations,

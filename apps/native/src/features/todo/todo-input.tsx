@@ -8,8 +8,11 @@ import {
 	View,
 } from "react-native";
 import { useSync } from "@/features/sync/sync-context";
-import { PLACEHOLDER_COLORS, TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
+import {
+	PLACEHOLDER_COLORS,
+	TEXT_ON_PRIMARY,
+} from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
 
 import { addTodo } from "./todo-actions";
 

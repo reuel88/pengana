@@ -5,14 +5,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FormRoot } from "@/components/form-root";
 import {
 	OrgLogoField,
 	OrgNameField,
 	OrgSlugField,
-} from "@/components/org-form-fields";
-import { useOrgGuard } from "@/components/org-guard";
-import { useOrgRole } from "@/hooks/use-org-queries";
+} from "@/features/org-management/org-form-fields";
+import { useOrgRole } from "@/shared/hooks/use-org-queries";
+import { FormRoot } from "@/shared/ui/form-root";
+import { useOrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,

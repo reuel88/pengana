@@ -10,10 +10,6 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { Container } from "@/components/container";
-import { EmptyOrgScreen } from "@/components/empty-org-screen";
-import { LoadingScreen } from "@/components/loading-screen";
 import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
 import { TeamNameEditor } from "@/features/org/team-name-editor";
 import {
@@ -21,9 +17,12 @@ import {
 	useOrgRole,
 	useTeamMembers,
 	useTeams,
-} from "@/hooks/use-org-queries";
-import { useTheme } from "@/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
+} from "@/shared/hooks/use-org-queries";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import { Container } from "@/shared/ui/container";
+import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 
 export default function TeamDetailScreen() {
 	const { theme } = useTheme();

@@ -5,10 +5,9 @@ import { deLocalizeUrl, initWebI18n, localizeUrl } from "@pengana/i18n/web";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
-
-import { Loader } from "./components/loader";
 import { routeTree } from "./routeTree.gen";
-import { orpc, queryClient } from "./utils/orpc";
+import { orpc, queryClient } from "./shared/api/orpc";
+import { Loader } from "./shared/ui/loader";
 
 declare module "@tanstack/react-router" {
 	interface Register {

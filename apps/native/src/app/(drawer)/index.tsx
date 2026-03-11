@@ -6,12 +6,11 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { Container } from "@/components/container";
-import { authClient } from "@/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
-import { queryClient } from "@/utils/orpc";
+import { queryClient } from "@/shared/api/orpc";
+import { authClient } from "@/shared/lib/auth-client";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { Container } from "@/shared/ui/container";
 
 export default function Home() {
 	const { theme } = useTheme();

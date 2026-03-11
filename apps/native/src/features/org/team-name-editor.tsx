@@ -14,10 +14,9 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { ThemedTextInput } from "@/components/themed-text-input";
-import { useTheme } from "@/lib/theme";
-import { sharedStyles } from "@/styles/shared";
+import { useTheme } from "@/shared/lib/theme";
+import { sharedStyles } from "@/shared/styles/shared";
+import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 export function TeamNameEditor({
 	teamId,

@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
-import { requireAuthAndOrg } from "@/lib/auth-client";
+import { requireAuthAndOrg } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/org")({
 	component: OrgLayout,

@@ -3,7 +3,7 @@ import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
 
 export function SyncDevtoolsImpl() {
 	const { isOnline, isSyncing, triggerSync } = useSync();

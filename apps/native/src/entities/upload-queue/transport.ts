@@ -3,7 +3,7 @@ import { MIME_TO_EXT } from "@pengana/sync-engine";
 
 import { File } from "expo-file-system";
 
-import { client } from "@/utils/orpc";
+import { client } from "@/shared/api/orpc";
 
 export function createNativeUploadTransport(): UploadTransport {
 	return {

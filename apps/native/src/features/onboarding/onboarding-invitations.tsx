@@ -9,10 +9,10 @@ import {
 	View,
 } from "react-native";
 
-import { useUserInvitations } from "@/hooks/use-org-queries";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
-import { useTheme } from "@/lib/theme";
-import { mutedText } from "@/styles/shared";
+import { useUserInvitations } from "@/shared/hooks/use-org-queries";
+import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText } from "@/shared/styles/shared";
 
 import { onboardingStyles } from "./onboarding-styles";
 

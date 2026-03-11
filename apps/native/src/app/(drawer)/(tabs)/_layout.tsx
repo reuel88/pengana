@@ -1,8 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { Tabs } from "expo-router";
-
-import { TabBarIcon } from "@/components/tabbar-icon";
-import { useTheme } from "@/lib/theme";
+import { useTheme } from "@/shared/lib/theme";
+import { TabBarIcon } from "@/shared/ui/tabbar-icon";
 
 export default function TabLayout() {
 	const { theme } = useTheme();

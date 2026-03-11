@@ -7,11 +7,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { Container } from "@/components/container";
-import { OrgSwitcher } from "@/components/org-switcher";
-import { useActiveOrg } from "@/hooks/use-org-queries";
-import { useTheme } from "@/lib/theme";
+import { OrgSwitcher } from "@/features/org/org-switcher";
+import { useActiveOrg } from "@/shared/hooks/use-org-queries";
+import { useTheme } from "@/shared/lib/theme";
+import { Container } from "@/shared/ui/container";
 
 export default function OrgIndexScreen() {
 	const { theme } = useTheme();

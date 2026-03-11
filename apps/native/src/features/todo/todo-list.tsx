@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from "@/lib/theme";
-import { mutedText } from "@/styles/shared";
+import { useTheme } from "@/shared/lib/theme";
+import { mutedText } from "@/shared/styles/shared";
 
 import type { TodoItemRow } from "./components/todo-item";
 import { TodoItem } from "./components/todo-item";
