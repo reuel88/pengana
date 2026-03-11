@@ -2,21 +2,21 @@ packages:
   - apps/*
   - packages/*
 catalog:
-  dotenv: ^17.2.2
-  zod: ^4.1.13
+  dotenv: ^17.3.1
+  zod: ^4.3.6
   typescript: ^5
-  "@types/node": ^22.13.14
-  hono: ^4.8.2
+  "@types/node": ^25.4.0
+  hono: ^4.12.7
   "@orpc/server": ^1.12.2
   "@orpc/openapi": ^1.12.2
   "@orpc/zod": ^1.12.2
-  better-auth: 1.5.2
+  better-auth: 1.5.4
   "@orpc/tanstack-query": ^1.12.2
   "@orpc/client": ^1.12.2
-  "@tanstack/react-form": ^1.28.0
+  "@tanstack/react-form": ^1.28.4
   "@polar-sh/better-auth": ^1.6.4
-  "@better-auth/expo": 1.5.2
+  "@better-auth/expo": 1.5.4
   "@tanstack/react-query": ^5.85.5
-  vite: ^6.4.1
-  vitest: ^3.2.1
+  vite: ^7.3.1
+  vitest: ^4.0.18
   "@logtape/logtape": ^2.0.4

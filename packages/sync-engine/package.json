@@ -35,7 +35,7 @@
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
-		"@types/react": "^19.2.7",
+		"@types/react": "^19.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

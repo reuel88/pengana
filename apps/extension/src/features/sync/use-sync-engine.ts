@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type {
-	BackgroundBroadcast,
-	SyncStatus,
-} from "@/utils/background-messages";
+import type { BackgroundBroadcast } from "@/utils/background-messages";
 import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
 
@@ -17,7 +14,7 @@ export function useSyncEngine(userId: string) {
 		const init = async () => {
 			try {
 				await sendBackgroundMessage({ type: "init", userId });
-				const status = await sendBackgroundMessage<SyncStatus>({
+				const status = await sendBackgroundMessage({
 					type: "status:get",
 				});
 				if (status) {
