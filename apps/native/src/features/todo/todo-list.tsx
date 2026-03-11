@@ -20,7 +20,10 @@ export function TodoList({ todos }: { todos: TodoItemRow[] }) {
 	}
 
 	return (
-		<View style={[styles.list, { borderColor: theme.border }]}>
+		<View
+			style={[styles.list, { borderColor: theme.border }]}
+			testID="todo-list"
+		>
 			{todos.map((todo) => (
 				<TodoItem key={todo.id} todo={todo} />
 			))}

@@ -70,7 +70,11 @@ function OnboardingContent({
 				>
 					{t("description")}
 				</Text>
-				<TouchableOpacity onPress={handleSignOut}>
+				<TouchableOpacity
+					onPress={handleSignOut}
+					accessibilityRole="button"
+					accessibilityLabel={tCommon("user.signOut")}
+				>
 					<Text style={[styles.signOutText, { color: theme.primary }]}>
 						{tCommon("user.signOut")}
 					</Text>

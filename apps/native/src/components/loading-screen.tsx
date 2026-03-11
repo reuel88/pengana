@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 import { useTheme } from "@/lib/theme";
@@ -10,10 +10,14 @@ export function LoadingScreen() {
 
 	return (
 		<Container>
-			<View style={{ padding: 16, alignItems: "center", gap: 8 }}>
+			<View style={styles.container}>
 				<ActivityIndicator size="large" color={theme.primary} />
 				<Text style={{ color: theme.text }}>{t("common:status.loading")}</Text>
 			</View>
 		</Container>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: { padding: 16, alignItems: "center", gap: 8 },
+});

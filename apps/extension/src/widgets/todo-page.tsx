@@ -12,7 +12,7 @@ function TodoContent({ userId }: { userId: string }) {
 	const { t } = useTranslation("todos");
 
 	return (
-		<div className="flex flex-col gap-4 p-4">
+		<div className="flex flex-col gap-4 p-4" data-testid="todo-page">
 			<div className="flex items-center justify-between">
 				<h1 className="font-bold text-xl">{t("title")}</h1>
 				<LanguageSwitcher />

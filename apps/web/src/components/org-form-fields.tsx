@@ -26,11 +26,13 @@ function OrgFormField({
 	field,
 	id,
 	required,
+	testId,
 }: {
 	fieldKey: keyof typeof fieldConfig;
 	field: AnyFieldApi;
 	id?: string;
 	required?: boolean;
+	testId?: string;
 }) {
 	const { t } = useTranslation("organization");
 	const config = fieldConfig[fieldKey];
@@ -42,6 +44,7 @@ function OrgFormField({
 			id={id ?? config.defaultId}
 			placeholder={t(config.placeholderKey)}
 			required={required}
+			testId={testId}
 		/>
 	);
 }
@@ -49,33 +52,45 @@ function OrgFormField({
 export function OrgNameField({
 	field,
 	id,
+	testId,
 }: {
 	field: AnyFieldApi;
 	id?: string;
+	testId?: string;
 }) {
-	return <OrgFormField fieldKey="name" field={field} id={id} />;
+	return <OrgFormField fieldKey="name" field={field} id={id} testId={testId} />;
 }
 
 export function OrgSlugField({
 	field,
 	id,
 	required,
+	testId,
 }: {
 	field: AnyFieldApi;
 	id?: string;
 	required?: boolean;
+	testId?: string;
 }) {
 	return (
-		<OrgFormField fieldKey="slug" field={field} id={id} required={required} />
+		<OrgFormField
+			fieldKey="slug"
+			field={field}
+			id={id}
+			required={required}
+			testId={testId}
+		/>
 	);
 }
 
 export function OrgLogoField({
 	field,
 	id,
+	testId,
 }: {
 	field: AnyFieldApi;
 	id?: string;
+	testId?: string;
 }) {
-	return <OrgFormField fieldKey="logo" field={field} id={id} />;
+	return <OrgFormField fieldKey="logo" field={field} id={id} testId={testId} />;
 }

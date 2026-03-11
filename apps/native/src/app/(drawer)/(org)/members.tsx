@@ -13,8 +13,7 @@ import {
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
-import { useActiveOrg } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
+import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "@/lib/theme";
 import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";

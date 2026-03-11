@@ -9,7 +9,7 @@ export class StorageFullError extends Error {
 export function isQuotaError(error: unknown): boolean {
 	if (error instanceof StorageFullError) return true;
 
-	if (error instanceof DOMException) {
+	if (typeof DOMException !== "undefined" && error instanceof DOMException) {
 		// QuotaExceededError: name-based (modern browsers) or code 22 (legacy)
 		return error.name === "QuotaExceededError" || error.code === 22;
 	}

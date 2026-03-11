@@ -18,7 +18,11 @@ export default function LoginScreen() {
 				contentContainerStyle={styles.content}
 			>
 				<SignIn />
-				<Link href="/(auth)/sign-up" style={styles.link}>
+				<Link
+					href="/(auth)/sign-up"
+					style={styles.link}
+					testID="auth-switch-link"
+				>
 					<Text style={[styles.linkText, { color: theme.primary }]}>
 						{t("auth:signUp.title")}
 					</Text>

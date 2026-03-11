@@ -15,7 +15,7 @@ import { getLocales } from "expo-localization";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	I18nManager,
 	Platform,
@@ -116,7 +116,13 @@ function RootLayoutInner() {
 		lifecycleData,
 		orgError,
 		retryLifecycleCheck,
+		completeOnboarding,
 	} = useLifecycleCheck({ isPending, session });
+
+	const lifecycleContextValue = useMemo(
+		() => ({ lifecycleData, completeOnboarding }),
+		[lifecycleData, completeOnboarding],
+	);
 
 	useEffect(() => {
 		if (isPending || orgError) return;
@@ -156,7 +162,7 @@ function RootLayoutInner() {
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
 			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-			<LifecycleContext.Provider value={lifecycleData}>
+			<LifecycleContext.Provider value={lifecycleContextValue}>
 				<GestureHandlerRootView style={styles.container}>
 					<Stack>
 						<Stack.Screen name="(drawer)" options={{ headerShown: false }} />

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 import { Container } from "@/components/container";
 import { useTheme } from "@/lib/theme";
@@ -10,9 +10,13 @@ export function EmptyOrgScreen() {
 
 	return (
 		<Container>
-			<Text style={{ color: theme.text, padding: 16, opacity: 0.5 }}>
+			<Text style={[styles.text, { color: theme.text }]}>
 				{t("noActiveOrg")}
 			</Text>
 		</Container>
 	);
 }
+
+const styles = StyleSheet.create({
+	text: { padding: 16, opacity: 0.5 },
+});

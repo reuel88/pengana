@@ -1,16 +1,17 @@
 import { useTranslation } from "@pengana/i18n";
-import { useBatchInvite, useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 import { z } from "zod";
 import { RoleToggle } from "@/components/role-toggle";
+import { ThemedTextInput } from "@/components/themed-text-input";
+import { useBatchInvite } from "@/hooks/use-batch-invite";
 import { useActiveOrg } from "@/hooks/use-org-queries";
 import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
@@ -57,6 +58,7 @@ export function OnboardingInviteMembers({
 
 	return (
 		<View
+			testID="onboarding-invite-members"
 			style={[
 				onboardingStyles.card,
 				{ backgroundColor: theme.card, borderColor: theme.border },
@@ -83,19 +85,15 @@ export function OnboardingInviteMembers({
 								<form.Field name={`members[${index}].email`}>
 									{(emailField) => (
 										<>
-											<TextInput
-												style={[
-													styles.emailInput,
-													{
-														color: theme.text,
-														borderColor: theme.border,
-														backgroundColor: theme.background,
-													},
-												]}
+											<ThemedTextInput
+												testID="invite-email-input"
+												style={{
+													backgroundColor: theme.background,
+													marginBottom: 8,
+												}}
 												value={emailField.state.value as string}
 												onChangeText={emailField.handleChange}
 												placeholder={t("invite.emailPlaceholder")}
-												placeholderTextColor={theme.border}
 												keyboardType="email-address"
 												autoCapitalize="none"
 											/>
@@ -119,6 +117,8 @@ export function OnboardingInviteMembers({
 											role={roleField.state.value as "member" | "admin"}
 											onChange={(role) => roleField.handleChange(role)}
 											disabled={loading}
+											memberTestID="invite-role-input"
+											adminTestID="invite-role-input"
 										/>
 									)}
 								</form.Field>
@@ -126,6 +126,8 @@ export function OnboardingInviteMembers({
 									<TouchableOpacity
 										style={styles.removeButton}
 										onPress={() => form.removeFieldValue("members", index)}
+										accessibilityRole="button"
+										accessibilityLabel={t("invite.remove")}
 									>
 										<Text style={{ color: theme.notification, fontSize: 12 }}>
 											{t("invite.remove")}
@@ -139,6 +141,7 @@ export function OnboardingInviteMembers({
 			</form.Field>
 
 			<TouchableOpacity
+				testID="invite-add-row"
 				style={[styles.outlineButton, { borderColor: theme.border }]}
 				onPress={() =>
 					form.pushFieldValue("members", {
@@ -146,6 +149,8 @@ export function OnboardingInviteMembers({
 						role: "member" as const,
 					})
 				}
+				accessibilityRole="button"
+				accessibilityLabel={t("invite.addAnother")}
 			>
 				<Text style={[styles.outlineButtonText, { color: theme.text }]}>
 					{t("invite.addAnother")}
@@ -160,6 +165,7 @@ export function OnboardingInviteMembers({
 			>
 				{([isSubmitting, noValid]) => (
 					<TouchableOpacity
+						testID="invite-submit"
 						style={[
 							onboardingStyles.submitButton,
 							{
@@ -172,6 +178,8 @@ export function OnboardingInviteMembers({
 						]}
 						onPress={form.handleSubmit}
 						disabled={isSubmitting || loading || !activeOrg?.id || noValid}
+						accessibilityRole="button"
+						accessibilityLabel={t("invite.send")}
 					>
 						{loading ? (
 							<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
@@ -184,7 +192,13 @@ export function OnboardingInviteMembers({
 				)}
 			</form.Subscribe>
 
-			<TouchableOpacity style={onboardingStyles.ghostButton} onPress={onSkip}>
+			<TouchableOpacity
+				testID="invite-skip"
+				style={onboardingStyles.ghostButton}
+				onPress={onSkip}
+				accessibilityRole="button"
+				accessibilityLabel={t("invite.skip")}
+			>
 				<Text
 					style={[onboardingStyles.ghostButtonText, { color: theme.primary }]}
 				>
@@ -198,12 +212,6 @@ export function OnboardingInviteMembers({
 const styles = StyleSheet.create({
 	entryRow: {
 		marginBottom: 12,
-	},
-	emailInput: {
-		borderWidth: 1,
-		padding: 12,
-		fontSize: 14,
-		marginBottom: 8,
 	},
 	removeButton: {
 		paddingVertical: 4,

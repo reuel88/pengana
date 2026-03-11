@@ -55,7 +55,7 @@ export function OnboardingInviteMembers({
 	});
 
 	return (
-		<Card className="w-full max-w-md">
+		<Card className="w-full max-w-md" data-testid="onboarding-invite-members">
 			<CardHeader>
 				<CardTitle>{t("invite.title")}</CardTitle>
 				<p className="text-muted-foreground text-sm">
@@ -85,6 +85,7 @@ export function OnboardingInviteMembers({
 													}
 													placeholder={t("invite.emailPlaceholder")}
 													className="flex-1"
+													data-testid="invite-email-input"
 												/>
 											)}
 										</form.Field>
@@ -98,6 +99,7 @@ export function OnboardingInviteMembers({
 															e.target.value as "member" | "admin",
 														)
 													}
+													data-testid="invite-role-input"
 												>
 													<option value="member">
 														{t("organization:roles.member")}
@@ -126,6 +128,7 @@ export function OnboardingInviteMembers({
 					<Button
 						type="button"
 						variant="outline"
+						data-testid="invite-add-row"
 						onClick={() =>
 							form.pushFieldValue("members", {
 								email: "",
@@ -142,12 +145,21 @@ export function OnboardingInviteMembers({
 						]}
 					>
 						{([isSubmitting, noValid]) => (
-							<Button type="submit" disabled={isSubmitting || noValid}>
+							<Button
+								type="submit"
+								disabled={isSubmitting || noValid}
+								data-testid="invite-submit"
+							>
 								{isSubmitting ? t("common:submitting") : t("invite.send")}
 							</Button>
 						)}
 					</form.Subscribe>
-					<Button type="button" variant="ghost" onClick={onSkip}>
+					<Button
+						type="button"
+						variant="ghost"
+						onClick={onSkip}
+						data-testid="invite-skip"
+					>
 						{t("invite.skip")}
 					</Button>
 				</FormRoot>

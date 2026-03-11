@@ -7,6 +7,7 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 
+import { InvitationCard } from "@/components/invitation-card";
 import { useInvitationActions } from "@/hooks/use-invitation-actions";
 import { useUserInvitations } from "@/hooks/use-org-queries";
 
@@ -27,7 +28,7 @@ export function OnboardingInvitations({
 	});
 
 	return (
-		<Card className="w-full max-w-md">
+		<Card className="w-full max-w-md" data-testid="onboarding-invitations">
 			<CardHeader>
 				<CardTitle>{t("invitations.title")}</CardTitle>
 				<p className="text-muted-foreground text-sm">
@@ -36,28 +37,26 @@ export function OnboardingInvitations({
 			</CardHeader>
 			<CardContent className="flex flex-col gap-4">
 				{invitations?.map((invitation) => (
-					<div
+					<InvitationCard
 						key={invitation.id}
-						className="flex items-center justify-between rounded-md border p-3"
-					>
-						<div className="flex flex-col gap-0.5">
-							<span className="font-medium text-sm">
-								{invitation.organizationName}
-							</span>
-							<span className="text-muted-foreground text-xs">
-								{invitation.role}
-							</span>
-						</div>
-						<Button
-							size="sm"
-							onClick={() => handleAccept(invitation.id)}
-							disabled={actingId !== null}
-						>
-							{t("invitations.accept")}
-						</Button>
-					</div>
+						orgName={invitation.organizationName}
+						role={invitation.role}
+						actions={
+							<Button
+								size="sm"
+								onClick={() => handleAccept(invitation.id)}
+								disabled={actingId !== null}
+							>
+								{t("invitations.accept")}
+							</Button>
+						}
+					/>
 				))}
-				<Button variant="ghost" onClick={onSkipToCreate}>
+				<Button
+					variant="ghost"
+					onClick={onSkipToCreate}
+					data-testid="onboarding-create-instead"
+				>
 					{t("invitations.createInstead")}
 				</Button>
 			</CardContent>

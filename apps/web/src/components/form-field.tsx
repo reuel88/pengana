@@ -9,6 +9,7 @@ export function FormField({
 	type,
 	placeholder,
 	required,
+	testId,
 }: {
 	field: AnyFieldApi;
 	label: string;
@@ -16,6 +17,7 @@ export function FormField({
 	type?: string;
 	placeholder?: string;
 	required?: boolean;
+	testId?: string;
 }) {
 	const fieldId = id ?? field.name;
 
@@ -31,6 +33,7 @@ export function FormField({
 				onChange={(e) => field.handleChange(e.target.value)}
 				placeholder={placeholder}
 				required={required}
+				data-testid={testId}
 			/>
 			{field.state.meta.errors.map((error) => (
 				<p key={error?.message} className="text-red-500 text-xs">

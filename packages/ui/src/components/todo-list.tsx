@@ -31,7 +31,7 @@ export function TodoList({
 	}
 
 	return (
-		<div className="rounded-none border border-border">
+		<div className="rounded-none border border-border" data-testid="todo-list">
 			{todos.map((todo) => (
 				<TodoItem
 					key={todo.id}

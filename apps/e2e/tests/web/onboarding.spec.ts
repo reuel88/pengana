@@ -1,6 +1,5 @@
 import { TEST_PASSWORD } from "../../constants.js";
 import { expect, test } from "../../fixtures/index.js";
-import { AuthPage } from "../../page-objects/auth.page.js";
 import { OrgPage } from "../../page-objects/org.page.js";
 
 test.describe("Onboarding", () => {
@@ -9,18 +8,11 @@ test.describe("Onboarding", () => {
 		await expect(page).toHaveURL(/login/);
 	});
 
-	test("onboarding page is accessible", async ({ page }) => {
-		const orgPage = new OrgPage(page);
-		await orgPage.navigateToOnboarding();
-		// Unauthenticated users should be redirected
-		await expect(page).not.toHaveURL("/onboarding");
-	});
-
 	test("full flow: sign up → create org → skip invites → reach dashboard", async ({
+		authPage,
 		page,
 	}) => {
 		const ts = crypto.randomUUID();
-		const authPage = new AuthPage(page);
 		const orgPage = new OrgPage(page);
 
 		// Sign up

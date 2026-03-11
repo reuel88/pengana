@@ -2,15 +2,16 @@ import type { StorageLevel } from "@pengana/sync-engine";
 import { useNetworkStatus } from "@pengana/sync-engine";
 import { useCallback, useEffect, useState } from "react";
 import type { BackgroundBroadcast } from "@/utils/background-messages";
-import { isSyncActive } from "@/utils/background-messages";
+import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
 import { useUploadQueue } from "./use-upload-queue";
 
 export function useSyncEngine(userId: string) {
 	// --- State ---
 	const [isSyncing, setIsSyncing] = useState(false);
+	const [isUploading, setIsUploading] = useState(false);
 	const [storageLevel, setStorageLevel] = useState<StorageLevel>("ok");
-	const { isUploading, setIsUploading, enqueueUpload } = useUploadQueue();
+	const { enqueueUpload } = useUploadQueue();
 
 	// --- Network Status ---
 	const { isOnline, setIsOnline } = useNetworkStatus();
@@ -36,9 +37,9 @@ export function useSyncEngine(userId: string) {
 		};
 
 		init();
-	}, [userId, setIsOnline, setIsUploading]);
+	}, [userId, setIsOnline]);
 
-	// --- Online Reactivity (broadcast listener) ---
+	// --- Broadcast listener (single listener for all broadcast events) ---
 	useEffect(() => {
 		const listener = (message: BackgroundBroadcast) => {
 			if (!message?.type) return;
@@ -47,6 +48,11 @@ export function useSyncEngine(userId: string) {
 				case "sync:event": {
 					const active = isSyncActive(message.event);
 					if (active !== null) setIsSyncing(active);
+					break;
+				}
+				case "upload:event": {
+					const active = isUploadActive(message.event);
+					if (active !== null) setIsUploading(active);
 					break;
 				}
 				case "status:update":
@@ -63,7 +69,7 @@ export function useSyncEngine(userId: string) {
 
 		browser.runtime.onMessage.addListener(listener);
 		return () => browser.runtime.onMessage.removeListener(listener);
-	}, [setIsOnline, setIsUploading]);
+	}, [setIsOnline]);
 
 	// --- Public API ---
 	const triggerSync = useCallback(() => {

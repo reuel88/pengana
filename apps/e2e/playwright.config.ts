@@ -20,6 +20,16 @@ export default defineConfig({
 			},
 		},
 		{
+			name: "native",
+			testDir: "./tests/native",
+			use: {
+				...devices["Desktop Chrome"],
+				baseURL: "http://localhost:8081",
+				trace: "on",
+				screenshot: "only-on-failure",
+			},
+		},
+		{
 			name: "extension",
 			testDir: "./tests/extension",
 			use: {
@@ -38,6 +48,12 @@ export default defineConfig({
 			command: "pnpm --filter web dev",
 			url: "http://localhost:3001",
 			reuseExistingServer: !process.env.CI,
+		},
+		{
+			command: "pnpm --filter native web",
+			url: "http://localhost:8081",
+			reuseExistingServer: !process.env.CI,
+			timeout: 120000,
 		},
 	],
 });

@@ -59,9 +59,16 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 	};
 
 	return (
-		<View style={[styles.todoItem, { borderBottomColor: theme.border }]}>
+		<View
+			testID="todo-row"
+			style={[styles.todoItem, { borderBottomColor: theme.border }]}
+		>
 			<SyncDot status={todo.syncStatus} />
-			<Switch value={todo.completed} onValueChange={handleToggle} />
+			<Switch
+				testID="todo-toggle"
+				value={todo.completed}
+				onValueChange={handleToggle}
+			/>
 			<Text
 				style={[
 					styles.todoTitle,
@@ -85,7 +92,13 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 			{todo.attachmentStatus === "failed" && (
 				<RetryButton onPress={showPicker} />
 			)}
-			<TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+			<TouchableOpacity
+				testID="todo-delete"
+				onPress={handleDelete}
+				style={styles.deleteButton}
+				accessibilityRole="button"
+				accessibilityLabel={t("todos:actions.delete")}
+			>
 				<Text style={styles.deleteText}>{t("todos:actions.delete")}</Text>
 			</TouchableOpacity>
 		</View>

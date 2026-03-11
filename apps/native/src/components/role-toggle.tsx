@@ -7,10 +7,14 @@ export function RoleToggle({
 	role,
 	onChange,
 	disabled,
+	memberTestID,
+	adminTestID,
 }: {
 	role: "member" | "admin";
 	onChange: (role: "member" | "admin") => void;
 	disabled?: boolean;
+	memberTestID?: string;
+	adminTestID?: string;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
@@ -18,6 +22,7 @@ export function RoleToggle({
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
+				testID={memberTestID}
 				style={[
 					styles.button,
 					{
@@ -32,6 +37,7 @@ export function RoleToggle({
 				<Text style={{ color: theme.text }}>{t("roles.member")}</Text>
 			</TouchableOpacity>
 			<TouchableOpacity
+				testID={adminTestID}
 				style={[
 					styles.button,
 					{

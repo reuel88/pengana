@@ -1,27 +1,22 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	createOrgSchema,
-	useOrgSettings,
-	useZodForm,
-} from "@pengana/org-client";
+import { useOrgSettings } from "@pengana/org-client";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import {
 	Alert,
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
-import { useActiveOrg } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
+import { OrgForm } from "@/features/org/org-form";
+import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
+import { mutedText, sharedStyles } from "@/styles/shared";
 
 export default function OrgSettingsScreen() {
 	const { theme } = useTheme();
@@ -38,28 +33,17 @@ export default function OrgSettingsScreen() {
 		onError: (message) => Alert.alert("", message || t("settings.error")),
 	});
 
-	const form = useZodForm({
-		schema: createOrgSchema,
-		defaultValues: {
-			name: activeOrg?.name ?? "",
-			slug: activeOrg?.slug ?? "",
-			logo: activeOrg?.logo ?? "",
-		},
-		onSubmit: async ({ value }) => {
-			await updateOrg(value);
-		},
-	});
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
-	useEffect(() => {
-		if (activeOrg) {
-			form.reset({
-				name: activeOrg.name,
-				slug: activeOrg.slug,
-				logo: activeOrg.logo ?? "",
-			});
-		}
-	}, [activeOrg?.id]);
+	const orgDefaults = useMemo(
+		() =>
+			activeOrg
+				? {
+						name: activeOrg.name,
+						slug: activeOrg.slug,
+						logo: activeOrg.logo ?? "",
+					}
+				: undefined,
+		[activeOrg?.name, activeOrg?.slug, activeOrg?.logo, activeOrg],
+	);
 
 	if (isPending) return <LoadingScreen />;
 	if (!activeOrg) return <EmptyOrgScreen />;
@@ -80,65 +64,14 @@ export default function OrgSettingsScreen() {
 			<ScrollView style={styles.scrollView}>
 				<View style={styles.content}>
 					{isAdmin ? (
-						<>
-							<form.Field name="name">
-								{(field) => (
-									<TextInput
-										style={[sharedStyles.input, inputThemed(theme)]}
-										value={field.state.value}
-										onChangeText={field.handleChange}
-										onBlur={field.handleBlur}
-										placeholder={t("create.namePlaceholder")}
-										placeholderTextColor={theme.border}
-									/>
-								)}
-							</form.Field>
-							<form.Field name="slug">
-								{(field) => (
-									<TextInput
-										style={[sharedStyles.input, inputThemed(theme)]}
-										value={field.state.value}
-										onChangeText={field.handleChange}
-										onBlur={field.handleBlur}
-										placeholder={t("create.slugPlaceholder")}
-										placeholderTextColor={theme.border}
-									/>
-								)}
-							</form.Field>
-							<form.Field name="logo">
-								{(field) => (
-									<TextInput
-										style={[sharedStyles.input, inputThemed(theme)]}
-										value={field.state.value}
-										onChangeText={field.handleChange}
-										onBlur={field.handleBlur}
-										placeholder={t("create.logoPlaceholder")}
-										placeholderTextColor={theme.border}
-									/>
-								)}
-							</form.Field>
-							<form.Subscribe
-								selector={(s) => ({
-									isSubmitting: s.isSubmitting,
-									name: s.values.name,
-								})}
-							>
-								{({ isSubmitting, name }) => (
-									<TouchableOpacity
-										style={[
-											sharedStyles.button,
-											{ backgroundColor: theme.primary },
-										]}
-										onPress={form.handleSubmit}
-										disabled={loading || isSubmitting || !name.trim()}
-									>
-										<Text style={sharedStyles.buttonText}>
-											{loading ? t("common:submitting") : t("settings.update")}
-										</Text>
-									</TouchableOpacity>
-								)}
-							</form.Subscribe>
-						</>
+						<OrgForm
+							defaultValues={orgDefaults}
+							onSubmit={updateOrg}
+							loading={loading}
+							submitLabel={
+								loading ? t("common:submitting") : t("settings.update")
+							}
+						/>
 					) : (
 						<Text style={mutedText(theme)}>{t("settings.title")}</Text>
 					)}

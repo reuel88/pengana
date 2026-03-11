@@ -51,6 +51,7 @@ export function AuthFormShell({
 					onSubmit();
 				}}
 				className="space-y-4"
+				data-testid="auth-form"
 			>
 				{children}
 
@@ -65,6 +66,7 @@ export function AuthFormShell({
 							type="submit"
 							className="w-full"
 							disabled={!state.canSubmit || state.isSubmitting}
+							data-testid="auth-submit"
 						>
 							{state.isSubmitting ? t("submitting") : submitLabel}
 						</Button>
@@ -76,6 +78,7 @@ export function AuthFormShell({
 				<Link
 					to={switchTo}
 					className="text-primary text-sm hover:text-primary/80"
+					data-testid="auth-switch-link"
 				>
 					{switchLabel}
 				</Link>

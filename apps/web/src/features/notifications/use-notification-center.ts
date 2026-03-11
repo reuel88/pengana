@@ -26,11 +26,11 @@ export function useNotificationCenter() {
 				await authClient.organization.setActive({
 					organizationId: invitation.organizationId,
 				});
-				try {
-					await client.notification.onInvitationAccepted({ invitationId });
-				} catch (err) {
-					console.error("Failed to notify invitation accepted", err);
-				}
+				await client.notification
+					.onInvitationAccepted({ invitationId })
+					.catch(() => {
+						// Best-effort notification — failure doesn't affect the user flow
+					});
 				await invalidateNotifications();
 			}
 		},

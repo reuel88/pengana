@@ -7,8 +7,7 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { InviteForm } from "@/features/org/invite-form";
 import { OrgInvitationsList } from "@/features/org/org-invitations-list";
 import { UserInvitationsList } from "@/features/org/user-invitations-list";
-import { useActiveOrg } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
+import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
 import { sharedStyles } from "@/styles/shared";
 
 export default function InvitationsScreen() {
