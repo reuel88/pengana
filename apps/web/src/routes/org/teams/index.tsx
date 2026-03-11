@@ -16,9 +16,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { FormRoot } from "@/components/form-root";
-import { OrgGuard } from "@/components/org-guard";
+import { useOrgGuard } from "@/components/org-guard";
 import {
-	useActiveOrg,
 	useInvalidateOrg,
 	useOrgRole,
 	useTeams,
@@ -101,58 +100,50 @@ function CreateTeamDialog({
 
 function TeamsIndexPage() {
 	const { t } = useTranslation("organization");
-	const { data: activeOrg } = useActiveOrg();
+	const { activeOrg, guardElement } = useOrgGuard();
 	const { data: teams, isPending: teamsLoading } = useTeams(activeOrg?.id);
 	const [createOpen, setCreateOpen] = useState(false);
 	const { isAdmin } = useOrgRole();
 
+	if (guardElement || !activeOrg) return guardElement;
+
+	if (teamsLoading) {
+		return <p>{t("common:status.loading")}</p>;
+	}
+
 	return (
-		<OrgGuard>
-			{() => {
-				if (teamsLoading) {
-					return <p>{t("common:status.loading")}</p>;
-				}
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center justify-between">
+				<h2 className="font-medium text-sm">{t("teams.title")}</h2>
+				{isAdmin && (
+					<Dialog open={createOpen} onOpenChange={setCreateOpen}>
+						<DialogTrigger render={<Button size="sm" />}>
+							{t("teams.create")}
+						</DialogTrigger>
+						<CreateTeamDialog
+							onOpenChange={setCreateOpen}
+							orgId={activeOrg?.id}
+						/>
+					</Dialog>
+				)}
+			</div>
 
-				return (
-					<div className="flex flex-col gap-4">
-						<div className="flex items-center justify-between">
-							<h2 className="font-medium text-sm">{t("teams.title")}</h2>
-							{isAdmin && (
-								<Dialog open={createOpen} onOpenChange={setCreateOpen}>
-									<DialogTrigger render={<Button size="sm" />}>
-										{t("teams.create")}
-									</DialogTrigger>
-									{activeOrg && (
-										<CreateTeamDialog
-											onOpenChange={setCreateOpen}
-											orgId={activeOrg.id}
-										/>
-									)}
-								</Dialog>
-							)}
-						</div>
-
-						{!teams || teams.length === 0 ? (
-							<p className="text-muted-foreground text-xs">
-								{t("teams.noTeams")}
-							</p>
-						) : (
-							<div className="flex flex-col gap-2">
-								{teams.map((team) => (
-									<Link
-										key={team.id}
-										to="/org/teams/$teamId"
-										params={{ teamId: team.id }}
-										className="flex items-center justify-between border p-3 text-xs hover:bg-muted"
-									>
-										<span>{team.name}</span>
-									</Link>
-								))}
-							</div>
-						)}
-					</div>
-				);
-			}}
-		</OrgGuard>
+			{!teams || teams.length === 0 ? (
+				<p className="text-muted-foreground text-xs">{t("teams.noTeams")}</p>
+			) : (
+				<div className="flex flex-col gap-2">
+					{teams.map((team) => (
+						<Link
+							key={team.id}
+							to="/org/teams/$teamId"
+							params={{ teamId: team.id }}
+							className="flex items-center justify-between border p-3 text-xs hover:bg-muted"
+						>
+							<span>{team.name}</span>
+						</Link>
+					))}
+				</div>
+			)}
+		</div>
 	);
 }

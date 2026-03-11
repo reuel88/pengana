@@ -30,10 +30,10 @@ export interface SyncStatus {
 }
 
 export type MessageResponseMap = {
-	init: { ok: boolean };
-	"sync:trigger": { ok: boolean };
+	init: { ok: true } | { ok: false; error: string };
+	"sync:trigger": { ok: true } | { ok: false; error: string };
 	"status:get": SyncStatus;
-	"upload:enqueue": { ok: boolean } | { ok: false; error: string };
+	"upload:enqueue": { ok: true } | { ok: false; error: string };
 };
 
 /** Returns `true` on start, `false` on complete/error, `null` for no state change. */

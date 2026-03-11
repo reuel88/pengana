@@ -43,10 +43,12 @@ function SignIn() {
 				<AuthFormCard
 					title={t("auth:signIn.submit")}
 					error={error ?? validationError}
+					testID="auth-form"
 				>
 					<form.Field name="email">
 						{(field) => (
 							<AuthFormField
+								testID="auth-email-input"
 								placeholder={t("auth:fields.email")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -60,6 +62,7 @@ function SignIn() {
 					<form.Field name="password">
 						{(field) => (
 							<AuthFormField
+								testID="auth-password-input"
 								placeholder={t("auth:fields.password")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -74,6 +77,7 @@ function SignIn() {
 						onPress={form.handleSubmit}
 						isSubmitting={isSubmitting}
 						label={t("auth:signIn.submit")}
+						testID="auth-submit"
 					/>
 				</AuthFormCard>
 			)}

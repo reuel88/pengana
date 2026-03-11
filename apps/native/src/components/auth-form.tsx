@@ -16,14 +16,17 @@ export function AuthFormCard({
 	title,
 	error,
 	children,
+	testID,
 }: {
 	title: string;
 	error: string | null;
 	children: ReactNode;
+	testID?: string;
 }) {
 	const { theme } = useTheme();
 	return (
 		<View
+			testID={testID}
 			style={[
 				styles.card,
 				{ backgroundColor: theme.card, borderColor: theme.border },
@@ -32,6 +35,7 @@ export function AuthFormCard({
 			<Text style={[styles.title, { color: theme.text }]}>{title}</Text>
 			{error ? (
 				<View
+					testID="auth-error"
 					style={[
 						styles.errorContainer,
 						{ backgroundColor: `${theme.notification}20` },
@@ -52,11 +56,13 @@ export function AuthFormField({
 	onChangeText,
 	onBlur,
 	onClearError,
+	testID,
 	...rest
 }: TextInputProps & { onClearError?: () => void }) {
 	const { theme } = useTheme();
 	return (
 		<TextInput
+			testID={testID}
 			style={[
 				styles.input,
 				{
@@ -81,16 +87,21 @@ export function AuthSubmitButton({
 	onPress,
 	isSubmitting,
 	label,
+	testID,
 }: {
 	onPress: () => void;
 	isSubmitting: boolean;
 	label: string;
+	testID?: string;
 }) {
 	const { theme } = useTheme();
 	return (
 		<TouchableOpacity
+			testID={testID}
 			onPress={onPress}
 			disabled={isSubmitting}
+			accessibilityRole="button"
+			accessibilityLabel={label}
 			style={[
 				styles.button,
 				{

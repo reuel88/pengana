@@ -17,7 +17,8 @@ type Action =
 	| { type: "reset" }
 	| { type: "success"; data: UserLifecycleData }
 	| { type: "error" }
-	| { type: "retry" };
+	| { type: "retry" }
+	| { type: "onboardingComplete" };
 
 const initialState: State = {
 	lifecycleChecked: false,
@@ -41,6 +42,8 @@ function reducer(state: State, action: Action): State {
 			return { ...state, orgError: true, lifecycleChecked: true };
 		case "retry":
 			return { ...state, orgError: false, lifecycleChecked: false };
+		case "onboardingComplete":
+			return { ...state, needsOnboarding: false };
 	}
 }
 
@@ -59,6 +62,7 @@ export function useLifecycleCheck({
 			return;
 		}
 		if (state.orgError) return; // hold error UI; don't re-fetch
+		if (state.lifecycleChecked) return; // don't re-fetch mid-session
 
 		let cancelled = false;
 		(async () => {
@@ -76,10 +80,14 @@ export function useLifecycleCheck({
 		return () => {
 			cancelled = true;
 		};
-	}, [isPending, session, state.orgError]);
+	}, [isPending, session, state.orgError, state.lifecycleChecked]);
 
 	const retryLifecycleCheck = useCallback(() => {
 		dispatch({ type: "retry" });
+	}, []);
+
+	const completeOnboarding = useCallback(() => {
+		dispatch({ type: "onboardingComplete" });
 	}, []);
 
 	return {
@@ -88,5 +96,6 @@ export function useLifecycleCheck({
 		lifecycleData: state.lifecycleData,
 		orgError: state.orgError,
 		retryLifecycleCheck,
+		completeOnboarding,
 	};
 }

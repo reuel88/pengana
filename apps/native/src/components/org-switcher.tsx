@@ -1,10 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	createOrgSchema,
-	useCreateOrg,
-	useOrgSwitcher,
-	useZodForm,
-} from "@pengana/org-client";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -14,15 +8,16 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { OrgForm } from "@/features/org/org-form";
+import { useCreateOrg } from "@/hooks/use-create-org";
 import { useActiveOrg, useListOrgs } from "@/hooks/use-org-queries";
+import { useOrgSwitcher } from "@/hooks/use-org-switcher";
 import { authClient } from "@/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
+import { mutedText } from "@/styles/shared";
 
 function CreateOrgModal({
 	onCreated,
@@ -39,76 +34,19 @@ function CreateOrgModal({
 		onError: (message) => Alert.alert("", message || t("create.error")),
 	});
 
-	const form = useZodForm({
-		schema: createOrgSchema,
-		defaultValues: { name: "", slug: "", logo: "" },
-		onSubmit: async ({ value }) => {
-			await createOrg(value);
-		},
-	});
-
 	return (
 		<View style={styles.createForm}>
-			<form.Field name="name">
-				{(field) => (
-					<TextInput
-						style={[sharedStyles.input, inputThemed(theme)]}
-						value={field.state.value}
-						onChangeText={field.handleChange}
-						onBlur={field.handleBlur}
-						placeholder={t("create.namePlaceholder")}
-						placeholderTextColor={theme.border}
-					/>
-				)}
-			</form.Field>
-			<form.Field name="slug">
-				{(field) => (
-					<TextInput
-						style={[sharedStyles.input, inputThemed(theme)]}
-						value={field.state.value}
-						onChangeText={field.handleChange}
-						onBlur={field.handleBlur}
-						placeholder={t("create.slugPlaceholder")}
-						placeholderTextColor={theme.border}
-					/>
-				)}
-			</form.Field>
-			<form.Subscribe
-				selector={(s) => ({
-					isSubmitting: s.isSubmitting,
-					name: s.values.name,
-				})}
+			<OrgForm
+				onSubmit={createOrg}
+				loading={loading}
+				submitLabel={t("create.submit")}
 			>
-				{({ isSubmitting, name }) => {
-					const isDisabled = loading || isSubmitting || !name.trim();
-					return (
-						<TouchableOpacity
-							style={[
-								sharedStyles.button,
-								{
-									backgroundColor: theme.primary,
-									opacity: isDisabled ? 0.5 : 1,
-								},
-							]}
-							onPress={form.handleSubmit}
-							disabled={isDisabled}
-						>
-							{loading ? (
-								<ActivityIndicator color={TEXT_ON_PRIMARY} />
-							) : (
-								<Text style={sharedStyles.buttonText}>
-									{t("create.submit")}
-								</Text>
-							)}
-						</TouchableOpacity>
-					);
-				}}
-			</form.Subscribe>
-			<TouchableOpacity onPress={onBack} disabled={loading}>
-				<Text style={[styles.linkText, { color: theme.primary }]}>
-					{t("switcher.back")}
-				</Text>
-			</TouchableOpacity>
+				<TouchableOpacity onPress={onBack} disabled={loading}>
+					<Text style={[styles.linkText, { color: theme.primary }]}>
+						{t("switcher.back")}
+					</Text>
+				</TouchableOpacity>
+			</OrgForm>
 		</View>
 	);
 }

@@ -5,7 +5,6 @@ import {
 	FlatList,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -13,17 +12,18 @@ import {
 import { Container } from "@/components/container";
 import { EmptyOrgScreen } from "@/components/empty-org-screen";
 import { LoadingScreen } from "@/components/loading-screen";
+import { ThemedTextInput } from "@/components/themed-text-input";
 import {
 	useActiveOrg,
 	useInvalidateOrg,
+	useOrgRole,
 	useTeams,
 } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
 import { authClient } from "@/lib/auth-client";
 import { authMutation } from "@/lib/auth-mutation";
 import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, mutedText, sharedStyles } from "@/styles/shared";
+import { mutedText, sharedStyles } from "@/styles/shared";
 
 export default function TeamsIndexScreen() {
 	const { theme } = useTheme();
@@ -66,12 +66,11 @@ export default function TeamsIndexScreen() {
 				ListHeaderComponent={
 					isAdmin ? (
 						<View style={styles.createRow}>
-							<TextInput
-								style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
+							<ThemedTextInput
+								style={{ flex: 1 }}
 								value={teamName}
 								onChangeText={setTeamName}
 								placeholder={t("teams.namePlaceholder")}
-								placeholderTextColor={theme.border}
 							/>
 							<TouchableOpacity
 								style={[

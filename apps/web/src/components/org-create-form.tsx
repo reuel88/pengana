@@ -46,13 +46,31 @@ export function OrgCreateForm({
 	return (
 		<FormRoot form={form} className="flex flex-col gap-3">
 			<form.Field name="name">
-				{(field) => <OrgNameField field={field} id={`${idPrefix}-org-name`} />}
+				{(field) => (
+					<OrgNameField
+						field={field}
+						id={`${idPrefix}-org-name`}
+						testId="org-name-input"
+					/>
+				)}
 			</form.Field>
 			<form.Field name="slug">
-				{(field) => <OrgSlugField field={field} id={`${idPrefix}-org-slug`} />}
+				{(field) => (
+					<OrgSlugField
+						field={field}
+						id={`${idPrefix}-org-slug`}
+						testId="org-slug-input"
+					/>
+				)}
 			</form.Field>
 			<form.Field name="logo">
-				{(field) => <OrgLogoField field={field} id={`${idPrefix}-org-logo`} />}
+				{(field) => (
+					<OrgLogoField
+						field={field}
+						id={`${idPrefix}-org-logo`}
+						testId="org-logo-input"
+					/>
+				)}
 			</form.Field>
 			<form.Subscribe
 				selector={(s) => ({
@@ -61,7 +79,11 @@ export function OrgCreateForm({
 				})}
 			>
 				{({ isSubmitting, nameEmpty }) => (
-					<Button type="submit" disabled={isSubmitting || nameEmpty}>
+					<Button
+						type="submit"
+						disabled={isSubmitting || nameEmpty}
+						data-testid="org-submit"
+					>
 						{isSubmitting ? t("common:submitting") : t("create.submit")}
 					</Button>
 				)}

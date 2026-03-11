@@ -1,18 +1,12 @@
 import { useTranslation } from "@pengana/i18n";
 import { useInviteMember, useZodForm } from "@pengana/org-client";
-import {
-	Alert,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { z } from "zod";
 
 import { RoleToggle } from "@/components/role-toggle";
+import { ThemedTextInput } from "@/components/themed-text-input";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, sharedStyles } from "@/styles/shared";
+import { sharedStyles } from "@/styles/shared";
 
 const inviteSchema = z.object({
 	email: z.string().email(),
@@ -41,13 +35,11 @@ export function InviteForm({ orgId }: { orgId: string }) {
 		<View style={styles.inviteForm}>
 			<form.Field name="email">
 				{(field) => (
-					<TextInput
-						style={[sharedStyles.input, inputThemed(theme)]}
+					<ThemedTextInput
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
 						placeholder={t("invitations.emailPlaceholder")}
-						placeholderTextColor={theme.border}
 						keyboardType="email-address"
 						autoCapitalize="none"
 					/>

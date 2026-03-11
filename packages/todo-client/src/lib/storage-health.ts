@@ -14,8 +14,14 @@ export function createWebStorageHealthProvider(): StorageHealthProvider {
 		async estimate(): Promise<StorageEstimate | null> {
 			if (!navigator?.storage?.estimate) return null;
 
-			const { usage, quota } = await navigator.storage.estimate();
-			if (!usage || !quota) return null;
+			let usage: number | undefined;
+			let quota: number | undefined;
+			try {
+				({ usage, quota } = await navigator.storage.estimate());
+			} catch {
+				return null;
+			}
+			if (usage == null || quota == null || quota === 0) return null;
 
 			return {
 				usageBytes: usage,

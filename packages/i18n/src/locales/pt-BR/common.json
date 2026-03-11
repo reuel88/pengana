@@ -1,6 +1,6 @@
 {
 	"nav": {
-		"home": "Inicio",
+		"home": "Início",
 		"dashboard": "Painel",
 		"todos": "Tarefas",
 		"explore": "Explorar",
@@ -22,8 +22,8 @@
 		"checking": "Verificando...",
 		"connected": "Conectado",
 		"disconnected": "Desconectado",
-		"checkingConnection": "Verificando conexao...",
-		"connectedToApi": "Conectado a API",
+		"checkingConnection": "Verificando conexão...",
+		"connectedToApi": "Conectado à API",
 		"apiDisconnected": "API Desconectada"
 	},
 	"apiStatus": "Status da API",

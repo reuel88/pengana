@@ -1,12 +1,12 @@
 {
 	"syncing": "Sincronizando...",
 	"online": "Conectado",
-	"offline": "Sem conexao - alteracoes salvas no dispositivo",
+	"offline": "Sem conexão - alterações salvas no dispositivo",
 	"devtools": {
 		"title": "Ferramentas de sincronização",
 		"status": "Status:",
 		"statusOnline": "Conectado",
-		"statusOffline": "Sem conexao",
+		"statusOffline": "Sem conexão",
 		"syncing": "(sincronizando)",
 		"goOnline": "Conectar",
 		"simulateOffline": "Simular modo offline",

@@ -9,7 +9,7 @@ export class TodoPage {
 
 	async addTodo(title: string) {
 		await this.page.getByPlaceholder("Add a new todo...").fill(title);
-		await this.page.getByRole("button", { name: "Add" }).click();
+		await this.page.getByTestId("todo-submit").click();
 	}
 
 	private todoRow(title: string) {
@@ -27,10 +27,12 @@ export class TodoPage {
 	}
 
 	completedTodoLocator(title: string) {
-		return this.todoRow(title).locator("span", { hasText: title });
+		return this.page
+			.locator('[data-testid="todo-row"][data-completed="true"]')
+			.filter({ has: this.page.locator("span", { hasText: title }) });
 	}
 
 	todoLocator(title: string) {
-		return this.page.getByText(title);
+		return this.todoRow(title);
 	}
 }

@@ -73,31 +73,35 @@ function getStatus(): SyncStatus {
 }
 
 const storageHealthProvider = createWebStorageHealthProvider();
+const uploadAdapter = createWebUploadAdapter();
 
 async function checkStorageHealth(): Promise<void> {
-	const estimate = await storageHealthProvider.estimate();
-	if (!estimate) return;
+	try {
+		const estimate = await storageHealthProvider.estimate();
+		if (!estimate) return;
 
-	let level: StorageLevel = "ok";
-	if (estimate.usageRatio >= STORAGE_CRITICAL_RATIO) {
-		level = "critical";
-	} else if (estimate.usageRatio >= STORAGE_WARNING_RATIO) {
-		level = "warning";
+		let level: StorageLevel = "ok";
+		if (estimate.usageRatio >= STORAGE_CRITICAL_RATIO) {
+			level = "critical";
+		} else if (estimate.usageRatio >= STORAGE_WARNING_RATIO) {
+			level = "warning";
+		}
+
+		if (level === "warning" || level === "critical") {
+			await cleanupUploaded({
+				uploadAdapter,
+				removeFile: removeFileFromIndexedDB,
+			});
+		}
+
+		if (level === "critical" && state.storageLevel !== "critical") {
+			broadcast({ type: "storage:critical" });
+		}
+
+		state.storageLevel = level;
+	} catch (err) {
+		console.error("[background] storage health check failed:", err);
 	}
-
-	if (level === "warning" || level === "critical") {
-		const uploadAdapter = createWebUploadAdapter();
-		await cleanupUploaded({
-			uploadAdapter,
-			removeFile: removeFileFromIndexedDB,
-		});
-	}
-
-	if (level === "critical" && state.storageLevel !== "critical") {
-		broadcast({ type: "storage:critical" });
-	}
-
-	state.storageLevel = level;
 }
 
 function broadcast(message: BackgroundBroadcast) {
@@ -143,7 +147,6 @@ function createSyncEngine(userId: string): SyncEngine {
 }
 
 function createUploadQueueForEngine(engine: SyncEngine): UploadQueue {
-	const uploadAdapter = createWebUploadAdapter();
 	const uploadTransport = createIndexedDbUploadTransport();
 	const queue = new UploadQueue(uploadAdapter, uploadTransport);
 

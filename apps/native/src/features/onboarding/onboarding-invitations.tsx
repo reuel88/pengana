@@ -34,6 +34,7 @@ export function OnboardingInvitations({
 
 	return (
 		<View
+			testID="onboarding-invitations"
 			style={[
 				onboardingStyles.card,
 				{ backgroundColor: theme.card, borderColor: theme.border },
@@ -81,6 +82,7 @@ export function OnboardingInvitations({
 			))}
 
 			<TouchableOpacity
+				testID="onboarding-create-instead"
 				style={onboardingStyles.ghostButton}
 				onPress={onSkipToCreate}
 				disabled={actingId !== null}

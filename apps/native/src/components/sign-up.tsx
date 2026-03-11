@@ -47,10 +47,12 @@ function SignUp() {
 				<AuthFormCard
 					title={t("auth:signUp.title")}
 					error={error ?? validationError}
+					testID="auth-form"
 				>
 					<form.Field name="name">
 						{(field) => (
 							<AuthFormField
+								testID="auth-name-input"
 								placeholder={t("auth:fields.name")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -62,6 +64,7 @@ function SignUp() {
 					<form.Field name="email">
 						{(field) => (
 							<AuthFormField
+								testID="auth-email-input"
 								placeholder={t("auth:fields.email")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -75,6 +78,7 @@ function SignUp() {
 					<form.Field name="password">
 						{(field) => (
 							<AuthFormField
+								testID="auth-password-input"
 								placeholder={t("auth:fields.password")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -89,6 +93,7 @@ function SignUp() {
 						onPress={form.handleSubmit}
 						isSubmitting={isSubmitting}
 						label={t("auth:signUp.submit")}
+						testID="auth-submit"
 					/>
 				</AuthFormCard>
 			)}

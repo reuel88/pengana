@@ -11,8 +11,8 @@ import {
 	OrgNameField,
 	OrgSlugField,
 } from "@/components/org-form-fields";
-import { OrgGuard } from "@/components/org-guard";
-import { useActiveOrg, useOrgRole } from "@/hooks/use-org-queries";
+import { useOrgGuard } from "@/components/org-guard";
+import { useOrgRole } from "@/hooks/use-org-queries";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,
@@ -26,8 +26,8 @@ const updateOrgSchema = z.object({
 
 function OrgSettingsPage() {
 	const { t } = useTranslation("organization");
-	const { data: activeOrg } = useActiveOrg();
 	const { isOwner, isAdmin } = useOrgRole();
+	const { activeOrg, guardElement } = useOrgGuard();
 
 	const { updateOrg, deleteOrg, loading } = useOrgSettings({
 		onUpdateSuccess: () => toast.success(t("settings.updateSuccess")),
@@ -58,60 +58,48 @@ function OrgSettingsPage() {
 		}
 	}, [activeOrg?.id]);
 
+	if (guardElement || !activeOrg) return guardElement;
+
+	const onDelete = async () => {
+		if (!confirm(t("settings.deleteConfirm"))) return;
+		await deleteOrg(activeOrg?.id);
+	};
+
 	return (
-		<OrgGuard>
-			{(org) => {
-				const onDelete = async () => {
-					if (!confirm(t("settings.deleteConfirm"))) return;
-					await deleteOrg(org.id);
-				};
-
-				return (
-					<div className="flex max-w-md flex-col gap-6">
-						{isAdmin ? (
-							<FormRoot form={form} className="flex flex-col gap-3">
-								<h2 className="font-medium text-sm">{t("settings.update")}</h2>
-								<form.Field name="name">
-									{(field) => <OrgNameField field={field} id="org-name" />}
-								</form.Field>
-								<form.Field name="slug">
-									{(field) => (
-										<OrgSlugField field={field} id="org-slug" required />
-									)}
-								</form.Field>
-								<form.Field name="logo">
-									{(field) => <OrgLogoField field={field} id="org-logo" />}
-								</form.Field>
-								<form.Subscribe selector={(s) => s.isSubmitting}>
-									{(isSubmitting) => (
-										<Button type="submit" disabled={isSubmitting || loading}>
-											{isSubmitting || loading
-												? t("common:submitting")
-												: t("settings.update")}
-										</Button>
-									)}
-								</form.Subscribe>
-							</FormRoot>
-						) : (
-							<p className="text-muted-foreground text-sm">
-								{t("settings.title")}
-							</p>
+		<div className="flex max-w-md flex-col gap-6">
+			{isAdmin ? (
+				<FormRoot form={form} className="flex flex-col gap-3">
+					<h2 className="font-medium text-sm">{t("settings.update")}</h2>
+					<form.Field name="name">
+						{(field) => <OrgNameField field={field} id="org-name" />}
+					</form.Field>
+					<form.Field name="slug">
+						{(field) => <OrgSlugField field={field} id="org-slug" required />}
+					</form.Field>
+					<form.Field name="logo">
+						{(field) => <OrgLogoField field={field} id="org-logo" />}
+					</form.Field>
+					<form.Subscribe selector={(s) => s.isSubmitting}>
+						{(isSubmitting) => (
+							<Button type="submit" disabled={isSubmitting || loading}>
+								{isSubmitting || loading
+									? t("common:submitting")
+									: t("settings.update")}
+							</Button>
 						)}
+					</form.Subscribe>
+				</FormRoot>
+			) : (
+				<p className="text-muted-foreground text-sm">{t("settings.title")}</p>
+			)}
 
-						{isOwner && (
-							<div className="border-t pt-4">
-								<Button
-									variant="destructive"
-									onClick={onDelete}
-									disabled={loading}
-								>
-									{t("settings.delete")}
-								</Button>
-							</div>
-						)}
-					</div>
-				);
-			}}
-		</OrgGuard>
+			{isOwner && (
+				<div className="border-t pt-4">
+					<Button variant="destructive" onClick={onDelete} disabled={loading}>
+						{t("settings.delete")}
+					</Button>
+				</div>
+			)}
+		</div>
 	);
 }

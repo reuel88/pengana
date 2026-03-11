@@ -70,6 +70,7 @@ export function TodoItem({
 		<div
 			className="flex flex-col border-border border-b"
 			data-testid="todo-row"
+			data-completed={todo.completed}
 		>
 			<div className="flex items-center gap-3 px-3 py-2">
 				<input
@@ -80,7 +81,11 @@ export function TodoItem({
 					onChange={handleFileChange}
 				/>
 				<SyncDot status={todo.syncStatus} />
-				<Checkbox checked={todo.completed} onCheckedChange={onToggle} />
+				<Checkbox
+					checked={todo.completed}
+					onCheckedChange={onToggle}
+					data-testid="todo-toggle"
+				/>
 				<span
 					className={cn(
 						"flex-1 text-sm",
@@ -121,7 +126,12 @@ export function TodoItem({
 						{t("actions.retry")}
 					</Button>
 				)}
-				<Button size="xs" variant="ghost" onClick={onDelete}>
+				<Button
+					size="xs"
+					variant="ghost"
+					onClick={onDelete}
+					data-testid="todo-delete"
+				>
 					{t("actions.delete")}
 				</Button>
 			</div>

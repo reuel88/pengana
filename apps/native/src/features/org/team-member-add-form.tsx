@@ -9,14 +9,13 @@ import {
 	Alert,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 
+import { ThemedTextInput } from "@/components/themed-text-input";
 import { TEXT_ON_PRIMARY } from "@/lib/design-tokens";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, sharedStyles } from "@/styles/shared";
 
 export function TeamMemberAddForm({
 	teamId,
@@ -47,13 +46,12 @@ export function TeamMemberAddForm({
 		<View style={styles.addRow}>
 			<form.Field name="email">
 				{(field) => (
-					<TextInput
-						style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
+					<ThemedTextInput
+						style={{ flex: 1 }}
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
 						placeholder={t("invitations.emailPlaceholder")}
-						placeholderTextColor={theme.border}
 						keyboardType="email-address"
 						autoCapitalize="none"
 					/>

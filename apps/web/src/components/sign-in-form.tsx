@@ -4,9 +4,8 @@ import { useZodForm } from "@pengana/org-client";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-
-import { AuthFormField } from "./auth-form-field";
 import { AuthFormShell } from "./auth-form-shell";
+import { FormField } from "./form-field";
 
 export function SignInForm() {
 	const navigate = useNavigate();
@@ -50,20 +49,22 @@ export function SignInForm() {
 		>
 			<form.Field name="email">
 				{(field) => (
-					<AuthFormField
+					<FormField
 						field={field}
 						label={t("auth:fields.email")}
 						type="email"
+						testId="auth-email-input"
 					/>
 				)}
 			</form.Field>
 
 			<form.Field name="password">
 				{(field) => (
-					<AuthFormField
+					<FormField
 						field={field}
 						label={t("auth:fields.password")}
 						type="password"
+						testId="auth-password-input"
 					/>
 				)}
 			</form.Field>

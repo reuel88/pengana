@@ -4,6 +4,7 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createContext } from "@pengana/api/context";
+import { ERROR_CODES } from "@pengana/api/errors";
 import { appRouter } from "@pengana/api/routers/index";
 import type { Context, Next } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
@@ -46,19 +47,13 @@ async function parseJsonObject(
 			return raw as Record<string, unknown>;
 		}
 		return {};
-	} catch {
+	} catch (err) {
+		orpcLogger.debug`parseJsonObject failed: ${err}`;
 		return {};
 	}
 }
 
-const VALID_ERROR_CODES = new Set([
-	"UNAUTHORIZED",
-	"NOT_FOUND",
-	"BAD_REQUEST",
-	"FORBIDDEN",
-	"INTERNAL_SERVER_ERROR",
-	"TOO_MANY_REQUESTS",
-]);
+const VALID_ERROR_CODES = new Set<string>(ERROR_CODES);
 
 async function ensureErrorEnvelope(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";

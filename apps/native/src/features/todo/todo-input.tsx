@@ -35,8 +35,9 @@ export function TodoInput({ userId }: { userId: string }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={styles.container} testID="todo-form">
 			<TextInput
+				testID="todo-input"
 				value={title}
 				onChangeText={setTitle}
 				placeholder={t("todos:addPlaceholder")}
@@ -57,8 +58,11 @@ export function TodoInput({ userId }: { userId: string }) {
 				]}
 			/>
 			<TouchableOpacity
+				testID="todo-submit"
 				onPress={handleSubmit}
 				disabled={!title.trim() || submitting}
+				accessibilityRole="button"
+				accessibilityLabel={t("todos:addButton")}
 				style={[
 					styles.button,
 					{

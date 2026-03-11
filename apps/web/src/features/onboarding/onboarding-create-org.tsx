@@ -19,7 +19,7 @@ export function OnboardingCreateOrg({
 	const { t } = useTranslation("onboarding");
 
 	return (
-		<Card className="w-full max-w-md">
+		<Card className="w-full max-w-md" data-testid="onboarding-create-org">
 			<CardHeader>
 				<CardTitle>{t("create.title")}</CardTitle>
 				<p className="text-muted-foreground text-sm">

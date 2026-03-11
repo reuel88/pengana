@@ -7,6 +7,7 @@
 		"e2e": "playwright test",
 		"e2e:ui": "playwright test --ui",
 		"e2e:web": "playwright test --project=web",
+		"e2e:native": "playwright test --project=native",
 		"e2e:extension": "playwright test --project=extension",
 		"e2e:report": "playwright show-report",
 		"check-types": "tsc --noEmit"

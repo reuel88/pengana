@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import type { Column } from "@/components/data-table";
 import { DataTable } from "@/components/data-table";
-import { OrgGuard } from "@/components/org-guard";
+import { useOrgGuard } from "@/components/org-guard";
 import { useOrgRole } from "@/hooks/use-org-queries";
 
 export const Route = createFileRoute("/org/members")({
@@ -100,34 +100,27 @@ function MembersPage() {
 		},
 	];
 
+	const { activeOrg, guardElement } = useOrgGuard();
+	if (guardElement) return guardElement;
+
+	const members = (activeOrg?.members || []) as Member[];
+
 	return (
-		<OrgGuard>
-			{(activeOrg) => {
-				const members = (activeOrg.members || []) as Member[];
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center justify-between">
+				<h2 className="font-medium text-sm">{t("members.title")}</h2>
+				<Button variant="outline" size="sm" onClick={() => onLeave(members)}>
+					{t("members.leave")}
+				</Button>
+			</div>
 
-				return (
-					<div className="flex flex-col gap-4">
-						<div className="flex items-center justify-between">
-							<h2 className="font-medium text-sm">{t("members.title")}</h2>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => onLeave(members)}
-							>
-								{t("members.leave")}
-							</Button>
-						</div>
-
-						{members.length === 0 ? (
-							<p className="text-muted-foreground text-xs">
-								{t("members.noMembers")}
-							</p>
-						) : (
-							<DataTable columns={columns} data={members} keyFn={(m) => m.id} />
-						)}
-					</div>
-				);
-			}}
-		</OrgGuard>
+			{members.length === 0 ? (
+				<p className="text-muted-foreground text-xs">
+					{t("members.noMembers")}
+				</p>
+			) : (
+				<DataTable columns={columns} data={members} keyFn={(m) => m.id} />
+			)}
+		</div>
 	);
 }

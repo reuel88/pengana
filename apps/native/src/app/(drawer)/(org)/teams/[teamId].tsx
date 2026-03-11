@@ -18,10 +18,10 @@ import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
 import { TeamNameEditor } from "@/features/org/team-name-editor";
 import {
 	useActiveOrg,
+	useOrgRole,
 	useTeamMembers,
 	useTeams,
 } from "@/hooks/use-org-queries";
-import { useOrgRole } from "@/hooks/use-org-role";
 import { useTheme } from "@/lib/theme";
 import { mutedText, secondaryText, sharedStyles } from "@/styles/shared";
 
@@ -64,7 +64,7 @@ export default function TeamDetailScreen() {
 	if (!teamId || !teamName) {
 		return (
 			<Container>
-				<Text style={[{ padding: 16 }, mutedText(theme)]}>
+				<Text style={[styles.notFoundText, mutedText(theme)]}>
 					{t("teams.notFound")}
 				</Text>
 			</Container>
@@ -183,4 +183,5 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 	},
 	removeButton: { paddingHorizontal: 12, paddingVertical: 6 },
+	notFoundText: { padding: 16 },
 });

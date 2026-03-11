@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
 import { SyncEngine } from "../core/engine";
@@ -94,14 +94,20 @@ export function useSyncEngineCore(
 		};
 	}, [userId, deps]);
 
+	const cleanupDeps = useMemo(
+		() =>
+			uploadAdapterRef.current
+				? {
+						uploadAdapter: uploadAdapterRef.current,
+						removeFile: deps.removeFile,
+					}
+				: undefined,
+		[deps.removeFile],
+	);
+
 	const { storageLevel } = useStorageHealth({
 		provider: deps.storageHealth,
-		cleanupDeps: uploadAdapterRef.current
-			? {
-					uploadAdapter: uploadAdapterRef.current,
-					removeFile: deps.removeFile,
-				}
-			: undefined,
+		cleanupDeps,
 		onStorageCritical: deps.onStorageCritical,
 	});
 

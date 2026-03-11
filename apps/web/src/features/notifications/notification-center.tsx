@@ -7,6 +7,7 @@ import {
 } from "@pengana/ui/components/dropdown-menu";
 import { Bell } from "lucide-react";
 
+import { InvitationCard } from "@/components/invitation-card";
 import { useNotificationCenter } from "./use-notification-center";
 
 function InvitationItem({
@@ -28,35 +29,31 @@ function InvitationItem({
 	const { t } = useTranslation("notifications");
 
 	return (
-		<div className="flex flex-col items-start gap-2 p-2">
-			<div className="flex w-full items-center justify-between">
-				<div className="flex flex-col gap-0.5">
-					<span className="font-medium text-sm">
-						{invitation.organizationName}
-					</span>
-					<span className="text-muted-foreground text-xs">
-						{invitation.role}
-					</span>
-				</div>
-				<div className="flex gap-1">
-					<Button
-						size="sm"
-						variant="default"
-						disabled={disabled}
-						onClick={() => onAccept(invitation.id)}
-					>
-						{t("accept")}
-					</Button>
-					<Button
-						size="sm"
-						variant="outline"
-						disabled={disabled}
-						onClick={() => onReject(invitation.id)}
-					>
-						{t("reject")}
-					</Button>
-				</div>
-			</div>
+		<div className="p-2">
+			<InvitationCard
+				orgName={invitation.organizationName}
+				role={invitation.role}
+				actions={
+					<>
+						<Button
+							size="sm"
+							variant="default"
+							disabled={disabled}
+							onClick={() => onAccept(invitation.id)}
+						>
+							{t("accept")}
+						</Button>
+						<Button
+							size="sm"
+							variant="outline"
+							disabled={disabled}
+							onClick={() => onReject(invitation.id)}
+						>
+							{t("reject")}
+						</Button>
+					</>
+				}
+			/>
 		</div>
 	);
 }

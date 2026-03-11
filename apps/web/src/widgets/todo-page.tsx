@@ -12,7 +12,10 @@ function TodoContent({ userId }: { userId: string }) {
 	const { t } = useTranslation("todos");
 
 	return (
-		<div className="mx-auto flex max-w-lg flex-col gap-4 p-4">
+		<div
+			className="mx-auto flex max-w-lg flex-col gap-4 p-4"
+			data-testid="todo-page"
+		>
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />

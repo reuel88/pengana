@@ -17,13 +17,8 @@ import { toast } from "sonner";
 import type { Column } from "@/components/data-table";
 import { DataTable } from "@/components/data-table";
 import { FormRoot } from "@/components/form-root";
-import { OrgGuard } from "@/components/org-guard";
-import {
-	useActiveOrg,
-	useOrgRole,
-	useTeamMembers,
-	useTeams,
-} from "@/hooks/use-org-queries";
+import { useOrgGuard } from "@/components/org-guard";
+import { useOrgRole, useTeamMembers, useTeams } from "@/hooks/use-org-queries";
 
 export const Route = createFileRoute("/org/teams/$teamId")({
 	component: TeamDetailPage,
@@ -236,7 +231,7 @@ function TeamDetailPage() {
 	const { teamId } = Route.useParams();
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
-	const { data: activeOrg } = useActiveOrg();
+	const { activeOrg, guardElement } = useOrgGuard();
 	const { isAdmin } = useOrgRole();
 	const {
 		data: teams,
@@ -260,54 +255,48 @@ function TeamDetailPage() {
 
 	const team = teams?.find((tm) => tm.id === teamId);
 
+	if (guardElement || !activeOrg) return guardElement;
+
+	if (teamsLoading || membersLoading) {
+		return <p>{t("common:status.loading")}</p>;
+	}
+
+	if (teamsError || membersError) {
+		return (
+			<p className="text-destructive text-sm">{t("common:error.generic")}</p>
+		);
+	}
+
+	if (!team) {
+		return <p className="text-muted-foreground">{t("teams.notFound")}</p>;
+	}
+
+	const onDelete = async () => {
+		if (!confirm(t("teams.deleteConfirm"))) return;
+		await handleDeleteTeam(team.id, activeOrg?.id);
+	};
+
 	return (
-		<OrgGuard>
-			{(org) => {
-				if (teamsLoading || membersLoading) {
-					return <p>{t("common:status.loading")}</p>;
-				}
+		<div className="flex flex-col gap-6">
+			<div className="flex items-center justify-between">
+				<TeamNameEditor team={team} orgId={activeOrg?.id} />
+				{isAdmin && (
+					<Button variant="destructive" size="sm" onClick={onDelete}>
+						{t("teams.delete")}
+					</Button>
+				)}
+			</div>
 
-				if (teamsError || membersError) {
-					return (
-						<p className="text-destructive text-sm">
-							{t("common:error.generic")}
-						</p>
-					);
-				}
+			{isAdmin && (
+				<TeamMemberAddForm teamId={teamId} members={activeOrg?.members ?? []} />
+			)}
 
-				if (!team) {
-					return <p className="text-muted-foreground">{t("teams.notFound")}</p>;
-				}
-
-				const onDelete = async () => {
-					if (!confirm(t("teams.deleteConfirm"))) return;
-					await handleDeleteTeam(team.id, org.id);
-				};
-
-				return (
-					<div className="flex flex-col gap-6">
-						<div className="flex items-center justify-between">
-							<TeamNameEditor team={team} orgId={org.id} />
-							{isAdmin && (
-								<Button variant="destructive" size="sm" onClick={onDelete}>
-									{t("teams.delete")}
-								</Button>
-							)}
-						</div>
-
-						{isAdmin && (
-							<TeamMemberAddForm teamId={teamId} members={org.members ?? []} />
-						)}
-
-						<TeamMembersTable
-							teamId={teamId}
-							teamMembers={teamMembers ?? []}
-							orgMembers={org.members ?? []}
-							onRemoveMember={handleRemoveMember}
-						/>
-					</div>
-				);
-			}}
-		</OrgGuard>
+			<TeamMembersTable
+				teamId={teamId}
+				teamMembers={teamMembers ?? []}
+				orgMembers={activeOrg?.members ?? []}
+				onRemoveMember={handleRemoveMember}
+			/>
+		</div>
 	);
 }

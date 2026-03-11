@@ -1,37 +1,37 @@
 import { expect, test } from "../../fixtures/index.js";
-import { TodoPage } from "../../page-objects/todo.page.js";
 
 test.describe("Todos", () => {
 	test.use({ storageState: undefined }); // each test gets a fresh session via fixture
 
 	test("todos page loads for authenticated user with org", async ({
 		authenticatedWithOrgPage: { page },
+		todoPage,
 	}) => {
-		const todoPage = new TodoPage(page);
 		await todoPage.navigate();
 		await expect(page.getByRole("heading", { name: "Todos" })).toBeVisible();
 		await expect(page.getByPlaceholder("Add a new todo...")).toBeVisible();
 	});
 
-	test("add a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new TodoPage(page);
+	test("add a todo", async ({ authenticatedWithOrgPage: _setup, todoPage }) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Buy milk");
 		await expect(todoPage.todoLocator("Buy milk")).toBeVisible();
 	});
 
-	test("complete a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new TodoPage(page);
+	test("complete a todo", async ({
+		authenticatedWithOrgPage: _setup,
+		todoPage,
+	}) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Exercise");
 		await todoPage.toggleTodo("Exercise");
-		await expect(todoPage.completedTodoLocator("Exercise")).toHaveClass(
-			/line-through/,
-		);
+		await expect(todoPage.completedTodoLocator("Exercise")).toBeVisible();
 	});
 
-	test("delete a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new TodoPage(page);
+	test("delete a todo", async ({
+		authenticatedWithOrgPage: _setup,
+		todoPage,
+	}) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Temporary task");
 		await todoPage.deleteTodo("Temporary task");
@@ -40,8 +40,8 @@ test.describe("Todos", () => {
 
 	test("todos persist after page reload", async ({
 		authenticatedWithOrgPage: { page },
+		todoPage,
 	}) => {
-		const todoPage = new TodoPage(page);
 		await todoPage.navigate();
 		const title = `Persist-${crypto.randomUUID()}`;
 		await todoPage.addTodo(title);

@@ -16,7 +16,7 @@ export function TodoContent({ userId }: { userId: string }) {
 	const { isOnline, isSyncing } = useSync();
 
 	return (
-		<View style={styles.content}>
+		<View style={styles.content} testID="todo-page">
 			<Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />

@@ -11,13 +11,13 @@ import {
 	Pressable,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 
+import { ThemedTextInput } from "@/components/themed-text-input";
 import { useTheme } from "@/lib/theme";
-import { inputThemed, sharedStyles } from "@/styles/shared";
+import { sharedStyles } from "@/styles/shared";
 
 export function TeamNameEditor({
 	teamId,
@@ -55,8 +55,8 @@ export function TeamNameEditor({
 			<View style={styles.editNameRow}>
 				<form.Field name="name">
 					{(field) => (
-						<TextInput
-							style={[sharedStyles.input, { flex: 1 }, inputThemed(theme)]}
+						<ThemedTextInput
+							style={{ flex: 1 }}
 							value={field.state.value}
 							onChangeText={field.handleChange}
 							onBlur={field.handleBlur}
