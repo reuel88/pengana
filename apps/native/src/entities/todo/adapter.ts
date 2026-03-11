@@ -1,4 +1,5 @@
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
+import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { and, eq, inArray } from "drizzle-orm";
 
@@ -21,22 +22,27 @@ export function createDrizzleSyncAdapter(userId: string): SyncAdapter {
 			conflictIds: string[] = [],
 		): Promise<void> {
 			const conflictSet = new Set(conflictIds);
-			for (const serverTodo of serverTodos) {
-				const [local] = await db
-					.select()
-					.from(todos)
-					.where(eq(todos.id, serverTodo.id));
+			try {
+				for (const serverTodo of serverTodos) {
+					const [local] = await db
+						.select()
+						.from(todos)
+						.where(eq(todos.id, serverTodo.id));
 
-				const isConflict = conflictSet.has(serverTodo.id);
-				if (!local || local.syncStatus !== "pending" || isConflict) {
-					await db
-						.insert(todos)
-						.values(todoToRow(serverTodo, isConflict ? "conflict" : "synced"))
-						.onConflictDoUpdate({
-							target: todos.id,
-							set: todoToRow(serverTodo, isConflict ? "conflict" : "synced"),
-						});
+					const isConflict = conflictSet.has(serverTodo.id);
+					if (!local || local.syncStatus !== "pending" || isConflict) {
+						await db
+							.insert(todos)
+							.values(todoToRow(serverTodo, isConflict ? "conflict" : "synced"))
+							.onConflictDoUpdate({
+								target: todos.id,
+								set: todoToRow(serverTodo, isConflict ? "conflict" : "synced"),
+							});
+					}
 				}
+			} catch (e) {
+				if (isQuotaError(e)) throw new StorageFullError();
+				throw e;
 			}
 		},
 

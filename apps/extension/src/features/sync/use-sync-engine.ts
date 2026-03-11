@@ -1,3 +1,4 @@
+import type { StorageLevel } from "@pengana/sync-engine";
 import { useNetworkStatus } from "@pengana/sync-engine";
 import { useCallback, useEffect, useState } from "react";
 import type { BackgroundBroadcast } from "@/utils/background-messages";
@@ -8,6 +9,7 @@ import { useUploadQueue } from "./use-upload-queue";
 export function useSyncEngine(userId: string) {
 	// --- State ---
 	const [isSyncing, setIsSyncing] = useState(false);
+	const [storageLevel, setStorageLevel] = useState<StorageLevel>("ok");
 	const { isUploading, setIsUploading, enqueueUpload } = useUploadQueue();
 
 	// --- Network Status ---
@@ -25,6 +27,7 @@ export function useSyncEngine(userId: string) {
 					setIsOnline(status.isOnline);
 					setIsSyncing(status.isSyncing);
 					setIsUploading(status.isUploading);
+					setStorageLevel(status.storageLevel);
 				}
 				await sendBackgroundMessage({ type: "sync:trigger" });
 			} catch (err) {
@@ -50,6 +53,10 @@ export function useSyncEngine(userId: string) {
 					setIsOnline(message.status.isOnline);
 					setIsSyncing(message.status.isSyncing);
 					setIsUploading(message.status.isUploading);
+					setStorageLevel(message.status.storageLevel);
+					break;
+				case "storage:critical":
+					setStorageLevel("critical");
 					break;
 			}
 		};
@@ -71,6 +78,7 @@ export function useSyncEngine(userId: string) {
 			isOnline,
 			isSyncing,
 			isUploading,
+			storageLevel,
 			triggerSync,
 			enqueueUpload,
 		},

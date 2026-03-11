@@ -9,7 +9,9 @@ import type {
 	UploadAdapter,
 	UploadTransport,
 } from "../types";
+import type { StorageHealthProvider } from "../types/storage-health";
 import { usePeriodicSync } from "./use-periodic-sync";
+import { useStorageHealth } from "./use-storage-health";
 import { useUploadQueue } from "./use-upload-queue";
 import { useWebSocketReconnect } from "./use-websocket-reconnect";
 
@@ -28,6 +30,11 @@ export interface SyncEnginePlatformDeps {
 
 	// Optional focus subscription
 	onFocusSubscribe?: (triggerSync: () => void) => () => void;
+
+	// Optional storage health monitoring
+	storageHealth?: StorageHealthProvider;
+	removeFile?: (todoId: string) => Promise<void>;
+	onStorageCritical?: () => void;
 }
 
 export function useSyncEngineCore(
@@ -77,6 +84,27 @@ export function useSyncEngineCore(
 		deps.createUploadTransport,
 	);
 
+	// --- Storage Health ---
+	const uploadAdapterRef = useRef<UploadAdapter | null>(null);
+	useEffect(() => {
+		if (!userId) return;
+		uploadAdapterRef.current = deps.createUploadAdapter();
+		return () => {
+			uploadAdapterRef.current = null;
+		};
+	}, [userId, deps]);
+
+	const { storageLevel } = useStorageHealth({
+		provider: deps.storageHealth,
+		cleanupDeps: uploadAdapterRef.current
+			? {
+					uploadAdapter: uploadAdapterRef.current,
+					removeFile: deps.removeFile,
+				}
+			: undefined,
+		onStorageCritical: deps.onStorageCritical,
+	});
+
 	// --- Online Reactivity ---
 	useEffect(() => {
 		if (effectiveOnline) {
@@ -113,6 +141,7 @@ export function useSyncEngineCore(
 			isOnline: effectiveOnline,
 			isSyncing,
 			isUploading,
+			storageLevel,
 			triggerSync,
 			enqueueUpload,
 		},

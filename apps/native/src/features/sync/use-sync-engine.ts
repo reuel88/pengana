@@ -11,6 +11,7 @@ import {
 	createUploadTransport,
 } from "@/entities/upload-queue";
 import { authClient } from "@/lib/auth-client";
+import { createNativeStorageHealthProvider } from "@/lib/storage-health";
 import { client } from "@/utils/orpc";
 import { useNetworkStatus } from "./use-network-status";
 
@@ -42,6 +43,7 @@ const platformDeps: SyncEnginePlatformDeps = {
 		});
 		return () => subscription.remove();
 	},
+	storageHealth: createNativeStorageHealthProvider(),
 };
 
 export function useSyncEngine(userId: string | undefined) {

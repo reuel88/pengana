@@ -5,7 +5,11 @@ import {
 	useNetworkStatus,
 	useSyncEngineCore,
 } from "@pengana/sync-engine";
-import { createDexieSyncAdapter } from "@pengana/todo-client";
+import {
+	createDexieSyncAdapter,
+	removeFileFromIndexedDB,
+} from "@pengana/todo-client";
+import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import {
 	createWebUploadAdapter,
 	createWebUploadTransport,
@@ -37,6 +41,8 @@ const platformDeps: SyncEnginePlatformDeps = {
 		document.addEventListener("visibilitychange", handler);
 		return () => document.removeEventListener("visibilitychange", handler);
 	},
+	storageHealth: createWebStorageHealthProvider(),
+	removeFile: removeFileFromIndexedDB,
 };
 
 export function useSyncEngine(userId: string | undefined) {

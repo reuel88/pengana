@@ -57,8 +57,8 @@ export function useWebSocketReconnect(
 				}, backoff);
 			};
 
-			ws.onerror = (event) => {
-				console.error("[ws] error:", event);
+			ws.onerror = () => {
+				console.warn("[ws] connection error");
 				ws?.close();
 			};
 		}

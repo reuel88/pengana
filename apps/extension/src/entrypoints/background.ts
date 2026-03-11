@@ -1,15 +1,24 @@
 import { env } from "@pengana/env/web";
 import type {
+	StorageLevel,
 	SyncEvent,
 	SyncInput,
 	SyncOutput,
 	UploadEvent,
 } from "@pengana/sync-engine";
-import { SyncEngine, UploadQueue } from "@pengana/sync-engine";
+import {
+	cleanupUploaded,
+	STORAGE_CRITICAL_RATIO,
+	STORAGE_WARNING_RATIO,
+	SyncEngine,
+	UploadQueue,
+} from "@pengana/sync-engine";
 import {
 	createDexieSyncAdapter,
 	createWebUploadAdapter,
+	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
+import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { createIndexedDbUploadTransport } from "@/entities/upload-queue";
 import type {
 	BackgroundBroadcast,
@@ -35,6 +44,7 @@ interface BackgroundState {
 	isOnline: boolean;
 	isSyncing: boolean;
 	isUploading: boolean;
+	storageLevel: StorageLevel;
 }
 
 // Mutable singleton — async interleaving is safe because all mutations are
@@ -47,6 +57,7 @@ const state: BackgroundState = {
 	isOnline: true,
 	isSyncing: false,
 	isUploading: false,
+	storageLevel: "ok",
 };
 
 // --- Utilities ---
@@ -57,7 +68,36 @@ function getStatus(): SyncStatus {
 		isSyncing: state.isSyncing,
 		isUploading: state.isUploading,
 		userId: state.currentUserId,
+		storageLevel: state.storageLevel,
 	};
+}
+
+const storageHealthProvider = createWebStorageHealthProvider();
+
+async function checkStorageHealth(): Promise<void> {
+	const estimate = await storageHealthProvider.estimate();
+	if (!estimate) return;
+
+	let level: StorageLevel = "ok";
+	if (estimate.usageRatio >= STORAGE_CRITICAL_RATIO) {
+		level = "critical";
+	} else if (estimate.usageRatio >= STORAGE_WARNING_RATIO) {
+		level = "warning";
+	}
+
+	if (level === "warning" || level === "critical") {
+		const uploadAdapter = createWebUploadAdapter();
+		await cleanupUploaded({
+			uploadAdapter,
+			removeFile: removeFileFromIndexedDB,
+		});
+	}
+
+	if (level === "critical" && state.storageLevel !== "critical") {
+		broadcast({ type: "storage:critical" });
+	}
+
+	state.storageLevel = level;
 }
 
 function broadcast(message: BackgroundBroadcast) {
@@ -234,9 +274,12 @@ export default defineBackground(() => {
 	}
 
 	browser.alarms.onAlarm.addListener(async (alarm) => {
-		if (alarm.name === SYNC_ALARM_NAME && state.isOnline) {
-			await ensureEngine();
-			state.engine?.sync();
+		if (alarm.name === SYNC_ALARM_NAME) {
+			if (state.isOnline) {
+				await ensureEngine();
+				state.engine?.sync();
+			}
+			await checkStorageHealth();
 		}
 	});
 

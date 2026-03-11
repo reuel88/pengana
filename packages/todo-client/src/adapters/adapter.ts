@@ -1,4 +1,5 @@
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
+import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { todoDb } from "../lib/db";
 
@@ -21,20 +22,25 @@ export function createDexieSyncAdapter(userId: string): SyncAdapter {
 			conflictIds: string[] = [],
 		): Promise<void> {
 			const conflictSet = new Set(conflictIds);
-			await todoDb.transaction("rw", todoDb.todos, async () => {
-				for (const serverTodo of todos) {
-					const local = await todoDb.todos.get(serverTodo.id);
-					const isConflict = conflictSet.has(serverTodo.id);
-					if (!local || local.syncStatus !== "pending" || isConflict) {
-						await todoDb.todos.put({
-							...serverTodo,
-							syncStatus: isConflict ? "conflict" : "synced",
-							attachmentLocalUri: local?.attachmentLocalUri ?? null,
-							attachmentStatus: local?.attachmentStatus ?? null,
-						});
+			try {
+				await todoDb.transaction("rw", todoDb.todos, async () => {
+					for (const serverTodo of todos) {
+						const local = await todoDb.todos.get(serverTodo.id);
+						const isConflict = conflictSet.has(serverTodo.id);
+						if (!local || local.syncStatus !== "pending" || isConflict) {
+							await todoDb.todos.put({
+								...serverTodo,
+								syncStatus: isConflict ? "conflict" : "synced",
+								attachmentLocalUri: local?.attachmentLocalUri ?? null,
+								attachmentStatus: local?.attachmentStatus ?? null,
+							});
+						}
 					}
-				}
-			});
+				});
+			} catch (e) {
+				if (isQuotaError(e)) throw new StorageFullError();
+				throw e;
+			}
 		},
 
 		async markAsSynced(pushedItems: Todo[]): Promise<void> {

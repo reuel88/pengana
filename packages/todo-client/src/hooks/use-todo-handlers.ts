@@ -1,3 +1,4 @@
+import { isQuotaError } from "@pengana/sync-engine";
 import { useCallback, useMemo } from "react";
 
 import {
@@ -39,8 +40,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				clearError(id);
 				await toggleTodo(id);
 				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToToggleTodo"));
+			} catch (e) {
+				onError(
+					id,
+					isQuotaError(e)
+						? t("errors:storageFull")
+						: t("errors:failedToToggleTodo"),
+				);
 			}
 		},
 		[clearError, triggerSync, onError, t],
@@ -53,8 +59,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				await deleteTodo(id);
 				onDeleteSuccess?.(id);
 				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToDeleteTodo"));
+			} catch (e) {
+				onError(
+					id,
+					isQuotaError(e)
+						? t("errors:storageFull")
+						: t("errors:failedToDeleteTodo"),
+				);
 			}
 		},
 		[clearError, triggerSync, onError, onDeleteSuccess, t],
@@ -66,8 +77,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				clearError(id);
 				await resolveConflict(id, resolution);
 				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToResolveConflict"));
+			} catch (e) {
+				onError(
+					id,
+					isQuotaError(e)
+						? t("errors:storageFull")
+						: t("errors:failedToResolveConflict"),
+				);
 			}
 		},
 		[clearError, triggerSync, onError, t],
@@ -82,8 +98,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				await attachFile(id, fileRef);
 				enqueueUpload(id, fileRef, file.type);
 				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToStoreFile"));
+			} catch (e) {
+				onError(
+					id,
+					isQuotaError(e)
+						? t("errors:storageFull")
+						: t("errors:failedToStoreFile"),
+				);
 			}
 		},
 		[
