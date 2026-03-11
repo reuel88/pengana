@@ -8,7 +8,8 @@
 		"e2e:ui": "playwright test --ui",
 		"e2e:web": "playwright test --project=web",
 		"e2e:extension": "playwright test --project=extension",
-		"e2e:report": "playwright show-report"
+		"e2e:report": "playwright show-report",
+		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
 		"dotenv": "catalog:",

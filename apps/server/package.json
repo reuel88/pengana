@@ -10,7 +10,7 @@
 		"start": "node dist/index.mjs"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.14.4",
+		"@hono/node-server": "^1.19.11",
 		"@logtape/logtape": "^2.0.4",
 		"@orpc/openapi": "catalog:",
 		"@orpc/server": "catalog:",
@@ -31,7 +31,7 @@
 		"@pengana/config": "workspace:*",
 		"@types/node": "catalog:",
 		"@types/ws": "^8.18.0",
-		"tsdown": "^0.16.5",
+		"tsdown": "^0.21.1",
 		"tsx": "^4.19.2",
 		"typescript": "catalog:"
 	}
