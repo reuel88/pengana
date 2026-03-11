@@ -1,5 +1,5 @@
-import { fetchUserLifecycleData } from "@pengana/auth/user-lifecycle";
 import { env } from "@pengana/env/web";
+import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 import { polarClient } from "@polar-sh/better-auth";
 import { redirect } from "@tanstack/react-router";
 import { organizationClient } from "better-auth/client/plugins";

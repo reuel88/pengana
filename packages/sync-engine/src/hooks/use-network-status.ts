@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { useEffect, useState } from "react";
 
 export function useNetworkStatus() {
@@ -17,6 +18,7 @@ export function useNetworkStatus() {
 
 	return {
 		isOnline: isOnline && !simulateOffline,
+		setIsOnline,
 		simulateOffline,
 		setSimulateOffline,
 	};

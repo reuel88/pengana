@@ -1,15 +1,19 @@
+import { useNetworkStatus } from "@pengana/sync-engine";
 import { useCallback, useEffect, useState } from "react";
-
 import type { BackgroundBroadcast } from "@/utils/background-messages";
-import { isSyncActive, isUploadActive } from "@/utils/background-messages";
+import { isSyncActive } from "@/utils/background-messages";
 import { sendBackgroundMessage } from "@/utils/send-background-message";
+import { useUploadQueue } from "./use-upload-queue";
 
 export function useSyncEngine(userId: string) {
-	const [isOnline, setIsOnline] = useState(navigator.onLine);
+	// --- State ---
 	const [isSyncing, setIsSyncing] = useState(false);
-	const [isUploading, setIsUploading] = useState(false);
+	const { isUploading, setIsUploading, enqueueUpload } = useUploadQueue();
 
-	// Initialize background engine and trigger sync on mount
+	// --- Network Status ---
+	const { isOnline, setIsOnline } = useNetworkStatus();
+
+	// --- Engine Init Effect (delegates to background) ---
 	useEffect(() => {
 		const init = async () => {
 			try {
@@ -29,9 +33,9 @@ export function useSyncEngine(userId: string) {
 		};
 
 		init();
-	}, [userId]);
+	}, [userId, setIsOnline, setIsUploading]);
 
-	// Listen for broadcasts from background
+	// --- Online Reactivity (broadcast listener) ---
 	useEffect(() => {
 		const listener = (message: BackgroundBroadcast) => {
 			if (!message?.type) return;
@@ -40,11 +44,6 @@ export function useSyncEngine(userId: string) {
 				case "sync:event": {
 					const active = isSyncActive(message.event);
 					if (active !== null) setIsSyncing(active);
-					break;
-				}
-				case "upload:event": {
-					const active = isUploadActive(message.event);
-					if (active !== null) setIsUploading(active);
 					break;
 				}
 				case "status:update":
@@ -57,43 +56,23 @@ export function useSyncEngine(userId: string) {
 
 		browser.runtime.onMessage.addListener(listener);
 		return () => browser.runtime.onMessage.removeListener(listener);
-	}, []);
+	}, [setIsOnline, setIsUploading]);
 
-	// Local online/offline for UI responsiveness
-	useEffect(() => {
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-		};
-	}, []);
-
+	// --- Public API ---
 	const triggerSync = useCallback(() => {
 		sendBackgroundMessage({ type: "sync:trigger" }).catch((err) =>
 			console.error("[sync-engine] trigger failed:", err),
 		);
 	}, []);
 
-	const enqueueUpload = useCallback(
-		(todoId: string, fileUri: string, mimeType: string) => {
-			sendBackgroundMessage({
-				type: "upload:enqueue",
-				payload: { todoId, fileUri, mimeType },
-			}).catch((err) =>
-				console.error("[sync-engine] enqueue upload failed:", err),
-			);
-		},
-		[],
-	);
-
+	// --- Return ---
 	return {
-		isOnline,
-		isSyncing,
-		isUploading,
-		triggerSync,
-		enqueueUpload,
+		core: {
+			isOnline,
+			isSyncing,
+			isUploading,
+			triggerSync,
+			enqueueUpload,
+		},
 	};
 }

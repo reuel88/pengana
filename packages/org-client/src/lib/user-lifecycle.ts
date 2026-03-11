@@ -2,8 +2,15 @@ import type { AuthClientOrg, UserLifecycleData } from "../types";
 
 export type { UserLifecycleData } from "../types";
 
+type LifecycleClient = {
+	organization: Pick<
+		AuthClientOrg["organization"],
+		"list" | "listUserInvitations"
+	>;
+};
+
 export async function fetchUserLifecycleData(
-	authClient: Pick<AuthClientOrg, "organization">,
+	authClient: LifecycleClient,
 ): Promise<UserLifecycleData> {
 	const [orgs, invitations] = await Promise.all([
 		authClient.organization.list(),

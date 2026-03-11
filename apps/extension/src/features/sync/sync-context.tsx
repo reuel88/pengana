@@ -1,10 +1,8 @@
-import type { SyncContextValue } from "@pengana/sync-engine";
-
-import { createContext, use } from "react";
+import { SyncContext } from "@pengana/sync-engine";
 
 import { useSyncEngine } from "./use-sync-engine";
 
-const SyncContext = createContext<SyncContextValue | null>(null);
+export { useSync, useSyncDevtools } from "@pengana/sync-engine";
 
 export function SyncProvider({
 	userId,
@@ -13,15 +11,7 @@ export function SyncProvider({
 	userId: string;
 	children: React.ReactNode;
 }) {
-	const sync = useSyncEngine(userId);
+	const { core } = useSyncEngine(userId);
 
-	return <SyncContext value={sync}>{children}</SyncContext>;
-}
-
-export function useSync(): SyncContextValue {
-	const context = use(SyncContext);
-	if (!context) {
-		throw new Error("useSync must be used within a SyncProvider");
-	}
-	return context;
+	return <SyncContext value={core}>{children}</SyncContext>;
 }

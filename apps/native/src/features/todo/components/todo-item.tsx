@@ -61,11 +61,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 	return (
 		<View style={[styles.todoItem, { borderBottomColor: theme.border }]}>
 			<SyncDot status={todo.syncStatus} />
-			<Switch
-				value={todo.completed}
-				onValueChange={handleToggle}
-				style={styles.switch}
-			/>
+			<Switch value={todo.completed} onValueChange={handleToggle} />
 			<Text
 				style={[
 					styles.todoTitle,
@@ -104,9 +100,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		paddingVertical: 8,
 		borderBottomWidth: 1,
-	},
-	switch: {
-		transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }],
 	},
 	todoTitle: {
 		flex: 1,

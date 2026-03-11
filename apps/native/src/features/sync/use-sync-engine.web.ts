@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
-
-import { getServerUrl } from "@/lib/server-url";
-
 import {
 	type SyncEnginePlatformDeps,
+	useNetworkStatus,
 	useSyncEngineCore,
-} from "./use-sync-engine.shared";
+} from "@pengana/sync-engine";
+import { createSyncAdapter } from "@/entities/todo";
+import {
+	createUploadAdapter,
+	createUploadTransport,
+} from "@/entities/upload-queue";
+import { getServerUrl } from "@/lib/server-url";
+import { client } from "@/utils/orpc";
 
 function getWsUrl() {
 	return `${getServerUrl().replace(/^http/, "ws")}/ws`;
@@ -14,24 +18,23 @@ function getWsUrl() {
 const platformDeps: SyncEnginePlatformDeps = {
 	getWsUrl,
 	generateUUID: () => crypto.randomUUID(),
+	createSyncAdapter: (userId) => createSyncAdapter(userId),
+	createSyncTransport: () => ({
+		sync: async (input) => (await client.todo.sync(input)).data,
+	}),
+	createUploadAdapter,
+	createUploadTransport,
+	onFocusSubscribe: (triggerSync) => {
+		const handler = () => {
+			if (document.visibilityState === "visible") triggerSync();
+		};
+		document.addEventListener("visibilitychange", handler);
+		return () => document.removeEventListener("visibilitychange", handler);
+	},
 };
 
 export function useSyncEngine(userId: string | undefined) {
-	const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-	// Network connectivity listener using browser APIs
-	useEffect(() => {
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-		};
-	}, []);
+	const { isOnline } = useNetworkStatus();
 
 	return useSyncEngineCore(userId, isOnline, platformDeps);
 }
