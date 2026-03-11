@@ -13,7 +13,7 @@ export function createNativeStorageHealthProvider(): StorageHealthProvider {
 			const free = Paths.availableDiskSpace;
 			const total = Paths.totalDiskSpace;
 
-			if (!total || total === 0) return null;
+			if (!total || total === 0 || !free) return null;
 
 			const usage = total - free;
 			return {

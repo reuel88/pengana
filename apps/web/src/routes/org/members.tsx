@@ -100,7 +100,7 @@ function MembersPage() {
 	];
 
 	const { activeOrg, guardElement } = useOrgGuard();
-	if (guardElement) return guardElement;
+	if (guardElement || !activeOrg) return guardElement;
 
 	const members = (activeOrg?.members || []) as Member[];
 

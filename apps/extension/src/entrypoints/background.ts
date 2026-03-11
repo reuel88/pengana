@@ -94,11 +94,11 @@ async function checkStorageHealth(): Promise<void> {
 			});
 		}
 
-		if (level === "critical" && state.storageLevel !== "critical") {
-			broadcast({ type: "storage:critical" });
-		}
-
+		const previousLevel = state.storageLevel;
 		state.storageLevel = level;
+		if (level !== previousLevel) {
+			broadcast({ type: "status:update", status: getStatus() });
+		}
 	} catch (err) {
 		console.error("[background] storage health check failed:", err);
 	}
@@ -241,6 +241,7 @@ function handleMessage(
 		case "status:get": {
 			if (!state.currentUserId || !state.engine) {
 				ensureEngine()
+					.then(() => checkStorageHealth())
 					.then(() => sendResponse(getStatus()))
 					.catch(() => sendResponse(getStatus()));
 				return true; // async — keep channel open
@@ -263,6 +264,8 @@ async function initBackground() {
 	if (userId) {
 		setupEngine(userId);
 	}
+
+	await checkStorageHealth();
 
 	await browser.alarms.create(SYNC_ALARM_NAME, {
 		periodInMinutes: SYNC_INTERVAL_MINUTES,

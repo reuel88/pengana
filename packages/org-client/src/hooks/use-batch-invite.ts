@@ -37,14 +37,14 @@ export function useBatchInvite({
 			);
 
 			const failed = results.filter((r) => r.status === "rejected");
-			if (failed.length > 0) {
-				onPartialFailure?.(failed.length);
-			}
-			if (failed.length < results.length) {
+			if (failed.length === results.length) {
+				onError?.("All invitations failed");
+			} else {
+				if (failed.length > 0) {
+					onPartialFailure?.(failed.length);
+				}
 				await invalidateActiveOrg();
 				onSuccess?.();
-			} else {
-				onError?.("All invitations failed");
 			}
 		} catch {
 			onError?.("Failed to send invitations");

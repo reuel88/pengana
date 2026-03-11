@@ -20,7 +20,7 @@ export default function LoginScreen() {
 				<Link
 					href="/(auth)/sign-up"
 					style={styles.link}
-					testID="auth-switch-link"
+					testID="auth-switch-to-signup-link"
 				>
 					<Text style={[styles.linkText, { color: theme.primary }]}>
 						{t("auth:signUp.title")}

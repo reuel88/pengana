@@ -7,7 +7,6 @@ import { wsLogger } from "./logger";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
-const WS_CLOSE_TRY_AGAIN_LATER = 1013;
 
 function redactId(id: string): string {
 	if (id.length <= 8) return "***";
@@ -47,15 +46,9 @@ export function setupWebSocket(server: ServerType) {
 	const aliveSet = new WeakSet<WebSocket>();
 
 	function handleConnection(ws: WebSocket, userId: string) {
-		const userSockets = connections.get(userId);
-		if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
-			wsLogger.warn`Rejected connection for user ${redactId(userId)} (max connections reached)`;
-			ws.close(WS_CLOSE_TRY_AGAIN_LATER, "Too many connections");
-			return;
-		}
-
-		const sockets = userSockets ?? new Set<WebSocket>();
-		if (!userSockets) connections.set(userId, sockets);
+		const existing = connections.get(userId);
+		const sockets = existing ?? new Set<WebSocket>();
+		if (!existing) connections.set(userId, sockets);
 		sockets.add(ws);
 		aliveSet.add(ws);
 		wsLogger.info`Connection accepted for user ${redactId(userId)} (${String(sockets.size)} total)`;
@@ -89,6 +82,14 @@ export function setupWebSocket(server: ServerType) {
 		if (!userId) {
 			wsLogger.warn`Auth failed for upgrade request`;
 			socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+			socket.destroy();
+			return;
+		}
+
+		const userSockets = connections.get(userId);
+		if (userSockets && userSockets.size >= MAX_CONNECTIONS_PER_USER) {
+			wsLogger.warn`Rejected connection for user ${redactId(userId)} (max connections reached)`;
+			socket.write("HTTP/1.1 429 Too Many Requests\r\n\r\n");
 			socket.destroy();
 			return;
 		}

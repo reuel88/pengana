@@ -8,8 +8,8 @@ export class NativeOrgPage {
 	}
 
 	async createOrg(name: string, slug: string) {
-		await this.page.getByPlaceholder("My Organization").fill(name);
-		await this.page.getByPlaceholder("my-org").fill(slug);
+		await this.page.getByTestId("org-name-input").fill(name);
+		await this.page.getByTestId("org-slug-input").fill(slug);
 		await this.page.getByRole("button", { name: "Create" }).click();
 	}
 

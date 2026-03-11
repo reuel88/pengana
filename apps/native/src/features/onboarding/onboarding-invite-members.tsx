@@ -86,7 +86,7 @@ export function OnboardingInviteMembers({
 									{(emailField) => (
 										<>
 											<ThemedTextInput
-												testID="invite-email-input"
+												testID={`invite-email-input-${index}`}
 												style={{
 													backgroundColor: theme.background,
 													marginBottom: 8,
@@ -117,13 +117,14 @@ export function OnboardingInviteMembers({
 											role={roleField.state.value as "member" | "admin"}
 											onChange={(role) => roleField.handleChange(role)}
 											disabled={loading}
-											memberTestID="invite-role-input"
-											adminTestID="invite-role-input"
+											memberTestID={`invite-role-member-${index}`}
+											adminTestID={`invite-role-admin-${index}`}
 										/>
 									)}
 								</form.Field>
 								{membersField.state.value.length > 1 && (
 									<TouchableOpacity
+										testID={`invite-remove-button-${index}`}
 										style={styles.removeButton}
 										onPress={() => form.removeFieldValue("members", index)}
 										accessibilityRole="button"

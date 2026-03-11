@@ -68,6 +68,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 				testID="todo-toggle"
 				value={todo.completed}
 				onValueChange={handleToggle}
+				accessibilityLabel={todo.title}
 			/>
 			<Text
 				style={[
