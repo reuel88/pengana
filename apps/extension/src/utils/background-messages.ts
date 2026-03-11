@@ -1,4 +1,8 @@
-import type { SyncEvent, UploadEvent } from "@pengana/sync-engine";
+import type {
+	StorageLevel,
+	SyncEvent,
+	UploadEvent,
+} from "@pengana/sync-engine";
 
 // Messages from popup → background
 export type BackgroundMessage =
@@ -14,13 +18,15 @@ export type BackgroundMessage =
 export type BackgroundBroadcast =
 	| { type: "sync:event"; event: SyncEvent }
 	| { type: "upload:event"; event: UploadEvent }
-	| { type: "status:update"; status: SyncStatus };
+	| { type: "status:update"; status: SyncStatus }
+	| { type: "storage:critical" };
 
 export interface SyncStatus {
 	isOnline: boolean;
 	isSyncing: boolean;
 	isUploading: boolean;
 	userId: string | null;
+	storageLevel: StorageLevel;
 }
 
 export type MessageResponseMap = {

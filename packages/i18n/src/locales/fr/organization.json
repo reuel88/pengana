@@ -112,7 +112,7 @@
 		"admin": "Administrateur",
 		"member": "Membre",
 		"description": "Les rôles définissent ce que les membres peuvent faire au sein de l'organisation.",
-		"permissions": "Permissions",
+		"permissions": "Autorisations",
 		"ownerDescription": "Contrôle total sur l'organisation.",
 		"adminDescription": "Peut gérer les membres, les invitations et les équipes.",
 		"memberDescription": "Peut consulter les données de l'organisation."

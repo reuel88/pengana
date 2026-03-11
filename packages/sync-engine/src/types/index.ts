@@ -7,6 +7,12 @@ export type {
 	UploadStatus,
 } from "../schemas";
 
+export type {
+	StorageEstimate,
+	StorageHealthProvider,
+	StorageLevel,
+} from "./storage-health";
+
 import type { Todo, UploadItem, UploadStatus } from "../schemas";
 
 export interface UploadAdapter {
@@ -17,6 +23,7 @@ export interface UploadAdapter {
 	markCompleted(id: string, attachmentUrl: string): Promise<void>;
 	markFailed(id: string): Promise<void>;
 	getQueueItems(): Promise<UploadItem[]>;
+	removeItem(id: string): Promise<void>;
 }
 
 export interface UploadTransport {
@@ -74,11 +81,14 @@ export interface UploadEvent {
 	todoId: string;
 }
 
+import type { StorageLevel } from "./storage-health";
+
 /** Core sync context shape shared by all apps (web, native, extension). */
 export interface SyncContextValue {
 	isOnline: boolean;
 	isSyncing: boolean;
 	isUploading: boolean;
+	storageLevel: StorageLevel;
 	triggerSync: () => void;
 	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
 }

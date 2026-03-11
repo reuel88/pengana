@@ -1,4 +1,5 @@
 import type { UploadAdapter, UploadItem } from "@pengana/sync-engine";
+import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { todoDb } from "../lib/db";
 import { uploadQueueDb } from "../lib/upload-queue-db";
@@ -6,7 +7,12 @@ import { uploadQueueDb } from "../lib/upload-queue-db";
 export function createWebUploadAdapter(): UploadAdapter {
 	return {
 		async addToQueue(item: UploadItem): Promise<void> {
-			await uploadQueueDb.uploadQueue.add(item);
+			try {
+				await uploadQueueDb.uploadQueue.add(item);
+			} catch (e) {
+				if (isQuotaError(e)) throw new StorageFullError();
+				throw e;
+			}
 		},
 
 		async getNextQueued(): Promise<UploadItem | null> {
@@ -64,6 +70,10 @@ export function createWebUploadAdapter(): UploadAdapter {
 
 		async getQueueItems(): Promise<UploadItem[]> {
 			return uploadQueueDb.uploadQueue.orderBy("createdAt").toArray();
+		},
+
+		async removeItem(id: string): Promise<void> {
+			await uploadQueueDb.uploadQueue.delete(id);
 		},
 	};
 }

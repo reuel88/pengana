@@ -54,5 +54,10 @@
 			"biome check --write ."
 		]
 	},
-	"packageManager": "pnpm@10.30.3"
+	"packageManager": "pnpm@10.30.3",
+	"pnpm": {
+		"overrides": {
+			"@babel/types": "^7.29.0"
+		}
+	}
 }

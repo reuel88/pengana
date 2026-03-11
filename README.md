@@ -1,6 +1,6 @@
 # Pengana
 
-A full-stack TypeScript application with web, server, mobile (React Native), browser extension, and desktop (Tauri) platforms.
+A full-stack TypeScript application for collaborative todo management across web, server, mobile (React Native), browser extension, and desktop (Tauri) platforms.
 
 ## Tech Stack
 
@@ -20,16 +20,48 @@ A full-stack TypeScript application with web, server, mobile (React Native), bro
 - **Turborepo** - Monorepo build system
 - **Biome** - Linting and formatting
 
+## What It Does
+
+- **Organizations and teams** - Multi-user workspaces with invitations and role management
+- **Todos with offline sync** - Shared todo flows backed by a reusable sync engine
+- **Realtime updates** - WebSocket notifications prompt clients to resync
+- **Attachments** - File uploads tied to todo items
+- **Internationalization** - Shared i18n across web, native, extension, and server
+- **Multi-platform clients** - Web, Expo native app, browser extension, and Tauri desktop shell
+
 ## Getting Started
 
 ```bash
 pnpm install
 ```
 
+### Environment Setup
+
+Copy the example env files and fill in values for your local setup:
+
+```bash
+cp apps/server/.env.example apps/server/.env
+cp apps/web/.env.example apps/web/.env
+cp apps/native/.env.example apps/native/.env
+```
+
+Required variables by app:
+
+- `apps/server/.env` - `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `CORS_ORIGIN`, `PORT`, `NODE_ENV`, and Polar values
+- `apps/web/.env` - `VITE_SERVER_URL`, `VITE_WEB_URL`
+- `apps/native/.env` - `EXPO_PUBLIC_SERVER_URL`
+
+If you want to run the browser extension locally, also copy `apps/extension/.env.example` to `apps/extension/.env`.
+
 ### Database Setup
 
 1. Set up a PostgreSQL database.
-2. Copy `apps/server/.env.example` to `apps/server/.env` and fill in your values.
+2. Start the local database container if needed:
+
+```bash
+pnpm run db:start
+```
+
 3. Push the schema:
 
 ```bash
@@ -44,25 +76,29 @@ pnpm run dev
 
 - Web: [http://localhost:3001](http://localhost:3001)
 - API: [http://localhost:3000](http://localhost:3000)
-- Native: Use Expo Go
+- Native: Expo dev server via `pnpm run dev:native`
 
 ## Project Structure
 
 ```
 pengana/
 ├── apps/
-│   ├── web/         # Web app (React + TanStack Router + PWA + Tauri desktop)
-│   ├── native/      # Mobile app (React Native + Expo)
-│   ├── server/      # Backend API (Hono + oRPC)
-│   └── extension/   # Browser extension (WXT)
+│   ├── web/         # React web app, PWA, and Tauri desktop shell
+│   ├── native/      # Expo / React Native mobile app
+│   ├── server/      # Hono server for auth, RPC, uploads, and WebSockets
+│   ├── extension/   # WXT browser extension client
+│   └── e2e/         # Playwright end-to-end tests
 ├── packages/
-│   ├── api/          # API routes & business logic
-│   ├── auth/         # Authentication (Better-Auth + Polar)
-│   ├── db/           # Database schema & queries (Drizzle + PostgreSQL)
-│   ├── env/          # Environment config
-│   ├── config/       # Shared config (TypeScript, Biome)
+│   ├── api/          # Shared oRPC routes, procedures, and server context
+│   ├── auth/         # Better Auth configuration and auth-related hooks
+│   ├── db/           # Drizzle schema, migrations, and query helpers
+│   ├── env/          # Typed environment validation per platform
+│   ├── config/       # Shared TypeScript and tooling config
+│   ├── i18n/         # Shared locales and i18n bootstrapping
+│   ├── org-client/   # Shared org/team/invitation client logic
 │   ├── sync-engine/  # Offline-first sync engine
-│   └── todo-client/  # Shared client-side logic
+│   ├── todo-client/  # Shared local todo and upload queue logic
+│   └── ui/           # Shared UI components and styles
 ```
 
 ## Available Scripts
@@ -77,13 +113,15 @@ pengana/
 - `pnpm run db:generate` - Generate database types
 - `pnpm run db:migrate` - Run migrations
 - `pnpm run db:studio` - Open Drizzle Studio
+- `pnpm run db:start` - Start the local PostgreSQL container
+- `pnpm run db:stop` - Stop the local PostgreSQL container
 - `pnpm run check` - Run Biome formatting and linting
 - `cd apps/web && pnpm run desktop:dev` - Start Tauri desktop app
 - `cd apps/web && pnpm run desktop:build` - Build Tauri desktop app
 
 ## E2E Testing
 
-E2E tests use Playwright and run against a live dev environment.
+E2E tests use Playwright against a local API and web app.
 
 ### One-time setup
 
@@ -95,17 +133,17 @@ pnpm --filter @pengana/e2e exec playwright install
 
 ### Running tests
 
-Ensure the PostgreSQL container is running before starting tests:
+Ensure PostgreSQL is running before starting tests:
 
 ```bash
-pnpm db:start
+pnpm run db:start
 ```
 
 Then run:
 
 ```bash
-pnpm e2e          # run all E2E tests
-pnpm e2e:ui       # open Playwright UI (interactive)
+pnpm run e2e          # run all E2E tests
+pnpm run e2e:ui       # open Playwright UI (interactive)
 ```
 
-Playwright automatically starts the API server and web app before running tests.
+Playwright starts the API server and web app automatically before running tests.

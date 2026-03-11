@@ -53,7 +53,7 @@
 	"invitations": {
 		"title": "Mga Imbitasyon",
 		"invite": "Mag-imbita ng Miyembro",
-		"email": "Email Address",
+		"email": "Email address",
 		"emailPlaceholder": "user@example.com",
 		"role": "Tungkulin",
 		"send": "Ipadala ang Imbitasyon",

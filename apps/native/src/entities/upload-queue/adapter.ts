@@ -1,4 +1,5 @@
 import type { UploadAdapter, UploadItem } from "@pengana/sync-engine";
+import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { asc, eq } from "drizzle-orm";
 
@@ -9,15 +10,20 @@ import { uploadQueue } from "./schema";
 export function createNativeUploadAdapter(): UploadAdapter {
 	return {
 		async addToQueue(item: UploadItem): Promise<void> {
-			await db.insert(uploadQueue).values({
-				id: item.id,
-				todoId: item.todoId,
-				fileUri: item.fileUri,
-				mimeType: item.mimeType,
-				status: item.status,
-				retryCount: item.retryCount,
-				createdAt: item.createdAt,
-			});
+			try {
+				await db.insert(uploadQueue).values({
+					id: item.id,
+					todoId: item.todoId,
+					fileUri: item.fileUri,
+					mimeType: item.mimeType,
+					status: item.status,
+					retryCount: item.retryCount,
+					createdAt: item.createdAt,
+				});
+			} catch (e) {
+				if (isQuotaError(e)) throw new StorageFullError();
+				throw e;
+			}
 		},
 
 		async getNextQueued(): Promise<UploadItem | null> {
@@ -121,6 +127,10 @@ export function createNativeUploadAdapter(): UploadAdapter {
 				retryCount: row.retryCount,
 				createdAt: row.createdAt,
 			}));
+		},
+
+		async removeItem(id: string): Promise<void> {
+			await db.delete(uploadQueue).where(eq(uploadQueue.id, id));
 		},
 	};
 }

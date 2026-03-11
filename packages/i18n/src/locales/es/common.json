@@ -30,7 +30,7 @@
 	"systemStatus": "Estado del sistema",
 	"orpcBackend": "Backend ORPC",
 	"privateData": "Datos privados",
-	"modal": "Modal",
+	"modal": "Ventana modal",
 	"submitting": "Enviando...",
 	"loginPrompt": "Inicie sesion en la aplicacion web primero.",
 	"loginButton": "Iniciar sesión",
