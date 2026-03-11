@@ -20,9 +20,13 @@ import { isSyncActive, isUploadActive } from "@/utils/background-messages";
 import { client } from "@/utils/orpc";
 import { sessionResponseSchema } from "@/utils/session-schema";
 
+// --- Constants ---
+
 const SYNC_ALARM_NAME = "periodic-sync";
 const SYNC_INTERVAL_SECONDS = 30;
 const SYNC_INTERVAL_MINUTES = SYNC_INTERVAL_SECONDS / 60;
+
+// --- State ---
 
 interface BackgroundState {
 	engine: SyncEngine | null;
@@ -44,6 +48,8 @@ const state: BackgroundState = {
 	isSyncing: false,
 	isUploading: false,
 };
+
+// --- Utilities ---
 
 function getStatus(): SyncStatus {
 	return {
@@ -75,13 +81,7 @@ async function fetchUserId(): Promise<string | null> {
 	}
 }
 
-function teardownEngine() {
-	if (state.uploadQueue) {
-		state.uploadQueue.pause();
-	}
-	state.engine = null;
-	state.uploadQueue = null;
-}
+// --- Engine Lifecycle ---
 
 function createSyncEngine(userId: string): SyncEngine {
 	const adapter = createDexieSyncAdapter(userId);
@@ -119,6 +119,14 @@ function createUploadQueueForEngine(engine: SyncEngine): UploadQueue {
 	return queue;
 }
 
+function teardownEngine() {
+	if (state.uploadQueue) {
+		state.uploadQueue.pause();
+	}
+	state.engine = null;
+	state.uploadQueue = null;
+}
+
 function setupEngine(userId: string) {
 	if (state.engine && state.currentUserId === userId) return;
 
@@ -138,6 +146,8 @@ async function ensureEngine(): Promise<void> {
 	const userId = state.currentUserId ?? (await fetchUserId());
 	if (userId) setupEngine(userId);
 }
+
+// --- Message Handler ---
 
 /**
  * Handles messages from the popup/content scripts.
@@ -202,6 +212,8 @@ function handleMessage(
 		}
 	}
 }
+
+// --- Entry Point ---
 
 async function initBackground() {
 	const userId = await fetchUserId();

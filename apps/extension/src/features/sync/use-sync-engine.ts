@@ -66,12 +66,13 @@ export function useSyncEngine(userId: string) {
 	}, []);
 
 	// --- Return ---
-	// Flat shape -- no devtools in extension
 	return {
-		isOnline,
-		isSyncing,
-		isUploading,
-		triggerSync,
-		enqueueUpload,
+		core: {
+			isOnline,
+			isSyncing,
+			isUploading,
+			triggerSync,
+			enqueueUpload,
+		},
 	};
 }
