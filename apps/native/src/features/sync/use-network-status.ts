@@ -11,7 +11,7 @@ export function useNetworkStatus() {
 		});
 
 		const subscription = Network.addNetworkStateListener((state) => {
-			setIsOnline(state.isConnected ?? false);
+			setIsOnline(state.isConnected ?? true);
 		});
 
 		return () => {

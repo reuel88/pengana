@@ -55,7 +55,7 @@ export function useSyncEngineCore(
 		engineRef.current = engine;
 
 		const unsubscribeSyncEvents = engine.onEvent((event) => {
-			setEvents((prev) => [...prev.slice(-MAX_EVENT_LOG_SIZE), event]);
+			setEvents((prev) => [...prev.slice(-(MAX_EVENT_LOG_SIZE - 1)), event]);
 			if (event.type === "sync:start") setIsSyncing(true);
 			if (event.type === "sync:complete" || event.type === "sync:error")
 				setIsSyncing(false);

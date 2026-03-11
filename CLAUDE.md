@@ -52,7 +52,7 @@ This is handled automatically by the envelope middleware in `packages/api/src/in
 - xState machine at `apps/web/src/machines/onboarding-machine.ts` manages onboarding flow
 - Route guard `requireAuthAndOrg()` in `apps/web/src/lib/auth-client.ts` redirects org-less users to `/onboarding`
 - Shared data fetching in `packages/org-client/src/lib/user-lifecycle.ts` — single source for lifecycle checks
-- Onboarding components in `apps/web/src/components/onboarding/`
+- Onboarding components in `apps/web/src/features/onboarding/`
 
 ## Future: Long-Lived User Actor
 When a **second lifecycle gate** is added (email verification, KYC, payment setup), migrate to a user actor:
