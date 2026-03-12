@@ -8,8 +8,12 @@ export function TodoInput({ userId }: { userId: string }) {
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await addTodo(userId, title);
-				triggerSync();
+				try {
+					await addTodo(userId, title);
+					triggerSync();
+				} catch (err) {
+					console.error("[TodoInput] failed to add todo:", err);
+				}
 			}}
 		/>
 	);

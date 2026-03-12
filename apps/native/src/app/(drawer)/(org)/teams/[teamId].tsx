@@ -11,6 +11,7 @@ import {
 	View,
 } from "react-native";
 import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
+import { TeamMemberRow } from "@/features/org/team-member-row";
 import { TeamNameEditor } from "@/features/org/team-name-editor";
 import {
 	useActiveOrg,
@@ -19,7 +20,7 @@ import {
 	useTeams,
 } from "@/shared/hooks/use-org-queries";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import { mutedText, sharedStyles } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
@@ -132,34 +133,12 @@ export default function TeamDetailScreen() {
 				renderItem={({ item }) => {
 					const orgMember = membersByUserId.get(item.userId);
 					return (
-						<View
-							style={[
-								styles.memberItem,
-								{ borderColor: theme.border, backgroundColor: theme.card },
-							]}
-						>
-							<View style={{ flex: 1 }}>
-								<Text style={{ color: theme.text }}>
-									{orgMember?.user.name ?? item.userId}
-								</Text>
-								<Text style={secondaryText(theme)}>
-									{orgMember?.user.email ?? ""}
-								</Text>
-							</View>
-							{isAdmin && (
-								<TouchableOpacity
-									onPress={() => onRemoveMember(item.userId)}
-									style={[
-										styles.removeButton,
-										{ backgroundColor: theme.notification },
-									]}
-								>
-									<Text style={sharedStyles.smallButtonText}>
-										{t("teams.removeMember")}
-									</Text>
-								</TouchableOpacity>
-							)}
-						</View>
+						<TeamMemberRow
+							name={orgMember?.user.name ?? item.userId}
+							email={orgMember?.user.email ?? ""}
+							isAdmin={isAdmin}
+							onRemove={isAdmin ? () => onRemoveMember(item.userId) : undefined}
+						/>
 					);
 				}}
 			/>
@@ -175,12 +154,5 @@ const styles = StyleSheet.create({
 		marginBottom: 12,
 	},
 	deleteButton: { paddingHorizontal: 12, paddingVertical: 6 },
-	memberItem: {
-		flexDirection: "row",
-		alignItems: "center",
-		padding: 12,
-		borderWidth: 1,
-	},
-	removeButton: { paddingHorizontal: 12, paddingVertical: 6 },
 	notFoundText: { padding: 16 },
 });

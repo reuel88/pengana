@@ -1,3 +1,4 @@
+import { filterTodos } from "@pengana/todo-client";
 import { eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
@@ -8,10 +9,7 @@ export function useTodos(userId: string) {
 		db.select().from(todos).where(eq(todos.userId, userId)),
 	);
 
-	const activeTodos = (allTodos ?? []).filter((todo) => !todo.deleted);
-	const conflictTodos = (allTodos ?? []).filter(
-		(todo) => todo.syncStatus === "conflict",
-	);
+	const { activeTodos, conflictTodos } = filterTodos(allTodos ?? []);
 
 	return { todos: activeTodos, conflictTodos };
 }

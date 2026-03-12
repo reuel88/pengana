@@ -11,7 +11,7 @@ export function SyncProvider({
 	userId: string;
 	children: React.ReactNode;
 }) {
-	const { core } = useSyncEngine(userId);
+	const syncState = useSyncEngine(userId);
 
-	return <SyncContext value={core}>{children}</SyncContext>;
+	return <SyncContext value={syncState}>{children}</SyncContext>;
 }

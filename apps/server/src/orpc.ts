@@ -33,7 +33,7 @@ const rpcHandler = new RPCHandler(appRouter, {
 // instance, but this middleware is created before the server exists. We use a
 // mutable ref so that once the server starts and notifyUser is wired up, all
 // subsequent requests pick up the real implementation.
-export const notifyRef: {
+const notifyRef: {
 	notifyUser: (userId: string) => void;
 	notifyOrgMembers: (orgId: string, excludeUserId: string) => void;
 } = {
@@ -45,7 +45,15 @@ export const notifyRef: {
 	},
 };
 
-async function parseJsonObject(
+export function wireNotifications(
+	notifyUser: (userId: string) => void,
+	notifyOrgMembers: (orgId: string, excludeUserId: string) => void,
+) {
+	notifyRef.notifyUser = notifyUser;
+	notifyRef.notifyOrgMembers = notifyOrgMembers;
+}
+
+async function tryParseJsonObject(
 	response: Response,
 ): Promise<Record<string, unknown>> {
 	try {
@@ -67,7 +75,7 @@ async function ensureErrorEnvelope(c: Context, response: Response) {
 	if (!contentType.includes("application/json") || response.status < 400) {
 		return c.newResponse(response.body, response);
 	}
-	const body = await parseJsonObject(response);
+	const body = await tryParseJsonObject(response);
 	const rawCode = typeof body.code === "string" ? body.code : "";
 	return c.json(
 		errorEnvelope(

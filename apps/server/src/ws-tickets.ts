@@ -11,7 +11,7 @@ interface Ticket {
 const tickets = new Map<string, Ticket>();
 
 // Periodically clean up expired tickets
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
 	const now = Date.now();
 	for (const [token, ticket] of tickets) {
 		if (ticket.expiresAt <= now) {
@@ -19,6 +19,11 @@ setInterval(() => {
 		}
 	}
 }, CLEANUP_INTERVAL_MS);
+
+/** Stop the periodic cleanup timer (useful for test teardown). */
+export function stopTicketCleanup() {
+	clearInterval(cleanupTimer);
+}
 
 /** Issue a short-lived, one-time-use ticket for WebSocket authentication. */
 export function issueWsTicket(userId: string): string {

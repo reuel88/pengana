@@ -1,13 +1,13 @@
 import { useTranslation } from "@pengana/i18n";
 import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
 import { Button } from "@pengana/ui/components/button";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher";
 import { OnboardingCreateOrg } from "@/features/onboarding/onboarding-create-org";
 import { OnboardingInvitations } from "@/features/onboarding/onboarding-invitations";
 import { OnboardingInviteMembers } from "@/features/onboarding/onboarding-invite-members";
 import { useOnboarding } from "@/features/onboarding/use-onboarding";
-import { queryClient } from "@/shared/api/orpc";
+import { useSignOut } from "@/shared/hooks/use-sign-out";
 import { authClient, requireAuth } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/(account)/onboarding")({
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/(account)/onboarding")({
 function OnboardingPage() {
 	const { session, hasPendingInvitations } = Route.useRouteContext();
 	const { t } = useTranslation("onboarding");
-	const navigate = useNavigate();
+	const handleSignOut = useSignOut("/login");
 	const [state, send] = useOnboarding({ hasPendingInvitations });
 
 	const isViewInvitations = state.matches({
@@ -46,20 +46,7 @@ function OnboardingPage() {
 				<span className="font-semibold text-lg">pengana</span>
 				<div className="flex items-center gap-2">
 					<LanguageSwitcher />
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() =>
-							authClient.signOut({
-								fetchOptions: {
-									onSuccess: () => {
-										queryClient.clear();
-										navigate({ to: "/login" });
-									},
-								},
-							})
-						}
-					>
+					<Button variant="ghost" size="sm" onClick={handleSignOut}>
 						{t("common:user.signOut")}
 					</Button>
 				</div>

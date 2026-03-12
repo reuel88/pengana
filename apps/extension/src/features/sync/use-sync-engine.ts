@@ -80,13 +80,11 @@ export function useSyncEngine(userId: string) {
 
 	// --- Return ---
 	return {
-		core: {
-			isOnline,
-			isSyncing,
-			isUploading,
-			storageLevel,
-			triggerSync,
-			enqueueUpload,
-		},
+		isOnline,
+		isSyncing,
+		isUploading,
+		storageLevel,
+		triggerSync,
+		enqueueUpload,
 	};
 }

@@ -2,22 +2,22 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { auth, setNotifyUser } from "@pengana/auth";
 import { db } from "@pengana/db";
-import { findUserByEmail } from "@pengana/db/notification-queries";
-import { sendEmail } from "@pengana/email-dev/send-email";
 import { env } from "@pengana/env/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@pengana/i18n/config";
 import { initServerI18n } from "@pengana/i18n/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
+import { errorEnvelope } from "./error-envelope";
 import { initLogger, logger, requestLogger } from "./logger";
-import { handleOrpcRoutes, notifyRef } from "./orpc";
+import { handleOrpcRoutes, wireNotifications } from "./orpc";
 import {
 	authLimiter,
 	globalLimiter,
 	syncLimiter,
 	uploadLimiter,
 } from "./rate-limit";
+import { createSignUpGuard } from "./sign-up-guard";
 import { setupWebSocket } from "./ws";
 import { issueWsTicket } from "./ws-tickets";
 
@@ -67,44 +67,20 @@ app.use("/rpc/upload.*", uploadLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
 // Intercept sign-up to prevent email enumeration: always return 200
-app.post("/api/auth/sign-up/email", async (c) => {
-	const clonedReq = c.req.raw.clone();
-	const response = await auth.handler(c.req.raw);
-
-	if (response.ok) return response;
-
-	// Sign-up failed (likely duplicate email) — mask the error
-	try {
-		const body = await clonedReq.json();
-		const email = body?.email as string | undefined;
-		if (email) {
-			const existingUser = await findUserByEmail(email);
-			if (existingUser) {
-				await sendEmail(db, {
-					to: email,
-					from: "noreply@pengana.com",
-					subject: "Sign-up attempt with your email",
-					html: `<p>Hi ${existingUser.name ?? ""},</p><p>Someone tried to create an account using your email address. If this was you, try <a href="${allowedOrigins[0]}/login">signing in</a> instead.</p><p>If you didn't request this, you can safely ignore this email.</p>`,
-				});
-			}
-		}
-	} catch (err) {
-		logger.error`Failed to handle sign-up enumeration protection: ${err}`;
-	}
-
-	// Return a neutral 200 so the caller can't distinguish new vs existing
-	return new Response(JSON.stringify({ token: null, user: null }), {
-		status: 200,
-		headers: { "Content-Type": "application/json" },
-	});
-});
+app.post(
+	"/api/auth/sign-up/email",
+	createSignUpGuard(auth, db, allowedOrigins),
+);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.post("/api/ws-ticket", async (c) => {
 	const session = await auth.api.getSession({ headers: c.req.raw.headers });
 	if (!session?.user?.id) {
-		return c.json({ error: "Unauthorized" }, 401);
+		return c.json(
+			errorEnvelope("UNAUTHORIZED", "Authentication required"),
+			401,
+		);
 	}
 	return c.json({ ticket: issueWsTicket(session.user.id) });
 });
@@ -137,7 +113,6 @@ const server = serve(
 );
 
 // Wire WebSocket notifications into ORPC context and auth hooks
-const { notifyUser, notifyOrgMembers } = setupWebSocket(server);
-notifyRef.notifyUser = notifyUser;
-notifyRef.notifyOrgMembers = notifyOrgMembers;
-setNotifyUser(notifyUser);
+const ws = setupWebSocket(server);
+wireNotifications(ws.notifyUser, ws.notifyOrgMembers);
+setNotifyUser(ws.notifyUser);

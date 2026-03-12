@@ -1,11 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
 import { useActiveOrg } from "@pengana/org-client";
-import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { SubscriptionCard } from "@/features/billing/subscription-card";
 import { orpc } from "@/shared/api/orpc";
-import { authClient, requireAuthAndOrg } from "@/shared/lib/auth-client";
+import { requireAuthAndOrg } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/")({
 	component: DashboardPage,
@@ -24,24 +23,6 @@ function DashboardPage() {
 	const activeOrg = useActiveOrg();
 	const orgId = activeOrg.data?.id ?? "";
 
-	const subscription = useQuery(
-		orpc.billing.getOrgSubscription.queryOptions({
-			input: { organizationId: orgId },
-			enabled: !!orgId,
-		}),
-	);
-
-	const hasProSubscription = subscription.data?.data?.status === "active";
-
-	const handlePaymentAction = async (action: () => Promise<unknown>) => {
-		try {
-			await action();
-		} catch (err) {
-			console.error("[payment]", err);
-			toast.error(t("errors:paymentError"));
-		}
-	};
-
 	return (
 		<div>
 			<h1>{t("title")}</h1>
@@ -54,29 +35,7 @@ function DashboardPage() {
 			) : (
 				<p>API: {privateData.data?.data?.message}</p>
 			)}
-			<p>{hasProSubscription ? t("planPro") : t("planFree")}</p>
-			{hasProSubscription ? (
-				<Button
-					onClick={() =>
-						handlePaymentAction(() => authClient.customer.portal())
-					}
-				>
-					{t("manageSubscription")}
-				</Button>
-			) : (
-				<Button
-					onClick={() =>
-						handlePaymentAction(() =>
-							authClient.checkout({
-								slug: "pro",
-								metadata: { orgId },
-							}),
-						)
-					}
-				>
-					{t("upgradeToPro")}
-				</Button>
-			)}
+			<SubscriptionCard orgId={orgId} />
 		</div>
 	);
 }

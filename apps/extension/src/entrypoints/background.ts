@@ -258,6 +258,8 @@ function handleMessage(
 }
 
 // --- Entry Point ---
+// Console convention: console.error/warn are always-on for production
+// diagnostics; console.log is guarded by import.meta.env.DEV.
 
 async function initBackground() {
 	const userId = await fetchUserId();

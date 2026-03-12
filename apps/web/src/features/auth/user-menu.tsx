@@ -11,14 +11,14 @@ import {
 	DropdownMenuTrigger,
 } from "@pengana/ui/components/dropdown-menu";
 import { Skeleton } from "@pengana/ui/components/skeleton";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { queryClient } from "@/shared/api/orpc";
+import { Link } from "@tanstack/react-router";
+import { useSignOut } from "@/shared/hooks/use-sign-out";
 import { authClient } from "@/shared/lib/auth-client";
 
 export function UserMenu() {
-	const navigate = useNavigate();
 	const { data: session, isPending } = authClient.useSession();
 	const { t } = useTranslation();
+	const handleSignOut = useSignOut();
 
 	if (isPending) {
 		return <Skeleton className="h-9 w-24" />;
@@ -31,17 +31,6 @@ export function UserMenu() {
 			</Link>
 		);
 	}
-
-	const handleSignOut = () => {
-		authClient.signOut({
-			fetchOptions: {
-				onSuccess: () => {
-					queryClient.clear();
-					navigate({ to: "/" });
-				},
-			},
-		});
-	};
 
 	return (
 		<DropdownMenu>

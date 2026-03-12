@@ -64,28 +64,23 @@ export function TodoPage({
 
 			{organizationId && (
 				<div className="flex gap-2 border-b">
-					<button
-						type="button"
-						className={`px-3 py-2 font-medium text-sm ${
-							activeTab === "personal"
-								? "border-current border-b-2"
-								: "opacity-60"
-						}`}
-						onClick={() => setActiveTab("personal")}
-					>
-						{t("tabs.personal")}
-					</button>
-					<button
-						type="button"
-						className={`px-3 py-2 font-medium text-sm ${
-							activeTab === "organization"
-								? "border-current border-b-2"
-								: "opacity-60"
-						}`}
-						onClick={() => setActiveTab("organization")}
-					>
-						{t("tabs.organization")}
-					</button>
+					{(
+						[
+							{ key: "personal", label: t("tabs.personal") },
+							{ key: "organization", label: t("tabs.organization") },
+						] as const
+					).map(({ key, label }) => (
+						<button
+							key={key}
+							type="button"
+							className={`px-3 py-2 font-medium text-sm ${
+								activeTab === key ? "border-current border-b-2" : "opacity-60"
+							}`}
+							onClick={() => setActiveTab(key)}
+						>
+							{label}
+						</button>
+					))}
 				</div>
 			)}
 

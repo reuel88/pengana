@@ -7,7 +7,7 @@ export type ActiveOrg = NonNullable<ReturnType<typeof useActiveOrg>["data"]>;
 
 export function useOrgGuard() {
 	const { t } = useTranslation("organization");
-	const { data: activeOrg, isPending, isError, error } = useActiveOrg();
+	const { data: activeOrg, isPending, isError } = useActiveOrg();
 
 	let guardElement: ReactNode = null;
 	if (isPending) {
@@ -18,7 +18,7 @@ export function useOrgGuard() {
 		guardElement = <p>{t("noOrganization")}</p>;
 	}
 
-	return { activeOrg, guardElement, isError, error };
+	return { activeOrg, guardElement };
 }
 
 export function OrgGuard({

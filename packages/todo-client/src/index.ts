@@ -27,6 +27,7 @@ export { useTodos } from "./hooks/use-todos";
 export type { WebOrgTodo, WebTodo } from "./lib/db";
 export { TodoDatabase, todoDb } from "./lib/db";
 export { readFileAsBase64 } from "./lib/file-utils";
+export { filterTodos } from "./lib/filter-todos";
 export {
 	addOrgTodo,
 	attachOrgFile,

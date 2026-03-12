@@ -8,12 +8,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-import { Input } from "@pengana/ui/components/input";
-import { Label } from "@pengana/ui/components/label";
-import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
+import { AccountFieldCard } from "./account-field-card";
 
 export function AccountSettingsForm() {
 	const { t } = useTranslation();
@@ -21,115 +19,28 @@ export function AccountSettingsForm() {
 
 	return (
 		<div className="space-y-6">
-			<ChangeNameSection currentName={session?.user.name ?? ""} t={t} />
-			<ChangeEmailSection currentEmail={session?.user.email ?? ""} t={t} />
-			<ChangePasswordSection t={t} />
+			<AccountFieldCard
+				title={t("auth:settings.account.changeName")}
+				label={t("auth:fields.name")}
+				value={session?.user.name ?? ""}
+				onSubmit={(name) => authClient.updateUser({ name })}
+			/>
+			<AccountFieldCard
+				title={t("auth:settings.account.changeEmail")}
+				label={t("auth:fields.email")}
+				type="email"
+				note={t("auth:settings.account.changeEmailNote")}
+				value={session?.user.email ?? ""}
+				onSubmit={(newEmail) => authClient.changeEmail({ newEmail })}
+			/>
+			<ChangePasswordSection />
 		</div>
 	);
 }
 
-function ChangeNameSection({
-	currentName,
-	t,
-}: {
-	currentName: string;
-	t: ReturnType<typeof useTranslation>["t"];
-}) {
-	const [name, setName] = useState(currentName);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+function ChangePasswordSection() {
+	const { t } = useTranslation();
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsSubmitting(true);
-		try {
-			await authClient.updateUser({ name });
-			toast.success(t("auth:settings.account.updateSuccess"));
-		} catch {
-			toast.error(t("error.generic"));
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{t("auth:settings.account.changeName")}</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div className="space-y-2">
-						<Label>{t("auth:fields.name")}</Label>
-						<Input value={name} onChange={(e) => setName(e.target.value)} />
-					</div>
-					<Button type="submit" disabled={isSubmitting}>
-						{isSubmitting
-							? t("submitting")
-							: t("auth:settings.account.changeName")}
-					</Button>
-				</form>
-			</CardContent>
-		</Card>
-	);
-}
-
-function ChangeEmailSection({
-	currentEmail,
-	t,
-}: {
-	currentEmail: string;
-	t: ReturnType<typeof useTranslation>["t"];
-}) {
-	const [email, setEmail] = useState(currentEmail);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsSubmitting(true);
-		try {
-			await authClient.changeEmail({ newEmail: email });
-			toast.success(t("auth:settings.account.updateSuccess"));
-		} catch {
-			toast.error(t("error.generic"));
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{t("auth:settings.account.changeEmail")}</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div className="space-y-2">
-						<Label>{t("auth:fields.email")}</Label>
-						<Input
-							type="email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-						/>
-					</div>
-					<p className="text-muted-foreground text-xs">
-						{t("auth:settings.account.changeEmailNote")}
-					</p>
-					<Button type="submit" disabled={isSubmitting}>
-						{isSubmitting
-							? t("submitting")
-							: t("auth:settings.account.changeEmail")}
-					</Button>
-				</form>
-			</CardContent>
-		</Card>
-	);
-}
-
-function ChangePasswordSection({
-	t,
-}: {
-	t: ReturnType<typeof useTranslation>["t"];
-}) {
 	const form = useZodForm({
 		schema: makeChangePasswordSchema(t),
 		defaultValues: {

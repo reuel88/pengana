@@ -8,13 +8,11 @@ import {
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
+const basePlugins = [organizationClient({ teams: { enabled: true } })];
+
 export const authClient = createAuthClient({
 	baseURL: env.VITE_SERVER_URL,
-	plugins: [
-		polarClient(),
-		organizationClient({ teams: { enabled: true } }),
-		magicLinkClient(),
-	],
+	plugins: [...basePlugins, polarClient(), magicLinkClient()],
 	sessionOptions: {
 		refetchOnWindowFocus: false,
 	},
