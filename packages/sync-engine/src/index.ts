@@ -38,6 +38,9 @@ export type { SyncEnginePlatformDeps } from "./hooks/use-sync-engine-core";
 export { useSyncEngineCore } from "./hooks/use-sync-engine-core";
 export { useWebSocketReconnect } from "./hooks/use-websocket-reconnect";
 export {
+	orgSyncInputSchema,
+	orgSyncOutputSchema,
+	orgTodoSchema,
 	syncInputSchema,
 	syncOutputSchema,
 	syncStatusSchema,
@@ -46,6 +49,9 @@ export {
 	uploadStatusSchema,
 } from "./schemas";
 export type {
+	OrgSyncInput,
+	OrgSyncOutput,
+	OrgTodo,
 	StorageEstimate,
 	StorageHealthProvider,
 	StorageLevel,

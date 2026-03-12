@@ -145,5 +145,15 @@ export function setupWebSocket(server: ServerType) {
 		wsLogger.debug`notifyUser(${redactId(userId)}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
-	return { notifyUser };
+	async function notifyOrgMembers(orgId: string, excludeUserId: string) {
+		const { getSeatedMemberUserIds } = await import("@pengana/db/seat-queries");
+		const memberUserIds = await getSeatedMemberUserIds(orgId);
+		for (const uid of memberUserIds) {
+			if (uid !== excludeUserId) {
+				notifyUser(uid);
+			}
+		}
+	}
+
+	return { notifyUser, notifyOrgMembers };
 }

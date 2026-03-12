@@ -87,6 +87,7 @@ const server = serve(
 );
 
 // Wire WebSocket notifications into ORPC context and auth hooks
-const { notifyUser } = setupWebSocket(server);
+const { notifyUser, notifyOrgMembers } = setupWebSocket(server);
 notifyRef.current = notifyUser;
+notifyRef.orgCurrent = notifyOrgMembers;
 setNotifyUser(notifyUser);

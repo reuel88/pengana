@@ -50,6 +50,20 @@
 			"when": 1773228985449,
 			"tag": "0006_calm_millenium_guard",
 			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1773300505494,
+			"tag": "0007_bizarre_squadron_supreme",
+			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1773301269195,
+			"tag": "0008_hard_radioactive_man",
+			"breakpoints": true
 		}
 	]
 }

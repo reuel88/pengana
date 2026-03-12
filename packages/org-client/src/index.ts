@@ -31,6 +31,8 @@ export {
 export { useOrgRole } from "./hooks/use-org-role";
 export { useOrgSettings } from "./hooks/use-org-settings";
 export { useOrgSwitcher } from "./hooks/use-org-switcher";
+export type { SeatStatus } from "./hooks/use-seat-status";
+export { useSeatStatus } from "./hooks/use-seat-status";
 export {
 	useTeamActions,
 	useTeamMemberAdd,

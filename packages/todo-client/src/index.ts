@@ -11,8 +11,10 @@ export {
 	storeFileInMemory,
 } from "./adapters/memory-file-store";
 export { createMemoryUploadTransport } from "./adapters/memory-upload-transport";
+export { createDexieOrgSyncAdapter } from "./adapters/org-adapter";
 export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
 export { createUploadTransport } from "./adapters/upload-transport";
+export { useOrgTodos } from "./hooks/use-org-todos";
 export type {
 	FileStorageStrategy,
 	TodoHandlerDeps,
@@ -21,9 +23,16 @@ export { useTodoHandlers } from "./hooks/use-todo-handlers";
 export type { UseTodoListWiringConfig } from "./hooks/use-todo-list-wiring";
 export { useTodoListWiring } from "./hooks/use-todo-list-wiring";
 export { useTodos } from "./hooks/use-todos";
-export type { WebTodo } from "./lib/db";
+export type { WebOrgTodo, WebTodo } from "./lib/db";
 export { TodoDatabase, todoDb } from "./lib/db";
 export { readFileAsBase64 } from "./lib/file-utils";
+export {
+	addOrgTodo,
+	attachOrgFile,
+	deleteOrgTodo,
+	resolveOrgConflict,
+	toggleOrgTodo,
+} from "./lib/org-todo-actions";
 export {
 	addTodo,
 	attachFile,

@@ -11,6 +11,7 @@ export const Route = createFileRoute("/todos")({
 function TodosPage() {
 	const { session } = Route.useRouteContext();
 	const userId = session.data.user.id;
+	const organizationId = session.data.session.activeOrganizationId ?? undefined;
 
-	return <TodoPage userId={userId} />;
+	return <TodoPage userId={userId} organizationId={organizationId} />;
 }

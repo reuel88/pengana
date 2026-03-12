@@ -8,8 +8,11 @@ export class TodoPage {
 	}
 
 	async addTodo(title: string) {
-		await this.page.getByPlaceholder("Add a new todo...").fill(title);
-		await this.page.getByTestId("todo-submit").click();
+		await this.page
+			.getByPlaceholder("Add a new todo...")
+			.locator("visible=true")
+			.fill(title);
+		await this.page.getByTestId("todo-submit").locator("visible=true").click();
 	}
 
 	private todoRow(title: string) {

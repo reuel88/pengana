@@ -46,12 +46,19 @@ export function createWebUploadAdapter(): UploadAdapter {
 
 			await uploadQueueDb.uploadQueue.update(id, { status: "uploaded" });
 
-			await todoDb.todos.update(item.todoId, {
+			const updateData = {
 				attachmentUrl,
-				attachmentStatus: "uploaded",
+				attachmentStatus: "uploaded" as const,
 				updatedAt: new Date().toISOString(),
-				syncStatus: "pending",
-			});
+				syncStatus: "pending" as const,
+			};
+
+			const personalTodo = await todoDb.todos.get(item.todoId);
+			if (personalTodo) {
+				await todoDb.todos.update(item.todoId, updateData);
+			} else {
+				await todoDb.orgTodos.update(item.todoId, updateData);
+			}
 		},
 
 		async markFailed(id: string): Promise<void> {
@@ -62,10 +69,17 @@ export function createWebUploadAdapter(): UploadAdapter {
 
 			// Intentionally does NOT set syncStatus: 'pending'. A failed upload
 			// should not trigger sync — the user should retry the upload.
-			await todoDb.todos.update(item.todoId, {
-				attachmentStatus: "failed",
+			const updateData = {
+				attachmentStatus: "failed" as const,
 				updatedAt: new Date().toISOString(),
-			});
+			};
+
+			const personalTodo = await todoDb.todos.get(item.todoId);
+			if (personalTodo) {
+				await todoDb.todos.update(item.todoId, updateData);
+			} else {
+				await todoDb.orgTodos.update(item.todoId, updateData);
+			}
 		},
 
 		async getQueueItems(): Promise<UploadItem[]> {

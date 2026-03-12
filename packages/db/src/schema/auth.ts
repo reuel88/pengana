@@ -8,6 +8,7 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+import { seatAssignment } from "./seat-assignment";
 import { subscription } from "./subscription";
 
 export const user = pgTable("user", {
@@ -202,6 +203,7 @@ export const organizationRelations = relations(
 		members: many(member),
 		invitations: many(invitation),
 		subscription: one(subscription),
+		seatAssignments: many(seatAssignment),
 	}),
 );
 
@@ -233,6 +235,7 @@ export const memberRelations = relations(member, ({ one }) => ({
 		fields: [member.userId],
 		references: [user.id],
 	}),
+	seatAssignment: one(seatAssignment),
 }));
 
 export const invitationRelations = relations(invitation, ({ one }) => ({
