@@ -1,3 +1,5 @@
-export function errorEnvelope(code: string, message: string) {
+import type { ErrorCode } from "@pengana/api/errors";
+
+export function errorEnvelope(code: ErrorCode, message: string) {
 	return { success: false as const, error: { code, message } };
 }

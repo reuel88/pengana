@@ -6,11 +6,11 @@ import { useSync } from "@/features/sync/sync-context";
 
 import { attachFile } from "../todo-actions";
 
-export function useFilePicker(todoId: string) {
+export function useFilePicker() {
 	const { enqueueUpload } = useSync();
 	const { t } = useTranslation();
 
-	const showPicker = () => {
+	const showPickerForTodo = (todoId: string) => {
 		const input = document.createElement("input");
 		input.type = "file";
 		input.accept = "image/jpeg,image/png,image/heic,application/pdf";
@@ -44,5 +44,5 @@ export function useFilePicker(todoId: string) {
 		input.click();
 	};
 
-	return { showPicker };
+	return { showPickerForTodo };
 }

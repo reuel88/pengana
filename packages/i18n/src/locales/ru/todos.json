@@ -1,5 +1,9 @@
 {
 	"title": "Задачи",
+	"tabs": {
+		"personal": "Личные",
+		"organization": "Организация"
+	},
 	"addPlaceholder": "Добавить новую задачу...",
 	"addButton": "Добавить",
 	"empty": "Задач пока нет",

@@ -7,8 +7,6 @@ import {
 import { client } from "@/shared/api/orpc";
 import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";
-import { authClient } from "@/shared/lib/auth-client";
-
 export function useNotificationCenter() {
 	const { t } = useTranslation("organization");
 	const { data: invitations } = useUserInvitations();
@@ -21,18 +19,12 @@ export function useNotificationCenter() {
 		rejectSuccessMessage: t("invitations.rejectSuccess"),
 		rejectErrorMessage: t("invitations.error"),
 		onAcceptSuccess: async (invitationId) => {
-			const invitation = invitations?.find((i) => i.id === invitationId);
-			if (invitation) {
-				await authClient.organization.setActive({
-					organizationId: invitation.organizationId,
+			await client.notification
+				.onInvitationAccepted({ invitationId })
+				.catch(() => {
+					// Best-effort notification — failure doesn't affect the user flow
 				});
-				await client.notification
-					.onInvitationAccepted({ invitationId })
-					.catch(() => {
-						// Best-effort notification — failure doesn't affect the user flow
-					});
-				await invalidateNotifications();
-			}
+			await invalidateNotifications();
 		},
 	});
 

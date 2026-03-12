@@ -13,6 +13,7 @@ import { OnboardingCreateOrg } from "@/features/onboarding/onboarding-create-org
 import { OnboardingInvitations } from "@/features/onboarding/onboarding-invitations";
 import { OnboardingInviteMembers } from "@/features/onboarding/onboarding-invite-members";
 import { useOnboarding } from "@/features/onboarding/use-onboarding";
+import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 import { useLifecycleData } from "@/shared/lib/lifecycle-context";
 import { useTheme } from "@/shared/lib/theme";
@@ -54,6 +55,7 @@ function OnboardingContent({
 
 	const handleSignOut = async () => {
 		await authClient.signOut();
+		queryClient.clear();
 	};
 
 	return (

@@ -25,8 +25,10 @@ export function OrgSwitcher() {
 	const { data: session, isPending: sessionPending } = authClient.useSession();
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
-	const { data: orgs, isPending: orgsPending } = useListOrgs();
-	const { data: activeOrg } = useActiveOrg();
+	const { data: orgs, isPending: orgsPending } = useListOrgs({
+		enabled: !!session,
+	});
+	const { data: activeOrg } = useActiveOrg({ enabled: !!session });
 	const [createOpen, setCreateOpen] = useState(false);
 
 	const { handleSwitch } = useOrgSwitcher({

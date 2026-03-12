@@ -1,5 +1,6 @@
 {
 	"title": "Tổ chức",
+	"noOrganization": "Không tìm thấy tổ chức đang hoạt động.",
 	"switcher": {
 		"label": "Tổ chức",
 		"create": "Tạo tổ chức",

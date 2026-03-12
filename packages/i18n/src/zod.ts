@@ -30,6 +30,51 @@ export function makeNativeSignInSchema(t: TFunction) {
 	});
 }
 
+export function makeForgotPasswordSchema(t: TFunction) {
+	return z.object({
+		email: z.email(t("auth:validation.invalidEmail")),
+	});
+}
+
+export function makeResetPasswordSchema(t: TFunction) {
+	return z
+		.object({
+			password: z.string().min(8, t("auth:validation.passwordMin")),
+			confirmPassword: z.string().min(8, t("auth:validation.passwordMin")),
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: t("auth:validation.passwordsMustMatch"),
+			path: ["confirmPassword"],
+		});
+}
+
+export function makeMagicLinkSchema(t: TFunction) {
+	return z.object({
+		email: z.email(t("auth:validation.invalidEmail")),
+	});
+}
+
+export function makeChangePasswordSchema(t: TFunction) {
+	return z
+		.object({
+			currentPassword: z.string().min(8, t("auth:validation.passwordMin")),
+			newPassword: z.string().min(8, t("auth:validation.passwordMin")),
+			confirmPassword: z.string().min(8, t("auth:validation.passwordMin")),
+		})
+		.refine((data) => data.newPassword === data.confirmPassword, {
+			message: t("auth:validation.passwordsMustMatch"),
+			path: ["confirmPassword"],
+		});
+}
+
+export function makeDeleteAccountSchema(t: TFunction) {
+	return z.object({
+		confirmation: z.string().refine((val) => val === "DELETE", {
+			message: t("auth:validation.deleteConfirmRequired"),
+		}),
+	});
+}
+
 export function makeNativeSignUpSchema(t: TFunction) {
 	return z.object({
 		name: z

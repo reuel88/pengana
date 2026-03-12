@@ -1,5 +1,9 @@
 {
 	"title": "Tarefas",
+	"tabs": {
+		"personal": "Pessoal",
+		"organization": "Organização"
+	},
 	"addPlaceholder": "Adicionar uma nova tarefa...",
 	"addButton": "Adicionar",
 	"empty": "Nenhuma tarefa ainda",

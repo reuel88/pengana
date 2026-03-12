@@ -1,5 +1,6 @@
 {
 	"title": "Organisation",
+	"noOrganization": "No active organisation found.",
 	"switcher": {
 		"label": "Organisations",
 		"create": "Create Organisation",

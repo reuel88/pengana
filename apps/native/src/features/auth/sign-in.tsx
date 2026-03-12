@@ -2,7 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignInSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
 import { useState } from "react";
-import { getErrorMessage } from "@/shared/api/form-helpers";
+
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 
@@ -40,13 +40,12 @@ function SignIn() {
 		<form.Subscribe
 			selector={(state) => ({
 				isSubmitting: state.isSubmitting,
-				validationError: getErrorMessage(state.errorMap.onSubmit),
 			})}
 		>
-			{({ isSubmitting, validationError }) => (
+			{({ isSubmitting }) => (
 				<AuthFormCard
 					title={t("auth:signIn.submit")}
-					error={error ?? validationError}
+					error={error}
 					testID="auth-form"
 				>
 					<form.Field name="email">
@@ -58,6 +57,7 @@ function SignIn() {
 								onBlur={field.handleBlur}
 								onChangeText={field.handleChange}
 								onClearError={() => error && setError(null)}
+								errors={field.state.meta.errors}
 								keyboardType="email-address"
 								autoCapitalize="none"
 							/>
@@ -72,6 +72,7 @@ function SignIn() {
 								onBlur={field.handleBlur}
 								onChangeText={field.handleChange}
 								onClearError={() => error && setError(null)}
+								errors={field.state.meta.errors}
 								secureTextEntry
 								onSubmitEditing={form.handleSubmit}
 							/>

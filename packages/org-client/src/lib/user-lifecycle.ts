@@ -24,8 +24,10 @@ export async function fetchUserLifecycleData(
 	}
 	const pendingInvitations =
 		invitations.data?.filter((inv) => inv.status === "pending") ?? [];
+	const orgList = orgs.data ?? [];
 	return {
-		hasOrganization: (orgs.data?.length ?? 0) > 0,
+		hasOrganization: orgList.length > 0,
 		hasPendingInvitations: pendingInvitations.length > 0,
+		organizations: orgList,
 	};
 }

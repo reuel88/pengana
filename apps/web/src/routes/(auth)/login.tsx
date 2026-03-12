@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SignInForm } from "@/features/auth/sign-in-form";
 import { AuthLayout } from "@/widgets/auth-layout";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/(auth)/login")({
 	component: LoginPage,
 	head: () => ({
 		meta: [

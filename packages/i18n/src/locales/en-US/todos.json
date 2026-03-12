@@ -1,5 +1,9 @@
 {
 	"title": "Todos",
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organization"
+	},
 	"addPlaceholder": "Add a new todo...",
 	"addButton": "Add",
 	"empty": "No todos yet",

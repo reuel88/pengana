@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
 import { Link } from "@tanstack/react-router";
+import { CircleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 import { authClient } from "@/shared/lib/auth-client";
 import { Loader } from "@/shared/ui/loader";
@@ -22,6 +23,7 @@ interface AuthFormShellProps {
 		}>;
 	};
 	children: ReactNode;
+	errorMessage?: string | null;
 }
 
 export function AuthFormShell({
@@ -32,6 +34,7 @@ export function AuthFormShell({
 	onSubmit,
 	form,
 	children,
+	errorMessage,
 }: AuthFormShellProps) {
 	const { isPending } = authClient.useSession();
 	const { t } = useTranslation();
@@ -54,6 +57,16 @@ export function AuthFormShell({
 				data-testid="auth-form"
 			>
 				{children}
+
+				{errorMessage && (
+					<div
+						className="flex items-center gap-2 text-destructive text-sm"
+						data-testid="auth-error"
+					>
+						<CircleAlert className="h-4 w-4 shrink-0" />
+						<span>{errorMessage}</span>
+					</div>
+				)}
 
 				<form.Subscribe
 					selector={(state) => ({

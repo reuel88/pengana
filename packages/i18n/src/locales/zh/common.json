@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "登录",
 		"signOut": "退出登录",
-		"myAccount": "我的账户"
+		"myAccount": "我的账户",
+		"settings": "设置"
 	},
 	"status": {
 		"loading": "加载中...",
@@ -24,7 +25,8 @@
 		"disconnected": "已断开",
 		"checkingConnection": "正在检查连接...",
 		"connectedToApi": "已连接到 API",
-		"apiDisconnected": "API 已断开"
+		"apiDisconnected": "API 已断开",
+		"error": "出了点问题，请重试。"
 	},
 	"apiStatus": "API 状态",
 	"systemStatus": "系统状态",

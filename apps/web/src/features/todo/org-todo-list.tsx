@@ -1,17 +1,24 @@
 import { useTranslation } from "@pengana/i18n";
-import { isQuotaError } from "@pengana/sync-engine";
-import type { WebOrgTodo } from "@pengana/todo-client";
+import type { TodoActions, WebOrgTodo } from "@pengana/todo-client";
 import {
 	attachOrgFile,
 	deleteOrgTodo,
 	resolveOrgConflict,
 	toggleOrgTodo,
+	useTodoListWiring,
 } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { storeFileInMemory } from "@/entities/upload-queue";
+import { storeFileInMemory } from "@/features/sync/entities/upload-queue";
 import { useOrgSync } from "@/features/sync/org-sync-context";
+
+const orgActions: TodoActions = {
+	toggleTodo: toggleOrgTodo,
+	deleteTodo: deleteOrgTodo,
+	resolveConflict: resolveOrgConflict,
+	attachFile: attachOrgFile,
+};
 
 export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
 	const { triggerSync, enqueueUpload } = useOrgSync();
@@ -21,61 +28,24 @@ export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
 		toast.error(msg);
 	}, []);
 
-	const handleToggle = useCallback(
-		async (id: string) => {
-			try {
-				await toggleOrgTodo(id);
-				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToToggleTodo"));
-			}
-		},
-		[triggerSync, onError, t],
+	const fileStorage = useMemo(
+		() => ({
+			storeFile: (_id: string, file: File) => storeFileInMemory(_id, file),
+			createFileRef: (_id: string, file: File) => URL.createObjectURL(file),
+		}),
+		[],
 	);
 
-	const handleDelete = useCallback(
-		async (id: string) => {
-			try {
-				await deleteOrgTodo(id);
-				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToDeleteTodo"));
-			}
-		},
-		[triggerSync, onError, t],
-	);
-
-	const handleResolve = useCallback(
-		async (id: string, resolution: "local" | "server") => {
-			try {
-				await resolveOrgConflict(id, resolution);
-				triggerSync();
-			} catch {
-				onError(id, t("errors:failedToResolveTodo"));
-			}
-		},
-		[triggerSync, onError, t],
-	);
-
-	const handleFileSelected = useCallback(
-		async (id: string, file: File) => {
-			try {
-				storeFileInMemory(id, file);
-				const fileRef = URL.createObjectURL(file);
-				await attachOrgFile(id, fileRef);
-				enqueueUpload(id, fileRef, file.type);
-				triggerSync();
-			} catch (e) {
-				onError(
-					id,
-					isQuotaError(e)
-						? t("errors:storageFull")
-						: t("errors:failedToStoreFile"),
-				);
-			}
-		},
-		[enqueueUpload, triggerSync, onError, t],
-	);
+	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
+		useTodoListWiring({
+			triggerSync,
+			enqueueUpload,
+			onError,
+			clearError: () => {},
+			fileStorage,
+			t,
+			actions: orgActions,
+		});
 
 	return (
 		<TodoListBase

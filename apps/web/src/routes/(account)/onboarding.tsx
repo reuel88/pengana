@@ -7,9 +7,10 @@ import { OnboardingCreateOrg } from "@/features/onboarding/onboarding-create-org
 import { OnboardingInvitations } from "@/features/onboarding/onboarding-invitations";
 import { OnboardingInviteMembers } from "@/features/onboarding/onboarding-invite-members";
 import { useOnboarding } from "@/features/onboarding/use-onboarding";
+import { queryClient } from "@/shared/api/orpc";
 import { authClient, requireAuth } from "@/shared/lib/auth-client";
 
-export const Route = createFileRoute("/onboarding")({
+export const Route = createFileRoute("/(account)/onboarding")({
 	component: OnboardingPage,
 	beforeLoad: async () => {
 		const { session } = await requireAuth();
@@ -52,6 +53,7 @@ function OnboardingPage() {
 							authClient.signOut({
 								fetchOptions: {
 									onSuccess: () => {
+										queryClient.clear();
 										navigate({ to: "/login" });
 									},
 								},

@@ -6,7 +6,7 @@ import { orgQueryKeys } from "../lib/org-query-keys";
 
 const STALE_TIME = 30_000;
 
-export function useActiveOrg() {
+export function useActiveOrg(options?: { enabled?: boolean }) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.activeOrg,
@@ -16,6 +16,7 @@ export function useActiveOrg() {
 			if (error) throw error;
 			return data;
 		},
+		enabled: options?.enabled,
 		staleTime: STALE_TIME,
 	});
 }
@@ -33,7 +34,7 @@ export function useActiveMember() {
 	});
 }
 
-export function useListOrgs() {
+export function useListOrgs(options?: { enabled?: boolean }) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.listOrgs,
@@ -42,6 +43,7 @@ export function useListOrgs() {
 			if (error) throw error;
 			return data;
 		},
+		enabled: options?.enabled,
 		staleTime: STALE_TIME,
 	});
 }

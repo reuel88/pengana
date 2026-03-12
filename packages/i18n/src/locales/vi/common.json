@@ -1,37 +1,39 @@
 {
 	"nav": {
-		"home": "Trang ch\u1ee7",
-		"dashboard": "B\u1ea3ng \u0111i\u1ec1u khi\u1ec3n",
-		"todos": "C\u00f4ng vi\u1ec7c",
-		"explore": "Kh\u00e1m ph\u00e1",
-		"tabs": "Th\u1ebb"
+		"home": "Trang chủ",
+		"dashboard": "Bảng điều khiển",
+		"todos": "Công việc",
+		"explore": "Khám phá",
+		"tabs": "Thẻ"
 	},
 	"theme": {
-		"toggle": "Chuy\u1ec3n \u0111\u1ed5i giao di\u1ec7n",
-		"light": "S\u00e1ng",
-		"dark": "T\u1ed1i",
-		"system": "H\u1ec7 th\u1ed1ng"
+		"toggle": "Chuyển đổi giao diện",
+		"light": "Sáng",
+		"dark": "Tối",
+		"system": "Hệ thống"
 	},
 	"user": {
-		"signIn": "\u0110\u0103ng nh\u1eadp",
-		"signOut": "\u0110\u0103ng xu\u1ea5t",
-		"myAccount": "T\u00e0i kho\u1ea3n c\u1ee7a t\u00f4i"
+		"signIn": "Đăng nhập",
+		"signOut": "Đăng xuất",
+		"myAccount": "Tài khoản của tôi",
+		"settings": "Cài đặt"
 	},
 	"status": {
-		"loading": "\u0110ang t\u1ea3i...",
-		"checking": "\u0110ang ki\u1ec3m tra...",
-		"connected": "\u0110\u00e3 k\u1ebft n\u1ed1i",
-		"disconnected": "M\u1ea5t k\u1ebft n\u1ed1i",
-		"checkingConnection": "\u0110ang ki\u1ec3m tra k\u1ebft n\u1ed1i...",
-		"connectedToApi": "\u0110\u00e3 k\u1ebft n\u1ed1i v\u1edbi API",
-		"apiDisconnected": "API b\u1ecb ng\u1eaft k\u1ebft n\u1ed1i"
+		"loading": "Đang tải...",
+		"checking": "Đang kiểm tra...",
+		"connected": "Đã kết nối",
+		"disconnected": "Mất kết nối",
+		"checkingConnection": "Đang kiểm tra kết nối...",
+		"connectedToApi": "Đã kết nối với API",
+		"apiDisconnected": "API bị ngắt kết nối",
+		"error": "Đã xảy ra lỗi. Vui lòng thử lại."
 	},
-	"apiStatus": "Tr\u1ea1ng th\u00e1i API",
-	"systemStatus": "Tr\u1ea1ng th\u00e1i h\u1ec7 th\u1ed1ng",
+	"apiStatus": "Trạng thái API",
+	"systemStatus": "Trạng thái hệ thống",
 	"orpcBackend": "ORPC Backend",
-	"privateData": "D\u1eef li\u1ec7u ri\u00eang t\u01b0",
-	"modal": "H\u1ed9p tho\u1ea1i",
-	"submitting": "\u0110ang g\u1eedi...",
+	"privateData": "Dữ liệu riêng tư",
+	"modal": "Hộp thoại",
+	"submitting": "Đang gửi...",
 	"loginPrompt": "Vui lòng đăng nhập tại ứng dụng web trước.",
 	"loginButton": "Đăng nhập",
 	"onboardingPrompt": "Vui lòng hoàn tất thiết lập tài khoản của bạn trên ứng dụng web.",

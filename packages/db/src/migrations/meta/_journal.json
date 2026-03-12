@@ -64,6 +64,13 @@
 			"when": 1773301269195,
 			"tag": "0008_hard_radioactive_man",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1773310412925,
+			"tag": "0009_dusty_karnak",
+			"breakpoints": true
 		}
 	]
 }

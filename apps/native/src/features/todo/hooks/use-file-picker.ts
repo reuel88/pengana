@@ -51,11 +51,11 @@ async function pickAsset(
 	return { uri: asset.uri, mimeType };
 }
 
-export function useFilePicker(todoId: string) {
+export function useFilePicker() {
 	const { enqueueUpload } = useSync();
 	const { t } = useTranslation();
 
-	const attachAsset = async (uri: string, mimeType: string) => {
+	const attachAsset = async (todoId: string, uri: string, mimeType: string) => {
 		await attachFile(todoId, uri);
 		enqueueUpload(todoId, uri, mimeType);
 	};
@@ -73,7 +73,7 @@ export function useFilePicker(todoId: string) {
 			fileTooLargeMessage,
 		);
 
-	const pickFromCamera = async () => {
+	const pickFromCamera = async (todoId: string) => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
 		if (!permission.granted) return;
 		try {
@@ -85,7 +85,7 @@ export function useFilePicker(todoId: string) {
 					}),
 				"image/jpeg",
 			);
-			if (asset) await attachAsset(asset.uri, asset.mimeType);
+			if (asset) await attachAsset(todoId, asset.uri, asset.mimeType);
 		} catch {
 			Alert.alert(
 				t("todos:attachment.cameraUnavailable"),
@@ -94,7 +94,7 @@ export function useFilePicker(todoId: string) {
 		}
 	};
 
-	const pickFromLibrary = async () => {
+	const pickFromLibrary = async (todoId: string) => {
 		const asset = await pick(
 			() =>
 				ImagePicker.launchImageLibraryAsync({
@@ -103,10 +103,10 @@ export function useFilePicker(todoId: string) {
 				}),
 			"image/jpeg",
 		);
-		if (asset) await attachAsset(asset.uri, asset.mimeType);
+		if (asset) await attachAsset(todoId, asset.uri, asset.mimeType);
 	};
 
-	const pickPdf = async () => {
+	const pickPdf = async (todoId: string) => {
 		const asset = await pick(
 			() =>
 				DocumentPicker.getDocumentAsync({
@@ -115,10 +115,10 @@ export function useFilePicker(todoId: string) {
 				}),
 			"application/pdf",
 		);
-		if (asset) await attachAsset(asset.uri, asset.mimeType);
+		if (asset) await attachAsset(todoId, asset.uri, asset.mimeType);
 	};
 
-	const showPicker = () => {
+	const showPickerForTodo = (todoId: string) => {
 		const options = [
 			t("todos:actions.takePhoto"),
 			t("todos:actions.chooseFromLibrary"),
@@ -131,23 +131,26 @@ export function useFilePicker(todoId: string) {
 			ActionSheetIOS.showActionSheetWithOptions(
 				{ options, cancelButtonIndex },
 				(buttonIndex) => {
-					if (buttonIndex === 0) pickFromCamera();
-					else if (buttonIndex === 1) pickFromLibrary();
-					else if (buttonIndex === 2) pickPdf();
+					if (buttonIndex === 0) pickFromCamera(todoId);
+					else if (buttonIndex === 1) pickFromLibrary(todoId);
+					else if (buttonIndex === 2) pickPdf(todoId);
 				},
 			);
 		} else {
 			Alert.alert(t("todos:actions.attach"), t("todos:actions.chooseOption"), [
-				{ text: t("todos:actions.takePhoto"), onPress: pickFromCamera },
+				{
+					text: t("todos:actions.takePhoto"),
+					onPress: () => pickFromCamera(todoId),
+				},
 				{
 					text: t("todos:actions.chooseFromLibrary"),
-					onPress: pickFromLibrary,
+					onPress: () => pickFromLibrary(todoId),
 				},
-				{ text: t("todos:actions.choosePdf"), onPress: pickPdf },
+				{ text: t("todos:actions.choosePdf"), onPress: () => pickPdf(todoId) },
 				{ text: t("todos:actions.cancel"), style: "cancel" },
 			]);
 		}
 	};
 
-	return { showPicker };
+	return { showPickerForTodo };
 }

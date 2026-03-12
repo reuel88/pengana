@@ -19,7 +19,7 @@ import {
 	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
-import { createIndexedDbUploadTransport } from "@/entities/upload-queue";
+import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import type {
 	BackgroundBroadcast,
 	BackgroundMessage,
@@ -290,7 +290,11 @@ export default defineBackground(() => {
 	});
 
 	browser.runtime.onMessage.addListener(
-		(message: BackgroundMessage, _sender, sendResponse) => {
+		(message: BackgroundMessage, sender, sendResponse) => {
+			if (sender.id !== browser.runtime.id) {
+				sendResponse({ ok: false, error: "Unauthorized sender" });
+				return false;
+			}
 			return handleMessage(message, sendResponse);
 		},
 	);

@@ -3,6 +3,7 @@ import { TEST_PASSWORD, TEST_USER_NAME } from "../constants.js";
 import { AuthPage } from "../page-objects/auth.page.js";
 import { OrgPage } from "../page-objects/org.page.js";
 import { TodoPage } from "../page-objects/todo.page.js";
+import { signUpAndVerify } from "../support/web-auth.js";
 
 export type TestFixtures = {
 	authPage: AuthPage;
@@ -24,9 +25,7 @@ export const test = base.extend<TestFixtures>({
 		const ts = crypto.randomUUID();
 		const email = `test-${ts}@e2e.test`;
 		const password = TEST_PASSWORD;
-		const authPage = new AuthPage(page);
-		await authPage.signUp(TEST_USER_NAME, email, password);
-		await page.waitForURL(/onboarding/);
+		await signUpAndVerify(page, email, password, TEST_USER_NAME);
 		await use({ page, email, password });
 	},
 

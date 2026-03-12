@@ -1,5 +1,9 @@
 {
 	"title": "Mga Gawain",
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organisasyon"
+	},
 	"addPlaceholder": "Magdagdag ng bagong gawain...",
 	"addButton": "Idagdag",
 	"empty": "Wala pang mga gawain",

@@ -4,6 +4,7 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createContext } from "@pengana/api/context";
+import type { ErrorCode } from "@pengana/api/errors";
 import { ERROR_CODES } from "@pengana/api/errors";
 import { appRouter } from "@pengana/api/routers/index";
 import type { Context, Next } from "hono";
@@ -33,13 +34,13 @@ const rpcHandler = new RPCHandler(appRouter, {
 // mutable ref so that once the server starts and notifyUser is wired up, all
 // subsequent requests pick up the real implementation.
 export const notifyRef: {
-	current: (userId: string) => void;
-	orgCurrent: (orgId: string, excludeUserId: string) => void;
+	notifyUser: (userId: string) => void;
+	notifyOrgMembers: (orgId: string, excludeUserId: string) => void;
 } = {
-	current: () => {
+	notifyUser: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
 	},
-	orgCurrent: () => {
+	notifyOrgMembers: () => {
 		logger.warn`notifyOrgMembers called before WebSocket server initialized`;
 	},
 };
@@ -54,7 +55,7 @@ async function parseJsonObject(
 		}
 		return {};
 	} catch (err) {
-		orpcLogger.debug`parseJsonObject failed: ${err}`;
+		orpcLogger.warn`parseJsonObject failed: ${err}`;
 		return {};
 	}
 }
@@ -70,7 +71,9 @@ async function ensureErrorEnvelope(c: Context, response: Response) {
 	const rawCode = typeof body.code === "string" ? body.code : "";
 	return c.json(
 		errorEnvelope(
-			VALID_ERROR_CODES.has(rawCode) ? rawCode : "INTERNAL_SERVER_ERROR",
+			VALID_ERROR_CODES.has(rawCode)
+				? (rawCode as ErrorCode)
+				: "INTERNAL_SERVER_ERROR",
 			typeof body.message === "string" ? body.message : "Unknown error",
 		),
 		response.status as ContentfulStatusCode,
@@ -88,8 +91,8 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 	const appContext = await createContext({ context: c });
 	const orpcContext = {
 		...appContext,
-		notifyUser: notifyRef.current,
-		notifyOrgMembers: notifyRef.orgCurrent,
+		notifyUser: notifyRef.notifyUser,
+		notifyOrgMembers: notifyRef.notifyOrgMembers,
 	};
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {

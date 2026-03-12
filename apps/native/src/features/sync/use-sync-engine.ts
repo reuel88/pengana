@@ -5,11 +5,11 @@ import {
 } from "@pengana/sync-engine";
 import { randomUUID } from "expo-crypto";
 import { AppState, Platform } from "react-native";
-import { createSyncAdapter } from "@/entities/todo";
 import {
 	createUploadAdapter,
 	createUploadTransport,
-} from "@/entities/upload-queue";
+} from "@/features/sync/entities/upload-queue";
+import { createSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 import { createNativeStorageHealthProvider } from "@/shared/lib/storage-health";

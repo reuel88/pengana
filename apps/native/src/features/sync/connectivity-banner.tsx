@@ -14,20 +14,24 @@ export function ConnectivityBanner({
 	const { colorScheme } = useTheme();
 	const { t } = useTranslation("sync");
 
-	const backgroundColor = isOnline
-		? BANNER_COLORS.onlineBg
-		: BANNER_COLORS.offlineBg;
-	const textColor = isOnline
-		? colorScheme === "dark"
-			? BANNER_COLORS.onlineTextDark
-			: BANNER_COLORS.onlineTextLight
-		: colorScheme === "dark"
-			? BANNER_COLORS.offlineTextDark
-			: BANNER_COLORS.offlineTextLight;
+	const isDark = colorScheme === "dark";
+	const bannerColors = isOnline
+		? {
+				bg: BANNER_COLORS.onlineBg,
+				text: isDark
+					? BANNER_COLORS.onlineTextDark
+					: BANNER_COLORS.onlineTextLight,
+			}
+		: {
+				bg: BANNER_COLORS.offlineBg,
+				text: isDark
+					? BANNER_COLORS.offlineTextDark
+					: BANNER_COLORS.offlineTextLight,
+			};
 
 	return (
-		<View style={[styles.banner, { backgroundColor }]}>
-			<Text style={[styles.text, { color: textColor }]}>
+		<View style={[styles.banner, { backgroundColor: bannerColors.bg }]}>
+			<Text style={[styles.text, { color: bannerColors.text }]}>
 				{isOnline ? (isSyncing ? t("syncing") : t("online")) : t("offline")}
 			</Text>
 		</View>

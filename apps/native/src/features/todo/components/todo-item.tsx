@@ -1,19 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
 import type { Todo } from "@pengana/sync-engine";
-import {
-	Alert,
-	StyleSheet,
-	Switch,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
-import { useSync } from "@/features/sync/sync-context";
 import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
-import { useFilePicker } from "../hooks/use-file-picker";
-import { deleteTodo, resolveConflict, toggleTodo } from "../todo-actions";
 
 import { AttachButton, RetryButton } from "./attachment-actions";
 import { AttachmentIndicator } from "./attachment-indicator";
@@ -25,38 +15,22 @@ export interface TodoItemRow extends Todo {
 	attachmentStatus?: "queued" | "uploading" | "uploaded" | "failed" | null;
 }
 
-export function TodoItem({ todo }: { todo: TodoItemRow }) {
-	const { triggerSync } = useSync();
+export interface TodoItemHandlers {
+	onToggle: (id: string) => void;
+	onDelete: (id: string) => void;
+	onResolve: (id: string, resolution: "local" | "server") => void;
+	onAttach: (id: string) => void;
+}
+
+export function TodoItem({
+	todo,
+	onToggle,
+	onDelete,
+	onResolve,
+	onAttach,
+}: { todo: TodoItemRow } & TodoItemHandlers) {
 	const { theme } = useTheme();
 	const { t } = useTranslation();
-	const { showPicker } = useFilePicker(todo.id);
-
-	const handleToggle = async () => {
-		try {
-			await toggleTodo(todo.id);
-			triggerSync();
-		} catch {
-			Alert.alert(t("error.title"), t("errors:failedToToggleTodo"));
-		}
-	};
-
-	const handleDelete = async () => {
-		try {
-			await deleteTodo(todo.id);
-			triggerSync();
-		} catch {
-			Alert.alert(t("error.title"), t("errors:failedToDeleteTodo"));
-		}
-	};
-
-	const handleResolve = async (resolution: "local" | "server") => {
-		try {
-			await resolveConflict(todo.id, resolution);
-			triggerSync();
-		} catch {
-			Alert.alert(t("error.title"), t("errors:failedToResolveConflict"));
-		}
-	};
 
 	return (
 		<View
@@ -67,7 +41,7 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 			<Switch
 				testID="todo-toggle"
 				value={todo.completed}
-				onValueChange={handleToggle}
+				onValueChange={() => onToggle(todo.id)}
 				accessibilityLabel={todo.title}
 			/>
 			<Text
@@ -85,17 +59,17 @@ export function TodoItem({ todo }: { todo: TodoItemRow }) {
 				attachmentUrl={todo.attachmentUrl}
 			/>
 			{todo.syncStatus === "conflict" && (
-				<ConflictActions onResolve={handleResolve} />
+				<ConflictActions onResolve={(r) => onResolve(todo.id, r)} />
 			)}
 			{!todo.attachmentUrl && !todo.attachmentStatus && (
-				<AttachButton onPress={showPicker} />
+				<AttachButton onPress={() => onAttach(todo.id)} />
 			)}
 			{todo.attachmentStatus === "failed" && (
-				<RetryButton onPress={showPicker} />
+				<RetryButton onPress={() => onAttach(todo.id)} />
 			)}
 			<TouchableOpacity
 				testID="todo-delete"
-				onPress={handleDelete}
+				onPress={() => onDelete(todo.id)}
 				style={styles.deleteButton}
 				accessibilityRole="button"
 				accessibilityLabel={t("todos:actions.delete")}

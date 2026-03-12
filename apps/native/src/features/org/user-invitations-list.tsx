@@ -11,7 +11,7 @@ export function UserInvitationsList({
 	onReject,
 }: {
 	isPendingFor: (id: string) => boolean;
-	onAccept: (id: string) => void;
+	onAccept: (id: string, organizationId: string) => void;
 	onReject: (id: string) => void;
 }) {
 	const { theme } = useTheme();
@@ -63,7 +63,7 @@ export function UserInvitationsList({
 						</View>
 						<View style={styles.actionRow}>
 							<TouchableOpacity
-								onPress={() => onAccept(inv.id)}
+								onPress={() => onAccept(inv.id, inv.organizationId)}
 								disabled={isPendingFor(inv.id)}
 								style={[
 									styles.acceptButton,

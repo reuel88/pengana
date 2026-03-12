@@ -8,9 +8,8 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
-import { db, todos } from "@/entities/todo";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
+import { db, todos } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";

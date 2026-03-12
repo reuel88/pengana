@@ -21,6 +21,7 @@ export function useInvitationActions({
 			toast.success(successMessage);
 			await onAcceptSuccess?.(invitationId);
 		},
+
 		onRejectSuccess: async () => {
 			toast.success(rejectSuccessMessage ?? successMessage);
 			await onRejectSuccess?.();

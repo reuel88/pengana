@@ -1,5 +1,6 @@
 {
 	"title": "Organisasyon",
+	"noOrganization": "Walang aktibong organisasyon na nahanap.",
 	"switcher": {
 		"label": "Mga Organisasyon",
 		"create": "Lumikha ng Organisasyon",

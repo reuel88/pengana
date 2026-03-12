@@ -16,6 +16,7 @@
 		"@better-auth/expo": "catalog:",
 		"@logtape/logtape": "^2.0.4",
 		"@pengana/db": "workspace:*",
+		"@pengana/email-dev": "workspace:*",
 		"@pengana/env": "workspace:*",
 		"@polar-sh/better-auth": "catalog:",
 		"@polar-sh/sdk": "^0.46.3",

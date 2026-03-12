@@ -24,6 +24,7 @@
 		"db:destroy": "docker compose down -v"
 	},
 	"dependencies": {
+		"@pengana/email-dev": "workspace:*",
 		"@pengana/env": "workspace:*",
 		"pg": "^8.17.1",
 		"dotenv": "catalog:",

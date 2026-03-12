@@ -67,7 +67,9 @@ export function OnboardingInvitations({
 					</View>
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
-						onPress={() => handleAccept(invitation.id)}
+						onPress={() =>
+							handleAccept(invitation.id, invitation.organizationId)
+						}
 						disabled={actingId !== null}
 					>
 						{actingId === invitation.id ? (

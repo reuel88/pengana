@@ -1,8 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignUpSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
-import { useState } from "react";
-import { getErrorMessage } from "@/shared/api/form-helpers";
+import { Alert } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 
@@ -13,8 +12,11 @@ import {
 } from "@/shared/ui/auth-form";
 
 function SignUp() {
-	const [error, setError] = useState<string | null>(null);
 	const { t } = useTranslation();
+
+	const showCheckEmail = () => {
+		Alert.alert(t("auth:signUp.checkEmail"));
+	};
 
 	const form = useZodForm({
 		schema: makeNativeSignUpSchema(t),
@@ -27,13 +29,13 @@ function SignUp() {
 					password: value.password,
 				},
 				{
-					onError(error) {
-						setError(error.error?.message || t("errors:failedToSignUp"));
+					onError() {
+						showCheckEmail();
 					},
 					onSuccess() {
-						setError(null);
 						form.reset();
 						queryClient.refetchQueries();
+						showCheckEmail();
 					},
 				},
 			);
@@ -44,13 +46,12 @@ function SignUp() {
 		<form.Subscribe
 			selector={(state) => ({
 				isSubmitting: state.isSubmitting,
-				validationError: getErrorMessage(state.errorMap.onSubmit),
 			})}
 		>
-			{({ isSubmitting, validationError }) => (
+			{({ isSubmitting }) => (
 				<AuthFormCard
 					title={t("auth:signUp.title")}
-					error={error ?? validationError}
+					error={null}
 					testID="auth-form"
 				>
 					<form.Field name="name">
@@ -61,7 +62,7 @@ function SignUp() {
 								value={field.state.value}
 								onBlur={field.handleBlur}
 								onChangeText={field.handleChange}
-								onClearError={() => error && setError(null)}
+								errors={field.state.meta.errors}
 							/>
 						)}
 					</form.Field>
@@ -73,7 +74,7 @@ function SignUp() {
 								value={field.state.value}
 								onBlur={field.handleBlur}
 								onChangeText={field.handleChange}
-								onClearError={() => error && setError(null)}
+								errors={field.state.meta.errors}
 								keyboardType="email-address"
 								autoCapitalize="none"
 							/>
@@ -87,7 +88,7 @@ function SignUp() {
 								value={field.state.value}
 								onBlur={field.handleBlur}
 								onChangeText={field.handleChange}
-								onClearError={() => error && setError(null)}
+								errors={field.state.meta.errors}
 								secureTextEntry
 								onSubmitEditing={form.handleSubmit}
 							/>

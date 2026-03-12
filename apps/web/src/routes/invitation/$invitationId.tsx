@@ -104,7 +104,9 @@ function InvitationPage() {
 					{isInvitationPending ? (
 						<div className="flex gap-2">
 							<Button
-								onClick={() => handleAccept(invitation.id)}
+								onClick={() =>
+									handleAccept(invitation.id, invitation.organizationId)
+								}
 								disabled={acting}
 							>
 								{t("invitations.accept")}

@@ -4,7 +4,7 @@ import { useTodoListWiring } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { storeFileInMemory } from "@/entities/upload-queue";
+import { storeFileInMemory } from "@/features/sync/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
 
 export function TodoList({ todos }: { todos: WebTodo[] }) {

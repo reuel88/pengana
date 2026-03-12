@@ -11,16 +11,19 @@ const STALE_TIME = 30_000;
 
 export { orgQueryKeys, useOrgRole, useOrgSettings };
 
+async function unwrapAuth<T>(
+	promise: Promise<{ data?: T | null; error?: unknown }>,
+): Promise<T> {
+	const { data, error } = await promise;
+	if (error) throw error;
+	return data as T;
+}
+
 export function useActiveOrg() {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.activeOrg,
-		queryFn: async () => {
-			const { data, error } =
-				await authClient.organization.getFullOrganization();
-			if (error) throw error;
-			return data;
-		},
+		queryFn: () => unwrapAuth(authClient.organization.getFullOrganization()),
 		staleTime: STALE_TIME,
 	});
 }
@@ -29,11 +32,7 @@ export function useActiveMember() {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.activeMember,
-		queryFn: async () => {
-			const { data, error } = await authClient.organization.getActiveMember();
-			if (error) throw error;
-			return data;
-		},
+		queryFn: () => unwrapAuth(authClient.organization.getActiveMember()),
 		staleTime: STALE_TIME,
 	});
 }
@@ -42,11 +41,7 @@ export function useListOrgs() {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.listOrgs,
-		queryFn: async () => {
-			const { data, error } = await authClient.organization.list();
-			if (error) throw error;
-			return data;
-		},
+		queryFn: () => unwrapAuth(authClient.organization.list()),
 		staleTime: STALE_TIME,
 	});
 }
@@ -55,13 +50,12 @@ export function useTeams(orgId: string | undefined) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.teams(orgId),
-		queryFn: async () => {
-			const { data, error } = await authClient.organization.listTeams({
-				query: { organizationId: orgId as string },
-			});
-			if (error) throw error;
-			return data ?? [];
-		},
+		queryFn: async () =>
+			(await unwrapAuth(
+				authClient.organization.listTeams({
+					query: { organizationId: orgId as string },
+				}),
+			)) ?? [],
 		enabled: !!orgId,
 		staleTime: STALE_TIME,
 	});
@@ -71,13 +65,12 @@ export function useTeamMembers(teamId: string | undefined) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.teamMembers(teamId),
-		queryFn: async () => {
-			const { data, error } = await authClient.organization.listTeamMembers({
-				query: { teamId: teamId as string },
-			});
-			if (error) throw error;
-			return data ?? [];
-		},
+		queryFn: async () =>
+			(await unwrapAuth(
+				authClient.organization.listTeamMembers({
+					query: { teamId: teamId as string },
+				}),
+			)) ?? [],
 		enabled: !!teamId,
 		staleTime: STALE_TIME,
 	});
@@ -87,12 +80,7 @@ export function useUserInvitations() {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.userInvitations,
-		queryFn: async () => {
-			const { data, error } =
-				await authClient.organization.listUserInvitations();
-			if (error) throw error;
-			return data;
-		},
+		queryFn: () => unwrapAuth(authClient.organization.listUserInvitations()),
 		staleTime: STALE_TIME,
 	});
 }
@@ -101,13 +89,12 @@ export function useInvitation(invitationId: string) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.invitation(invitationId),
-		queryFn: async () => {
-			const { data, error } = await authClient.organization.getInvitation({
-				query: { id: invitationId },
-			});
-			if (error) throw error;
-			return data;
-		},
+		queryFn: () =>
+			unwrapAuth(
+				authClient.organization.getInvitation({
+					query: { id: invitationId },
+				}),
+			),
 		enabled: !!invitationId,
 		staleTime: STALE_TIME,
 	});

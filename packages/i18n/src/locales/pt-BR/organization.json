@@ -1,5 +1,6 @@
 {
 	"title": "Organização",
+	"noOrganization": "Nenhuma organização ativa encontrada.",
 	"switcher": {
 		"label": "Organizações",
 		"create": "Criar organização",

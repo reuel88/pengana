@@ -13,6 +13,23 @@ export interface FileStorageStrategy {
 	createFileRef: (id: string, file: File) => string;
 }
 
+export interface TodoActions {
+	toggleTodo: (id: string) => Promise<void>;
+	deleteTodo: (id: string) => Promise<void>;
+	resolveConflict: (
+		id: string,
+		resolution: "local" | "server",
+	) => Promise<void>;
+	attachFile: (id: string, localUri: string) => Promise<void>;
+}
+
+const defaultActions: TodoActions = {
+	toggleTodo,
+	deleteTodo,
+	resolveConflict,
+	attachFile,
+};
+
 export interface TodoHandlerDeps {
 	triggerSync: () => void;
 	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
@@ -21,6 +38,7 @@ export interface TodoHandlerDeps {
 	fileStorage: FileStorageStrategy;
 	t: (key: string) => string;
 	onDeleteSuccess?: (id: string) => void;
+	actions?: TodoActions;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {
@@ -32,13 +50,14 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		fileStorage: { storeFile, createFileRef },
 		t,
 		onDeleteSuccess,
+		actions = defaultActions,
 	} = deps;
 
 	const handleToggle = useCallback(
 		async (id: string) => {
 			try {
 				clearError(id);
-				await toggleTodo(id);
+				await actions.toggleTodo(id);
 				triggerSync();
 			} catch (e) {
 				onError(
@@ -49,14 +68,14 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, triggerSync, onError, t],
+		[clearError, actions, triggerSync, onError, t],
 	);
 
 	const handleDelete = useCallback(
 		async (id: string) => {
 			try {
 				clearError(id);
-				await deleteTodo(id);
+				await actions.deleteTodo(id);
 				onDeleteSuccess?.(id);
 				triggerSync();
 			} catch (e) {
@@ -68,14 +87,14 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, triggerSync, onError, onDeleteSuccess, t],
+		[clearError, actions, triggerSync, onError, onDeleteSuccess, t],
 	);
 
 	const handleResolve = useCallback(
 		async (id: string, resolution: "local" | "server") => {
 			try {
 				clearError(id);
-				await resolveConflict(id, resolution);
+				await actions.resolveConflict(id, resolution);
 				triggerSync();
 			} catch (e) {
 				onError(
@@ -86,7 +105,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, triggerSync, onError, t],
+		[clearError, actions, triggerSync, onError, t],
 	);
 
 	const handleFileSelected = useCallback(
@@ -95,7 +114,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				clearError(id);
 				await storeFile(id, file);
 				const fileRef = createFileRef(id, file);
-				await attachFile(id, fileRef);
+				await actions.attachFile(id, fileRef);
 				enqueueUpload(id, fileRef, file.type);
 				triggerSync();
 			} catch (e) {
@@ -111,6 +130,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			clearError,
 			storeFile,
 			createFileRef,
+			actions,
 			enqueueUpload,
 			triggerSync,
 			onError,

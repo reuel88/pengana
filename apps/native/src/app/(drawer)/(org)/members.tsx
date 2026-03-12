@@ -17,6 +17,56 @@ import { Container } from "@/shared/ui/container";
 import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
 
+function MemberRow({
+	member,
+	isAdmin,
+	isCurrentUser,
+	onRemove,
+	t,
+}: {
+	member: {
+		id: string;
+		userId: string;
+		role: string;
+		user: { name: string; email: string };
+	};
+	isAdmin: boolean;
+	isCurrentUser: boolean;
+	onRemove: (memberId: string) => void;
+	t: (key: string) => string;
+}) {
+	const { theme } = useTheme();
+
+	return (
+		<View
+			style={[
+				styles.memberItem,
+				{ borderColor: theme.border, backgroundColor: theme.card },
+			]}
+		>
+			<View style={styles.memberInfo}>
+				<Text style={[styles.memberName, { color: theme.text }]}>
+					{member.user.name}
+				</Text>
+				<Text style={secondaryText(theme)}>{member.user.email}</Text>
+				<Text style={[styles.roleText, { color: theme.primary }]}>
+					{t(`roles.${member.role}`)}
+				</Text>
+			</View>
+			{isAdmin && !isCurrentUser && member.role !== "owner" && (
+				<TouchableOpacity
+					onPress={() => onRemove(member.id)}
+					style={[styles.removeButton, { backgroundColor: theme.notification }]}
+				>
+					<Text style={sharedStyles.smallButtonText}>
+						{t("members.remove")}
+					</Text>
+				</TouchableOpacity>
+			)}
+		</View>
+	);
+}
+
 export default function MembersScreen() {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
@@ -89,37 +139,13 @@ export default function MembersScreen() {
 					<Text style={mutedText(theme)}>{t("members.noMembers")}</Text>
 				}
 				renderItem={({ item: member }) => (
-					<View
-						style={[
-							styles.memberItem,
-							{ borderColor: theme.border, backgroundColor: theme.card },
-						]}
-					>
-						<View style={styles.memberInfo}>
-							<Text style={[styles.memberName, { color: theme.text }]}>
-								{member.user.name}
-							</Text>
-							<Text style={secondaryText(theme)}>{member.user.email}</Text>
-							<Text style={{ color: theme.primary, fontSize: 12 }}>
-								{t(`roles.${member.role}`)}
-							</Text>
-						</View>
-						{isAdmin &&
-							member.userId !== currentUserId &&
-							member.role !== "owner" && (
-								<TouchableOpacity
-									onPress={() => onRemove(member.id)}
-									style={[
-										styles.removeButton,
-										{ backgroundColor: theme.notification },
-									]}
-								>
-									<Text style={sharedStyles.smallButtonText}>
-										{t("members.remove")}
-									</Text>
-								</TouchableOpacity>
-							)}
-					</View>
+					<MemberRow
+						member={member}
+						isAdmin={isAdmin}
+						isCurrentUser={member.userId === currentUserId}
+						onRemove={onRemove}
+						t={t}
+					/>
 				)}
 			/>
 		</Container>
@@ -137,4 +163,5 @@ const styles = StyleSheet.create({
 	memberName: { fontSize: 14, fontWeight: "bold" },
 	removeButton: { paddingHorizontal: 12, paddingVertical: 6 },
 	leaveButton: { padding: 12, alignItems: "center", marginBottom: 12 },
+	roleText: { fontSize: 12 },
 });

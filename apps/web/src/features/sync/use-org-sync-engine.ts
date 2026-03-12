@@ -1,36 +1,12 @@
-import { env } from "@pengana/env/web";
-import { orgQueryKeys } from "@pengana/org-client";
-import {
-	type SyncEnginePlatformDeps,
-	useNetworkStatus,
-	useSyncEngineCore,
-} from "@pengana/sync-engine";
-import {
-	createDexieOrgSyncAdapter,
-	removeFileFromIndexedDB,
-} from "@pengana/todo-client";
-import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
-import { notificationQueryKeys } from "@/entities/notification/query-keys";
-import {
-	createWebUploadAdapter,
-	createWebUploadTransport,
-} from "@/entities/upload-queue";
-import { client, queryClient } from "@/shared/api/orpc";
+import { useNetworkStatus, useSyncEngineCore } from "@pengana/sync-engine";
+import { createDexieOrgSyncAdapter } from "@pengana/todo-client";
+import { client } from "@/shared/api/orpc";
 
-function getWsUrl() {
-	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
-}
+import { createWebPlatformDeps } from "./platform-deps";
 
-const orgPlatformDeps: SyncEnginePlatformDeps = {
-	getWsUrl,
-	generateUUID: () => crypto.randomUUID(),
-	onSyncNotify: () => {
-		queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list });
-		queryClient.invalidateQueries({ queryKey: orgQueryKeys.userInvitations });
-	},
-	createSyncAdapter: (organizationId) =>
-		createDexieOrgSyncAdapter(organizationId),
-	createSyncTransport: () => ({
+const orgPlatformDeps = createWebPlatformDeps(
+	(organizationId) => createDexieOrgSyncAdapter(organizationId),
+	() => ({
 		sync: async (input) => {
 			// Map from sync engine's Todo shape (userId) to OrgTodo shape (organizationId/createdBy)
 			const orgInput = {
@@ -52,18 +28,7 @@ const orgPlatformDeps: SyncEnginePlatformDeps = {
 			};
 		},
 	}),
-	createUploadAdapter: createWebUploadAdapter,
-	createUploadTransport: createWebUploadTransport,
-	onFocusSubscribe: (triggerSync) => {
-		const handler = () => {
-			if (document.visibilityState === "visible") triggerSync();
-		};
-		document.addEventListener("visibilitychange", handler);
-		return () => document.removeEventListener("visibilitychange", handler);
-	},
-	storageHealth: createWebStorageHealthProvider(),
-	removeFile: removeFileFromIndexedDB,
-};
+);
 
 export function useOrgSyncEngine(organizationId: string | undefined) {
 	const { isOnline } = useNetworkStatus();

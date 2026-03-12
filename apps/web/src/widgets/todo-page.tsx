@@ -73,7 +73,7 @@ export function TodoPage({
 						}`}
 						onClick={() => setActiveTab("personal")}
 					>
-						Personal
+						{t("tabs.personal")}
 					</button>
 					<button
 						type="button"
@@ -84,7 +84,7 @@ export function TodoPage({
 						}`}
 						onClick={() => setActiveTab("organization")}
 					>
-						Organization
+						{t("tabs.organization")}
 					</button>
 				</div>
 			)}
