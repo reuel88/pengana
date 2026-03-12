@@ -9,7 +9,12 @@ export type TestFixtures = {
 	authPage: AuthPage;
 	todoPage: TodoPage;
 	authenticatedPage: { page: Page; email: string; password: string };
-	authenticatedWithOrgPage: { page: Page; email: string; password: string };
+	authenticatedWithOrgPage: {
+		page: Page;
+		email: string;
+		password: string;
+		orgName: string;
+	};
 };
 
 export const test = base.extend<TestFixtures>({
@@ -32,10 +37,11 @@ export const test = base.extend<TestFixtures>({
 	authenticatedWithOrgPage: async ({ authenticatedPage }, use) => {
 		const { page, email, password } = authenticatedPage;
 		const orgPage = new OrgPage(page);
-		await orgPage.createOrg(`E2E Org ${email}`);
+		const orgName = `E2E Org ${email}`;
+		await orgPage.createOrg(orgName);
 		await page.waitForURL(/onboarding/);
 		await orgPage.skipInvites();
-		await use({ page, email, password });
+		await use({ page, email, password, orgName });
 	},
 });
 

@@ -29,13 +29,19 @@ export function UserInvitationsList({
 
 	return (
 		<>
-			<Text style={[styles.sectionTitle, { color: theme.text, marginTop: 16 }]}>
+			<Text
+				style={[
+					styles.sectionTitle,
+					styles.sectionTitleSpacing,
+					{ color: theme.text },
+				]}
+			>
 				{t("invitations.myInvitations")}
 			</Text>
 			{myInvitationsLoading ? (
 				<Text style={mutedText(theme)}>{t("common:status.loading")}</Text>
 			) : myInvitationsError ? (
-				<View style={{ gap: 8 }}>
+				<View style={styles.errorContainer}>
 					<Text style={mutedText(theme)}>{t("invitations.fetchError")}</Text>
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
@@ -57,7 +63,7 @@ export function UserInvitationsList({
 							{ borderColor: theme.border, backgroundColor: theme.card },
 						]}
 					>
-						<View style={{ flex: 1 }}>
+						<View style={styles.invInfo}>
 							<Text style={{ color: theme.text }}>{inv.organizationName}</Text>
 							<Text style={secondaryText(theme)}>{t(`roles.${inv.role}`)}</Text>
 						</View>
@@ -97,7 +103,10 @@ export function UserInvitationsList({
 }
 
 const styles = StyleSheet.create({
-	sectionTitle: { fontSize: 14, fontWeight: "bold" },
+	sectionTitle: { fontSize: 14, fontWeight: "bold" as const },
+	sectionTitleSpacing: { marginTop: 16 },
+	invInfo: { flex: 1 },
+	errorContainer: { gap: 8 },
 	invItem: {
 		flexDirection: "row",
 		alignItems: "center",

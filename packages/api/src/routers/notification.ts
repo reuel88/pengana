@@ -115,7 +115,7 @@ export const notificationRouter = {
 				},
 			});
 
-			context.notifyUser?.(row.inviterId);
+			context.notifyUser(row.inviterId);
 
 			return envelope({ notified: true });
 		}),

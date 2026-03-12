@@ -17,6 +17,8 @@ export function VerifyEmailCallback() {
 			return;
 		}
 
+		// Raw fetch is intentional: better-auth's verify endpoint needs cookie
+		// credentials and returns a plain 200/4xx — no SDK method wraps this.
 		fetch(
 			`${env.VITE_SERVER_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`,
 			{ credentials: "include" },

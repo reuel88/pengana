@@ -16,6 +16,14 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink, organization } from "better-auth/plugins";
 
+import { NOREPLY_EMAIL } from "./lib/constants";
+import {
+	invitationEmail,
+	magicLinkEmail,
+	resetPasswordEmail,
+	verifyEmail,
+	welcomeEmail,
+} from "./lib/email-templates";
 import { polarClient } from "./lib/payments";
 
 const logger = getLogger(["app", "auth"]);
@@ -51,9 +59,9 @@ export const auth = betterAuth({
 		sendResetPassword: async ({ user, url }) => {
 			await sendEmail(db, {
 				to: user.email,
-				from: "noreply@pengana.com",
+				from: NOREPLY_EMAIL,
 				subject: "Reset your password",
-				html: `<p>Hi ${user.name ?? ""},</p><p>Click the link below to reset your password:</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`,
+				html: resetPasswordEmail(user.name ?? "", url),
 			});
 		},
 	},
@@ -66,9 +74,9 @@ export const auth = betterAuth({
 			const callbackUrl = `${webUrl}/verify-email/callback?token=${encodeURIComponent(token)}`;
 			await sendEmail(db, {
 				to: user.email,
-				from: "noreply@pengana.com",
+				from: NOREPLY_EMAIL,
 				subject: "Verify your email",
-				html: `<p>Hi ${user.name ?? ""},</p><p>Click the link below to verify your email address:</p><p><a href="${callbackUrl}">${callbackUrl}</a></p>`,
+				html: verifyEmail(user.name ?? "", callbackUrl),
 			});
 		},
 	},
@@ -86,9 +94,9 @@ export const auth = betterAuth({
 					try {
 						await sendEmail(db, {
 							to: user.email,
-							from: "noreply@pengana.com",
+							from: NOREPLY_EMAIL,
 							subject: "Welcome to pengana!",
-							html: `<p>Hi ${user.name ?? ""},</p><p>Welcome to pengana! Your account has been created successfully.</p>`,
+							html: welcomeEmail(user.name ?? ""),
 						});
 					} catch (error) {
 						logger.error`Failed to send welcome email: ${error}`;
@@ -170,9 +178,9 @@ export const auth = betterAuth({
 			sendMagicLink: async ({ email, url }) => {
 				await sendEmail(db, {
 					to: email,
-					from: "noreply@pengana.com",
+					from: NOREPLY_EMAIL,
 					subject: "Sign in to pengana",
-					html: `<p>Click the link below to sign in:</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`,
+					html: magicLinkEmail(url),
 				});
 			},
 		}),
@@ -180,11 +188,16 @@ export const auth = betterAuth({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
 			sendInvitationEmail: async ({ invitation, organization, inviter }) => {
 				const webUrl = env.CORS_ORIGIN.split(",")[0]?.trim() ?? "";
+				const inviterName = inviter.user.name ?? "Someone";
 				await sendEmail(db, {
 					to: invitation.email,
-					from: "noreply@pengana.com",
-					subject: `${inviter.user.name ?? "Someone"} invited you to join ${organization.name}`,
-					html: `<p>${inviter.user.name ?? "Someone"} invited you to join <strong>${organization.name}</strong> on pengana.</p><p><a href="${webUrl}/invitation/${invitation.id}">Accept Invitation</a></p>`,
+					from: NOREPLY_EMAIL,
+					subject: `${inviterName} invited you to join ${organization.name}`,
+					html: invitationEmail(
+						inviterName,
+						organization.name,
+						`${webUrl}/invitation/${invitation.id}`,
+					),
 				});
 			},
 			organizationHooks: {

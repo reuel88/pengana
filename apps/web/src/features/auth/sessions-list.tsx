@@ -6,7 +6,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@pengana/ui/components/card";
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { authClient } from "@/shared/lib/auth-client";
 import { Loader } from "@/shared/ui/loader";
@@ -20,45 +20,43 @@ interface Session {
 
 export function SessionsList() {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const { data: currentSession } = authClient.useSession();
-	const [sessions, setSessions] = useState<Session[]>([]);
-	const [loading, setLoading] = useState(true);
 
-	const fetchSessions = useCallback(async () => {
-		setLoading(true);
-		try {
+	const { data: sessions = [], isLoading } = useQuery({
+		queryKey: ["sessions"],
+		queryFn: async () => {
 			const res = await authClient.listSessions();
-			setSessions((res.data as Session[]) ?? []);
-		} catch {
-			// ignore
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+			return (res.data as Session[]) ?? [];
+		},
+	});
 
-	useEffect(() => {
-		fetchSessions();
-	}, [fetchSessions]);
+	const invalidate = () =>
+		queryClient.invalidateQueries({ queryKey: ["sessions"] });
 
-	const handleRevoke = async (token: string) => {
-		await authClient.revokeSession({ token });
-		toast.success(t("auth:settings.sessions.revokeSuccess"));
-		fetchSessions();
-	};
+	const revokeMutation = useMutation({
+		mutationFn: (token: string) => authClient.revokeSession({ token }),
+		onSuccess: () => {
+			toast.success(t("auth:settings.sessions.revokeSuccess"));
+			invalidate();
+		},
+	});
 
-	const handleRevokeAll = async () => {
-		await authClient.revokeSessions();
-		toast.success(t("auth:settings.sessions.revokeSuccess"));
-		fetchSessions();
-	};
+	const revokeAllMutation = useMutation({
+		mutationFn: () => authClient.revokeSessions(),
+		onSuccess: () => {
+			toast.success(t("auth:settings.sessions.revokeSuccess"));
+			invalidate();
+		},
+	});
 
-	if (loading) return <Loader />;
+	if (isLoading) return <Loader />;
 
 	return (
 		<div className="space-y-4">
 			{sessions.length > 1 && (
 				<div className="flex justify-end">
-					<Button variant="outline" onClick={handleRevokeAll}>
+					<Button variant="outline" onClick={() => revokeAllMutation.mutate()}>
 						{t("auth:settings.sessions.revokeAll")}
 					</Button>
 				</div>
@@ -92,7 +90,7 @@ export function SessionsList() {
 								<Button
 									variant="outline"
 									size="sm"
-									onClick={() => handleRevoke(session.token)}
+									onClick={() => revokeMutation.mutate(session.token)}
 								>
 									{t("auth:settings.sessions.revoke")}
 								</Button>

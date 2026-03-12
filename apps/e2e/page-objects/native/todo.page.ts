@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
+import { BaseTodoPage } from "../base/todo.page.js";
 
-export class NativeTodoPage {
-	constructor(private readonly page: Page) {}
-
+export class NativeTodoPage extends BaseTodoPage {
 	async navigate() {
 		await this.page.goto("/todos");
 	}
@@ -31,6 +29,6 @@ export class NativeTodoPage {
 	}
 
 	todoLocator(title: string) {
-		return this.page.getByText(title);
+		return this.todoRow(title);
 	}
 }

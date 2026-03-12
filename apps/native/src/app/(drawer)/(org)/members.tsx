@@ -22,7 +22,6 @@ function MemberRow({
 	isAdmin,
 	isCurrentUser,
 	onRemove,
-	t,
 }: {
 	member: {
 		id: string;
@@ -33,9 +32,9 @@ function MemberRow({
 	isAdmin: boolean;
 	isCurrentUser: boolean;
 	onRemove: (memberId: string) => void;
-	t: (key: string) => string;
 }) {
 	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
 
 	return (
 		<View
@@ -144,7 +143,6 @@ export default function MembersScreen() {
 						isAdmin={isAdmin}
 						isCurrentUser={member.userId === currentUserId}
 						onRemove={onRemove}
-						t={t}
 					/>
 				)}
 			/>

@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
+import { BaseTodoPage } from "./base/todo.page.js";
 
-export class TodoPage {
-	constructor(private readonly page: Page) {}
-
+export class TodoPage extends BaseTodoPage {
 	async navigate() {
 		await this.page.goto("/todos");
 	}

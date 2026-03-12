@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
+import { BaseAuthPage } from "../base/auth.page.js";
 
-export class NativeAuthPage {
-	constructor(private readonly page: Page) {}
-
+export class NativeAuthPage extends BaseAuthPage {
 	async navigateToSignIn() {
 		await this.page.goto("/login");
 	}

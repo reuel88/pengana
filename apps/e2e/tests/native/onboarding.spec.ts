@@ -9,13 +9,6 @@ test.describe("Onboarding", () => {
 		await expect(page).toHaveURL(/login/);
 	});
 
-	test("onboarding page is accessible", async ({ page }) => {
-		const orgPage = new NativeOrgPage(page);
-		await orgPage.navigateToOnboarding();
-		// Unauthenticated users should be redirected
-		await expect(page).not.toHaveURL("/onboarding");
-	});
-
 	test("full flow: sign up → create org → skip invites → reach dashboard", async ({
 		page,
 	}) => {

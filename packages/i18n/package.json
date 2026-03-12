@@ -31,6 +31,9 @@
 		},
 		"./config": {
 			"default": "./src/config.ts"
+		},
+		"./persistence": {
+			"default": "./src/persistence.ts"
 		}
 	},
 	"dependencies": {

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
 import { db, todos } from "@/features/todo/entities/todo";
+import { pendingUpdate } from "./lib/pending-update";
 
 export async function addTodo(userId: string, title: string): Promise<void> {
 	await db.insert(todos).values({
@@ -22,39 +23,18 @@ export async function toggleTodo(id: string): Promise<void> {
 	const [todo] = await db.select().from(todos).where(eq(todos.id, id));
 	if (!todo) throw new Error(`Todo not found: ${id}`);
 
-	await db
-		.update(todos)
-		.set({
-			completed: !todo.completed,
-			updatedAt: new Date().toISOString(),
-			syncStatus: "pending",
-		})
-		.where(eq(todos.id, id));
+	await pendingUpdate(id, { completed: !todo.completed });
 }
 
 export async function updateTodoTitle(
 	id: string,
 	title: string,
 ): Promise<void> {
-	await db
-		.update(todos)
-		.set({
-			title,
-			updatedAt: new Date().toISOString(),
-			syncStatus: "pending",
-		})
-		.where(eq(todos.id, id));
+	await pendingUpdate(id, { title });
 }
 
 export async function deleteTodo(id: string): Promise<void> {
-	await db
-		.update(todos)
-		.set({
-			deleted: true,
-			updatedAt: new Date().toISOString(),
-			syncStatus: "pending",
-		})
-		.where(eq(todos.id, id));
+	await pendingUpdate(id, { deleted: true });
 }
 
 export async function resolveConflict(
@@ -62,13 +42,7 @@ export async function resolveConflict(
 	resolution: "local" | "server",
 ): Promise<void> {
 	if (resolution === "local") {
-		await db
-			.update(todos)
-			.set({
-				updatedAt: new Date().toISOString(),
-				syncStatus: "pending",
-			})
-			.where(eq(todos.id, id));
+		await pendingUpdate(id, {});
 	} else {
 		await db
 			.update(todos)

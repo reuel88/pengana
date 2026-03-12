@@ -6,7 +6,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { queryClient } from "@/shared/api/orpc";
+import { useSignOut } from "@/shared/hooks/use-sign-out";
 import { authClient } from "@/shared/lib/auth-client";
 import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
@@ -16,6 +16,7 @@ export default function Home() {
 	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const { t } = useTranslation();
+	const handleSignOut = useSignOut();
 
 	return (
 		<Container>
@@ -42,10 +43,7 @@ export default function Home() {
 							styles.signOutButton,
 							{ backgroundColor: theme.notification },
 						]}
-						onPress={async () => {
-							await authClient.signOut();
-							queryClient.clear();
-						}}
+						onPress={handleSignOut}
 					>
 						<Text style={styles.signOutText}>{t("user.signOut")}</Text>
 					</TouchableOpacity>

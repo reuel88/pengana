@@ -21,6 +21,6 @@ export async function createContext({ context }: CreateContextOptions) {
 
 type BaseContext = Awaited<ReturnType<typeof createContext>>;
 export type Context = BaseContext & {
-	notifyUser?: (userId: string) => void;
-	notifyOrgMembers?: (orgId: string, excludeUserId: string) => void;
+	notifyUser: (userId: string) => void;
+	notifyOrgMembers: (orgId: string, excludeUserId: string) => void;
 };

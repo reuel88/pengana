@@ -22,6 +22,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 	}, []);
 
 	const clearError = useCallback((id: string) => {
+		// Destructure to omit the key matching `id`, keeping the rest
 		setErrors(({ [id]: _, ...rest }) => rest);
 	}, []);
 

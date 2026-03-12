@@ -39,7 +39,7 @@ export function OrgInvitationsList({
 							{ borderColor: theme.border, backgroundColor: theme.card },
 						]}
 					>
-						<View style={{ flex: 1 }}>
+						<View style={styles.invInfo}>
 							<Text style={bodyText(theme)}>{inv.email}</Text>
 							<Text style={secondaryText(theme)}>
 								{t(`roles.${inv.role}`, { defaultValue: inv.role })} -{" "}
@@ -81,5 +81,6 @@ const styles = StyleSheet.create({
 		padding: 12,
 		borderWidth: 1,
 	},
+	invInfo: { flex: 1 },
 	cancelButton: { paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
 });

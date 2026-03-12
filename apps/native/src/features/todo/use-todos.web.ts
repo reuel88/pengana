@@ -1,4 +1,5 @@
 import type { Todo } from "@pengana/sync-engine";
+import { filterTodos } from "@pengana/todo-client";
 import { useLiveQuery } from "dexie-react-hooks";
 
 import { todoDb } from "@/features/todo/entities/todo";
@@ -10,10 +11,7 @@ export function useTodos(userId: string) {
 		[] as Todo[],
 	);
 
-	const activeTodos = todos.filter((todo: Todo) => !todo.deleted);
-	const conflictTodos = todos.filter(
-		(todo: Todo) => todo.syncStatus === "conflict",
-	);
+	const { activeTodos, conflictTodos } = filterTodos(todos);
 
 	return { todos: activeTodos, conflictTodos };
 }

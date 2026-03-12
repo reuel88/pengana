@@ -21,7 +21,7 @@ export function useNetworkStatus() {
 
 	return {
 		isOnline: isOnline && !simulateOffline,
-		simulateOffline,
-		setSimulateOffline,
+		// Devtools state — only used in __DEV__ UI
+		...(__DEV__ ? { simulateOffline, setSimulateOffline } : {}),
 	};
 }

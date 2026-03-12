@@ -58,12 +58,11 @@ export function OrgSwitcher() {
 	const { data: session } = authClient.useSession();
 	const { data: orgs, isPending } = useListOrgs();
 	const { data: activeOrg } = useActiveOrg();
-	const [showPicker, setShowPicker] = useState(false);
-	const [showCreate, setShowCreate] = useState(false);
+	const [modal, setModal] = useState<"closed" | "picker" | "create">("closed");
 
 	const { handleSwitch, switchingId } = useOrgSwitcher({
 		onSwitchSuccess: () => {
-			setShowPicker(false);
+			setModal("closed");
 			router.push("/(drawer)/(org)");
 		},
 		onError: (message) =>
@@ -76,8 +75,7 @@ export function OrgSwitcher() {
 	if (!session) return null;
 
 	const handleCreated = (_orgId: string) => {
-		setShowCreate(false);
-		setShowPicker(false);
+		setModal("closed");
 		router.push("/(drawer)/(org)");
 	};
 
@@ -85,7 +83,7 @@ export function OrgSwitcher() {
 		<>
 			<TouchableOpacity
 				style={[styles.trigger, { borderColor: theme.border }]}
-				onPress={() => setShowPicker(true)}
+				onPress={() => setModal("picker")}
 			>
 				<Text style={[styles.triggerText, { color: theme.text }]}>
 					{activeOrg?.name || t("switcher.label")}
@@ -93,10 +91,10 @@ export function OrgSwitcher() {
 			</TouchableOpacity>
 
 			<Modal
-				visible={showPicker}
+				visible={modal !== "closed"}
 				transparent
 				animationType="slide"
-				onRequestClose={() => setShowPicker(false)}
+				onRequestClose={() => setModal("closed")}
 			>
 				<View style={styles.modalOverlay}>
 					<View
@@ -109,10 +107,10 @@ export function OrgSwitcher() {
 							{t("switcher.label")}
 						</Text>
 
-						{showCreate ? (
+						{modal === "create" ? (
 							<CreateOrgModal
 								onCreated={handleCreated}
-								onBack={() => setShowCreate(false)}
+								onBack={() => setModal("picker")}
 							/>
 						) : (
 							<ScrollView style={styles.orgList}>
@@ -141,7 +139,7 @@ export function OrgSwitcher() {
 								)}
 								<TouchableOpacity
 									style={[styles.orgItem, { borderColor: theme.border }]}
-									onPress={() => setShowCreate(true)}
+									onPress={() => setModal("create")}
 								>
 									<Text style={{ color: theme.primary }}>
 										+ {t("switcher.create")}
@@ -152,11 +150,8 @@ export function OrgSwitcher() {
 
 						<TouchableOpacity
 							style={styles.closeButton}
-							disabled={switchingId !== null || showCreate}
-							onPress={() => {
-								setShowPicker(false);
-								setShowCreate(false);
-							}}
+							disabled={switchingId !== null || modal === "create"}
+							onPress={() => setModal("closed")}
 						>
 							<Text style={{ color: theme.text }}>{t("switcher.close")}</Text>
 						</TouchableOpacity>
