@@ -7,6 +7,7 @@ import {
 	protectedProcedure,
 	publicProcedure,
 } from "../index";
+import { billingRouter } from "./billing";
 import { notificationRouter } from "./notification";
 import { todoRouter } from "./todo";
 import { uploadRouter } from "./upload";
@@ -43,6 +44,7 @@ export const appRouter = {
 				user: context.session?.user,
 			});
 		}),
+	billing: billingRouter,
 	notification: notificationRouter,
 	todo: todoRouter,
 	upload: uploadRouter,

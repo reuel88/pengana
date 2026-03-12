@@ -6,5 +6,6 @@
 	"manageSubscription": "Administrar suscripcion",
 	"upgradeToPro": "Actualizar a Pro",
 	"paymentSuccessful": "Pago exitoso!",
-	"checkoutId": "ID de compra: {{id}}"
+	"checkoutId": "ID de compra: {{id}}",
+	"backToDashboard": "Volver al panel"
 }

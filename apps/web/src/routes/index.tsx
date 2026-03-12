@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { useActiveOrg } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -10,19 +11,27 @@ export const Route = createFileRoute("/")({
 	component: DashboardPage,
 	beforeLoad: async () => {
 		const { session } = await requireAuthAndOrg();
-		const { data: customerState } = await authClient.customer.state();
-		return { session, customerState };
+		return { session };
 	},
 });
 
 function DashboardPage() {
-	const { session, customerState } = Route.useRouteContext();
+	const { session } = Route.useRouteContext();
 	const { t } = useTranslation("dashboard");
 
 	const privateData = useQuery(orpc.privateData.queryOptions());
 
-	const hasProSubscription =
-		(customerState?.activeSubscriptions?.length ?? 0) > 0;
+	const activeOrg = useActiveOrg();
+	const orgId = activeOrg.data?.id ?? "";
+
+	const subscription = useQuery(
+		orpc.billing.getOrgSubscription.queryOptions({
+			input: { organizationId: orgId },
+			enabled: !!orgId,
+		}),
+	);
+
+	const hasProSubscription = subscription.data?.data?.status === "active";
 
 	const handlePaymentAction = async (action: () => Promise<unknown>) => {
 		try {
@@ -57,7 +66,12 @@ function DashboardPage() {
 			) : (
 				<Button
 					onClick={() =>
-						handlePaymentAction(() => authClient.checkout({ slug: "pro" }))
+						handlePaymentAction(() =>
+							authClient.checkout({
+								slug: "pro",
+								metadata: { orgId },
+							}),
+						)
 					}
 				>
 					{t("upgradeToPro")}

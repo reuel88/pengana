@@ -6,5 +6,6 @@
 	"manageSubscription": "Pamahalaan ang Subscription",
 	"upgradeToPro": "Mag-upgrade sa Pro",
 	"paymentSuccessful": "Matagumpay ang Pagbabayad!",
-	"checkoutId": "Checkout ID: {{id}}"
+	"checkoutId": "Checkout ID: {{id}}",
+	"backToDashboard": "Bumalik sa Dashboard"
 }

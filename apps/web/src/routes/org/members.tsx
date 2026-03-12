@@ -3,7 +3,9 @@ import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Select } from "@pengana/ui/components/select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback } from "react";
 import { toast } from "sonner";
+import { client } from "@/shared/api/orpc";
 import { useOrgRole } from "@/shared/hooks/use-org-queries";
 import type { Column } from "@/shared/ui/data-table";
 import { DataTable } from "@/shared/ui/data-table";
@@ -26,6 +28,17 @@ function MembersPage() {
 	const { session } = Route.useRouteContext();
 	const { isAdmin } = useOrgRole();
 
+	const { activeOrg, guardElement } = useOrgGuard();
+
+	const removeMemberFn = useCallback(
+		(memberIdOrEmail: string) =>
+			client.billing.removeOrgMember({
+				memberIdOrEmail,
+				organizationId: activeOrg?.id ?? "",
+			}),
+		[activeOrg?.id],
+	);
+
 	const { handleUpdateRole, handleRemove, handleLeave } = useMemberActions({
 		onUpdateRoleSuccess: () => toast.success(t("members.updateRoleSuccess")),
 		onRemoveSuccess: () => toast.success(t("members.removeSuccess")),
@@ -39,6 +52,7 @@ function MembersPage() {
 			remove: t("members.removeError"),
 			leave: t("members.leaveError"),
 		},
+		removeMemberFn,
 	});
 
 	const currentUserId = session.data.user.id;
@@ -99,7 +113,6 @@ function MembersPage() {
 		},
 	];
 
-	const { activeOrg, guardElement } = useOrgGuard();
 	if (guardElement || !activeOrg) return guardElement;
 
 	const members = (activeOrg?.members || []) as Member[];

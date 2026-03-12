@@ -43,6 +43,13 @@
 			"when": 1772925090810,
 			"tag": "0005_parched_doctor_spectrum",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1773228985449,
+			"tag": "0006_calm_millenium_guard",
+			"breakpoints": true
 		}
 	]
 }

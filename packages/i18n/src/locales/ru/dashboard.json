@@ -6,5 +6,6 @@
 	"manageSubscription": "Управление подпиской",
 	"upgradeToPro": "Перейти на Pro",
 	"paymentSuccessful": "Оплата прошла успешно!",
-	"checkoutId": "ID заказа: {{id}}"
+	"checkoutId": "ID заказа: {{id}}",
+	"backToDashboard": "Вернуться на панель управления"
 }

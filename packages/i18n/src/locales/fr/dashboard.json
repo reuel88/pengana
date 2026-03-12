@@ -6,5 +6,6 @@
 	"manageSubscription": "Gérer l'abonnement",
 	"upgradeToPro": "Passer au forfait Pro",
 	"paymentSuccessful": "Paiement réussi !",
-	"checkoutId": "ID de commande : {{id}}"
+	"checkoutId": "ID de commande : {{id}}",
+	"backToDashboard": "Retour au tableau de bord"
 }

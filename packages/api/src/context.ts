@@ -15,6 +15,7 @@ export async function createContext({ context }: CreateContextOptions) {
 		session,
 		locale,
 		t: getServerT(locale),
+		headers: context.req.raw.headers,
 	};
 }
 
