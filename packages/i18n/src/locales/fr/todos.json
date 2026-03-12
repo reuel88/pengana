@@ -1,5 +1,9 @@
 {
 	"title": "Tâches",
+	"tabs": {
+		"personal": "Personnel",
+		"organization": "Organisation"
+	},
 	"addPlaceholder": "Ajouter une nouvelle tâche...",
 	"addButton": "Ajouter",
 	"empty": "Aucune tâche pour le moment",

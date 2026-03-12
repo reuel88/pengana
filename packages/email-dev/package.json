@@ -1,0 +1,24 @@
+{
+	"name": "@pengana/email-dev",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./schema": {
+			"default": "./src/schema.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"dependencies": {
+		"drizzle-orm": "^0.45.1",
+		"hono": "catalog:"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

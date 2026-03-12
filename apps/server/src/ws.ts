@@ -4,6 +4,7 @@ import { WS_PATH, type WsMessage } from "@pengana/api/ws-types";
 import { auth } from "@pengana/auth";
 import { WebSocket, WebSocketServer } from "ws";
 import { wsLogger } from "./logger";
+import { redeemWsTicket } from "./ws-tickets";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
@@ -17,19 +18,21 @@ async function authenticateRequest(
 	req: IncomingMessage,
 	url: URL,
 ): Promise<string | null> {
+	// Preferred: one-time ticket (avoids exposing session cookies in URLs)
+	const ticket = url.searchParams.get("ticket");
+	if (ticket) {
+		const userId = redeemWsTicket(ticket);
+		if (userId) return userId;
+		wsLogger.debug`Invalid or expired WebSocket ticket`;
+		return null;
+	}
+
 	try {
 		const headers = new Headers();
 		for (const [key, value] of Object.entries(req.headers)) {
 			if (value) {
 				headers.set(key, Array.isArray(value) ? value.join(", ") : value);
 			}
-		}
-
-		// Native clients pass cookies as a query param since WebSocket
-		// on React Native doesn't send cookies automatically
-		const cookieParam = url.searchParams.get("cookie");
-		if (cookieParam) {
-			headers.set("cookie", cookieParam);
 		}
 
 		const session = await auth.api.getSession({ headers });
@@ -146,6 +149,7 @@ export function setupWebSocket(server: ServerType) {
 	}
 
 	async function notifyOrgMembers(orgId: string, excludeUserId: string) {
+		// Dynamic import avoids a circular dependency: db → auth → ws → db
 		const { getSeatedMemberUserIds } = await import("@pengana/db/seat-queries");
 		const memberUserIds = await getSeatedMemberUserIds(orgId);
 		for (const uid of memberUserIds) {

@@ -1,3 +1,4 @@
+export { emailLog } from "@pengana/email-dev/schema";
 export * from "./auth";
 export * from "./notification";
 export * from "./org-todo";

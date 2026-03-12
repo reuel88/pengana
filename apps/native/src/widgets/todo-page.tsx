@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { db } from "@/entities/todo";
 import { SyncProvider } from "@/features/sync/sync-context";
+import { db } from "@/features/todo/entities/todo";
 import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 import migrations from "../../drizzle/migrations";

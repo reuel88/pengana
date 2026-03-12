@@ -9,11 +9,12 @@ import {
 	getOrgSubscription,
 	upsertSubscription,
 } from "@pengana/db/subscription-queries";
+import { sendEmail } from "@pengana/email-dev/send-email";
 import { env } from "@pengana/env/server";
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { organization } from "better-auth/plugins";
+import { magicLink, organization } from "better-auth/plugins";
 
 import { polarClient } from "./lib/payments";
 
@@ -26,6 +27,7 @@ export function setNotifyUser(fn: (userId: string) => void) {
 }
 
 export const auth = betterAuth({
+	baseURL: env.BETTER_AUTH_URL,
 	database: drizzleAdapter(db, {
 		provider: "pg",
 
@@ -46,12 +48,53 @@ export const auth = betterAuth({
 	],
 	emailAndPassword: {
 		enabled: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendEmail(db, {
+				to: user.email,
+				from: "noreply@pengana.com",
+				subject: "Reset your password",
+				html: `<p>Hi ${user.name ?? ""},</p><p>Click the link below to reset your password:</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`,
+			});
+		},
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		autoSignInAfterVerification: true,
+		sendVerificationEmail: async ({ user, url }) => {
+			const token = new URL(url).searchParams.get("token") ?? "";
+			const webUrl = env.CORS_ORIGIN.split(",")[0]?.trim() ?? "";
+			const callbackUrl = `${webUrl}/verify-email/callback?token=${encodeURIComponent(token)}`;
+			await sendEmail(db, {
+				to: user.email,
+				from: "noreply@pengana.com",
+				subject: "Verify your email",
+				html: `<p>Hi ${user.name ?? ""},</p><p>Click the link below to verify your email address:</p><p><a href="${callbackUrl}">${callbackUrl}</a></p>`,
+			});
+		},
 	},
 	advanced: {
 		defaultCookieAttributes: {
 			sameSite: env.NODE_ENV === "development" ? "lax" : "none",
 			secure: env.NODE_ENV !== "development",
 			httpOnly: true,
+		},
+	},
+	databaseHooks: {
+		user: {
+			create: {
+				after: async (user) => {
+					try {
+						await sendEmail(db, {
+							to: user.email,
+							from: "noreply@pengana.com",
+							subject: "Welcome to pengana!",
+							html: `<p>Hi ${user.name ?? ""},</p><p>Welcome to pengana! Your account has been created successfully.</p>`,
+						});
+					} catch (error) {
+						logger.error`Failed to send welcome email: ${error}`;
+					}
+				},
+			},
 		},
 	},
 	plugins: [
@@ -123,8 +166,27 @@ export const auth = betterAuth({
 				}),
 			],
 		}),
+		magicLink({
+			sendMagicLink: async ({ email, url }) => {
+				await sendEmail(db, {
+					to: email,
+					from: "noreply@pengana.com",
+					subject: "Sign in to pengana",
+					html: `<p>Click the link below to sign in:</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`,
+				});
+			},
+		}),
 		organization({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
+			sendInvitationEmail: async ({ invitation, organization, inviter }) => {
+				const webUrl = env.CORS_ORIGIN.split(",")[0]?.trim() ?? "";
+				await sendEmail(db, {
+					to: invitation.email,
+					from: "noreply@pengana.com",
+					subject: `${inviter.user.name ?? "Someone"} invited you to join ${organization.name}`,
+					html: `<p>${inviter.user.name ?? "Someone"} invited you to join <strong>${organization.name}</strong> on pengana.</p><p><a href="${webUrl}/invitation/${invitation.id}">Accept Invitation</a></p>`,
+				});
+			},
 			organizationHooks: {
 				afterCreateInvitation: async (data) => {
 					try {

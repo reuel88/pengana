@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 
-import type { FileStorageStrategy, TodoHandlerDeps } from "./use-todo-handlers";
+import type {
+	FileStorageStrategy,
+	TodoActions,
+	TodoHandlerDeps,
+} from "./use-todo-handlers";
 import { useTodoHandlers } from "./use-todo-handlers";
 
 export interface UseTodoListWiringConfig {
@@ -11,6 +15,7 @@ export interface UseTodoListWiringConfig {
 	clearError: (id: string) => void;
 	onDeleteSuccess?: (id: string) => void;
 	t: (key: string) => string;
+	actions?: TodoActions;
 }
 
 export function useTodoListWiring(config: UseTodoListWiringConfig) {
@@ -22,6 +27,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		clearError,
 		onDeleteSuccess,
 		t,
+		actions,
 	} = config;
 
 	const deps: TodoHandlerDeps = useMemo(
@@ -33,6 +39,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			fileStorage,
 			t,
 			onDeleteSuccess,
+			actions,
 		}),
 		[
 			triggerSync,
@@ -42,6 +49,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			fileStorage,
 			t,
 			onDeleteSuccess,
+			actions,
 		],
 	);
 

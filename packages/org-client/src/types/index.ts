@@ -193,4 +193,5 @@ export interface AuthMutationOptions<T> {
 export type UserLifecycleData = {
 	hasOrganization: boolean;
 	hasPendingInvitations: boolean;
+	organizations: OrganizationBase[];
 };

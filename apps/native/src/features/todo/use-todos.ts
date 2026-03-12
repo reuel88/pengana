@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
-import { db, todos } from "@/entities/todo";
+import { db, todos } from "@/features/todo/entities/todo";
 
 export function useTodos(userId: string) {
 	const { data: allTodos } = useLiveQuery(

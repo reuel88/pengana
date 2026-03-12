@@ -44,7 +44,7 @@ export default function Home() {
 						]}
 						onPress={async () => {
 							await authClient.signOut();
-							queryClient.invalidateQueries();
+							queryClient.clear();
 						}}
 					>
 						<Text style={styles.signOutText}>{t("user.signOut")}</Text>

@@ -23,7 +23,7 @@ function InvitationItem({
 		role: string;
 	};
 	disabled: boolean;
-	onAccept: (id: string) => void;
+	onAccept: (id: string, organizationId: string) => void;
 	onReject: (id: string) => void;
 }) {
 	const { t } = useTranslation("notifications");
@@ -39,7 +39,7 @@ function InvitationItem({
 							size="sm"
 							variant="default"
 							disabled={disabled}
-							onClick={() => onAccept(invitation.id)}
+							onClick={() => onAccept(invitation.id, invitation.organizationId)}
 						>
 							{t("accept")}
 						</Button>

@@ -107,7 +107,9 @@ export default function InvitationScreen() {
 									styles.acceptButton,
 									{ backgroundColor: theme.primary },
 								]}
-								onPress={() => handleAccept(invitation.id)}
+								onPress={() =>
+									handleAccept(invitation.id, invitation.organizationId)
+								}
 								disabled={acting}
 							>
 								<Text style={sharedStyles.buttonText}>

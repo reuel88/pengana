@@ -22,13 +22,14 @@ export function useInvitationActions({
 	} = useInvalidateOrg();
 	const [actingId, setActingId] = useState<string | null>(null);
 
-	const handleAccept = async (invitationId: string) => {
+	const handleAccept = async (invitationId: string, organizationId: string) => {
 		setActingId(invitationId);
 		await authMutation({
 			mutationFn: () =>
 				authClient.organization.acceptInvitation({ invitationId }),
 			errorMessage: "Failed to accept invitation",
 			onSuccess: async () => {
+				await authClient.organization.setActive({ organizationId });
 				await onAcceptSuccess?.(invitationId);
 				await Promise.all([
 					invalidateUserInvitations(),

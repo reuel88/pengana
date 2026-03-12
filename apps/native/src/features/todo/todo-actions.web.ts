@@ -10,7 +10,7 @@ export {
 	toggleTodo,
 } from "@pengana/todo-client";
 
-import { todoDb } from "@/entities/todo";
+import { todoDb } from "@/features/todo/entities/todo";
 
 export async function updateTodoTitle(
 	id: string,

@@ -1,5 +1,9 @@
 {
 	"title": "C\u00f4ng vi\u1ec7c",
+	"tabs": {
+		"personal": "Cá nhân",
+		"organization": "Tổ chức"
+	},
 	"addPlaceholder": "Th\u00eam c\u00f4ng vi\u1ec7c m\u1edbi...",
 	"addButton": "Th\u00eam",
 	"empty": "Ch\u01b0a c\u00f3 c\u00f4ng vi\u1ec7c n\u00e0o",

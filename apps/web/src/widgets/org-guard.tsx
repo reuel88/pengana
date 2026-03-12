@@ -12,6 +12,10 @@ export function useOrgGuard() {
 	let guardElement: ReactNode = null;
 	if (isPending) {
 		guardElement = <p>{t("common:status.loading")}</p>;
+	} else if (isError) {
+		guardElement = <p>{t("common:status.error")}</p>;
+	} else if (!activeOrg) {
+		guardElement = <p>{t("noOrganization")}</p>;
 	}
 
 	return { activeOrg, guardElement, isError, error };

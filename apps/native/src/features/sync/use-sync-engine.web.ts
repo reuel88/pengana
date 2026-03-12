@@ -3,11 +3,11 @@ import {
 	useNetworkStatus,
 	useSyncEngineCore,
 } from "@pengana/sync-engine";
-import { createSyncAdapter } from "@/entities/todo";
 import {
 	createUploadAdapter,
 	createUploadTransport,
-} from "@/entities/upload-queue";
+} from "@/features/sync/entities/upload-queue";
+import { createSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { getServerUrl } from "@/shared/lib/server-url";
 

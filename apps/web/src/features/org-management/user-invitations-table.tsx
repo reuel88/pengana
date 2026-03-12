@@ -33,7 +33,7 @@ export function UserInvitationsTable({
 				<div className="flex justify-end gap-2">
 					<Button
 						size="xs"
-						onClick={() => handleAccept(inv.id)}
+						onClick={() => handleAccept(inv.id, inv.organizationId)}
 						disabled={actingId !== null}
 					>
 						{t("invitations.accept")}

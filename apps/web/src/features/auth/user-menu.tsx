@@ -12,6 +12,7 @@ import {
 } from "@pengana/ui/components/dropdown-menu";
 import { Skeleton } from "@pengana/ui/components/skeleton";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 
 export function UserMenu() {
@@ -35,6 +36,7 @@ export function UserMenu() {
 		authClient.signOut({
 			fetchOptions: {
 				onSuccess: () => {
+					queryClient.clear();
 					navigate({ to: "/" });
 				},
 			},
@@ -51,6 +53,10 @@ export function UserMenu() {
 					<DropdownMenuLabel>{t("user.myAccount")}</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem>{session.user.email}</DropdownMenuItem>
+					<DropdownMenuItem render={<Link to="/settings/account" />}>
+						{t("user.settings")}
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
 					<DropdownMenuItem variant="destructive" onClick={handleSignOut}>
 						{t("user.signOut")}
 					</DropdownMenuItem>

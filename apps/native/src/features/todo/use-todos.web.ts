@@ -1,7 +1,7 @@
 import type { Todo } from "@pengana/sync-engine";
 import { useLiveQuery } from "dexie-react-hooks";
 
-import { todoDb } from "@/entities/todo";
+import { todoDb } from "@/features/todo/entities/todo";
 
 export function useTodos(userId: string) {
 	const todos = useLiveQuery(

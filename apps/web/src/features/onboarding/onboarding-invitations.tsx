@@ -43,7 +43,9 @@ export function OnboardingInvitations({
 						actions={
 							<Button
 								size="sm"
-								onClick={() => handleAccept(invitation.id)}
+								onClick={() =>
+									handleAccept(invitation.id, invitation.organizationId)
+								}
 								disabled={actingId !== null}
 							>
 								{t("invitations.accept")}

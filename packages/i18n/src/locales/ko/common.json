@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "로그인",
 		"signOut": "로그아웃",
-		"myAccount": "내 계정"
+		"myAccount": "내 계정",
+		"settings": "설정"
 	},
 	"status": {
 		"loading": "로딩 중...",
@@ -24,7 +25,8 @@
 		"disconnected": "연결 끊김",
 		"checkingConnection": "연결 확인 중...",
 		"connectedToApi": "API 연결됨",
-		"apiDisconnected": "API 연결 끊김"
+		"apiDisconnected": "API 연결 끊김",
+		"error": "문제가 발생했습니다. 다시 시도해 주세요."
 	},
 	"apiStatus": "API 상태",
 	"systemStatus": "시스템 상태",

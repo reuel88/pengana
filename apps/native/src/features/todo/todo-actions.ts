@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
-import { db, todos } from "@/entities/todo";
+import { db, todos } from "@/features/todo/entities/todo";
 
 export async function addTodo(userId: string, title: string): Promise<void> {
 	await db.insert(todos).values({

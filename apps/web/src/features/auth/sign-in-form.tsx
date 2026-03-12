@@ -1,7 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignInSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
@@ -10,6 +11,7 @@ import { AuthFormShell } from "./auth-form-shell";
 export function SignInForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+	const [error, setError] = useState<string | null>(null);
 
 	const form = useZodForm({
 		schema: makeSignInSchema(t),
@@ -18,6 +20,7 @@ export function SignInForm() {
 			password: "",
 		},
 		onSubmit: async ({ value }) => {
+			setError(null);
 			await authClient.signIn.email(
 				{
 					email: value.email,
@@ -31,7 +34,7 @@ export function SignInForm() {
 						toast.success(t("auth:signIn.success"));
 					},
 					onError: (error) => {
-						toast.error(error.error.message || error.error.statusText);
+						setError(error.error.message || error.error.statusText);
 					},
 				},
 			);
@@ -46,6 +49,7 @@ export function SignInForm() {
 			switchTo="/sign-up"
 			onSubmit={() => form.handleSubmit()}
 			form={form}
+			errorMessage={error}
 		>
 			<form.Field name="email">
 				{(field) => (
@@ -68,6 +72,21 @@ export function SignInForm() {
 					/>
 				)}
 			</form.Field>
+
+			<div className="flex justify-between">
+				<Link
+					to="/magic-link"
+					className="text-primary text-sm hover:text-primary/80"
+				>
+					{t("auth:signIn.orMagicLink")}
+				</Link>
+				<Link
+					to="/forgot-password"
+					className="text-primary text-sm hover:text-primary/80"
+				>
+					{t("auth:signIn.forgotPassword")}
+				</Link>
+			</div>
 		</AuthFormShell>
 	);
 }

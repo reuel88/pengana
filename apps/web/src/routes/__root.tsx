@@ -56,7 +56,16 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	}),
 });
 
-const HEADERLESS_PREFIXES = ["/login", "/sign-up", "/onboarding"] as const;
+const HEADERLESS_PREFIXES = [
+	"/login",
+	"/sign-up",
+	"/onboarding",
+	"/verify-email",
+	"/magic-link",
+	"/forgot-password",
+	"/reset-password",
+	"/auth-error",
+] as const;
 
 function RootComponent() {
 	const { i18n } = useTranslation();

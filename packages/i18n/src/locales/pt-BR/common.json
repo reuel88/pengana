@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "Entrar",
 		"signOut": "Sair",
-		"myAccount": "Minha Conta"
+		"myAccount": "Minha Conta",
+		"settings": "Configurações"
 	},
 	"status": {
 		"loading": "Carregando...",
@@ -24,7 +25,8 @@
 		"disconnected": "Desconectado",
 		"checkingConnection": "Verificando conexão...",
 		"connectedToApi": "Conectado à API",
-		"apiDisconnected": "API Desconectada"
+		"apiDisconnected": "API Desconectada",
+		"error": "Algo deu errado. Tente novamente."
 	},
 	"apiStatus": "Status da API",
 	"systemStatus": "Status do Sistema",

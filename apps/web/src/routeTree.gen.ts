@@ -10,45 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
-import { Route as SuccessRouteImport } from './routes/success'
-import { Route as SignUpRouteImport } from './routes/sign-up'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as OrgRouteRouteImport } from './routes/org/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgIndexRouteImport } from './routes/org/index'
+import { Route as SettingsSessionsRouteImport } from './routes/settings/sessions'
+import { Route as SettingsDeleteAccountRouteImport } from './routes/settings/delete-account'
+import { Route as SettingsAccountRouteImport } from './routes/settings/account'
 import { Route as OrgSettingsRouteImport } from './routes/org/settings'
 import { Route as OrgRolesRouteImport } from './routes/org/roles'
 import { Route as OrgMembersRouteImport } from './routes/org/members'
 import { Route as OrgInvitationsRouteImport } from './routes/org/invitations'
 import { Route as InvitationInvitationIdRouteImport } from './routes/invitation/$invitationId'
+import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
+import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
+import { Route as authLoginRouteImport } from './routes/(auth)/login'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as authAuthErrorRouteImport } from './routes/(auth)/auth-error'
+import { Route as accountSuccessRouteImport } from './routes/(account)/success'
+import { Route as accountOnboardingRouteImport } from './routes/(account)/onboarding'
 import { Route as OrgTeamsRouteRouteImport } from './routes/org/teams/route'
 import { Route as OrgTeamsIndexRouteImport } from './routes/org/teams/index'
+import { Route as authVerifyEmailIndexRouteImport } from './routes/(auth)/verify-email/index'
+import { Route as authMagicLinkIndexRouteImport } from './routes/(auth)/magic-link/index'
 import { Route as OrgTeamsTeamIdRouteImport } from './routes/org/teams/$teamId'
+import { Route as authVerifyEmailCallbackRouteImport } from './routes/(auth)/verify-email/callback'
+import { Route as authMagicLinkVerifyRouteImport } from './routes/(auth)/magic-link/verify'
+import { Route as authMagicLinkPendingRouteImport } from './routes/(auth)/magic-link/pending'
 
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
   path: '/todos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SuccessRoute = SuccessRouteImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignUpRoute = SignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const SettingsRouteRoute = SettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrgRouteRoute = OrgRouteRouteImport.update({
@@ -65,6 +62,21 @@ const OrgIndexRoute = OrgIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => OrgRouteRoute,
+} as any)
+const SettingsSessionsRoute = SettingsSessionsRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
+const SettingsDeleteAccountRoute = SettingsDeleteAccountRouteImport.update({
+  id: '/delete-account',
+  path: '/delete-account',
+  getParentRoute: () => SettingsRouteRoute,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRouteRoute,
 } as any)
 const OrgSettingsRoute = OrgSettingsRouteImport.update({
   id: '/settings',
@@ -91,6 +103,41 @@ const InvitationInvitationIdRoute = InvitationInvitationIdRouteImport.update({
   path: '/invitation/$invitationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authSignUpRoute = authSignUpRouteImport.update({
+  id: '/(auth)/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authResetPasswordRoute = authResetPasswordRouteImport.update({
+  id: '/(auth)/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authLoginRoute = authLoginRouteImport.update({
+  id: '/(auth)/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
+  id: '/(auth)/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authAuthErrorRoute = authAuthErrorRouteImport.update({
+  id: '/(auth)/auth-error',
+  path: '/auth-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const accountSuccessRoute = accountSuccessRouteImport.update({
+  id: '/(account)/success',
+  path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const accountOnboardingRoute = accountOnboardingRouteImport.update({
+  id: '/(account)/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrgTeamsRouteRoute = OrgTeamsRouteRouteImport.update({
   id: '/teams',
   path: '/teams',
@@ -101,63 +148,124 @@ const OrgTeamsIndexRoute = OrgTeamsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OrgTeamsRouteRoute,
 } as any)
+const authVerifyEmailIndexRoute = authVerifyEmailIndexRouteImport.update({
+  id: '/(auth)/verify-email/',
+  path: '/verify-email/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authMagicLinkIndexRoute = authMagicLinkIndexRouteImport.update({
+  id: '/(auth)/magic-link/',
+  path: '/magic-link/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrgTeamsTeamIdRoute = OrgTeamsTeamIdRouteImport.update({
   id: '/$teamId',
   path: '/$teamId',
   getParentRoute: () => OrgTeamsRouteRoute,
 } as any)
+const authVerifyEmailCallbackRoute = authVerifyEmailCallbackRouteImport.update({
+  id: '/(auth)/verify-email/callback',
+  path: '/verify-email/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authMagicLinkVerifyRoute = authMagicLinkVerifyRouteImport.update({
+  id: '/(auth)/magic-link/verify',
+  path: '/magic-link/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authMagicLinkPendingRoute = authMagicLinkPendingRouteImport.update({
+  id: '/(auth)/magic-link/pending',
+  path: '/magic-link/pending',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/org': typeof OrgRouteRouteWithChildren
-  '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
-  '/sign-up': typeof SignUpRoute
-  '/success': typeof SuccessRoute
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
+  '/onboarding': typeof accountOnboardingRoute
+  '/success': typeof accountSuccessRoute
+  '/auth-error': typeof authAuthErrorRoute
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/login': typeof authLoginRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/sign-up': typeof authSignUpRoute
   '/invitation/$invitationId': typeof InvitationInvitationIdRoute
   '/org/invitations': typeof OrgInvitationsRoute
   '/org/members': typeof OrgMembersRoute
   '/org/roles': typeof OrgRolesRoute
   '/org/settings': typeof OrgSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings/sessions': typeof SettingsSessionsRoute
   '/org/': typeof OrgIndexRoute
+  '/magic-link/pending': typeof authMagicLinkPendingRoute
+  '/magic-link/verify': typeof authMagicLinkVerifyRoute
+  '/verify-email/callback': typeof authVerifyEmailCallbackRoute
   '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/magic-link/': typeof authMagicLinkIndexRoute
+  '/verify-email/': typeof authVerifyEmailIndexRoute
   '/org/teams/': typeof OrgTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
-  '/sign-up': typeof SignUpRoute
-  '/success': typeof SuccessRoute
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/todos': typeof TodosRoute
+  '/onboarding': typeof accountOnboardingRoute
+  '/success': typeof accountSuccessRoute
+  '/auth-error': typeof authAuthErrorRoute
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/login': typeof authLoginRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/sign-up': typeof authSignUpRoute
   '/invitation/$invitationId': typeof InvitationInvitationIdRoute
   '/org/invitations': typeof OrgInvitationsRoute
   '/org/members': typeof OrgMembersRoute
   '/org/roles': typeof OrgRolesRoute
   '/org/settings': typeof OrgSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings/sessions': typeof SettingsSessionsRoute
   '/org': typeof OrgIndexRoute
+  '/magic-link/pending': typeof authMagicLinkPendingRoute
+  '/magic-link/verify': typeof authMagicLinkVerifyRoute
+  '/verify-email/callback': typeof authVerifyEmailCallbackRoute
   '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/magic-link': typeof authMagicLinkIndexRoute
+  '/verify-email': typeof authVerifyEmailIndexRoute
   '/org/teams': typeof OrgTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/org': typeof OrgRouteRouteWithChildren
-  '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
-  '/sign-up': typeof SignUpRoute
-  '/success': typeof SuccessRoute
+  '/settings': typeof SettingsRouteRouteWithChildren
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
+  '/(account)/onboarding': typeof accountOnboardingRoute
+  '/(account)/success': typeof accountSuccessRoute
+  '/(auth)/auth-error': typeof authAuthErrorRoute
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/login': typeof authLoginRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
+  '/(auth)/sign-up': typeof authSignUpRoute
   '/invitation/$invitationId': typeof InvitationInvitationIdRoute
   '/org/invitations': typeof OrgInvitationsRoute
   '/org/members': typeof OrgMembersRoute
   '/org/roles': typeof OrgRolesRoute
   '/org/settings': typeof OrgSettingsRoute
+  '/settings/account': typeof SettingsAccountRoute
+  '/settings/delete-account': typeof SettingsDeleteAccountRoute
+  '/settings/sessions': typeof SettingsSessionsRoute
   '/org/': typeof OrgIndexRoute
+  '/(auth)/magic-link/pending': typeof authMagicLinkPendingRoute
+  '/(auth)/magic-link/verify': typeof authMagicLinkVerifyRoute
+  '/(auth)/verify-email/callback': typeof authVerifyEmailCallbackRoute
   '/org/teams/$teamId': typeof OrgTeamsTeamIdRoute
+  '/(auth)/magic-link/': typeof authMagicLinkIndexRoute
+  '/(auth)/verify-email/': typeof authVerifyEmailIndexRoute
   '/org/teams/': typeof OrgTeamsIndexRoute
 }
 export interface FileRouteTypes {
@@ -165,65 +273,110 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/org'
-    | '/login'
-    | '/onboarding'
-    | '/sign-up'
-    | '/success'
+    | '/settings'
     | '/todos'
     | '/org/teams'
+    | '/onboarding'
+    | '/success'
+    | '/auth-error'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/sign-up'
     | '/invitation/$invitationId'
     | '/org/invitations'
     | '/org/members'
     | '/org/roles'
     | '/org/settings'
+    | '/settings/account'
+    | '/settings/delete-account'
+    | '/settings/sessions'
     | '/org/'
+    | '/magic-link/pending'
+    | '/magic-link/verify'
+    | '/verify-email/callback'
     | '/org/teams/$teamId'
+    | '/magic-link/'
+    | '/verify-email/'
     | '/org/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
-    | '/onboarding'
-    | '/sign-up'
-    | '/success'
+    | '/settings'
     | '/todos'
+    | '/onboarding'
+    | '/success'
+    | '/auth-error'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/sign-up'
     | '/invitation/$invitationId'
     | '/org/invitations'
     | '/org/members'
     | '/org/roles'
     | '/org/settings'
+    | '/settings/account'
+    | '/settings/delete-account'
+    | '/settings/sessions'
     | '/org'
+    | '/magic-link/pending'
+    | '/magic-link/verify'
+    | '/verify-email/callback'
     | '/org/teams/$teamId'
+    | '/magic-link'
+    | '/verify-email'
     | '/org/teams'
   id:
     | '__root__'
     | '/'
     | '/org'
-    | '/login'
-    | '/onboarding'
-    | '/sign-up'
-    | '/success'
+    | '/settings'
     | '/todos'
     | '/org/teams'
+    | '/(account)/onboarding'
+    | '/(account)/success'
+    | '/(auth)/auth-error'
+    | '/(auth)/forgot-password'
+    | '/(auth)/login'
+    | '/(auth)/reset-password'
+    | '/(auth)/sign-up'
     | '/invitation/$invitationId'
     | '/org/invitations'
     | '/org/members'
     | '/org/roles'
     | '/org/settings'
+    | '/settings/account'
+    | '/settings/delete-account'
+    | '/settings/sessions'
     | '/org/'
+    | '/(auth)/magic-link/pending'
+    | '/(auth)/magic-link/verify'
+    | '/(auth)/verify-email/callback'
     | '/org/teams/$teamId'
+    | '/(auth)/magic-link/'
+    | '/(auth)/verify-email/'
     | '/org/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OrgRouteRoute: typeof OrgRouteRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  OnboardingRoute: typeof OnboardingRoute
-  SignUpRoute: typeof SignUpRoute
-  SuccessRoute: typeof SuccessRoute
+  SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   TodosRoute: typeof TodosRoute
+  accountOnboardingRoute: typeof accountOnboardingRoute
+  accountSuccessRoute: typeof accountSuccessRoute
+  authAuthErrorRoute: typeof authAuthErrorRoute
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authLoginRoute: typeof authLoginRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
+  authSignUpRoute: typeof authSignUpRoute
   InvitationInvitationIdRoute: typeof InvitationInvitationIdRoute
+  authMagicLinkPendingRoute: typeof authMagicLinkPendingRoute
+  authMagicLinkVerifyRoute: typeof authMagicLinkVerifyRoute
+  authVerifyEmailCallbackRoute: typeof authVerifyEmailCallbackRoute
+  authMagicLinkIndexRoute: typeof authMagicLinkIndexRoute
+  authVerifyEmailIndexRoute: typeof authVerifyEmailIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -235,32 +388,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/success': {
-      id: '/success'
-      path: '/success'
-      fullPath: '/success'
-      preLoaderRoute: typeof SuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sign-up': {
-      id: '/sign-up'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/org': {
@@ -283,6 +415,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/'
       preLoaderRoute: typeof OrgIndexRouteImport
       parentRoute: typeof OrgRouteRoute
+    }
+    '/settings/sessions': {
+      id: '/settings/sessions'
+      path: '/sessions'
+      fullPath: '/settings/sessions'
+      preLoaderRoute: typeof SettingsSessionsRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
+    '/settings/delete-account': {
+      id: '/settings/delete-account'
+      path: '/delete-account'
+      fullPath: '/settings/delete-account'
+      preLoaderRoute: typeof SettingsDeleteAccountRouteImport
+      parentRoute: typeof SettingsRouteRoute
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
+      parentRoute: typeof SettingsRouteRoute
     }
     '/org/settings': {
       id: '/org/settings'
@@ -319,6 +472,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvitationInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/sign-up': {
+      id: '/(auth)/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/login': {
+      id: '/(auth)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/auth-error': {
+      id: '/(auth)/auth-error'
+      path: '/auth-error'
+      fullPath: '/auth-error'
+      preLoaderRoute: typeof authAuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(account)/success': {
+      id: '/(account)/success'
+      path: '/success'
+      fullPath: '/success'
+      preLoaderRoute: typeof accountSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(account)/onboarding': {
+      id: '/(account)/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof accountOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/org/teams': {
       id: '/org/teams'
       path: '/teams'
@@ -333,12 +535,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgTeamsIndexRouteImport
       parentRoute: typeof OrgTeamsRouteRoute
     }
+    '/(auth)/verify-email/': {
+      id: '/(auth)/verify-email/'
+      path: '/verify-email'
+      fullPath: '/verify-email/'
+      preLoaderRoute: typeof authVerifyEmailIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/magic-link/': {
+      id: '/(auth)/magic-link/'
+      path: '/magic-link'
+      fullPath: '/magic-link/'
+      preLoaderRoute: typeof authMagicLinkIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/org/teams/$teamId': {
       id: '/org/teams/$teamId'
       path: '/$teamId'
       fullPath: '/org/teams/$teamId'
       preLoaderRoute: typeof OrgTeamsTeamIdRouteImport
       parentRoute: typeof OrgTeamsRouteRoute
+    }
+    '/(auth)/verify-email/callback': {
+      id: '/(auth)/verify-email/callback'
+      path: '/verify-email/callback'
+      fullPath: '/verify-email/callback'
+      preLoaderRoute: typeof authVerifyEmailCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/magic-link/verify': {
+      id: '/(auth)/magic-link/verify'
+      path: '/magic-link/verify'
+      fullPath: '/magic-link/verify'
+      preLoaderRoute: typeof authMagicLinkVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/magic-link/pending': {
+      id: '/(auth)/magic-link/pending'
+      path: '/magic-link/pending'
+      fullPath: '/magic-link/pending'
+      preLoaderRoute: typeof authMagicLinkPendingRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -379,15 +616,40 @@ const OrgRouteRouteWithChildren = OrgRouteRoute._addFileChildren(
   OrgRouteRouteChildren,
 )
 
+interface SettingsRouteRouteChildren {
+  SettingsAccountRoute: typeof SettingsAccountRoute
+  SettingsDeleteAccountRoute: typeof SettingsDeleteAccountRoute
+  SettingsSessionsRoute: typeof SettingsSessionsRoute
+}
+
+const SettingsRouteRouteChildren: SettingsRouteRouteChildren = {
+  SettingsAccountRoute: SettingsAccountRoute,
+  SettingsDeleteAccountRoute: SettingsDeleteAccountRoute,
+  SettingsSessionsRoute: SettingsSessionsRoute,
+}
+
+const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
+  SettingsRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OrgRouteRoute: OrgRouteRouteWithChildren,
-  LoginRoute: LoginRoute,
-  OnboardingRoute: OnboardingRoute,
-  SignUpRoute: SignUpRoute,
-  SuccessRoute: SuccessRoute,
+  SettingsRouteRoute: SettingsRouteRouteWithChildren,
   TodosRoute: TodosRoute,
+  accountOnboardingRoute: accountOnboardingRoute,
+  accountSuccessRoute: accountSuccessRoute,
+  authAuthErrorRoute: authAuthErrorRoute,
+  authForgotPasswordRoute: authForgotPasswordRoute,
+  authLoginRoute: authLoginRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
+  authSignUpRoute: authSignUpRoute,
   InvitationInvitationIdRoute: InvitationInvitationIdRoute,
+  authMagicLinkPendingRoute: authMagicLinkPendingRoute,
+  authMagicLinkVerifyRoute: authMagicLinkVerifyRoute,
+  authVerifyEmailCallbackRoute: authVerifyEmailCallbackRoute,
+  authMagicLinkIndexRoute: authMagicLinkIndexRoute,
+  authVerifyEmailIndexRoute: authVerifyEmailIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,7 +2,6 @@ import { useTranslation } from "@pengana/i18n";
 import { makeSignUpSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
 import { AuthFormShell } from "./auth-form-shell";
@@ -10,6 +9,10 @@ import { AuthFormShell } from "./auth-form-shell";
 export function SignUpForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+
+	const navigateWithCheckEmail = (email?: string) => {
+		navigate({ to: "/verify-email", search: { email } });
+	};
 
 	const form = useZodForm({
 		schema: makeSignUpSchema(t),
@@ -27,13 +30,10 @@ export function SignUpForm() {
 				},
 				{
 					onSuccess: () => {
-						navigate({
-							to: "/onboarding",
-						});
-						toast.success(t("auth:signUp.success"));
+						navigateWithCheckEmail(value.email);
 					},
-					onError: (error) => {
-						toast.error(error.error.message || error.error.statusText);
+					onError: () => {
+						navigateWithCheckEmail(value.email);
 					},
 				},
 			);

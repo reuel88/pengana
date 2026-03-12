@@ -17,6 +17,7 @@ export { createUploadTransport } from "./adapters/upload-transport";
 export { useOrgTodos } from "./hooks/use-org-todos";
 export type {
 	FileStorageStrategy,
+	TodoActions,
 	TodoHandlerDeps,
 } from "./hooks/use-todo-handlers";
 export { useTodoHandlers } from "./hooks/use-todo-handlers";

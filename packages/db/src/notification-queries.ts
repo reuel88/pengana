@@ -40,7 +40,7 @@ export async function insertNotification(values: {
 
 export async function findUserByEmail(email: string) {
 	const [found] = await db
-		.select({ id: user.id })
+		.select({ id: user.id, name: user.name })
 		.from(user)
 		.where(eq(user.email, email))
 		.limit(1);

@@ -1,5 +1,9 @@
 {
 	"title": "할 일",
+	"tabs": {
+		"personal": "개인",
+		"organization": "조직"
+	},
 	"addPlaceholder": "새로운 할 일 추가...",
 	"addButton": "추가",
 	"empty": "할 일이 없습니다",

@@ -1,5 +1,6 @@
 {
 	"title": "组织",
+	"noOrganization": "未找到活跃的组织。",
 	"switcher": {
 		"label": "组织",
 		"create": "创建组织",

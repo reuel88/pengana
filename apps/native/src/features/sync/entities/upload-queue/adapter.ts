@@ -3,8 +3,8 @@ import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { asc, eq } from "drizzle-orm";
 
-import { db } from "../todo/db";
-import { todos } from "../todo/schema";
+import { db } from "@/features/todo/entities/todo/db";
+import { todos } from "@/features/todo/entities/todo/schema";
 import { uploadQueue } from "./schema";
 
 export function createNativeUploadAdapter(): UploadAdapter {

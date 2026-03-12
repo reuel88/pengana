@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "Mag-sign In",
 		"signOut": "Mag-sign Out",
-		"myAccount": "Aking Account"
+		"myAccount": "Aking Account",
+		"settings": "Mga Setting"
 	},
 	"status": {
 		"loading": "Naglo-load...",
@@ -24,7 +25,8 @@
 		"disconnected": "Hindi Nakakonekta",
 		"checkingConnection": "Sinusuri ang koneksyon...",
 		"connectedToApi": "Nakakonekta sa API",
-		"apiDisconnected": "Hindi Nakakonekta ang API"
+		"apiDisconnected": "Hindi Nakakonekta ang API",
+		"error": "May nangyaring mali. Subukan muli."
 	},
 	"apiStatus": "Katayuan ng API",
 	"systemStatus": "Katayuan ng Sistema",

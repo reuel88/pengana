@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "Sign In",
 		"signOut": "Sign Out",
-		"myAccount": "My Account"
+		"myAccount": "My Account",
+		"settings": "Settings"
 	},
 	"status": {
 		"loading": "Loading...",
@@ -24,7 +25,8 @@
 		"disconnected": "Disconnected",
 		"checkingConnection": "Checking connection...",
 		"connectedToApi": "Connected to API",
-		"apiDisconnected": "API Disconnected"
+		"apiDisconnected": "API Disconnected",
+		"error": "Something went wrong. Please try again."
 	},
 	"apiStatus": "API Status",
 	"systemStatus": "System Status",

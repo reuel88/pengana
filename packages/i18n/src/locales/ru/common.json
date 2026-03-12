@@ -15,7 +15,8 @@
 	"user": {
 		"signIn": "Войти",
 		"signOut": "Выйти",
-		"myAccount": "Мой аккаунт"
+		"myAccount": "Мой аккаунт",
+		"settings": "Настройки"
 	},
 	"status": {
 		"loading": "Загрузка...",
@@ -24,7 +25,8 @@
 		"disconnected": "Отключено",
 		"checkingConnection": "Проверка соединения...",
 		"connectedToApi": "Подключено к API",
-		"apiDisconnected": "API отключён"
+		"apiDisconnected": "API отключён",
+		"error": "Что-то пошло не так. Попробуйте снова."
 	},
 	"apiStatus": "Статус API",
 	"systemStatus": "Состояние системы",

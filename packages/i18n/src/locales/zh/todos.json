@@ -1,5 +1,9 @@
 {
 	"title": "待办事项",
+	"tabs": {
+		"personal": "个人",
+		"organization": "组织"
+	},
 	"addPlaceholder": "添加新的待办事项...",
 	"addButton": "添加",
 	"empty": "暂无待办事项",

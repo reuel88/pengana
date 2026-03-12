@@ -9,7 +9,11 @@ import {
 	View,
 } from "react-native";
 
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
+import {
+	BANNER_COLORS,
+	STATUS_COLORS,
+	TEXT_ON_PRIMARY,
+} from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 
 export function AuthFormCard({
@@ -23,7 +27,12 @@ export function AuthFormCard({
 	children: ReactNode;
 	testID?: string;
 }) {
-	const { theme } = useTheme();
+	const { theme, colorScheme } = useTheme();
+	const errorTextColor =
+		colorScheme === "dark"
+			? BANNER_COLORS.offlineTextDark
+			: BANNER_COLORS.offlineTextLight;
+
 	return (
 		<View
 			testID={testID}
@@ -38,10 +47,13 @@ export function AuthFormCard({
 					testID="auth-error"
 					style={[
 						styles.errorContainer,
-						{ backgroundColor: `${theme.notification}20` },
+						{
+							backgroundColor: BANNER_COLORS.offlineBg,
+							borderColor: STATUS_COLORS.error,
+						},
 					]}
 				>
-					<Text style={[styles.errorText, { color: theme.notification }]}>
+					<Text style={[styles.errorText, { color: errorTextColor }]}>
 						{error}
 					</Text>
 				</View>
@@ -56,30 +68,47 @@ export function AuthFormField({
 	onChangeText,
 	onBlur,
 	onClearError,
+	errors,
 	testID,
 	...rest
-}: TextInputProps & { onClearError?: () => void }) {
+}: TextInputProps & {
+	onClearError?: () => void;
+	errors?: Array<{ message: string }> | undefined;
+}) {
 	const { theme } = useTheme();
+	const hasErrors = errors != null && errors.length > 0;
 	return (
-		<TextInput
-			testID={testID}
-			style={[
-				styles.input,
-				{
-					color: theme.text,
-					borderColor: theme.border,
-					backgroundColor: theme.background,
-				},
-			]}
-			placeholderTextColor={theme.text}
-			value={value}
-			onBlur={onBlur}
-			onChangeText={(text) => {
-				onChangeText?.(text);
-				onClearError?.();
-			}}
-			{...rest}
-		/>
+		<View style={styles.fieldContainer}>
+			<TextInput
+				testID={testID}
+				style={[
+					styles.input,
+					{
+						color: theme.text,
+						borderColor: hasErrors ? theme.notification : theme.border,
+						backgroundColor: theme.background,
+					},
+				]}
+				placeholderTextColor={theme.text}
+				value={value}
+				onBlur={onBlur}
+				onChangeText={(text) => {
+					onChangeText?.(text);
+					onClearError?.();
+				}}
+				{...rest}
+			/>
+			{hasErrors
+				? errors.map((err) => (
+						<Text
+							key={err.message}
+							style={[styles.fieldErrorText, { color: theme.notification }]}
+						>
+							{err.message}
+						</Text>
+					))
+				: null}
+		</View>
 	);
 }
 
@@ -133,15 +162,23 @@ const styles = StyleSheet.create({
 	errorContainer: {
 		marginBottom: 12,
 		padding: 8,
+		borderWidth: 1,
 	},
 	errorText: {
 		fontSize: 14,
+		lineHeight: 20,
+	},
+	fieldContainer: {
+		marginBottom: 12,
 	},
 	input: {
 		borderWidth: 1,
 		padding: 12,
 		fontSize: 16,
-		marginBottom: 12,
+	},
+	fieldErrorText: {
+		fontSize: 12,
+		marginTop: 4,
 	},
 	button: {
 		padding: 12,
