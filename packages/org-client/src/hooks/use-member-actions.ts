@@ -10,6 +10,7 @@ export function useMemberActions({
 	onLeaveSuccess,
 	onError,
 	errorMessages,
+	removeMemberFn,
 }: {
 	onUpdateRoleSuccess?: () => void;
 	onRemoveSuccess?: () => void;
@@ -20,6 +21,7 @@ export function useMemberActions({
 		remove?: string;
 		leave?: string;
 	};
+	removeMemberFn?: (memberIdOrEmail: string) => Promise<unknown>;
 }) {
 	const authClient = useAuthClient();
 	const { invalidateActiveOrg, invalidateActiveMember, invalidateAll } =
@@ -45,9 +47,23 @@ export function useMemberActions({
 
 	const handleRemove = async (memberIdOrEmail: string) => {
 		setActingId(memberIdOrEmail);
+		const mutationFn = removeMemberFn
+			? async () => {
+					try {
+						await removeMemberFn(memberIdOrEmail);
+						return { data: null, error: null };
+					} catch (e) {
+						return {
+							data: null,
+							error: {
+								message: e instanceof Error ? e.message : "Unknown error",
+							},
+						};
+					}
+				}
+			: () => authClient.organization.removeMember({ memberIdOrEmail });
 		await authMutation({
-			mutationFn: () =>
-				authClient.organization.removeMember({ memberIdOrEmail }),
+			mutationFn,
 			errorMessage: errorMessages?.remove ?? "Failed to remove member",
 			onSuccess: async () => {
 				await invalidateActiveOrg();

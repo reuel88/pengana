@@ -6,5 +6,6 @@
 	"manageSubscription": "Qu\u1ea3n l\u00fd g\u00f3i \u0111\u0103ng k\u00fd",
 	"upgradeToPro": "N\u00e2ng c\u1ea5p l\u00ean Pro",
 	"paymentSuccessful": "Thanh to\u00e1n th\u00e0nh c\u00f4ng!",
-	"checkoutId": "M\u00e3 thanh to\u00e1n: {{id}}"
+	"checkoutId": "M\u00e3 thanh to\u00e1n: {{id}}",
+	"backToDashboard": "Quay l\u1ea1i b\u1ea3ng \u0111i\u1ec1u khi\u1ec3n"
 }

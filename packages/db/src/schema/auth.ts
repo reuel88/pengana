@@ -8,6 +8,8 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+import { subscription } from "./subscription";
+
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
@@ -193,11 +195,15 @@ export const accountRelations = relations(account, ({ one }) => ({
 	}),
 }));
 
-export const organizationRelations = relations(organization, ({ many }) => ({
-	teams: many(team),
-	members: many(member),
-	invitations: many(invitation),
-}));
+export const organizationRelations = relations(
+	organization,
+	({ one, many }) => ({
+		teams: many(team),
+		members: many(member),
+		invitations: many(invitation),
+		subscription: one(subscription),
+	}),
+);
 
 export const teamRelations = relations(team, ({ one, many }) => ({
 	organization: one(organization, {

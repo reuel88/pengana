@@ -6,5 +6,6 @@
 	"manageSubscription": "Manage Subscription",
 	"upgradeToPro": "Upgrade to Pro",
 	"paymentSuccessful": "Payment Successful!",
-	"checkoutId": "Checkout ID: {{id}}"
+	"checkoutId": "Checkout ID: {{id}}",
+	"backToDashboard": "Back to Dashboard"
 }

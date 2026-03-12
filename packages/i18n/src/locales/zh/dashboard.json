@@ -6,5 +6,6 @@
 	"manageSubscription": "管理订阅",
 	"upgradeToPro": "升级到 Pro",
 	"paymentSuccessful": "支付成功！",
-	"checkoutId": "结账 ID：{{id}}"
+	"checkoutId": "结账 ID：{{id}}",
+	"backToDashboard": "返回仪表盘"
 }

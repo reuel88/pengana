@@ -6,5 +6,6 @@
 	"manageSubscription": "구독 관리",
 	"upgradeToPro": "Pro로 업그레이드",
 	"paymentSuccessful": "결제 완료!",
-	"checkoutId": "결제 ID: {{id}}"
+	"checkoutId": "결제 ID: {{id}}",
+	"backToDashboard": "대시보드로 돌아가기"
 }
