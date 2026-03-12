@@ -32,9 +32,15 @@ const rpcHandler = new RPCHandler(appRouter, {
 // instance, but this middleware is created before the server exists. We use a
 // mutable ref so that once the server starts and notifyUser is wired up, all
 // subsequent requests pick up the real implementation.
-export const notifyRef: { current: (userId: string) => void } = {
+export const notifyRef: {
+	current: (userId: string) => void;
+	orgCurrent: (orgId: string, excludeUserId: string) => void;
+} = {
 	current: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
+	},
+	orgCurrent: () => {
+		logger.warn`notifyOrgMembers called before WebSocket server initialized`;
 	},
 };
 
@@ -80,7 +86,11 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 	}
 
 	const appContext = await createContext({ context: c });
-	const orpcContext = { ...appContext, notifyUser: notifyRef.current };
+	const orpcContext = {
+		...appContext,
+		notifyUser: notifyRef.current,
+		notifyOrgMembers: notifyRef.orgCurrent,
+	};
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {
 		prefix: "/rpc",

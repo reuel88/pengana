@@ -1,4 +1,8 @@
 import { os } from "@orpc/server";
+import {
+	autoSeatOwner,
+	isMemberSeatedByUserId,
+} from "@pengana/db/seat-queries";
 import { z } from "zod";
 
 import type { Context } from "./context";
@@ -28,3 +32,33 @@ const requireAuth = o.middleware(async ({ context, next }) => {
 });
 
 export const protectedProcedure = publicProcedure.use(requireAuth);
+
+const requireSeat = o.middleware(async ({ context, next }) => {
+	if (!context.session?.user) {
+		throw apiError("UNAUTHORIZED", "Authentication required");
+	}
+
+	const userId = context.session.user.id;
+	const orgId = context.session.session.activeOrganizationId;
+	if (!orgId) {
+		throw apiError("BAD_REQUEST", "No active organization");
+	}
+
+	let seated = await isMemberSeatedByUserId(orgId, userId);
+
+	if (!seated) {
+		// Auto-seat owner on first write (lazy bootstrap)
+		seated = await autoSeatOwner(orgId, userId);
+	}
+
+	if (!seated) {
+		throw apiError(
+			"FORBIDDEN",
+			"A seat is required for write operations. Contact your organization owner.",
+		);
+	}
+
+	return next({ context: { session: context.session } });
+});
+
+export const seatedProcedure = protectedProcedure.use(requireSeat);

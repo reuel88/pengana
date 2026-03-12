@@ -1,5 +1,12 @@
 import { getLogger } from "@logtape/logtape";
 import {
+	assignSeatIfAvailable,
+	countSeatedMembers,
+	getEffectiveSeatLimit,
+	isMemberSeatedByUserId,
+	revokeSeat,
+} from "@pengana/db/seat-queries";
+import {
 	countOrgMembers,
 	getOrgSubscription,
 	upsertSubscription,
@@ -137,6 +144,81 @@ export const billingRouter = {
 				});
 			}
 
+			return envelope({ success: true });
+		}),
+
+	getSeatStatus: protectedProcedure
+		.route({
+			method: "GET",
+			path: "/billing/seat-status",
+			summary: "Get seat status for current user and org",
+		})
+		.input(z.object({ organizationId: z.string() }))
+		.output(
+			envelopeOutput(
+				z.object({
+					isSeated: z.boolean(),
+					seatedCount: z.number(),
+					seatLimit: z.number(),
+				}),
+			),
+		)
+		.handler(async ({ input, context }) => {
+			const userId = context.session.user.id;
+			const [isSeated, seatedCount, seatLimit] = await Promise.all([
+				isMemberSeatedByUserId(input.organizationId, userId),
+				countSeatedMembers(input.organizationId),
+				getEffectiveSeatLimit(input.organizationId),
+			]);
+			return envelope({ isSeated, seatedCount, seatLimit });
+		}),
+
+	assignSeat: protectedProcedure
+		.route({
+			method: "POST",
+			path: "/billing/assign-seat",
+			summary: "Assign a seat to a member (admin/owner only)",
+		})
+		.input(z.object({ organizationId: z.string(), memberId: z.string() }))
+		.output(envelopeOutput(z.object({ assigned: z.boolean() })))
+		.handler(async ({ input, context }) => {
+			const { auth } = await import("@pengana/auth");
+			const activeMember = await auth.api.getActiveMember({
+				headers: context.headers,
+			});
+			if (
+				!activeMember ||
+				(activeMember.role !== "owner" && activeMember.role !== "admin")
+			) {
+				throw apiError("FORBIDDEN", "Only admins and owners can assign seats");
+			}
+			const assigned = await assignSeatIfAvailable(
+				input.organizationId,
+				input.memberId,
+			);
+			return envelope({ assigned });
+		}),
+
+	revokeSeat: protectedProcedure
+		.route({
+			method: "POST",
+			path: "/billing/revoke-seat",
+			summary: "Revoke a seat from a member (admin/owner only)",
+		})
+		.input(z.object({ organizationId: z.string(), memberId: z.string() }))
+		.output(envelopeOutput(z.object({ success: z.boolean() })))
+		.handler(async ({ input, context }) => {
+			const { auth } = await import("@pengana/auth");
+			const activeMember = await auth.api.getActiveMember({
+				headers: context.headers,
+			});
+			if (
+				!activeMember ||
+				(activeMember.role !== "owner" && activeMember.role !== "admin")
+			) {
+				throw apiError("FORBIDDEN", "Only admins and owners can revoke seats");
+			}
+			await revokeSeat(input.organizationId, input.memberId);
 			return envelope({ success: true });
 		}),
 };

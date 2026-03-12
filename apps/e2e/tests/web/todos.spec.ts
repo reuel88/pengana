@@ -9,7 +9,9 @@ test.describe("Todos", () => {
 	}) => {
 		await todoPage.navigate();
 		await expect(page.getByRole("heading", { name: "Todos" })).toBeVisible();
-		await expect(page.getByPlaceholder("Add a new todo...")).toBeVisible();
+		await expect(
+			page.getByPlaceholder("Add a new todo...").locator("visible=true"),
+		).toBeVisible();
 	});
 
 	test("add a todo", async ({ authenticatedWithOrgPage: _setup, todoPage }) => {

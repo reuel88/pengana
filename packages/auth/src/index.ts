@@ -3,6 +3,7 @@ import { getLogger } from "@logtape/logtape";
 import { db } from "@pengana/db";
 import { findUserByEmail } from "@pengana/db/notification-queries";
 import * as schema from "@pengana/db/schema/auth";
+import { assignSeatIfAvailable } from "@pengana/db/seat-queries";
 import {
 	countOrgMembers,
 	getOrgSubscription,
@@ -138,6 +139,14 @@ export const auth = betterAuth({
 						_notifyUser(data.invitation.inviterId);
 					} catch (error) {
 						logger.error`Failed to notify after invitation accepted: ${error}`;
+					}
+					try {
+						const orgId = data.invitation.organizationId;
+						const memberId = data.member.id;
+						const assigned = await assignSeatIfAvailable(orgId, memberId);
+						logger.info`Invitation accepted: member ${memberId} seat ${assigned ? "assigned" : "unavailable (read-only)"}`;
+					} catch (error) {
+						logger.error`Failed to assign seat after invitation accepted: ${error}`;
 					}
 					try {
 						const orgId = data.invitation.organizationId;

@@ -1,4 +1,7 @@
 export type {
+	OrgSyncInput,
+	OrgSyncOutput,
+	OrgTodo,
 	SyncInput,
 	SyncOutput,
 	SyncStatus,

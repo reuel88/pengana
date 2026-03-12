@@ -9,6 +9,7 @@ import {
 } from "../index";
 import { billingRouter } from "./billing";
 import { notificationRouter } from "./notification";
+import { orgTodoRouter } from "./org-todo";
 import { todoRouter } from "./todo";
 import { uploadRouter } from "./upload";
 
@@ -46,6 +47,7 @@ export const appRouter = {
 		}),
 	billing: billingRouter,
 	notification: notificationRouter,
+	orgTodo: orgTodoRouter,
 	todo: todoRouter,
 	upload: uploadRouter,
 };

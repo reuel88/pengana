@@ -12,8 +12,24 @@ export interface WebTodo extends Todo {
 	attachmentStatus: UploadStatus | null;
 }
 
+export interface WebOrgTodo {
+	id: string;
+	title: string;
+	completed: boolean;
+	updatedAt: string;
+	userId: string; // stores organizationId for sync engine compatibility
+	organizationId: string;
+	createdBy: string | null;
+	syncStatus: "synced" | "pending" | "conflict";
+	deleted: boolean;
+	attachmentUrl: string | null;
+	attachmentLocalUri: string | null;
+	attachmentStatus: UploadStatus | null;
+}
+
 export class TodoDatabase extends Dexie {
 	todos!: EntityTable<WebTodo, "id">;
+	orgTodos!: EntityTable<WebOrgTodo, "id">;
 	syncMeta!: EntityTable<SyncMeta, "key">;
 
 	constructor() {
@@ -27,6 +43,12 @@ export class TodoDatabase extends Dexie {
 		// non-indexed column additions (e.g. attachmentLocalUri) are silently ignored.
 		this.version(2).stores({
 			todos: "id, userId, syncStatus, updatedAt",
+			syncMeta: "key",
+		});
+		// v3: add orgTodos table for organization-scoped todos
+		this.version(3).stores({
+			todos: "id, userId, syncStatus, updatedAt",
+			orgTodos: "id, userId, syncStatus, updatedAt",
 			syncMeta: "key",
 		});
 	}

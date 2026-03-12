@@ -10,6 +10,7 @@ export const env = createEnv({
 		POLAR_ACCESS_TOKEN: z.string().min(1),
 		POLAR_SUCCESS_URL: z.url(),
 		POLAR_WEBHOOK_SECRET: z.string().min(1),
+		FREE_TIER_SEATS: z.coerce.number().default(2),
 		CORS_ORIGIN: z.string().min(1),
 		PORT: z.coerce.number().default(3000),
 		NODE_ENV: z

@@ -13,13 +13,14 @@ export async function handleSync(
 	input: SyncInput,
 	userId: string,
 	notifyUser?: (userId: string) => void,
+	isSeated = true,
 ) {
 	const conflicts: string[] = [];
 	const now = new Date();
 
-	logger.debug`Sync started for user ${userId} with ${String(input.changes.length)} change(s)`;
+	logger.debug`Sync started for user ${userId} with ${String(input.changes.length)} change(s), seated=${String(isSeated)}`;
 
-	for (const change of input.changes) {
+	for (const change of isSeated ? input.changes : []) {
 		if (change.userId !== userId) continue;
 
 		const existing = await findTodoById(change.id);

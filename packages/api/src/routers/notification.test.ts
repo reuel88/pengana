@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@pengana/db/seat-queries", () => ({
+	isMemberSeatedByUserId: vi.fn(),
+	autoSeatOwner: vi.fn(),
+}));
+
 vi.mock("@pengana/db/notification-queries", () => ({
 	getUnreadNotifications: vi.fn(),
 	markNotificationRead: vi.fn(),
