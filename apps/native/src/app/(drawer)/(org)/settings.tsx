@@ -42,7 +42,7 @@ export default function OrgSettingsScreen() {
 						logo: activeOrg.logo ?? "",
 					}
 				: undefined,
-		[activeOrg?.id, activeOrg?.name, activeOrg?.slug, activeOrg?.logo],
+		[activeOrg],
 	);
 
 	if (isPending) return <LoadingScreen />;
