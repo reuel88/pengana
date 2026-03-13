@@ -38,7 +38,10 @@ export { useRealtimeTransport } from "./hooks/use-realtime-transport";
 export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
 export type { UseStorageHealthOptions } from "./hooks/use-storage-health";
 export { useStorageHealth } from "./hooks/use-storage-health";
-export type { SyncEnginePlatformDeps } from "./hooks/use-sync-engine-core";
+export type {
+	SyncEngineOptions,
+	SyncEnginePlatformDeps,
+} from "./hooks/use-sync-engine-core";
 export { useSyncEngineCore } from "./hooks/use-sync-engine-core";
 export { useWebSocketReconnect } from "./hooks/use-websocket-reconnect";
 export {

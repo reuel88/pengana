@@ -1,5 +1,6 @@
 export {
 	createDrizzleOrgSyncAdapter,
+	createDrizzleOrgSyncAdapter as createOrgSyncAdapter,
 	createDrizzleSyncAdapter,
 	createDrizzleSyncAdapter as createSyncAdapter,
 } from "./adapter";

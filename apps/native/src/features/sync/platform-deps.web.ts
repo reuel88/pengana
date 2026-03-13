@@ -1,26 +1,20 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
-import { env } from "@pengana/env/web";
-import { orgQueryKeys } from "@pengana/org-client";
 import {
 	createWebSocketRealtimeTransport,
 	type SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
-import { removeFileFromIndexedDB } from "@pengana/todo-client";
-import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
-import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
 import {
-	createIndexedDbUploadTransport,
-	createWebUploadAdapter,
+	createUploadAdapter,
+	createUploadTransport,
 } from "@/features/sync/entities/upload-queue";
-import { queryClient } from "@/shared/api/orpc";
-import { appDb } from "@/shared/db";
+import { getServerUrl } from "@/shared/lib/server-url";
 
 function getWsUrl() {
-	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
+	return `${getServerUrl().replace(/^http/, "ws")}/ws`;
 }
 
 function createRealtimeTransport(
-	_userId: string,
+	_id: string,
 	callbacks: { onNotify: () => void; onOpen?: () => void },
 ) {
 	return createWebSocketRealtimeTransport({
@@ -38,25 +32,17 @@ function createRealtimeTransport(
 type AdapterFactory = SyncEnginePlatformDeps["createSyncAdapter"];
 type TransportFactory = SyncEnginePlatformDeps["createSyncTransport"];
 
-export function createWebPlatformDeps(
+export function createPlatformDeps(
 	createSyncAdapter: AdapterFactory,
 	createSyncTransport: TransportFactory,
 ): SyncEnginePlatformDeps {
 	return {
-		createNotifyTransport: createRealtimeTransport,
 		generateUUID: () => crypto.randomUUID(),
-		onSyncNotify: () => {
-			queryClient.invalidateQueries({
-				queryKey: notificationQueryKeys.list,
-			});
-			queryClient.invalidateQueries({
-				queryKey: orgQueryKeys.userInvitations,
-			});
-		},
+		createNotifyTransport: createRealtimeTransport,
 		createSyncAdapter,
 		createSyncTransport,
-		createUploadAdapter: () => createWebUploadAdapter(appDb),
-		createUploadTransport: createIndexedDbUploadTransport,
+		createUploadAdapter,
+		createUploadTransport,
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {
 				if (document.visibilityState === "visible") triggerSync();
@@ -64,7 +50,5 @@ export function createWebPlatformDeps(
 			document.addEventListener("visibilitychange", handler);
 			return () => document.removeEventListener("visibilitychange", handler);
 		},
-		storageHealth: createWebStorageHealthProvider(),
-		removeFile: removeFileFromIndexedDB,
 	};
 }

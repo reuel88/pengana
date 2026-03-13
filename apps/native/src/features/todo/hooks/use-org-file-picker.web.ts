@@ -1,6 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
-import { storeFileInMemory } from "@pengana/todo-client";
+import {
+	INDEXEDDB_URI_PREFIX,
+	isAllowedMimeType,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync-engine";
+import { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 
 import { useOrgSync } from "@/features/sync/org-sync-context";
 
@@ -29,13 +33,12 @@ export function useOrgFilePicker() {
 				return;
 			}
 
-			const localUri = URL.createObjectURL(file);
+			const localUri = `${INDEXEDDB_URI_PREFIX}${todoId}`;
 			try {
+				await storeFileInIndexedDB(todoId, file);
 				await attachOrgFile(todoId, localUri);
-				storeFileInMemory(todoId, file);
 				enqueueUpload(todoId, localUri, file.type);
 			} catch {
-				URL.revokeObjectURL(localUri);
 				window.alert(t("errors:failedToAttachFile"));
 			}
 		};

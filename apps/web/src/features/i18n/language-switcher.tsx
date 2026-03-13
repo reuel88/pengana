@@ -1,4 +1,8 @@
-import { type SupportedLocale, useTranslation } from "@pengana/i18n";
+import {
+	resolveLocale,
+	type SupportedLocale,
+	useTranslation,
+} from "@pengana/i18n";
 import {
 	LOCALE_STORAGE_KEY_WEB,
 	persistLocale,
@@ -11,6 +15,8 @@ export function LanguageSwitcher() {
 	const { i18n } = useTranslation();
 	const routerState = useRouterState();
 
+	const currentLocale = resolveLocale(i18n.language);
+
 	const handleChange = (locale: SupportedLocale) => {
 		persistLocale(i18n, locale, LOCALE_STORAGE_KEY_WEB);
 		const cleanPath = deLocalizeUrl(routerState.location.pathname);
@@ -19,7 +25,7 @@ export function LanguageSwitcher() {
 
 	return (
 		<LanguageSwitcherBase
-			currentLocale={i18n.language as SupportedLocale}
+			currentLocale={currentLocale}
 			onLocaleChange={handleChange}
 		/>
 	);
