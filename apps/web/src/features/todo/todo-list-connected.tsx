@@ -19,18 +19,17 @@ export function TodoListConnected({
 }) {
 	const { t } = useTranslation();
 
-	const onError = useCallback((_id: string, msg: string) => {
-		toast.error(msg);
-	}, []);
-
-	const onValidationError = useCallback((_id: string, msg: string) => {
+	const handleToastError = useCallback((_id: string, msg: string) => {
 		toast.error(msg);
 	}, []);
 
 	const fileStorage = useMemo(
 		() => ({
 			storeFile: (_id: string, file: File) => storeFileInMemory(_id, file),
-			createFileRef: (_id: string, file: File) => URL.createObjectURL(file),
+			createFileRef: (_id: string, file: File) => {
+				const uri = URL.createObjectURL(file);
+				return { uri, revoke: () => URL.revokeObjectURL(uri) };
+			},
 		}),
 		[],
 	);
@@ -39,7 +38,7 @@ export function TodoListConnected({
 		useTodoListWiring({
 			triggerSync,
 			enqueueUpload,
-			onError,
+			onError: handleToastError,
 			clearError: () => {}, // no-op: errors are sent to toast, not local state
 			fileStorage,
 			t,
@@ -53,7 +52,7 @@ export function TodoListConnected({
 			onDelete={handleDelete}
 			onResolve={handleResolve}
 			onFileSelected={handleFileSelected}
-			onValidationError={onValidationError}
+			onValidationError={handleToastError}
 		/>
 	);
 }

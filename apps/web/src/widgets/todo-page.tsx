@@ -41,6 +41,7 @@ function OrgTodoContent({
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<OrgTodoInput organizationId={organizationId} userId={userId} />
 			<OrgTodoList todos={todos} />
+			<SyncDevtools />
 		</div>
 	);
 }
@@ -54,6 +55,7 @@ export function TodoPage({
 }) {
 	const [activeTab, setActiveTab] = useState<Tab>("personal");
 	const { t } = useTranslation("todos");
+	const showTabs = Boolean(organizationId);
 
 	return (
 		<div
@@ -62,7 +64,7 @@ export function TodoPage({
 		>
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 
-			{organizationId && (
+			{showTabs && (
 				<div className="flex gap-2 border-b" role="tablist">
 					{(
 						[
@@ -89,14 +91,20 @@ export function TodoPage({
 			)}
 
 			<SyncProvider userId={userId}>
-				<div
-					id="panel-personal"
-					role="tabpanel"
-					aria-labelledby="tab-personal"
-					className={activeTab !== "personal" ? "hidden" : undefined}
-				>
-					<PersonalTodoContent userId={userId} />
-				</div>
+				{showTabs ? (
+					<div
+						id="panel-personal"
+						role="tabpanel"
+						aria-labelledby="tab-personal"
+						className={activeTab !== "personal" ? "hidden" : undefined}
+					>
+						<PersonalTodoContent userId={userId} />
+					</div>
+				) : (
+					<div>
+						<PersonalTodoContent userId={userId} />
+					</div>
+				)}
 			</SyncProvider>
 
 			{organizationId && (

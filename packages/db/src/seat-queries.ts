@@ -1,3 +1,4 @@
+import { env } from "@pengana/env/server";
 import { and, eq, sql } from "drizzle-orm";
 
 import { db } from "./index";
@@ -5,7 +6,7 @@ import { member } from "./schema/auth";
 import { seatAssignment } from "./schema/seat-assignment";
 import { getOrgSubscription } from "./subscription-queries";
 
-const FREE_TIER_SEATS = Number(process.env.FREE_TIER_SEATS) || 2;
+const FREE_TIER_SEATS = env.FREE_TIER_SEATS;
 
 export async function getEffectiveSeatLimit(orgId: string) {
 	const sub = await getOrgSubscription(orgId);

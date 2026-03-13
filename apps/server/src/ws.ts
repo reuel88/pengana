@@ -35,6 +35,13 @@ async function authenticateRequest(
 			}
 		}
 
+		// React Native WebSocket clients cannot reliably attach custom headers,
+		// so the native app forwards its auth cookie in the query string.
+		const forwardedCookie = url.searchParams.get("cookie");
+		if (forwardedCookie) {
+			headers.set("cookie", forwardedCookie);
+		}
+
 		const session = await auth.api.getSession({ headers });
 		return session?.user?.id ?? null;
 	} catch (error) {

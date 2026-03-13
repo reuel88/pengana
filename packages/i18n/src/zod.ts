@@ -36,6 +36,59 @@ export function makeForgotPasswordSchema(t: TFunction) {
 	});
 }
 
+export function makeNativeInviteSchema(t: TFunction) {
+	return z.object({
+		email: z
+			.string()
+			.trim()
+			.min(1, t("auth:validation.emailRequired"))
+			.email(t("auth:validation.validEmail")),
+		role: z.enum(["member", "admin"]),
+	});
+}
+
+export function makeNativeInviteMembersSchema(t: TFunction) {
+	return z.object({
+		members: z.array(
+			z.object({
+				email: z.union([
+					z
+						.string()
+						.trim()
+						.min(1, t("auth:validation.emailRequired"))
+						.email(t("auth:validation.validEmail")),
+					z.literal(""),
+				]),
+				role: z.enum(["member", "admin"]),
+			}),
+		),
+	});
+}
+
+export function makeCreateOrgSchema(t: TFunction) {
+	return z.object({
+		name: z.string().trim().min(1, t("auth:validation.nameRequired")),
+		slug: z.string(),
+		logo: z.string(),
+	});
+}
+
+export function makeTeamNameSchema(t: TFunction) {
+	return z.object({
+		name: z.string().trim().min(1, t("auth:validation.nameRequired")),
+	});
+}
+
+export function makeAddMemberSchema(t: TFunction) {
+	return z.object({
+		email: z
+			.string()
+			.trim()
+			.min(1, t("auth:validation.emailRequired"))
+			.email(t("auth:validation.validEmail")),
+	});
+}
+
 export function makeResetPasswordSchema(t: TFunction) {
 	return z
 		.object({

@@ -13,6 +13,12 @@ import {
 } from "@/shared/ui/auth-form";
 
 function SignIn() {
+	const { i18n } = useTranslation();
+
+	return <SignInForm key={i18n.language} />;
+}
+
+function SignInForm() {
 	const [error, setError] = useState<string | null>(null);
 	const { t } = useTranslation();
 
@@ -52,6 +58,7 @@ function SignIn() {
 						{(field) => (
 							<AuthFormField
 								testID="auth-email-input"
+								label={t("auth:fields.email")}
 								placeholder={t("auth:fields.email")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -67,6 +74,7 @@ function SignIn() {
 						{(field) => (
 							<AuthFormField
 								testID="auth-password-input"
+								label={t("auth:fields.password")}
 								placeholder={t("auth:fields.password")}
 								value={field.state.value}
 								onBlur={field.handleBlur}

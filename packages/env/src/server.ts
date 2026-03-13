@@ -9,15 +9,18 @@ export const env = createEnv({
 		BETTER_AUTH_URL: z.url(),
 		POLAR_ACCESS_TOKEN: z.string().min(1),
 		POLAR_SERVER: z.enum(["sandbox", "production"]).default("sandbox"),
-		POLAR_PRO_PRODUCT_ID: z
-			.string()
-			.min(1)
-			.default("c69d9ab1-4e67-4a0c-8ff5-364a94e536f0"),
+		POLAR_PRO_PRODUCT_ID: z.string().min(1),
 		POLAR_PRO_PRODUCT_SLUG: z.string().min(1).default("pro"),
 		POLAR_SUCCESS_URL: z.url(),
 		POLAR_WEBHOOK_SECRET: z.string().min(1),
-		FREE_TIER_SEATS: z.coerce.number().default(2),
+		FREE_TIER_SEATS: z.coerce.number().int().nonnegative().default(2),
 		CORS_ORIGIN: z.string().min(1),
+		WEB_URL: z.url().optional(),
+		APP_URL: z.url().optional(),
+		ENABLE_EMAIL_DEV: z
+			.enum(["true", "false"])
+			.optional()
+			.transform((value) => value === "true"),
 		PORT: z.coerce.number().default(3000),
 		NODE_ENV: z
 			.enum(["development", "production", "test"])

@@ -70,15 +70,20 @@ export function AuthFormField({
 	onClearError,
 	errors,
 	testID,
+	label,
+	hint,
 	...rest
 }: TextInputProps & {
 	onClearError?: () => void;
 	errors?: Array<{ message: string }> | undefined;
+	label: string;
+	hint?: string;
 }) {
 	const { theme } = useTheme();
 	const hasErrors = errors != null && errors.length > 0;
 	return (
 		<View style={styles.fieldContainer}>
+			<Text style={[styles.label, { color: theme.text }]}>{label}</Text>
 			<TextInput
 				testID={testID}
 				style={[
@@ -92,17 +97,26 @@ export function AuthFormField({
 				placeholderTextColor={theme.text}
 				value={value}
 				onBlur={onBlur}
+				accessibilityLabel={rest.accessibilityLabel ?? label}
+				accessibilityHint={rest.accessibilityHint ?? hint}
+				accessibilityState={{
+					disabled: rest.editable === false,
+				}}
 				onChangeText={(text) => {
 					onChangeText?.(text);
 					onClearError?.();
 				}}
 				{...rest}
 			/>
+			{hint ? (
+				<Text style={[styles.hintText, { color: theme.text }]}>{hint}</Text>
+			) : null}
 			{hasErrors
-				? errors.map((err) => (
+				? errors.map((err, index) => (
 						<Text
-							key={err.message}
+							key={`${err.message}-${String(index)}`}
 							style={[styles.fieldErrorText, { color: theme.notification }]}
+							accessibilityLiveRegion="polite"
 						>
 							{err.message}
 						</Text>
@@ -131,6 +145,7 @@ export function AuthSubmitButton({
 			disabled={isSubmitting}
 			accessibilityRole="button"
 			accessibilityLabel={label}
+			accessibilityState={{ disabled: isSubmitting, busy: isSubmitting }}
 			style={[
 				styles.button,
 				{
@@ -171,10 +186,20 @@ const styles = StyleSheet.create({
 	fieldContainer: {
 		marginBottom: 12,
 	},
+	label: {
+		fontSize: 14,
+		fontWeight: "600",
+		marginBottom: 6,
+	},
 	input: {
 		borderWidth: 1,
 		padding: 12,
 		fontSize: 16,
+	},
+	hintText: {
+		fontSize: 12,
+		marginTop: 4,
+		opacity: 0.7,
 	},
 	fieldErrorText: {
 		fontSize: 12,

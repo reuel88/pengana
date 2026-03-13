@@ -98,6 +98,7 @@
 		"deleteSuccess": "Team deleted",
 		"addMemberSuccess": "Member added to team",
 		"removeMemberSuccess": "Member removed from team",
+		"removeMemberHint": "Removes this user from the team",
 		"error": "Failed to manage team",
 		"noTeams": "No teams yet",
 		"noMembers": "No team members",

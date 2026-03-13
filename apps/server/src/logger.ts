@@ -13,6 +13,10 @@ export const logger = getLogger(["app"]);
 export const httpLogger = getLogger(["app", "http"]);
 export const wsLogger = getLogger(["app", "ws"]);
 export const orpcLogger = getLogger(["app", "orpc"]);
+export const authResponseGuardLogger = getLogger([
+	"app",
+	"auth-response-guard",
+]);
 
 export const requestLogger: MiddlewareHandler = async (c, next) => {
 	const start = Date.now();

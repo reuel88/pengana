@@ -43,6 +43,8 @@ export function TodoItem({
 				value={todo.completed}
 				onValueChange={() => onToggle(todo.id)}
 				accessibilityLabel={todo.title}
+				accessibilityRole="switch"
+				accessibilityState={{ checked: todo.completed }}
 			/>
 			<Text
 				style={[
@@ -72,7 +74,7 @@ export function TodoItem({
 				onPress={() => onDelete(todo.id)}
 				style={styles.deleteButton}
 				accessibilityRole="button"
-				accessibilityLabel={t("todos:actions.delete")}
+				accessibilityLabel={`${t("todos:actions.delete")}: ${todo.title}`}
 			>
 				<Text style={styles.deleteText}>{t("todos:actions.delete")}</Text>
 			</TouchableOpacity>

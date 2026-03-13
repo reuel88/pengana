@@ -25,8 +25,10 @@ import {
 	welcomeEmail,
 } from "./lib/email-templates";
 import { polarClient } from "./lib/payments";
+import { normalizeSeatCount, resolveWebBaseUrl } from "./lib/web-url";
 
 const logger = getLogger(["app", "auth"]);
+const webUrl = resolveWebBaseUrl(env);
 
 let _notifyUser: (userId: string) => void = () => {};
 
@@ -70,7 +72,6 @@ export const auth = betterAuth({
 		autoSignInAfterVerification: true,
 		sendVerificationEmail: async ({ user, url }) => {
 			const token = new URL(url).searchParams.get("token") ?? "";
-			const webUrl = env.CORS_ORIGIN.split(",")[0]?.trim() ?? "";
 			const callbackUrl = `${webUrl}/verify-email/callback?token=${encodeURIComponent(token)}`;
 			await sendEmail(db, {
 				to: user.email,
@@ -167,7 +168,7 @@ export const auth = betterAuth({
 								polarSubscriptionId: data.id,
 								polarProductId: data.productId,
 								status: statusMap[payload.type] ?? "active",
-								seats: data.seats ? String(data.seats) : null,
+								seats: normalizeSeatCount(data.seats),
 							});
 							logger.info`Webhook ${payload.type}: upserted subscription for org=${orgId} polarSub=${data.id}`;
 						} catch (err) {
@@ -191,7 +192,6 @@ export const auth = betterAuth({
 		organization({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
 			sendInvitationEmail: async ({ invitation, organization, inviter }) => {
-				const webUrl = env.CORS_ORIGIN.split(",")[0]?.trim() ?? "";
 				const inviterName = inviter.user.name ?? "Someone";
 				await sendEmail(db, {
 					to: invitation.email,

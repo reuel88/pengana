@@ -98,6 +98,7 @@
 		"deleteSuccess": "Equipo eliminado",
 		"addMemberSuccess": "Miembro agregado al equipo",
 		"removeMemberSuccess": "Miembro eliminado del equipo",
+		"removeMemberHint": "Quita a este usuario del equipo",
 		"error": "Error al gestionar el equipo",
 		"noTeams": "Aún no hay equipos",
 		"noMembers": "No hay miembros en el equipo",

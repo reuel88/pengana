@@ -94,7 +94,7 @@ app.use("/uploads/*", serveStatic({ root: "./" }));
 
 await initServerI18n();
 
-if (env.NODE_ENV !== "production") {
+if (env.NODE_ENV === "development" || env.ENABLE_EMAIL_DEV) {
 	const { createEmailDevApp } = await import("@pengana/email-dev");
 	app.route("/dev/email", createEmailDevApp(db));
 }

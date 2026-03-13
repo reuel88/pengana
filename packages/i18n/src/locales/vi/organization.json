@@ -98,6 +98,7 @@
 		"deleteSuccess": "Đã xóa nhóm",
 		"addMemberSuccess": "Đã thêm thành viên vào nhóm",
 		"removeMemberSuccess": "Đã xóa thành viên khỏi nhóm",
+		"removeMemberHint": "Xóa người dùng này khỏi nhóm",
 		"error": "Không thể quản lý nhóm",
 		"noTeams": "Chưa có nhóm nào",
 		"noMembers": "Không có thành viên trong nhóm",

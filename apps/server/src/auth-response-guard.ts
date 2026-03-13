@@ -5,7 +5,7 @@ import type { db as Db } from "@pengana/db";
 import { findUserByEmail } from "@pengana/db/notification-queries";
 import { sendEmail } from "@pengana/email-dev/send-email";
 import type { Context } from "hono";
-import { logger } from "./logger";
+import { authResponseGuardLogger as logger } from "./logger";
 
 type AuthRouteBehavior = "acknowledge" | "generic-sign-in-failure" | null;
 
@@ -167,7 +167,8 @@ export function createAuthResponseGuard(
 	allowedOrigins: string[],
 ) {
 	return async (c: Context) => {
-		const response = await auth.handler(c.req.raw);
+		const authRequest = c.req.raw.clone();
+		const response = await auth.handler(authRequest);
 		if (!(await looksLikeEnumerationResponse(c.req.raw, response))) {
 			return response;
 		}

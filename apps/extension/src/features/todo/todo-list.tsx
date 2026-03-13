@@ -9,7 +9,7 @@ import { useSync } from "@/features/sync/sync-context";
 
 const fileStorage = {
 	storeFile: storeFileInIndexedDB,
-	createFileRef: (id: string) => `${INDEXEDDB_URI_PREFIX}${id}`,
+	createFileRef: (id: string) => ({ uri: `${INDEXEDDB_URI_PREFIX}${id}` }),
 };
 
 export function TodoList({ todos }: { todos: WebTodo[] }) {
