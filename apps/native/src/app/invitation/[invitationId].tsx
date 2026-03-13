@@ -1,7 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
 import { useInvitationActions } from "@pengana/org-client";
-import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { orpc } from "@/shared/api/orpc";
 import { useInvitation } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { useTheme } from "@/shared/lib/theme";
@@ -14,6 +16,11 @@ export default function InvitationScreen() {
 	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
 	const router = useRouter();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
+	const publicInvitation = useQuery(
+		orpc.invitationSummary.queryOptions({
+			input: { invitationId: invitationId ?? "" },
+		}),
+	);
 
 	const { actingId, handleAccept, handleReject } = useInvitationActions({
 		onAcceptSuccess: () => router.replace("/(drawer)/(org)"),
@@ -26,7 +33,7 @@ export default function InvitationScreen() {
 		isPending: loading,
 		isError: fetchError,
 		refetch,
-	} = useInvitation(invitationId ?? "");
+	} = useInvitation(invitationId ?? "", { enabled: !!session });
 
 	const acting = invitation ? actingId === invitation.id : false;
 
@@ -35,7 +42,86 @@ export default function InvitationScreen() {
 	}
 
 	if (!session) {
-		return <Redirect href="/" />;
+		if (publicInvitation.isPending) {
+			return null;
+		}
+
+		const summary = publicInvitation.data?.data;
+		if (!summary) {
+			return (
+				<Container>
+					<Text style={[{ padding: 16 }, mutedText(theme)]}>
+						{t("invitations.fetchError")}
+					</Text>
+				</Container>
+			);
+		}
+
+		const redirectTo = `/invitation/${summary.id}`;
+
+		return (
+			<Container>
+				<View style={styles.content}>
+					<View
+						style={[
+							styles.card,
+							{ backgroundColor: theme.card, borderColor: theme.border },
+						]}
+					>
+						<Text style={[styles.title, { color: theme.text }]}>
+							{t("invitations.title")}
+						</Text>
+						<Text style={{ color: theme.text, marginTop: 8 }}>
+							{t("invitations.invitedAs", {
+								org: summary.organizationName,
+								role: t(`roles.${summary.role ?? "member"}`),
+							})}
+						</Text>
+						<Text style={[secondaryText(theme), { marginTop: 4 }]}>
+							{t("invitations.invitedBy", { email: summary.inviterEmail })}
+						</Text>
+						<View style={styles.actions}>
+							<Link
+								href={{
+									pathname: "/(auth)/login",
+									params: { redirectTo, invitationId: summary.id },
+								}}
+								asChild
+							>
+								<TouchableOpacity
+									style={StyleSheet.flatten([
+										styles.acceptButton,
+										{ backgroundColor: theme.primary },
+									])}
+								>
+									<Text style={sharedStyles.buttonText}>
+										{t("common:user.signIn")}
+									</Text>
+								</TouchableOpacity>
+							</Link>
+							<Link
+								href={{
+									pathname: "/(auth)/sign-up",
+									params: { redirectTo, invitationId: summary.id },
+								}}
+								asChild
+							>
+								<TouchableOpacity
+									style={StyleSheet.flatten([
+										styles.rejectButton,
+										{ borderColor: theme.border },
+									])}
+								>
+									<Text style={{ color: theme.text }}>
+										{t("auth:signUp.submit")}
+									</Text>
+								</TouchableOpacity>
+							</Link>
+						</View>
+					</View>
+				</View>
+			</Container>
+		);
 	}
 
 	if (loading) {

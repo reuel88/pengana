@@ -18,6 +18,7 @@ import { magicLink, organization } from "better-auth/plugins";
 
 import { NOREPLY_EMAIL } from "./lib/constants";
 import {
+	accountDeletedEmail,
 	invitationEmail,
 	magicLinkEmail,
 	resetPasswordEmail,
@@ -79,6 +80,23 @@ export const auth = betterAuth({
 				subject: "Verify your email",
 				html: verifyEmail(user.name ?? "", callbackUrl),
 			});
+		},
+	},
+	user: {
+		deleteUser: {
+			enabled: true,
+			afterDelete: async (user) => {
+				try {
+					await sendEmail(db, {
+						to: user.email,
+						from: NOREPLY_EMAIL,
+						subject: "Your pengana account was deleted",
+						html: accountDeletedEmail(user.name ?? ""),
+					});
+				} catch (error) {
+					logger.error`Failed to send account deletion email: ${error}`;
+				}
+			},
 		},
 	},
 	advanced: {

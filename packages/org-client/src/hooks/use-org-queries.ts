@@ -94,7 +94,10 @@ export function useUserInvitations() {
 	});
 }
 
-export function useInvitation(invitationId: string) {
+export function useInvitation(
+	invitationId: string,
+	options?: { enabled?: boolean },
+) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.invitation(invitationId),
@@ -105,7 +108,7 @@ export function useInvitation(invitationId: string) {
 			if (error) throw error;
 			return data;
 		},
-		enabled: !!invitationId,
+		enabled: (options?.enabled ?? true) && !!invitationId,
 		staleTime: STALE_TIME,
 	});
 }

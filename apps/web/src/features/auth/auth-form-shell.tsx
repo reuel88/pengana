@@ -11,6 +11,7 @@ interface AuthFormShellProps {
 	submitLabel: string;
 	switchLabel: string;
 	switchTo: string;
+	switchSearch?: Record<string, string | undefined>;
 	onSubmit: () => void;
 	form: {
 		Subscribe: React.ComponentType<{
@@ -31,6 +32,7 @@ export function AuthFormShell({
 	submitLabel,
 	switchLabel,
 	switchTo,
+	switchSearch,
 	onSubmit,
 	form,
 	children,
@@ -90,6 +92,7 @@ export function AuthFormShell({
 			<div className="mt-4 text-center">
 				<Link
 					to={switchTo}
+					search={switchSearch}
 					className="text-primary text-sm hover:text-primary/80"
 					data-testid="auth-switch-link"
 				>

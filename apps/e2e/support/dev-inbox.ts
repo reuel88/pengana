@@ -11,6 +11,13 @@ interface EmailDetail {
 	html: string;
 }
 
+function decodeHtmlUrl(url: string) {
+	return url
+		.replaceAll("&amp;", "&")
+		.replaceAll("&#x3D;", "=")
+		.replaceAll("&#61;", "=");
+}
+
 export async function pollDevInbox(
 	page: Page,
 	email: string,
@@ -64,5 +71,35 @@ export function extractVerificationUrl(email: string, html: string): string {
 			`Verification email for ${email} did not contain a valid callback URL.`,
 		);
 	}
-	return match[1];
+	return decodeHtmlUrl(match[1]);
+}
+
+export function extractResetPasswordUrl(email: string, html: string): string {
+	const match = html.match(/href="([^"]+)"/i);
+	if (!match?.[1]) {
+		throw new Error(
+			`Reset password email for ${email} did not contain a valid reset URL.`,
+		);
+	}
+	return decodeHtmlUrl(match[1]);
+}
+
+export function extractMagicLinkUrl(email: string, html: string): string {
+	const match = html.match(/href="([^"]+)"/i);
+	if (!match?.[1]) {
+		throw new Error(
+			`Magic link email for ${email} did not contain a valid sign-in URL.`,
+		);
+	}
+	return decodeHtmlUrl(match[1]);
+}
+
+export function extractInvitationUrl(email: string, html: string): string {
+	const match = html.match(/href="([^"]*\/invitation\/[^"]+)"/i);
+	if (!match?.[1]) {
+		throw new Error(
+			`Invitation email for ${email} did not contain a valid invitation URL.`,
+		);
+	}
+	return decodeHtmlUrl(match[1]);
 }

@@ -58,6 +58,17 @@ const DrawerLayout = () => {
 				}}
 			/>
 			<Drawer.Screen
+				name="settings"
+				options={{
+					headerTitle: t("auth:settings.account.title"),
+					drawerLabel: t("common:user.settings"),
+					drawerIcon: ({ size, color }) => (
+						<Ionicons name="settings-outline" size={size} color={color} />
+					),
+					headerShown: false,
+				}}
+			/>
+			<Drawer.Screen
 				name="(tabs)"
 				options={{
 					headerTitle: t("nav.tabs"),

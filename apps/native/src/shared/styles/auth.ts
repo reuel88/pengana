@@ -13,6 +13,9 @@ export const authScreenStyles = StyleSheet.create({
 		alignSelf: "center",
 		marginTop: 16,
 	},
+	links: {
+		marginTop: 8,
+	},
 	linkText: {
 		fontSize: 14,
 	},

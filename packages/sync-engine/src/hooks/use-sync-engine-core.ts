@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
 import { SyncEngine } from "../core/engine";
+import type { CreateRealtimeTransport } from "../realtime/types";
 import type {
 	SyncAdapter,
 	SyncEvent,
@@ -11,16 +12,15 @@ import type {
 } from "../types";
 import type { StorageHealthProvider } from "../types/storage-health";
 import { usePeriodicSync } from "./use-periodic-sync";
+import { useRealtimeTransport } from "./use-realtime-transport";
 import { useStorageHealth } from "./use-storage-health";
 import { useUploadQueue } from "./use-upload-queue";
-import { useWebSocketReconnect } from "./use-websocket-reconnect";
 
 // --- Types ---
 export interface SyncEnginePlatformDeps {
-	// Existing
-	getWsUrl: () => string;
 	generateUUID: () => string;
 	onSyncNotify?: () => void;
+	createRealtimeTransport: CreateRealtimeTransport;
 
 	// Adapter/transport factories
 	createSyncAdapter: (userId: string) => SyncAdapter;
@@ -41,6 +41,7 @@ export function useSyncEngineCore(
 	userId: string | undefined,
 	isOnline: boolean,
 	deps: SyncEnginePlatformDeps,
+	isForeground = true,
 ) {
 	// --- State ---
 	const engineRef = useRef<SyncEngine | null>(null);
@@ -120,11 +121,11 @@ export function useSyncEngineCore(
 
 	// --- Sync Triggers ---
 	usePeriodicSync(effectiveOnline, engineRef);
-	useWebSocketReconnect(
+	useRealtimeTransport(
 		userId,
-		effectiveOnline,
+		effectiveOnline && isForeground,
 		engineRef,
-		deps.getWsUrl,
+		deps.createRealtimeTransport,
 		deps.onSyncNotify,
 	);
 

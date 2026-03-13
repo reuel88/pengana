@@ -8,9 +8,12 @@ export {
 } from "./constants/allowed-mime-types";
 export {
 	MAX_EVENT_LOG_SIZE,
+	REALTIME_FALLBACK_SYNC_INTERVAL_MS,
 	STORAGE_CRITICAL_RATIO,
 	STORAGE_WARNING_RATIO,
+	WS_DEGRADED_THRESHOLD,
 	WS_MAX_BACKOFF_MS,
+	WS_STALE_TIMEOUT_MS,
 } from "./constants/sync";
 export {
 	SyncContext,
@@ -31,12 +34,21 @@ export { UploadQueue } from "./core/upload-queue";
 export { isQuotaError, StorageFullError } from "./errors/storage-error";
 export { useNetworkStatus } from "./hooks/use-network-status";
 export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
+export { useRealtimeTransport } from "./hooks/use-realtime-transport";
 export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
 export type { UseStorageHealthOptions } from "./hooks/use-storage-health";
 export { useStorageHealth } from "./hooks/use-storage-health";
 export type { SyncEnginePlatformDeps } from "./hooks/use-sync-engine-core";
 export { useSyncEngineCore } from "./hooks/use-sync-engine-core";
 export { useWebSocketReconnect } from "./hooks/use-websocket-reconnect";
+export type {
+	CreateRealtimeTransport,
+	RealtimeMessageKind,
+	RealtimeTransport,
+	RealtimeTransportCallbacks,
+	RealtimeTransportStatus,
+} from "./realtime/types";
+export { createWebSocketRealtimeTransport } from "./realtime/websocket-realtime-transport";
 export {
 	orgSyncInputSchema,
 	orgSyncOutputSchema,

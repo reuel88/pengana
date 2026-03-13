@@ -24,6 +24,11 @@ export function welcomeEmail(name: string) {
 	return `<p>Hi ${safeName},</p><p>Welcome to pengana! Your account has been created successfully.</p>`;
 }
 
+export function accountDeletedEmail(name: string) {
+	const safeName = htmlEscape(name);
+	return `<p>Hi ${safeName},</p><p>Your pengana account has been deleted. If this wasn't you, contact support immediately.</p>`;
+}
+
 export function magicLinkEmail(url: string) {
 	const safeUrl = htmlEscape(url);
 	return `<p>Click the link below to sign in:</p><p><a href="${safeUrl}">${safeUrl}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`;

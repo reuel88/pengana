@@ -6,14 +6,12 @@ import { useTheme } from "@/shared/lib/theme";
 
 export function Container({ children }: { children: React.ReactNode }) {
 	const { theme } = useTheme();
+	const containerStyle = StyleSheet.flatten([
+		styles.container,
+		{ backgroundColor: theme.background },
+	]);
 
-	return (
-		<SafeAreaView
-			style={[styles.container, { backgroundColor: theme.background }]}
-		>
-			{children}
-		</SafeAreaView>
-	);
+	return <SafeAreaView style={containerStyle}>{children}</SafeAreaView>;
 }
 
 const styles = StyleSheet.create({
