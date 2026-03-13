@@ -49,8 +49,8 @@
 			"title": "Tab One",
 			"subtitle": "Explore the first section of your app"
 		},
-		"two": {
-			"title": "Tab Two",
+		"explore": {
+			"title": "Explore",
 			"subtitle": "Discover more features and content"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Restart Required",
 		"message": "The app needs to restart to apply the layout direction change. Please close and reopen the app."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

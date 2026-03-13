@@ -32,5 +32,6 @@
 		"choosePdf": "Pumili ng PDF",
 		"cancel": "Kanselahin",
 		"chooseOption": "Pumili ng opsyon"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

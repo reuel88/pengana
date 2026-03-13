@@ -7,4 +7,5 @@ export abstract class BaseAuthPage {
 	abstract navigateToSignUp(): Promise<void>;
 	abstract signIn(email: string, password: string): Promise<void>;
 	abstract signUp(name: string, email: string, password: string): Promise<void>;
+	abstract signOut(): Promise<void>;
 }

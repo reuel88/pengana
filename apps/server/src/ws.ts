@@ -35,13 +35,6 @@ async function authenticateRequest(
 			}
 		}
 
-		// React Native WebSocket clients cannot reliably attach custom headers,
-		// so the native app forwards its auth cookie in the query string.
-		const forwardedCookie = url.searchParams.get("cookie");
-		if (forwardedCookie) {
-			headers.set("cookie", forwardedCookie);
-		}
-
 		const session = await auth.api.getSession({ headers });
 		return session?.user?.id ?? null;
 	} catch (error) {
@@ -156,13 +149,19 @@ export function setupWebSocket(server: ServerType) {
 	}
 
 	async function notifyOrgMembers(orgId: string, excludeUserId: string) {
-		// Dynamic import avoids a circular dependency: db → auth → ws → db
-		const { getSeatedMemberUserIds } = await import("@pengana/db/seat-queries");
-		const memberUserIds = await getSeatedMemberUserIds(orgId);
-		for (const uid of memberUserIds) {
-			if (uid !== excludeUserId) {
-				notifyUser(uid);
+		try {
+			// Dynamic import avoids a circular dependency: db -> auth -> ws -> db
+			const { getSeatedMemberUserIds } = await import(
+				"@pengana/db/seat-queries"
+			);
+			const memberUserIds = await getSeatedMemberUserIds(orgId);
+			for (const uid of memberUserIds) {
+				if (uid !== excludeUserId) {
+					notifyUser(uid);
+				}
 			}
+		} catch (error) {
+			wsLogger.error`notifyOrgMembers failed for org ${redactId(orgId)}: ${error}`;
 		}
 	}
 

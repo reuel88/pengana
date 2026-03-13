@@ -15,5 +15,7 @@
 	"todoNotFound": "Todo not found",
 	"unauthorized": "Unauthorised",
 	"paymentError": "Something went wrong with payment. Please try again.",
-	"migrationError": "Migration error: {{message}}. Try restarting the app."
+	"migrationError": "Migration error: {{message}}. Try restarting the app.",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }

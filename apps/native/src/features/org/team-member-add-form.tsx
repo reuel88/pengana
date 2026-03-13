@@ -13,12 +13,14 @@ import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
+type TeamMember = { userId: string; user: { email: string } };
+
 export function TeamMemberAddForm({
 	teamId,
 	members,
 }: {
 	teamId: string;
-	members: Array<{ userId: string; user: { email: string } }> | undefined;
+	members: TeamMember[] | undefined;
 }) {
 	const { i18n, t } = useTranslation("organization");
 
@@ -38,7 +40,7 @@ function TeamMemberAddFormContent({
 	t,
 }: {
 	teamId: string;
-	members: Array<{ userId: string; user: { email: string } }> | undefined;
+	members: TeamMember[] | undefined;
 	t: ReturnType<typeof useTranslation<"organization">>["t"];
 }) {
 	const { theme } = useTheme();

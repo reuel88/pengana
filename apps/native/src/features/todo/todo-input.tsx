@@ -45,7 +45,7 @@ export function TodoInput({ userId }: { userId: string }) {
 				onChangeText={setTitle}
 				placeholder={t("todos:addPlaceholder")}
 				accessibilityLabel={t("todos:addPlaceholder")}
-				accessibilityHint={t("todos:addButton")}
+				accessibilityHint={t("todos:addInputHint")}
 				placeholderTextColor={
 					colorScheme === "dark"
 						? PLACEHOLDER_COLORS.dark

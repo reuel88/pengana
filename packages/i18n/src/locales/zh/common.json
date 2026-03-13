@@ -49,8 +49,8 @@
 			"title": "标签一",
 			"subtitle": "探索应用的第一个部分"
 		},
-		"two": {
-			"title": "标签二",
+		"explore": {
+			"title": "探索",
 			"subtitle": "发现更多功能和内容"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "需要重启",
 		"message": "应用需要重启以应用布局方向的更改。请关闭并重新打开应用。"
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

@@ -27,6 +27,8 @@ const app = new Hono();
 
 app.use(requestLogger);
 const allowedOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
+const webUrl =
+	env.WEB_URL ?? allowedOrigins.find(Boolean) ?? "http://localhost:3001";
 
 app.use(
 	"/*",
@@ -69,10 +71,11 @@ app.use("/rpc/todo.*", syncLimiter);
 app.on(
 	["POST", "GET"],
 	"/api/auth/*",
-	createAuthResponseGuard(auth, db, allowedOrigins),
+	createAuthResponseGuard(auth, db, webUrl),
 );
 
 app.post("/api/ws-ticket", async (c) => {
+	c.header("Cache-Control", "no-store");
 	const session = await auth.api.getSession({ headers: c.req.raw.headers });
 	if (!session?.user?.id) {
 		return c.json(

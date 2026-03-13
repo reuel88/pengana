@@ -1,6 +1,5 @@
 {
 	"title": "组织",
-	"noOrganization": "未找到活跃的组织。",
 	"switcher": {
 		"label": "组织",
 		"create": "创建组织",
@@ -130,5 +129,6 @@
 		"markReadError": "无法将通知标记为已读",
 		"markAllReadError": "无法将所有通知标记为已读"
 	},
-	"noActiveOrg": "没有活跃的组织。选择或创建一个以开始使用。"
+	"noActiveOrg": "没有活跃的组织。选择或创建一个以开始使用。",
+	"noActiveOrgFound": "未找到活跃的组织。"
 }

@@ -15,5 +15,7 @@
 	"todoNotFound": "待办事项未找到",
 	"unauthorized": "未授权",
 	"paymentError": "支付出现问题，请重试。",
-	"migrationError": "迁移错误：{{message}}。请尝试重新启动应用。"
+	"migrationError": "迁移错误：{{message}}。请尝试重新启动应用。",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }

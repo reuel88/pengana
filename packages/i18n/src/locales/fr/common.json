@@ -49,8 +49,8 @@
 			"title": "Onglet Un",
 			"subtitle": "Explorez la première section de votre application"
 		},
-		"two": {
-			"title": "Onglet Deux",
+		"explore": {
+			"title": "Explorer",
 			"subtitle": "Découvrez plus de fonctionnalités et de contenu"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Redémarrage requis",
 		"message": "L'application doit redémarrer pour appliquer le changement de direction de mise en page. Veuillez fermer et rouvrir l'application."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

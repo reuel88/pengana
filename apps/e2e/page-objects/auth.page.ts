@@ -37,6 +37,11 @@ export class AuthPage extends BaseAuthPage {
 		await this.page.getByRole("button", { name: "Sign up" }).click();
 	}
 
+	async signOut() {
+		await this.page.locator("header").getByRole("button").last().click();
+		await this.page.getByRole("menuitem", { name: "Sign Out" }).click();
+	}
+
 	async verifyEmailFromDevInbox(email: string) {
 		const verificationUrl = await this.waitForVerificationUrl(email);
 		await this.page.goto(verificationUrl);

@@ -31,7 +31,11 @@ export function AttachmentIndicator({
 	}
 	if (status === "failed") {
 		return (
-			<Text style={styles.attachmentFailed} accessible>
+			<Text
+				style={styles.attachmentFailed}
+				accessible
+				accessibilityRole="alert"
+			>
 				{t("attachment.failed")}
 			</Text>
 		);

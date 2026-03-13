@@ -128,7 +128,11 @@ export function OrgSwitcher() {
 								onBack={() => setModal("picker")}
 							/>
 						) : (
-							<ScrollView style={styles.orgList}>
+							<ScrollView
+								style={styles.orgList}
+								accessibilityRole="radiogroup"
+								accessibilityLabel={t("switcher.label")}
+							>
 								{isPending ? (
 									<ActivityIndicator />
 								) : orgs && orgs.length > 0 ? (
@@ -143,7 +147,7 @@ export function OrgSwitcher() {
 												},
 											]}
 											onPress={() => handleSwitch(org.id)}
-											accessibilityRole="button"
+											accessibilityRole="radio"
 											accessibilityLabel={org.name}
 											accessibilityState={{
 												selected: activeOrg?.id === org.id,
@@ -171,7 +175,11 @@ export function OrgSwitcher() {
 						)}
 
 						<TouchableOpacity
-							style={styles.closeButton}
+							style={[
+								styles.closeButton,
+								(switchingId !== null || modal === "create") &&
+									styles.closeButtonDisabled,
+							]}
 							disabled={switchingId !== null || modal === "create"}
 							onPress={handleClose}
 							accessibilityRole="button"
@@ -231,5 +239,8 @@ const styles = StyleSheet.create({
 		padding: 12,
 		alignItems: "center",
 		marginTop: 8,
+	},
+	closeButtonDisabled: {
+		opacity: 0.5,
 	},
 });

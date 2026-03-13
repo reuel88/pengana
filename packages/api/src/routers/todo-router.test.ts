@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Context } from "../context";
 
 vi.mock("@pengana/db/todo-queries", () => ({
 	updateTodoForUser: vi.fn(),
@@ -22,7 +23,7 @@ process.env.POLAR_SUCCESS_URL ??= "http://localhost:3001/success";
 process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
-function makeContext(overrides: Record<string, unknown> = {}) {
+function makeContext(overrides: Partial<Context> = {}): Context {
 	return {
 		session: {
 			user: {
@@ -39,7 +40,7 @@ function makeContext(overrides: Record<string, unknown> = {}) {
 		notifyUser: vi.fn(),
 		notifyOrgMembers: vi.fn(),
 		...overrides,
-	} as never;
+	} as Context;
 }
 
 describe("todo.sync", () => {

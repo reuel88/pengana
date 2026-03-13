@@ -109,7 +109,7 @@ async function looksLikeEnumerationResponse(
 async function maybeNotifyExistingUserOnDuplicateSignUp(
 	req: Request,
 	db: typeof Db,
-	allowedOrigins: string[],
+	webUrl: string,
 ) {
 	const pathname = new URL(req.url).pathname;
 	if (pathname !== "/api/auth/sign-up/email") return;
@@ -126,10 +126,7 @@ async function maybeNotifyExistingUserOnDuplicateSignUp(
 			to: email,
 			from: NOREPLY_EMAIL,
 			subject: "Sign-up attempt with your email",
-			html: signUpEnumerationEmail(
-				existingUser.name ?? "",
-				`${allowedOrigins[0]}/login`,
-			),
+			html: signUpEnumerationEmail(existingUser.name ?? "", `${webUrl}/login`),
 		});
 	} catch (err) {
 		logger.error`Failed to handle sign-up enumeration protection: ${err}`;
@@ -164,7 +161,7 @@ function genericSignInFailureResponse() {
 export function createAuthResponseGuard(
 	auth: typeof Auth,
 	db: typeof Db,
-	allowedOrigins: string[],
+	webUrl: string,
 ) {
 	return async (c: Context) => {
 		const authRequest = c.req.raw.clone();
@@ -179,11 +176,7 @@ export function createAuthResponseGuard(
 		}
 
 		// Fire-and-forget: avoid timing side-channel that leaks email existence
-		void maybeNotifyExistingUserOnDuplicateSignUp(
-			c.req.raw,
-			db,
-			allowedOrigins,
-		);
+		void maybeNotifyExistingUserOnDuplicateSignUp(c.req.raw, db, webUrl);
 		return acknowledgedResponse(c.req.raw);
 	};
 }

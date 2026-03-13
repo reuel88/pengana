@@ -72,6 +72,8 @@ export function AuthFormField({
 	testID,
 	label,
 	hint,
+	accessibilityLabel,
+	accessibilityHint,
 	...rest
 }: TextInputProps & {
 	onClearError?: () => void;
@@ -97,8 +99,9 @@ export function AuthFormField({
 				placeholderTextColor={theme.text}
 				value={value}
 				onBlur={onBlur}
-				accessibilityLabel={rest.accessibilityLabel ?? label}
-				accessibilityHint={rest.accessibilityHint ?? hint}
+				{...rest}
+				accessibilityLabel={accessibilityLabel ?? label}
+				accessibilityHint={accessibilityHint ?? hint}
 				accessibilityState={{
 					disabled: rest.editable === false,
 				}}
@@ -106,7 +109,6 @@ export function AuthFormField({
 					onChangeText?.(text);
 					onClearError?.();
 				}}
-				{...rest}
 			/>
 			{hint ? (
 				<Text style={[styles.hintText, { color: theme.text }]}>{hint}</Text>

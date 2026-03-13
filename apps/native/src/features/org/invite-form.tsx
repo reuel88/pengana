@@ -31,8 +31,10 @@ function InviteFormContent({
 		schema: makeNativeInviteSchema(t),
 		defaultValues: { email: "", role: "member" as "member" | "admin" },
 		onSubmit: async ({ value }) => {
-			await inviteMember({ ...value, organizationId: orgId });
-			form.reset();
+			const success = await inviteMember({ ...value, organizationId: orgId });
+			if (success) {
+				form.reset();
+			}
 		},
 	});
 

@@ -23,4 +23,9 @@ export class NativeAuthPage extends BaseAuthPage {
 		await this.page.getByPlaceholder("Password").fill(password);
 		await this.page.getByRole("button", { name: "Sign Up" }).click();
 	}
+
+	async signOut() {
+		await this.page.goto("/");
+		await this.page.getByText("Sign Out").click();
+	}
 }

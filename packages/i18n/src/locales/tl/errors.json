@@ -15,5 +15,7 @@
 	"todoNotFound": "Hindi nahanap ang gawain",
 	"unauthorized": "Hindi awtorisado",
 	"paymentError": "May problema sa pagbabayad. Pakisubukan muli.",
-	"migrationError": "Error sa migration: {{message}}. Subukang i-restart ang app."
+	"migrationError": "Error sa migration: {{message}}. Subukang i-restart ang app.",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }

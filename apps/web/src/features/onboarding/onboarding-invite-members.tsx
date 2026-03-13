@@ -49,7 +49,17 @@ export function OnboardingInviteMembers({
 		},
 		onSubmit: async ({ value }) => {
 			const valid = value.members.filter((m) => m.email.trim());
-			await batchInvite(valid);
+			const result = await batchInvite(valid);
+			if (!result || result.failures.length === 0) {
+				return;
+			}
+			if (result.successes.length === 0) {
+				return;
+			}
+
+			toast.error(
+				`${t("invite.error")}: ${result.failures.map((failure) => failure.email).join(", ")}`,
+			);
 		},
 	});
 

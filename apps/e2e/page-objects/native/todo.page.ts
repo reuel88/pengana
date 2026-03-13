@@ -21,14 +21,14 @@ export class NativeTodoPage extends BaseTodoPage {
 	}
 
 	async toggleTodo(title: string) {
-		await this.todoRow(title).getByTestId("todo-toggle").click();
+		await this.todoRow(title).getByTestId("todo-toggle").first().click();
 	}
 
 	completedTodoLocator(title: string) {
 		return this.todoRow(title).locator(`text=${title}`);
 	}
 
-	todoLocator(title: string) {
+	todoRowLocator(title: string) {
 		return this.todoRow(title);
 	}
 }

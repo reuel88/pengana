@@ -49,8 +49,8 @@
 			"title": "탭 1",
 			"subtitle": "앱의 첫 번째 섹션을 탐색하세요"
 		},
-		"two": {
-			"title": "탭 2",
+		"explore": {
+			"title": "탐색",
 			"subtitle": "더 많은 기능과 콘텐츠를 발견하세요"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "재시작 필요",
 		"message": "레이아웃 방향 변경을 적용하려면 앱을 다시 시작해야 합니다. 앱을 닫고 다시 열어 주세요."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

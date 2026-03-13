@@ -49,8 +49,8 @@
 			"title": "Pestaña Uno",
 			"subtitle": "Explora la primera sección de tu aplicación"
 		},
-		"two": {
-			"title": "Pestaña Dos",
+		"explore": {
+			"title": "Explorar",
 			"subtitle": "Descubre más funciones y contenido"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Reinicio necesario",
 		"message": "La aplicación necesita reiniciarse para aplicar el cambio de dirección del diseño. Por favor, cierre y vuelva a abrir la aplicación."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

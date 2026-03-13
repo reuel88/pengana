@@ -117,6 +117,10 @@ export function makeChangePasswordSchema(t: TFunction) {
 		.refine((data) => data.newPassword === data.confirmPassword, {
 			message: t("auth:validation.passwordsMustMatch"),
 			path: ["confirmPassword"],
+		})
+		.refine((data) => data.newPassword !== data.currentPassword, {
+			message: t("auth:validation.passwordMustDifferFromCurrent"),
+			path: ["newPassword"],
 		});
 }
 

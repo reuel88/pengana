@@ -20,9 +20,9 @@ export function useInviteMember({
 		role: "member" | "admin";
 		organizationId: string;
 	}) => {
-		if (!data.email) return;
+		if (!data.email) return false;
 
-		await authMutation({
+		return authMutation({
 			mutationFn: () =>
 				authClient.organization.inviteMember({
 					email: data.email,

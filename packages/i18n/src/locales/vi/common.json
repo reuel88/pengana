@@ -49,8 +49,8 @@
 			"title": "Tab Một",
 			"subtitle": "Khám phá phần đầu tiên của ứng dụng"
 		},
-		"two": {
-			"title": "Tab Hai",
+		"explore": {
+			"title": "Khám phá",
 			"subtitle": "Khám phá thêm tính năng và nội dung"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Cần khởi động lại",
 		"message": "Ứng dụng cần khởi động lại để áp dụng thay đổi hướng bố cục. Vui lòng đóng và mở lại ứng dụng."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

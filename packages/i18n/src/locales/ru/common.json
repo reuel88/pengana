@@ -49,8 +49,8 @@
 			"title": "Вкладка 1",
 			"subtitle": "Изучите первый раздел приложения"
 		},
-		"two": {
-			"title": "Вкладка 2",
+		"explore": {
+			"title": "Обзор",
 			"subtitle": "Откройте больше функций и контента"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Требуется перезапуск",
 		"message": "Приложение необходимо перезапустить для применения изменения направления макета. Пожалуйста, закройте и снова откройте приложение."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

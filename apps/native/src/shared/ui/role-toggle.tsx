@@ -20,7 +20,11 @@ export function RoleToggle({
 	const { t } = useTranslation("organization");
 
 	return (
-		<View style={styles.container}>
+		<View
+			style={styles.container}
+			accessibilityRole="radiogroup"
+			accessibilityLabel={t("roles.title")}
+		>
 			<TouchableOpacity
 				testID={memberTestID}
 				style={[

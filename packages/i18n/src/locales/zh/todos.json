@@ -32,5 +32,6 @@
 		"choosePdf": "选择 PDF",
 		"cancel": "取消",
 		"chooseOption": "选择一个选项"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

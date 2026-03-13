@@ -32,5 +32,6 @@
 		"choosePdf": "Выбрать PDF",
 		"cancel": "Отмена",
 		"chooseOption": "Выберите вариант"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

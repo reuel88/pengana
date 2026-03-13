@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from "@pengana/i18n";
+import { type TFunction, useTranslation } from "@pengana/i18n";
 import { makeTeamNameSchema } from "@pengana/i18n/zod";
 import { useTeamNameEditor, useZodForm } from "@pengana/org-client";
 import { useState } from "react";
@@ -51,7 +51,7 @@ function TeamNameEditorContent({
 	teamName: string;
 	orgId: string;
 	isAdmin: boolean;
-	t: ReturnType<typeof useTranslation<"organization">>["t"];
+	t: TFunction;
 }) {
 	const { theme } = useTheme();
 	const [editing, setEditing] = useState(false);

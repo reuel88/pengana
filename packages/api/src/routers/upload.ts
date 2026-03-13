@@ -45,13 +45,13 @@ export const uploadRouter = {
 			}
 
 			if (!todo) {
+				if (!activeOrgId) {
+					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
+				}
+
 				const orgTodo = await findOrgTodoById(input.todoId);
 				if (!orgTodo || orgTodo.organizationId !== activeOrgId) {
 					throw apiError("NOT_FOUND", context.t("todoNotFound"));
-				}
-
-				if (!activeOrgId) {
-					throw apiError("BAD_REQUEST", "No active organization");
 				}
 
 				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
@@ -60,10 +60,7 @@ export const uploadRouter = {
 				}
 
 				if (!seated) {
-					throw apiError(
-						"FORBIDDEN",
-						"A seat is required for write operations. Contact your organization owner.",
-					);
+					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
 				}
 			}
 

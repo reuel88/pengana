@@ -1,6 +1,5 @@
 {
 	"title": "Organisasyon",
-	"noOrganization": "Walang aktibong organisasyon na nahanap.",
 	"switcher": {
 		"label": "Mga Organisasyon",
 		"create": "Lumikha ng Organisasyon",
@@ -130,5 +129,6 @@
 		"markReadError": "Nabigong markahan ang notipikasyon bilang nabasa",
 		"markAllReadError": "Nabigong markahan ang lahat ng notipikasyon bilang nabasa"
 	},
-	"noActiveOrg": "Walang aktibong organisasyon. Pumili o lumikha ng isa para magsimula."
+	"noActiveOrg": "Walang aktibong organisasyon. Pumili o lumikha ng isa para magsimula.",
+	"noActiveOrgFound": "Walang aktibong organisasyon na nahanap."
 }

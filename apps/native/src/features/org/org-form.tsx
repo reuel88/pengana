@@ -104,7 +104,7 @@ function OrgFormContent({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
-						label={t("create.namePlaceholder")}
+						label={t("create.name")}
 						placeholder={t("create.namePlaceholder")}
 						error={field.state.meta.errors[0]?.message}
 					/>
@@ -118,7 +118,7 @@ function OrgFormContent({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
-						label={t("create.slugPlaceholder")}
+						label={t("create.slug")}
 						placeholder={t("create.slugPlaceholder")}
 						error={field.state.meta.errors[0]?.message}
 					/>
@@ -132,7 +132,7 @@ function OrgFormContent({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
-						label={t("create.logoPlaceholder")}
+						label={t("create.logo")}
 						placeholder={t("create.logoPlaceholder")}
 						error={field.state.meta.errors[0]?.message}
 					/>

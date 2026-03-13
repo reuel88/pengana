@@ -49,8 +49,8 @@
 			"title": "Aba Um",
 			"subtitle": "Explore a primeira seção do seu aplicativo"
 		},
-		"two": {
-			"title": "Aba Dois",
+		"explore": {
+			"title": "Explorar",
 			"subtitle": "Descubra mais recursos e conteúdo"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "Reinicialização necessária",
 		"message": "O aplicativo precisa ser reiniciado para aplicar a alteração na direção do layout. Por favor, feche e reabra o aplicativo."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }
