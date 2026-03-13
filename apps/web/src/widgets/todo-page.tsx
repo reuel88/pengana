@@ -63,7 +63,7 @@ export function TodoPage({
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 
 			{organizationId && (
-				<div className="flex gap-2 border-b">
+				<div className="flex gap-2 border-b" role="tablist">
 					{(
 						[
 							{ key: "personal", label: t("tabs.personal") },
@@ -72,7 +72,11 @@ export function TodoPage({
 					).map(({ key, label }) => (
 						<button
 							key={key}
+							id={`tab-${key}`}
 							type="button"
+							role="tab"
+							aria-selected={activeTab === key}
+							aria-controls={`panel-${key}`}
 							className={`px-3 py-2 font-medium text-sm ${
 								activeTab === key ? "border-current border-b-2" : "opacity-60"
 							}`}
@@ -85,14 +89,24 @@ export function TodoPage({
 			)}
 
 			<SyncProvider userId={userId}>
-				<div className={activeTab !== "personal" ? "hidden" : undefined}>
+				<div
+					id="panel-personal"
+					role="tabpanel"
+					aria-labelledby="tab-personal"
+					className={activeTab !== "personal" ? "hidden" : undefined}
+				>
 					<PersonalTodoContent userId={userId} />
 				</div>
 			</SyncProvider>
 
 			{organizationId && (
 				<OrgSyncProvider organizationId={organizationId}>
-					<div className={activeTab !== "organization" ? "hidden" : undefined}>
+					<div
+						id="panel-organization"
+						role="tabpanel"
+						aria-labelledby="tab-organization"
+						className={activeTab !== "organization" ? "hidden" : undefined}
+					>
 						<OrgTodoContent organizationId={organizationId} userId={userId} />
 					</div>
 				</OrgSyncProvider>

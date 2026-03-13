@@ -28,7 +28,7 @@ export async function requireAuth() {
 }
 
 export async function requireAuthAndOrg() {
-	const { session } = await requireAuth();
+	let { session } = await requireAuth();
 	const { hasOrganization, organizations } =
 		await fetchUserLifecycleData(authClient);
 	if (!hasOrganization) {
@@ -38,6 +38,10 @@ export async function requireAuthAndOrg() {
 		await authClient.organization.setActive({
 			organizationId: organizations[0].id,
 		});
+		const refreshedSession = await authClient.getSession();
+		if (refreshedSession.data) {
+			session = { ...refreshedSession, data: refreshedSession.data };
+		}
 	}
 	return { session };
 }

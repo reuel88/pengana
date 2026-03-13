@@ -8,6 +8,12 @@ export function persistLocale(
 	locale: string,
 	storageKey: string,
 ) {
-	localStorage.setItem(storageKey, locale);
+	if (typeof window !== "undefined" && window.localStorage) {
+		try {
+			window.localStorage.setItem(storageKey, locale);
+		} catch {
+			// Ignore storage failures and still switch the in-memory language.
+		}
+	}
 	void i18nInstance.changeLanguage(locale);
 }

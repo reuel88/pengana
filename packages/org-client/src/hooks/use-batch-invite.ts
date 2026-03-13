@@ -6,12 +6,10 @@ import { useInvalidateOrg } from "./use-org-queries";
 export function useBatchInvite({
 	organizationId,
 	onSuccess,
-	onPartialFailure,
 	onError,
 }: {
 	organizationId: string | undefined;
 	onSuccess?: () => void;
-	onPartialFailure?: (failedCount: number) => void;
 	onError?: (message: string) => void;
 }) {
 	const authClient = useAuthClient();
@@ -40,9 +38,6 @@ export function useBatchInvite({
 			if (failed.length === results.length) {
 				onError?.("All invitations failed");
 			} else {
-				if (failed.length > 0) {
-					onPartialFailure?.(failed.length);
-				}
 				await invalidateActiveOrg();
 				onSuccess?.();
 			}

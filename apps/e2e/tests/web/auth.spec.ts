@@ -49,7 +49,7 @@ test.describe("Authentication", () => {
 		await expect(page).toHaveURL(/login/);
 		await expect(page.getByTestId("auth-error")).toBeVisible();
 		await expect(page.getByTestId("auth-error")).toContainText(
-			"Invalid email or password",
+			"Failed to sign in",
 		);
 	});
 

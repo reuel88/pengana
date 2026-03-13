@@ -41,7 +41,6 @@ export function OnboardingInviteMembers({
 	const { batchInvite, loading } = useBatchInvite({
 		organizationId: activeOrg?.id,
 		onSuccess: () => onInvited(),
-		onPartialFailure: () => Alert.alert(t("invite.error")),
 		onError: () => Alert.alert(t("invite.error")),
 	});
 

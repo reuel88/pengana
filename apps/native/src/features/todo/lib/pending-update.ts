@@ -2,10 +2,16 @@ import { eq } from "drizzle-orm";
 
 import { db, todos } from "@/features/todo/entities/todo";
 
-export async function pendingUpdate(
-	id: string,
-	fields: Record<string, unknown>,
-) {
+type PendingTodoUpdate = Partial<{
+	title: string;
+	completed: boolean;
+	deleted: boolean;
+	attachmentUrl: string | null;
+	attachmentLocalUri: string | null;
+	attachmentStatus: "queued" | "uploading" | "uploaded" | "failed" | null;
+}>;
+
+export async function pendingUpdate(id: string, fields: PendingTodoUpdate) {
 	await db
 		.update(todos)
 		.set({

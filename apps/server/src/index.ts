@@ -8,6 +8,7 @@ import { initServerI18n } from "@pengana/i18n/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
+import { createAuthResponseGuard } from "./auth-response-guard";
 import { errorEnvelope } from "./error-envelope";
 import { initLogger, logger, requestLogger } from "./logger";
 import { handleOrpcRoutes, wireNotifications } from "./orpc";
@@ -17,7 +18,6 @@ import {
 	syncLimiter,
 	uploadLimiter,
 } from "./rate-limit";
-import { createSignUpGuard } from "./sign-up-guard";
 import { setupWebSocket } from "./ws";
 import { issueWsTicket } from "./ws-tickets";
 
@@ -66,13 +66,11 @@ for (const path of rateLimitedAuthPaths) {
 app.use("/rpc/upload.*", uploadLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
-// Intercept sign-up to prevent email enumeration: always return 200
-app.post(
-	"/api/auth/sign-up/email",
-	createSignUpGuard(auth, db, allowedOrigins),
+app.on(
+	["POST", "GET"],
+	"/api/auth/*",
+	createAuthResponseGuard(auth, db, allowedOrigins),
 );
-
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.post("/api/ws-ticket", async (c) => {
 	const session = await auth.api.getSession({ headers: c.req.raw.headers });

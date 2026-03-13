@@ -30,6 +30,7 @@ export function useInviteMember({
 					organizationId: data.organizationId,
 				}),
 			errorMessage: "Failed to send invitation",
+			preferServerErrorMessage: false,
 			onSuccess: async () => {
 				await invalidateActiveOrg();
 				await onSuccess?.();

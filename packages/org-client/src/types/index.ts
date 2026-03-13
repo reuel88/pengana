@@ -183,6 +183,7 @@ export interface AuthMutationOptions<T> {
 	}>;
 	successMessage?: string;
 	errorMessage: string;
+	preferServerErrorMessage?: boolean;
 	// biome-ignore lint/suspicious/noConfusingVoidType: callbacks may return void or a Promise
 	onSuccess?: (data: T | null) => void | Promise<unknown>;
 	setLoading?: (loading: boolean) => void;

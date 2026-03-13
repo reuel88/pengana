@@ -1,7 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignUpSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
-import { useState } from "react";
 import { Alert } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
@@ -14,8 +13,6 @@ import {
 
 function SignUp() {
 	const { t } = useTranslation();
-	const [error, setError] = useState<string | null>(null);
-
 	const showCheckEmail = () => {
 		Alert.alert(t("auth:signUp.checkEmail"));
 	};
@@ -24,7 +21,6 @@ function SignUp() {
 		schema: makeNativeSignUpSchema(t),
 		defaultValues: { name: "", email: "", password: "" },
 		onSubmit: async ({ value }) => {
-			setError(null);
 			await authClient.signUp.email(
 				{
 					name: value.name.trim(),
@@ -32,8 +28,8 @@ function SignUp() {
 					password: value.password,
 				},
 				{
-					onError(err) {
-						setError(err.error?.message || t("auth:signUp.error"));
+					// Anti-enumeration: always show "check email" regardless of outcome
+					onError() {
 						showCheckEmail();
 					},
 					onSuccess() {
@@ -53,11 +49,7 @@ function SignUp() {
 			})}
 		>
 			{({ isSubmitting }) => (
-				<AuthFormCard
-					title={t("auth:signUp.title")}
-					error={error}
-					testID="auth-form"
-				>
+				<AuthFormCard title={t("auth:signUp.title")} testID="auth-form">
 					<form.Field name="name">
 						{(field) => (
 							<AuthFormField

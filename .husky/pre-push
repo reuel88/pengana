@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
-pnpm test
 pnpm check
 pnpm check-types
 pnpm check:i18n
 pnpm build
+pnpm test
 pnpm e2e

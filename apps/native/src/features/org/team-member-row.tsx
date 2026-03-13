@@ -30,6 +30,10 @@ export function TeamMemberRow({
 			</View>
 			{isAdmin && onRemove && (
 				<TouchableOpacity
+					accessible
+					accessibilityRole="button"
+					accessibilityLabel={t("teams.removeMember")}
+					accessibilityHint="Removes this user from the team"
 					onPress={onRemove}
 					style={[styles.removeButton, { backgroundColor: theme.notification }]}
 				>

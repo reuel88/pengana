@@ -112,7 +112,10 @@ export const auth = betterAuth({
 			use: [
 				checkout({
 					products: [
-						{ productId: "c69d9ab1-4e67-4a0c-8ff5-364a94e536f0", slug: "pro" },
+						{
+							productId: env.POLAR_PRO_PRODUCT_ID,
+							slug: env.POLAR_PRO_PRODUCT_SLUG,
+						},
 					],
 					successUrl: env.POLAR_SUCCESS_URL,
 					authenticatedUsersOnly: true,
@@ -169,6 +172,7 @@ export const auth = betterAuth({
 							logger.info`Webhook ${payload.type}: upserted subscription for org=${orgId} polarSub=${data.id}`;
 						} catch (err) {
 							logger.error`Webhook ${payload.type}: failed to upsert subscription for org=${orgId}: ${err}`;
+							throw err;
 						}
 					},
 				}),
@@ -232,6 +236,8 @@ export const auth = betterAuth({
 							id: sub.polarSubscriptionId,
 							subscriptionUpdate: { seats: memberCount },
 						});
+						const assigned = await assignSeatIfAvailable(orgId, data.member.id);
+						logger.info`Invitation accepted: retry seat assignment for member ${data.member.id} ${assigned ? "succeeded" : "still unavailable"}`;
 					} catch (error) {
 						logger.error`Failed to sync Polar seat count: ${error}`;
 					}

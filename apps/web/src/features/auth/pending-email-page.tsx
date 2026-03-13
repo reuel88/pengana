@@ -19,16 +19,18 @@ export function PendingEmailPage({
 	const { t } = useTranslation();
 	const { email } = useSearch({ strict: false });
 	const [isResending, setIsResending] = useState(false);
+	const resendEmail =
+		typeof email === "string" && email.trim().length > 0 ? email : null;
 
 	const handleResend = async () => {
-		if (!email) return;
+		if (!resendEmail) return;
 		setIsResending(true);
 		try {
-			await onResend(email);
-			toast.success(t("auth:verifyEmail.resendSuccess"));
+			await onResend(resendEmail);
 		} catch {
 			// Silent — anti-enumeration
 		} finally {
+			toast.success(t("auth:verifyEmail.resendSuccess"));
 			setIsResending(false);
 		}
 	};
@@ -41,7 +43,7 @@ export function PendingEmailPage({
 			<h1 className="mb-2 font-bold text-3xl">{t(titleKey)}</h1>
 			<p className="mb-6 text-muted-foreground">{t(descriptionKey)}</p>
 
-			{email && (
+			{resendEmail && (
 				<Button
 					variant="outline"
 					className="mb-4 w-full"

@@ -23,8 +23,8 @@ function SignIn() {
 			await authClient.signIn.email(
 				{ email: value.email.trim(), password: value.password },
 				{
-					onError(error) {
-						setError(error.error?.message || t("errors:failedToSignIn"));
+					onError() {
+						setError(t("errors:failedToSignIn"));
 					},
 					onSuccess() {
 						setError(null);
