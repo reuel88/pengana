@@ -8,7 +8,7 @@ import {
 } from "@pengana/ui/components/card";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { toast } from "sonner";
 
 export function AccountFieldCard({
@@ -27,8 +27,13 @@ export function AccountFieldCard({
 	onSubmit: (value: string) => Promise<unknown>;
 }) {
 	const { t } = useTranslation();
+	const inputId = useId();
 	const [value, setValue] = useState(initialValue);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	useEffect(() => {
+		setValue(initialValue);
+	}, [initialValue]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -51,8 +56,9 @@ export function AccountFieldCard({
 			<CardContent>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div className="space-y-2">
-						<Label>{label}</Label>
+						<Label htmlFor={inputId}>{label}</Label>
 						<Input
+							id={inputId}
 							type={type}
 							value={value}
 							onChange={(e) => setValue(e.target.value)}

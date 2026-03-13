@@ -33,8 +33,8 @@ export function SignInForm() {
 						});
 						toast.success(t("auth:signIn.success"));
 					},
-					onError: (error) => {
-						setError(error.error.message || error.error.statusText);
+					onError: () => {
+						setError(t("errors:failedToSignIn"));
 					},
 				},
 			);

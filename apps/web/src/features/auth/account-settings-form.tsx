@@ -9,6 +9,7 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 import { toast } from "sonner";
+import { useInvalidateOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
 import { AccountFieldCard } from "./account-field-card";
@@ -16,6 +17,7 @@ import { AccountFieldCard } from "./account-field-card";
 export function AccountSettingsForm() {
 	const { t } = useTranslation();
 	const { data: session } = authClient.useSession();
+	const { invalidateAll } = useInvalidateOrg();
 
 	return (
 		<div className="space-y-6">
@@ -23,7 +25,11 @@ export function AccountSettingsForm() {
 				title={t("auth:settings.account.changeName")}
 				label={t("auth:fields.name")}
 				value={session?.user.name ?? ""}
-				onSubmit={(name) => authClient.updateUser({ name })}
+				onSubmit={async (name) => {
+					const result = await authClient.updateUser({ name });
+					await invalidateAll();
+					return result;
+				}}
 			/>
 			<AccountFieldCard
 				title={t("auth:settings.account.changeEmail")}
@@ -31,7 +37,11 @@ export function AccountSettingsForm() {
 				type="email"
 				note={t("auth:settings.account.changeEmailNote")}
 				value={session?.user.email ?? ""}
-				onSubmit={(newEmail) => authClient.changeEmail({ newEmail })}
+				onSubmit={async (newEmail) => {
+					const result = await authClient.changeEmail({ newEmail });
+					await invalidateAll();
+					return result;
+				}}
 			/>
 			<ChangePasswordSection />
 		</div>
@@ -40,6 +50,7 @@ export function AccountSettingsForm() {
 
 function ChangePasswordSection() {
 	const { t } = useTranslation();
+	const { invalidateAll } = useInvalidateOrg();
 
 	const form = useZodForm({
 		schema: makeChangePasswordSchema(t),
@@ -57,6 +68,7 @@ function ChangePasswordSection() {
 				{
 					onSuccess: () => {
 						toast.success(t("auth:settings.account.passwordChanged"));
+						void invalidateAll();
 						form.reset();
 					},
 					onError: (err) => {

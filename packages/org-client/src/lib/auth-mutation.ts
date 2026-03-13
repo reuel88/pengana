@@ -6,6 +6,7 @@ export async function authMutation<T>({
 	mutationFn,
 	successMessage,
 	errorMessage,
+	preferServerErrorMessage = true,
 	onSuccess,
 	setLoading,
 	notify,
@@ -15,7 +16,10 @@ export async function authMutation<T>({
 	try {
 		const { data, error } = await mutationFn();
 		if (error) {
-			const msg = error.message || errorMessage;
+			const msg =
+				preferServerErrorMessage && error.message
+					? error.message
+					: errorMessage;
 			notify ? notify.error(msg) : onError?.(msg);
 			return false;
 		}

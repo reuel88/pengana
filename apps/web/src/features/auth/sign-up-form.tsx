@@ -32,6 +32,7 @@ export function SignUpForm() {
 					onSuccess: () => {
 						navigateWithCheckEmail(value.email);
 					},
+					// Anti-enumeration: identical behavior prevents leaking whether email exists
 					onError: () => {
 						navigateWithCheckEmail(value.email);
 					},

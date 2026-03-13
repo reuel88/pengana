@@ -63,6 +63,17 @@ describe("authMutation", () => {
 		expect(onError).toHaveBeenCalledWith("oops");
 	});
 
+	it("uses fallback error when preferServerErrorMessage is false", async () => {
+		const onError = vi.fn();
+		await authMutation({
+			mutationFn: async () => ({ error: { message: "user already exists" } }),
+			errorMessage: "Failed to send invitation",
+			preferServerErrorMessage: false,
+			onError,
+		});
+		expect(onError).toHaveBeenCalledWith("Failed to send invitation");
+	});
+
 	it("calls notify.error when mutationFn throws", async () => {
 		const notify = { success: vi.fn(), error: vi.fn() };
 		await authMutation({

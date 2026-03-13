@@ -39,7 +39,6 @@ export function OnboardingInviteMembers({
 			toast.success(t("invite.success"));
 			onInvited();
 		},
-		onPartialFailure: () => toast.error(t("invite.error")),
 		onError: () => toast.error(t("invite.error")),
 	});
 

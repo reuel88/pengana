@@ -74,6 +74,11 @@ export function OrgSwitcher() {
 
 	if (!session) return null;
 
+	const handleClose = () => {
+		if (switchingId !== null || modal === "create") return;
+		setModal("closed");
+	};
+
 	const handleCreated = (_orgId: string) => {
 		setModal("closed");
 		router.push("/(drawer)/(org)");
@@ -94,7 +99,7 @@ export function OrgSwitcher() {
 				visible={modal !== "closed"}
 				transparent
 				animationType="slide"
-				onRequestClose={() => setModal("closed")}
+				onRequestClose={handleClose}
 			>
 				<View style={styles.modalOverlay}>
 					<View
@@ -151,7 +156,7 @@ export function OrgSwitcher() {
 						<TouchableOpacity
 							style={styles.closeButton}
 							disabled={switchingId !== null || modal === "create"}
-							onPress={() => setModal("closed")}
+							onPress={handleClose}
 						>
 							<Text style={{ color: theme.text }}>{t("switcher.close")}</Text>
 						</TouchableOpacity>

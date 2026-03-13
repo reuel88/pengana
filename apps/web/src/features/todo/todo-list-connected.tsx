@@ -23,6 +23,10 @@ export function TodoListConnected({
 		toast.error(msg);
 	}, []);
 
+	const onValidationError = useCallback((_id: string, msg: string) => {
+		toast.error(msg);
+	}, []);
+
 	const fileStorage = useMemo(
 		() => ({
 			storeFile: (_id: string, file: File) => storeFileInMemory(_id, file),
@@ -36,7 +40,7 @@ export function TodoListConnected({
 			triggerSync,
 			enqueueUpload,
 			onError,
-			clearError: () => {},
+			clearError: () => {}, // no-op: errors are sent to toast, not local state
 			fileStorage,
 			t,
 			actions,
@@ -49,7 +53,7 @@ export function TodoListConnected({
 			onDelete={handleDelete}
 			onResolve={handleResolve}
 			onFileSelected={handleFileSelected}
-			onValidationError={(_id, msg) => toast.error(msg)}
+			onValidationError={onValidationError}
 		/>
 	);
 }

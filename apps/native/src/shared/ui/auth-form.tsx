@@ -23,7 +23,7 @@ export function AuthFormCard({
 	testID,
 }: {
 	title: string;
-	error: string | null;
+	error?: string | null;
 	children: ReactNode;
 	testID?: string;
 }) {

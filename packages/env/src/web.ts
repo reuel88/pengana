@@ -6,6 +6,7 @@ export const env = createEnv({
 	client: {
 		VITE_SERVER_URL: z.url(),
 		VITE_WEB_URL: z.url(),
+		VITE_POLAR_PRO_PRODUCT_SLUG: z.string().min(1).default("pro"),
 	},
 	runtimeEnv: (import.meta as unknown as Record<string, unknown>).env as Record<
 		string,

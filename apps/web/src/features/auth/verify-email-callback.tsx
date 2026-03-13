@@ -12,21 +12,24 @@ export function VerifyEmailCallback() {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!token) {
+		if (typeof token !== "string" || token.trim().length === 0) {
 			setError(t("auth:verifyEmail.invalidToken"));
 			return;
 		}
+
+		const controller = new AbortController();
+		const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
 
 		// Raw fetch is intentional: better-auth's verify endpoint needs cookie
 		// credentials and returns a plain 200/4xx — no SDK method wraps this.
 		fetch(
 			`${env.VITE_SERVER_URL}/api/auth/verify-email?token=${encodeURIComponent(token)}`,
-			{ credentials: "include" },
+			{ credentials: "include", signal: controller.signal },
 		)
 			.then((res) => {
 				if (res.ok) {
 					toast.success(t("auth:verifyEmail.success"));
-					navigate({ to: "/" });
+					navigate({ to: "/", replace: true });
 				} else {
 					setError(t("auth:verifyEmail.invalidToken"));
 				}
@@ -34,6 +37,11 @@ export function VerifyEmailCallback() {
 			.catch(() => {
 				setError(t("auth:verifyEmail.error"));
 			});
+
+		return () => {
+			window.clearTimeout(timeoutId);
+			controller.abort();
+		};
 	}, [token, navigate, t]);
 
 	if (error) {
