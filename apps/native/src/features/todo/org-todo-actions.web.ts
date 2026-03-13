@@ -6,22 +6,22 @@ import {
 	toggleOrgTodo as _toggleOrgTodo,
 } from "@pengana/todo-client";
 
-import { todoDb } from "@/features/todo/entities/todo";
+import { appDb } from "@/features/todo/entities/todo";
 
 export const addOrgTodo = (
 	organizationId: string,
 	userId: string,
 	title: string,
-) => _addOrgTodo(todoDb, organizationId, userId, title);
+) => _addOrgTodo(appDb, organizationId, userId, title);
 
-export const toggleOrgTodo = (id: string) => _toggleOrgTodo(todoDb, id);
+export const toggleOrgTodo = (id: string) => _toggleOrgTodo(appDb, id);
 
-export const deleteOrgTodo = (id: string) => _deleteOrgTodo(todoDb, id);
+export const deleteOrgTodo = (id: string) => _deleteOrgTodo(appDb, id);
 
 export const attachOrgFile = (todoId: string, localUri: string) =>
-	_attachOrgFile(todoDb, todoId, localUri);
+	_attachOrgFile(appDb, todoId, localUri);
 
 export const resolveOrgConflict = (
 	id: string,
 	resolution: "local" | "server",
-) => _resolveOrgConflict(todoDb, id, resolution);
+) => _resolveOrgConflict(appDb, id, resolution);

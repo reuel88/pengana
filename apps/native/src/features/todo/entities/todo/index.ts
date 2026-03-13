@@ -8,5 +8,5 @@ export { syncMeta, todos } from "./schema";
 
 // Placeholder for web-only imports so TypeScript resolves .web.ts files correctly.
 // At runtime, .web.ts files import from index.web.ts via Metro's platform resolution.
-import type { todoDb as _todoDb } from "./db.web";
-export const todoDb = null as unknown as typeof _todoDb;
+import type { appDb as _appDb } from "./db.web";
+export const appDb = null as unknown as typeof _appDb;
