@@ -44,7 +44,11 @@ export function useBatchInvite({
 			);
 
 			if (successes.length > 0) {
-				await invalidateActiveOrg();
+				try {
+					await invalidateActiveOrg();
+				} catch {
+					onError?.("Failed to refresh organization data");
+				}
 			}
 
 			if (failures.length === results.length) {

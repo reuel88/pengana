@@ -1,7 +1,14 @@
 import { useAuthClient } from "@pengana/org-client";
 import { useState } from "react";
 
+import { runBatchInvitePostProcessing } from "./use-batch-invite.helpers";
 import { useInvalidateOrg } from "./use-org-queries";
+
+type BatchInviteEntry = { email: string; role: "member" | "admin" };
+
+type BatchInviteFailure = BatchInviteEntry & {
+	reason?: "missing-organization";
+};
 
 export function useBatchInvite({
 	organizationId,
@@ -16,11 +23,20 @@ export function useBatchInvite({
 	const { invalidateActiveOrg } = useInvalidateOrg();
 	const [loading, setLoading] = useState(false);
 
-	const batchInvite = async (
-		entries: Array<{ email: string; role: "member" | "admin" }>,
-	) => {
-		if (!organizationId || entries.length === 0) {
+	const batchInvite = async (entries: BatchInviteEntry[]) => {
+		if (entries.length === 0) {
 			return { successes: [], failures: [] };
+		}
+
+		if (!organizationId) {
+			onError?.("Missing organization");
+			return {
+				successes: [],
+				failures: entries.map((entry) => ({
+					...entry,
+					reason: "missing-organization",
+				})),
+			};
 		}
 
 		setLoading(true);
@@ -39,20 +55,17 @@ export function useBatchInvite({
 			const successes = entries.filter(
 				(_entry, index) => results[index]?.status === "fulfilled",
 			);
-			const failures = entries.filter(
+			const failures: BatchInviteFailure[] = entries.filter(
 				(_entry, index) => results[index]?.status === "rejected",
 			);
 
-			if (successes.length > 0) {
-				await invalidateActiveOrg();
-			}
-
-			if (failures.length === results.length) {
-				onError?.("All invitations failed");
-			} else if (failures.length === 0) {
-				onSuccess?.();
-			}
-			return { successes, failures };
+			return runBatchInvitePostProcessing({
+				result: { successes, failures },
+				totalCount: results.length,
+				invalidateActiveOrg,
+				onSuccess,
+				onError,
+			});
 		} catch {
 			onError?.("Failed to send invitations");
 			return { successes: [], failures: entries };

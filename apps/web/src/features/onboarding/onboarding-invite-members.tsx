@@ -54,6 +54,9 @@ export function OnboardingInviteMembers({
 				return;
 			}
 			if (result.successes.length === 0) {
+				toast.error(
+					`${t("invite.error")}: ${result.failures.map((failure) => failure.email).join(", ")}`,
+				);
 				return;
 			}
 

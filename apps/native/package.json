@@ -9,6 +9,7 @@
 		"ios": "expo run:ios",
 		"prebuild": "expo prebuild",
 		"web": "expo start --web",
+		"test": "vitest run",
 		"check-types": "tsc --noEmit",
 		"db:generate": "drizzle-kit generate"
 	},
@@ -69,6 +70,7 @@
 		"@types/react": "~19.2.14",
 		"babel-plugin-inline-import": "^3.0.0",
 		"drizzle-kit": "^0.31.9",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }
