@@ -1,16 +1,16 @@
-import type { SyncAdapter, SyncEvent, SyncTransport } from "../types";
+import type { SyncAdapter, SyncEvent, SyncTransport, Todo } from "../types";
 import { createEventEmitter } from "./event-emitter";
 
-export class SyncEngine {
-	private adapter: SyncAdapter;
-	private transport: SyncTransport;
+export class SyncEngine<T extends { id: string } = Todo> {
+	private adapter: SyncAdapter<T>;
+	private transport: SyncTransport<T>;
 	private events = createEventEmitter<SyncEvent>();
 	private syncing = false;
 	private syncRequested = false;
 
 	onEvent = this.events.onEvent;
 
-	constructor(adapter: SyncAdapter, transport: SyncTransport) {
+	constructor(adapter: SyncAdapter<T>, transport: SyncTransport<T>) {
 		this.adapter = adapter;
 		this.transport = transport;
 	}

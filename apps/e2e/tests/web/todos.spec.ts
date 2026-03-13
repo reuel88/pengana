@@ -23,6 +23,31 @@ test.describe("Todos", () => {
 		await expect(todoPage.todoRowLocator("Buy milk")).toBeVisible();
 	});
 
+	test("add, complete, and delete an organization todo", async ({
+		authenticatedWithOrgPage: { page },
+		todoPage,
+	}) => {
+		const title = `Org Todo ${crypto.randomUUID()}`;
+
+		await todoPage.navigate();
+		await page.getByRole("tab", { name: "Organization" }).click();
+		await expect(
+			page.getByRole("tab", { name: "Organization", selected: true }),
+		).toBeVisible();
+		await page
+			.getByPlaceholder("Add a new todo...")
+			.locator("visible=true")
+			.fill(title);
+		await page.getByTestId("todo-submit").locator("visible=true").click();
+		await expect(todoPage.todoRowLocator(title)).toBeVisible();
+
+		await todoPage.toggleTodo(title);
+		await expect(todoPage.completedTodoLocator(title)).toBeVisible();
+
+		await todoPage.deleteTodo(title);
+		await expect(todoPage.todoRowLocator(title)).not.toBeVisible();
+	});
+
 	test("complete a todo", async ({
 		authenticatedWithOrgPage: _setup,
 		todoPage,

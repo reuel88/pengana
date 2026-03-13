@@ -3,6 +3,7 @@ import { addOrgTodo } from "@pengana/todo-client";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { toast } from "sonner";
 import { useOrgSync } from "@/features/sync/org-sync-context";
+import { appDb } from "@/shared/db";
 
 export function OrgTodoInput({
 	organizationId,
@@ -17,7 +18,7 @@ export function OrgTodoInput({
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await addOrgTodo(organizationId, userId, title);
+				await addOrgTodo(appDb, organizationId, userId, title);
 				triggerSync();
 			}}
 			onError={() => toast.error(t("errors:failedToAddTodo"))}

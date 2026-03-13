@@ -3,6 +3,7 @@ import { addTodo } from "@pengana/todo-client";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { toast } from "sonner";
 import { useSync } from "@/features/sync/sync-context";
+import { appDb } from "@/shared/db";
 
 export function TodoInput({ userId }: { userId: string }) {
 	const { triggerSync } = useSync();
@@ -11,7 +12,7 @@ export function TodoInput({ userId }: { userId: string }) {
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await addTodo(userId, title);
+				await addTodo(appDb, userId, title);
 				triggerSync();
 			}}
 			onError={() => toast.error(t("errors:failedToAddTodo"))}

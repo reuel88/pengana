@@ -31,6 +31,7 @@ import type {
 import { isSyncActive, isUploadActive } from "@/shared/api/background-messages";
 import { client } from "@/shared/api/orpc";
 import { sessionResponseSchema } from "@/shared/api/session-schema";
+import { appDb } from "@/shared/db";
 
 // --- Constants ---
 
@@ -100,7 +101,7 @@ function getStatus(scope: SyncScope): SyncStatus {
 }
 
 const storageHealthProvider = createWebStorageHealthProvider();
-const uploadAdapter = createWebUploadAdapter();
+const uploadAdapter = createWebUploadAdapter(appDb);
 
 async function checkStorageHealth(scope: SyncScope): Promise<void> {
 	const scopeState = getOrCreateScopeState(scope);
@@ -158,8 +159,8 @@ async function fetchUserId(): Promise<string | null> {
 function createSyncEngine(scope: SyncScope): SyncEngine {
 	const adapter =
 		scope.scopeType === "organization"
-			? createDexieOrgSyncAdapter(scope.scopeId)
-			: createDexieSyncAdapter(scope.scopeId);
+			? createDexieOrgSyncAdapter(appDb, scope.scopeId)
+			: createDexieSyncAdapter(appDb, scope.scopeId);
 	const transport =
 		scope.scopeType === "organization"
 			? {

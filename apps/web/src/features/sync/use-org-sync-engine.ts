@@ -1,11 +1,12 @@
 import { useNetworkStatus, useSyncEngineCore } from "@pengana/sync-engine";
 import { createDexieOrgSyncAdapter } from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 
 import { createWebPlatformDeps } from "./platform-deps";
 
 const orgPlatformDeps = createWebPlatformDeps(
-	(organizationId) => createDexieOrgSyncAdapter(organizationId),
+	(organizationId) => createDexieOrgSyncAdapter(appDb, organizationId),
 	() => ({
 		sync: async (input) => {
 			// Map from sync engine's Todo shape (userId) to OrgTodo shape (organizationId/createdBy)

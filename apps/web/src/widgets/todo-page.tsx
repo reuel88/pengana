@@ -9,11 +9,12 @@ import { OrgTodoInput } from "@/features/todo/org-todo-input";
 import { OrgTodoList } from "@/features/todo/org-todo-list";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
+import { appDb } from "@/shared/db";
 
 type Tab = "personal" | "organization";
 
 function PersonalTodoContent({ userId }: { userId: string }) {
-	const { todos } = useTodos(userId);
+	const { todos } = useTodos(appDb, userId);
 	const { isOnline, isSyncing } = useSync();
 
 	return (
@@ -33,7 +34,7 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
-	const { todos } = useOrgTodos(organizationId);
+	const { todos } = useOrgTodos(appDb, organizationId);
 	const { isOnline, isSyncing } = useOrgSync();
 
 	return (

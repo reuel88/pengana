@@ -26,6 +26,7 @@
 		"@pengana/org-client": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
+		"@pengana/entity-store": "workspace:*",
 		"@pengana/todo-client": "workspace:*",
 		"@pengana/ui": "workspace:*",
 		"@polar-sh/better-auth": "catalog:",

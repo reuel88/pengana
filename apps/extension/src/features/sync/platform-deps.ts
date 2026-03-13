@@ -8,6 +8,7 @@ import {
 } from "@pengana/todo-client";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
+import { appDb } from "@/shared/db";
 
 function createNoopRealtimeTransport(): RealtimeTransport {
 	return {
@@ -34,7 +35,7 @@ export function createExtensionPlatformDeps(
 		generateUUID: () => crypto.randomUUID(),
 		createSyncAdapter,
 		createSyncTransport,
-		createUploadAdapter: createWebUploadAdapter,
+		createUploadAdapter: () => createWebUploadAdapter(appDb),
 		createUploadTransport: createIndexedDbUploadTransport,
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {

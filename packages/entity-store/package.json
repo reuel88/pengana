@@ -1,0 +1,36 @@
+{
+	"name": "@pengana/entity-store",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./define-entity": {
+			"default": "./src/define-entity.ts"
+		},
+		"./dexie/*": {
+			"default": "./src/dexie/*.ts"
+		},
+		"./drizzle/*": {
+			"default": "./src/drizzle/*.ts"
+		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@pengana/sync-engine": "workspace:*",
+		"dexie": "^4.0.11",
+		"dexie-react-hooks": "^4.2.0",
+		"drizzle-orm": "^0.45.1"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.14",
+		"typescript": "catalog:"
+	}
+}

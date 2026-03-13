@@ -1,14 +1,17 @@
 import type { RefObject } from "react";
 import { useEffect, useRef } from "react";
 
-import type { SyncEngine } from "../core/engine";
 import { subscribeToSharedNotifyChannel } from "../realtime/shared-notify-manager";
 import type { CreateNotifyTransport } from "../realtime/types";
+
+interface Syncable {
+	sync(): Promise<void>;
+}
 
 export function useRealtimeTransport(
 	notifyKey: string | undefined,
 	enabled: boolean,
-	engineRef: RefObject<SyncEngine | null>,
+	engineRef: RefObject<Syncable | null>,
 	createNotifyTransport: CreateNotifyTransport,
 	onSyncNotify?: () => void,
 ) {

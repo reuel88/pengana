@@ -25,7 +25,6 @@ export type { UseTodoListWiringConfig } from "./hooks/use-todo-list-wiring";
 export { useTodoListWiring } from "./hooks/use-todo-list-wiring";
 export { useTodos } from "./hooks/use-todos";
 export type { WebOrgTodo, WebTodo } from "./lib/db";
-export { TodoDatabase, todoDb } from "./lib/db";
 export { readFileAsBase64 } from "./lib/file-utils";
 export { filterTodos } from "./lib/filter-todos";
 export {
@@ -42,5 +41,6 @@ export {
 	resolveConflict,
 	toggleTodo,
 } from "./lib/todo-actions";
+export { orgTodoEntity, todoEntity } from "./lib/todo-entity";
 export type { FileDataRecord } from "./lib/upload-queue-db";
 export { UploadQueueDatabase, uploadQueueDb } from "./lib/upload-queue-db";

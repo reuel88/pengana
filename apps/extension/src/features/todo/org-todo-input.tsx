@@ -1,6 +1,7 @@
 import { addOrgTodo } from "@pengana/todo-client";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { useOrgSync } from "@/features/sync/org-sync-context";
+import { appDb } from "@/shared/db";
 
 export function OrgTodoInput({
 	organizationId,
@@ -15,7 +16,7 @@ export function OrgTodoInput({
 		<TodoInputBase
 			onSubmit={async (title) => {
 				try {
-					await addOrgTodo(organizationId, userId, title);
+					await addOrgTodo(appDb, organizationId, userId, title);
 					triggerSync();
 				} catch (err) {
 					console.error("[OrgTodoInput] failed to add org todo:", err);

@@ -1,11 +1,12 @@
 import { useNetworkStatus, useSyncEngineCore } from "@pengana/sync-engine";
 import { createDexieOrgSyncAdapter } from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 
 import { createExtensionPlatformDeps } from "./platform-deps";
 
 const platformDeps = createExtensionPlatformDeps(
-	(organizationId) => createDexieOrgSyncAdapter(organizationId),
+	(organizationId) => createDexieOrgSyncAdapter(appDb, organizationId),
 	() => ({
 		sync: async (input) => {
 			const orgInput = {

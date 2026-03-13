@@ -1,23 +1,12 @@
-import { useLiveQuery } from "dexie-react-hooks";
-import { useMemo } from "react";
+import { type EntityDatabase, useDexieEntity } from "@pengana/entity-store";
 
-import { todoDb } from "../lib/db";
+import type { WebOrgTodo } from "../lib/db";
 
-export function useOrgTodos(organizationId: string) {
-	const todos = useLiveQuery(
-		() => todoDb.orgTodos.where({ userId: organizationId }).toArray(),
-		[organizationId],
-		[],
+export function useOrgTodos(db: EntityDatabase, organizationId: string) {
+	const { items, conflicts } = useDexieEntity<WebOrgTodo>(
+		db,
+		"orgTodos",
+		organizationId,
 	);
-
-	const activeTodos = useMemo(
-		() => todos.filter((todo) => !todo.deleted),
-		[todos],
-	);
-	const conflictTodos = useMemo(
-		() => todos.filter((todo) => todo.syncStatus === "conflict"),
-		[todos],
-	);
-
-	return { todos: activeTodos, conflictTodos };
+	return { todos: items, conflictTodos: conflicts };
 }

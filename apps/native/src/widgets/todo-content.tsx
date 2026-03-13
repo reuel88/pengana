@@ -28,7 +28,12 @@ export function TodoShell({
 
 	return (
 		<View style={styles.content} testID="todo-page">
-			<Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
+			<Text
+				accessibilityRole="header"
+				style={[styles.title, { color: theme.text }]}
+			>
+				{t("title")}
+			</Text>
 			{showTabs ? (
 				<View
 					accessibilityRole="tablist"
@@ -45,6 +50,7 @@ export function TodoShell({
 							accessibilityRole="tab"
 							accessibilityState={{ selected: activeTab === key }}
 							onPress={() => onTabChange(key)}
+							testID={`todo-tab-${key}`}
 							style={[
 								styles.tabButton,
 								{

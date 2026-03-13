@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
-import type { SyncEngine } from "../core/engine";
 import { UploadQueue } from "../core/upload-queue";
 import type { UploadAdapter, UploadEvent, UploadTransport } from "../types";
 import { useStableSyncRef } from "./use-stable-sync-ref";
 
+interface Syncable {
+	sync(): Promise<void>;
+}
+
 export function useUploadQueue(
 	userId: string | undefined,
 	isOnline: boolean,
-	engineRef: React.RefObject<SyncEngine | null>,
+	engineRef: React.RefObject<Syncable | null>,
 	generateUUID: () => string,
 	createUploadAdapter: () => UploadAdapter,
 	createUploadTransport: () => UploadTransport,

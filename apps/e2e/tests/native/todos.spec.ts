@@ -12,7 +12,9 @@ test.describe("Todos", () => {
 	}) => {
 		const todoPage = new NativeTodoPage(page);
 		await todoPage.navigate();
-		await expect(page.getByRole("heading", { name: "Todos" })).toBeVisible();
+		await expect(
+			page.getByTestId("todo-page").getByRole("heading", { name: "Todos" }),
+		).toBeVisible();
 		await expect(
 			page.getByTestId("todo-input").locator("visible=true"),
 		).toBeVisible();
@@ -23,6 +25,31 @@ test.describe("Todos", () => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Buy milk");
 		await expect(todoPage.todoRowLocator("Buy milk")).toBeVisible();
+	});
+
+	test("add, complete, and delete an organization todo", async ({
+		authenticatedWithOrgPage: { page },
+	}) => {
+		const todoPage = new NativeTodoPage(page);
+		const title = `Org Todo ${crypto.randomUUID()}`;
+
+		await todoPage.navigate();
+		await page.getByTestId("todo-tab-organization").click();
+		await expect(
+			page.getByTestId("organization-todo-panel").locator("visible=true"),
+		).toBeVisible();
+		await page.getByTestId("todo-input").locator("visible=true").fill(title);
+		await page.getByTestId("todo-submit").locator("visible=true").click();
+		await expect(todoPage.todoRowLocator(title)).toBeVisible();
+
+		await todoPage.toggleTodo(title);
+		await expect(todoPage.completedTodoLocator(title)).toHaveCSS(
+			"text-decoration-line",
+			"line-through",
+		);
+
+		await todoPage.deleteTodo(title);
+		await expect(todoPage.todoRowLocator(title)).not.toBeVisible();
 	});
 
 	test("complete a todo", async ({ authenticatedWithOrgPage: { page } }) => {

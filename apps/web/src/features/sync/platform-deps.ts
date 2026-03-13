@@ -13,6 +13,7 @@ import {
 	createWebUploadTransport,
 } from "@/features/sync/entities/upload-queue";
 import { queryClient } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 
 function getWsUrl() {
 	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
@@ -54,7 +55,7 @@ export function createWebPlatformDeps(
 		},
 		createSyncAdapter,
 		createSyncTransport,
-		createUploadAdapter: createWebUploadAdapter,
+		createUploadAdapter: () => createWebUploadAdapter(appDb),
 		createUploadTransport: createWebUploadTransport,
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {
