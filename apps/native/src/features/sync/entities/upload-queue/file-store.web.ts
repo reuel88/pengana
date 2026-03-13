@@ -1,5 +1,5 @@
 export {
-	getFileFromMemory,
-	removeFileFromMemory,
-	storeFileInMemory,
-} from "@pengana/todo-client";
+	getFileFromIndexedDB,
+	removeFileFromIndexedDB,
+	storeFileInIndexedDB,
+} from "@pengana/todo-client/adapters/dexie-file-store";

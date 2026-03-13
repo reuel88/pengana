@@ -4,13 +4,6 @@ export {
 	removeFileFromIndexedDB,
 	storeFileInIndexedDB,
 } from "./adapters/dexie-file-store";
-// File store & transport utilities
-export {
-	getFileFromMemory,
-	removeFileFromMemory,
-	storeFileInMemory,
-} from "./adapters/memory-file-store";
-export { createMemoryUploadTransport } from "./adapters/memory-upload-transport";
 export { createDexieOrgSyncAdapter } from "./adapters/org-adapter";
 export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
 export { createUploadTransport } from "./adapters/upload-transport";

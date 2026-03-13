@@ -1,10 +1,8 @@
 export type { FileDataRecord } from "@pengana/todo-client";
 export {
 	createWebUploadAdapter,
-	getFileFromMemory,
-	removeFileFromMemory,
-	storeFileInMemory,
 	UploadQueueDatabase,
 	uploadQueueDb,
 } from "@pengana/todo-client";
-export { createWebUploadTransport } from "./transport";
+export { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
+export { createIndexedDbUploadTransport } from "./transport";

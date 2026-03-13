@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
+import { LOCALE_STORAGE_KEY_NATIVE } from "@pengana/i18n/persistence";
 import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
 
@@ -189,8 +190,8 @@ export default function RootLayout() {
 		const init = async () => {
 			const savedLocale =
 				Platform.OS === "web"
-					? localStorage.getItem("appLocale")
-					: await SecureStore.getItemAsync("appLocale");
+					? localStorage.getItem(LOCALE_STORAGE_KEY_NATIVE)
+					: await SecureStore.getItemAsync(LOCALE_STORAGE_KEY_NATIVE);
 			const deviceLocale = getLocales()[0]?.languageTag;
 			const i18n = await initNativeI18n(savedLocale ?? deviceLocale);
 			const locale = i18n.language as SupportedLocale;

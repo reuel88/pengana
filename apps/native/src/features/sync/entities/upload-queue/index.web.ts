@@ -3,11 +3,11 @@ export {
 	createWebUploadAdapter as createUploadAdapter,
 } from "./adapter.web";
 export {
-	getFileFromMemory,
-	removeFileFromMemory,
-	storeFileInMemory,
+	getFileFromIndexedDB,
+	removeFileFromIndexedDB,
+	storeFileInIndexedDB,
 } from "./file-store.web";
 export {
-	createWebUploadTransport,
-	createWebUploadTransport as createUploadTransport,
+	createIndexedDbUploadTransport,
+	createIndexedDbUploadTransport as createUploadTransport,
 } from "./transport.web";

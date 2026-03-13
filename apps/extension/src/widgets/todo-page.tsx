@@ -1,14 +1,16 @@
 import { useTranslation } from "@pengana/i18n";
 import { useOrgTodos, useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { OrgSyncProvider, useOrgSync } from "@/features/sync/org-sync-context";
 import { SyncProvider, useSync } from "@/features/sync/sync-context";
+import { useBackgroundPort } from "@/features/sync/use-background-port";
 import { OrgTodoInput } from "@/features/todo/org-todo-input";
 import { OrgTodoList } from "@/features/todo/org-todo-list";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
+import type { SyncScope } from "@/shared/api/background-messages";
 import { appDb } from "@/shared/db";
 
 type Tab = "personal" | "organization";
@@ -54,6 +56,16 @@ export function TodoPage({
 }) {
 	const [activeTab, setActiveTab] = useState<Tab>("personal");
 	const { t } = useTranslation("todos");
+
+	const scopes = useMemo<SyncScope[]>(() => {
+		const s: SyncScope[] = [{ scopeType: "personal", scopeId: userId }];
+		if (organizationId) {
+			s.push({ scopeType: "organization", scopeId: organizationId });
+		}
+		return s;
+	}, [userId, organizationId]);
+
+	useBackgroundPort(scopes);
 
 	return (
 		<div className="flex flex-col gap-4 p-4" data-testid="todo-page">

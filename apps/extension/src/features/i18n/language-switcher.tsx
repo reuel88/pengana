@@ -13,6 +13,8 @@ import { LanguageSwitcher as LanguageSwitcherBase } from "@pengana/ui/components
 export function LanguageSwitcher() {
 	const { i18n } = useTranslation();
 
+	const currentLocale = resolveLocale(i18n.language);
+
 	const handleChange = (locale: SupportedLocale) => {
 		persistLocale(i18n, locale, LOCALE_STORAGE_KEY_EXTENSION);
 		document.documentElement.dir = getDirection(locale);
@@ -21,7 +23,7 @@ export function LanguageSwitcher() {
 
 	return (
 		<LanguageSwitcherBase
-			currentLocale={resolveLocale(i18n.language)}
+			currentLocale={currentLocale}
 			onLocaleChange={handleChange}
 		/>
 	);

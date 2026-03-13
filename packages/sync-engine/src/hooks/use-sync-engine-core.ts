@@ -38,13 +38,24 @@ export interface SyncEnginePlatformDeps<T extends { id: string } = Todo> {
 	onStorageCritical?: () => void;
 }
 
+export interface SyncEngineOptions<T extends { id: string } = Todo> {
+	scopeId: string | undefined;
+	isOnline: boolean;
+	deps: SyncEnginePlatformDeps<T>;
+	isForeground?: boolean;
+	notifyKey?: string;
+}
+
 export function useSyncEngineCore<T extends { id: string } = Todo>(
-	scopeId: string | undefined,
-	isOnline: boolean,
-	deps: SyncEnginePlatformDeps<T>,
-	isForeground = true,
-	notifyKey = scopeId,
+	options: SyncEngineOptions<T>,
 ) {
+	const {
+		scopeId,
+		isOnline,
+		deps,
+		isForeground = true,
+		notifyKey = scopeId,
+	} = options;
 	// --- State ---
 	const engineRef = useRef<SyncEngine<T> | null>(null);
 	const [events, setEvents] = useState<SyncEvent[]>([]);

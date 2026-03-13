@@ -1,162 +1,49 @@
-import { Ionicons } from "@expo/vector-icons";
 import {
-	SUPPORTED_LOCALES,
+	resolveLocale,
 	type SupportedLocale,
 	useTranslation,
 } from "@pengana/i18n";
-import { isRtlLocale } from "@pengana/i18n/rtl";
-
+import { LOCALE_STORAGE_KEY_NATIVE } from "@pengana/i18n/persistence";
 import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
-import {
-	Alert,
-	FlatList,
-	I18nManager,
-	Modal,
-	Platform,
-	Pressable,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Alert, I18nManager, Platform } from "react-native";
 
-import { useTheme } from "@/shared/lib/theme";
-
-const LOCALE_LABELS: Record<SupportedLocale, string> = {
-	"en-US": "English (US)",
-	"en-AU": "English (AU)",
-	es: "Espanol",
-	zh: "\u4E2D\u6587",
-	tl: "Tagalog",
-	vi: "Ti\u1EBFng Vi\u1EC7t",
-	ar: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629",
-	fr: "Fran\u00E7ais",
-	ko: "\uD55C\uAD6D\uC5B4",
-	ru: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
-	"pt-BR": "Portugu\u00EAs (BR)",
-};
+import { changeLanguage } from "@/features/i18n/change-language";
+import { LanguageSwitcher as LanguageSwitcherBase } from "@/shared/ui/language-switcher";
 
 export function LanguageSwitcher() {
 	const { i18n, t } = useTranslation();
-	const { theme } = useTheme();
-	const [visible, setVisible] = useState(false);
 
-	const currentLocale = i18n.language as SupportedLocale;
+	const currentLocale = resolveLocale(i18n.language);
 
-	const handleSelect = async (locale: SupportedLocale) => {
-		setVisible(false);
-		if (locale === currentLocale) return;
+	const handleChange = async (locale: SupportedLocale) => {
+		await changeLanguage({
+			currentLocale,
+			nextLocale: locale,
+			i18n,
+			isWeb: Platform.OS === "web",
+			persistLocale: (nextLocale) => {
+				if (Platform.OS === "web") {
+					localStorage.setItem(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
+					return;
+				}
 
-		if (Platform.OS === "web") {
-			localStorage.setItem("appLocale", locale);
-			window.location.reload();
-			return;
-		}
-
-		await SecureStore.setItemAsync("appLocale", locale);
-
-		const wasRtl = isRtlLocale(currentLocale);
-		const willBeRtl = isRtlLocale(locale);
-
-		if (wasRtl !== willBeRtl) {
-			I18nManager.allowRTL(true);
-			I18nManager.forceRTL(willBeRtl);
-			Alert.alert(
-				t("common:restartRequired.title"),
-				t("common:restartRequired.message"),
-			);
-		}
-
-		await i18n.changeLanguage(locale);
+				return SecureStore.setItemAsync(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
+			},
+			reload: () => window.location.reload(),
+			allowRTL: (allow) => I18nManager.allowRTL(allow),
+			forceRTL: (rtl) => I18nManager.forceRTL(rtl),
+			showRestartAlert: () =>
+				Alert.alert(
+					t("common:restartRequired.title"),
+					t("common:restartRequired.message"),
+				),
+		});
 	};
 
 	return (
-		<>
-			<View style={{ paddingHorizontal: 12 }}>
-				<Pressable
-					onPress={() => setVisible(true)}
-					style={styles.trigger}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					accessibilityRole="button"
-					accessibilityLabel={t("common:language.changeLabel")}
-					accessibilityHint={t("common:language.changeHint")}
-					accessibilityState={{ expanded: visible }}
-				>
-					<Ionicons name="globe-outline" size={24} color={theme.text} />
-				</Pressable>
-			</View>
-			<Modal
-				visible={visible}
-				transparent
-				animationType="fade"
-				onRequestClose={() => setVisible(false)}
-				accessibilityViewIsModal
-			>
-				<Pressable style={styles.overlay} onPress={() => setVisible(false)}>
-					<View
-						style={[styles.modal, { backgroundColor: theme.background }]}
-						onStartShouldSetResponder={() => true}
-						accessibilityRole="menu"
-					>
-						<FlatList
-							data={SUPPORTED_LOCALES as unknown as SupportedLocale[]}
-							keyExtractor={(item) => item}
-							renderItem={({ item }) => (
-								<Pressable
-									onPress={() => handleSelect(item)}
-									style={[styles.item, { borderBottomColor: theme.border }]}
-									accessibilityRole="menuitem"
-									accessibilityLabel={LOCALE_LABELS[item]}
-									accessibilityState={{ selected: item === currentLocale }}
-								>
-									<Text style={[styles.label, { color: theme.text }]}>
-										{LOCALE_LABELS[item]}
-									</Text>
-									{item === currentLocale && (
-										<Ionicons
-											name="checkmark"
-											size={20}
-											color={theme.primary}
-										/>
-									)}
-								</Pressable>
-							)}
-						/>
-					</View>
-				</Pressable>
-			</Modal>
-		</>
+		<LanguageSwitcherBase
+			currentLocale={currentLocale}
+			onLocaleChange={handleChange}
+		/>
 	);
 }
-
-const styles = StyleSheet.create({
-	trigger: {
-		minWidth: 44,
-		minHeight: 44,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	overlay: {
-		flex: 1,
-		backgroundColor: "rgba(0,0,0,0.4)",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	modal: {
-		width: "80%",
-		maxHeight: "60%",
-		borderRadius: 12,
-		paddingVertical: 8,
-	},
-	item: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		paddingVertical: 14,
-		paddingHorizontal: 20,
-		borderBottomWidth: StyleSheet.hairlineWidth,
-	},
-	label: {
-		fontSize: 16,
-	},
-});

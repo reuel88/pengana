@@ -11,4 +11,5 @@ export {
 	SUPPORTED_LOCALES,
 	type SupportedLocale,
 } from "./config";
+export { getLocaleLabel, LOCALE_OPTIONS } from "./locale-display";
 export { getDirection, isRtlLocale } from "./rtl";
