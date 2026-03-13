@@ -20,7 +20,7 @@ import { useUploadQueue } from "./use-upload-queue";
 export interface SyncEnginePlatformDeps {
 	generateUUID: () => string;
 	onSyncNotify?: () => void;
-	createRealtimeTransport: CreateRealtimeTransport;
+	createNotifyTransport: CreateRealtimeTransport;
 
 	// Adapter/transport factories
 	createSyncAdapter: (userId: string) => SyncAdapter;
@@ -38,10 +38,11 @@ export interface SyncEnginePlatformDeps {
 }
 
 export function useSyncEngineCore(
-	userId: string | undefined,
+	scopeId: string | undefined,
 	isOnline: boolean,
 	deps: SyncEnginePlatformDeps,
 	isForeground = true,
+	notifyKey = scopeId,
 ) {
 	// --- State ---
 	const engineRef = useRef<SyncEngine | null>(null);
@@ -54,9 +55,9 @@ export function useSyncEngineCore(
 
 	// --- Engine Init Effect ---
 	useEffect(() => {
-		if (!userId) return;
+		if (!scopeId) return;
 
-		const adapter = deps.createSyncAdapter(userId);
+		const adapter = deps.createSyncAdapter(scopeId);
 		const transport = deps.createSyncTransport();
 
 		const engine = new SyncEngine(adapter, transport);
@@ -73,11 +74,11 @@ export function useSyncEngineCore(
 			unsubscribeSyncEvents();
 			engineRef.current = null;
 		};
-	}, [userId, deps]);
+	}, [scopeId, deps]);
 
 	// --- Upload Queue ---
 	const { isUploading, uploadEvents, enqueueUpload } = useUploadQueue(
-		userId,
+		scopeId,
 		effectiveOnline,
 		engineRef,
 		deps.generateUUID,
@@ -88,12 +89,12 @@ export function useSyncEngineCore(
 	// --- Storage Health ---
 	const uploadAdapterRef = useRef<UploadAdapter | null>(null);
 	useEffect(() => {
-		if (!userId) return;
+		if (!scopeId) return;
 		uploadAdapterRef.current = deps.createUploadAdapter();
 		return () => {
 			uploadAdapterRef.current = null;
 		};
-	}, [userId, deps]);
+	}, [scopeId, deps]);
 
 	const cleanupDeps = useMemo(
 		() =>
@@ -122,10 +123,10 @@ export function useSyncEngineCore(
 	// --- Sync Triggers ---
 	usePeriodicSync(effectiveOnline, engineRef);
 	useRealtimeTransport(
-		userId,
+		notifyKey,
 		effectiveOnline && isForeground,
 		engineRef,
-		deps.createRealtimeTransport,
+		deps.createNotifyTransport,
 		deps.onSyncNotify,
 	);
 

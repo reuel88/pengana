@@ -13,7 +13,7 @@ export async function handleOrgSync(
 	input: OrgSyncInput,
 	organizationId: string,
 	createdBy: string,
-	notifyOrgMembers?: (orgId: string, excludeUserId: string) => void,
+	notifyOrgMembers?: (orgId: string) => void,
 ) {
 	const conflicts: string[] = [];
 	const now = new Date();
@@ -69,7 +69,7 @@ export async function handleOrgSync(
 	}
 
 	if (input.changes.length > 0) {
-		notifyOrgMembers?.(organizationId, createdBy);
+		notifyOrgMembers?.(organizationId);
 	}
 
 	logger.debug`Org sync completed for org ${organizationId}: ${String(serverChanges.length)} server change(s), ${String(conflicts.length)} conflict(s)`;

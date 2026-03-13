@@ -156,7 +156,7 @@ export function setupWebSocket(server: ServerType) {
 		wsLogger.debug`notifyUser(${redactId(userId)}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
-	async function notifyOrgMembers(orgId: string, excludeUserId: string) {
+	async function notifyOrgMembers(orgId: string) {
 		try {
 			// Dynamic import avoids a circular dependency: db -> auth -> ws -> db
 			const { getSeatedMemberUserIds } = await import(
@@ -164,9 +164,7 @@ export function setupWebSocket(server: ServerType) {
 			);
 			const memberUserIds = await getSeatedMemberUserIds(orgId);
 			for (const uid of memberUserIds) {
-				if (uid !== excludeUserId) {
-					notifyUser(uid);
-				}
+				notifyUser(uid);
 			}
 		} catch (error) {
 			wsLogger.error`notifyOrgMembers failed for org ${redactId(orgId)}: ${error}`;

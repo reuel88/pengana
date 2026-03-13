@@ -2,28 +2,26 @@ import { useNetworkStatus, useSyncEngineCore } from "@pengana/sync-engine";
 import { createDexieOrgSyncAdapter } from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
 
-import { createWebPlatformDeps } from "./platform-deps";
+import { createExtensionPlatformDeps } from "./platform-deps";
 
-const orgPlatformDeps = createWebPlatformDeps(
+const platformDeps = createExtensionPlatformDeps(
 	(organizationId) => createDexieOrgSyncAdapter(organizationId),
 	() => ({
 		sync: async (input) => {
-			// Map from sync engine's Todo shape (userId) to OrgTodo shape (organizationId/createdBy)
 			const orgInput = {
-				changes: input.changes.map((c) => ({
-					...c,
-					organizationId: c.userId,
+				changes: input.changes.map((change) => ({
+					...change,
+					organizationId: change.userId,
 					createdBy: null as string | null,
 				})),
 				lastSyncedAt: input.lastSyncedAt,
 			};
 			const result = (await client.orgTodo.sync(orgInput)).data;
-			// Map back from OrgTodo shape to sync engine's Todo shape
 			return {
 				...result,
-				serverChanges: result.serverChanges.map((s) => ({
-					...s,
-					userId: s.organizationId,
+				serverChanges: result.serverChanges.map((change) => ({
+					...change,
+					userId: change.organizationId,
 				})),
 			};
 		},
@@ -39,7 +37,7 @@ export function useOrgSyncEngine(
 	return useSyncEngineCore(
 		organizationId,
 		isOnline,
-		orgPlatformDeps,
+		platformDeps,
 		true,
 		userId,
 	);

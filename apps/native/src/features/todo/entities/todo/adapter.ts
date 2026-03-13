@@ -7,12 +7,34 @@ import { db } from "./db";
 import { syncMeta, todos } from "./schema";
 
 export function createDrizzleSyncAdapter(userId: string): SyncAdapter {
+	return createScopedDrizzleSyncAdapter({
+		scopeId: userId,
+		lastSyncedAtKey: `lastSyncedAt:${userId}`,
+	});
+}
+
+export function createDrizzleOrgSyncAdapter(
+	organizationId: string,
+): SyncAdapter {
+	return createScopedDrizzleSyncAdapter({
+		scopeId: organizationId,
+		lastSyncedAtKey: `lastSyncedAt:org:${organizationId}`,
+	});
+}
+
+function createScopedDrizzleSyncAdapter({
+	scopeId,
+	lastSyncedAtKey,
+}: {
+	scopeId: string;
+	lastSyncedAtKey: string;
+}): SyncAdapter {
 	return {
 		async getPendingChanges(): Promise<Todo[]> {
 			const rows = await db
 				.select()
 				.from(todos)
-				.where(and(eq(todos.userId, userId), eq(todos.syncStatus, "pending")));
+				.where(and(eq(todos.userId, scopeId), eq(todos.syncStatus, "pending")));
 
 			return rows.map(rowToTodo);
 		},
@@ -73,14 +95,14 @@ export function createDrizzleSyncAdapter(userId: string): SyncAdapter {
 			const [row] = await db
 				.select()
 				.from(syncMeta)
-				.where(eq(syncMeta.key, `lastSyncedAt:${userId}`));
+				.where(eq(syncMeta.key, lastSyncedAtKey));
 			return row?.value ?? null;
 		},
 
 		async setLastSyncedAt(timestamp: string): Promise<void> {
 			await db
 				.insert(syncMeta)
-				.values({ key: `lastSyncedAt:${userId}`, value: timestamp })
+				.values({ key: lastSyncedAtKey, value: timestamp })
 				.onConflictDoUpdate({
 					target: syncMeta.key,
 					set: { value: timestamp },
@@ -103,12 +125,19 @@ function rowToTodo(row: typeof todos.$inferSelect): Todo {
 }
 
 function todoToRow(todo: Todo, syncStatus: string) {
+	const orgTodo = todo as Todo & {
+		organizationId?: string | null;
+		createdBy?: string | null;
+	};
+
 	return {
 		id: todo.id,
 		title: todo.title,
 		completed: todo.completed,
 		updatedAt: todo.updatedAt,
 		userId: todo.userId,
+		organizationId: orgTodo.organizationId ?? null,
+		createdBy: orgTodo.createdBy ?? null,
 		syncStatus: syncStatus as "synced" | "pending" | "conflict",
 		deleted: todo.deleted,
 		attachmentUrl: todo.attachmentUrl ?? null,

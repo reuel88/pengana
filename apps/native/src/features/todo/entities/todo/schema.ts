@@ -6,6 +6,8 @@ export const todos = sqliteTable("todos", {
 	completed: integer("completed", { mode: "boolean" }).notNull().default(false),
 	updatedAt: text("updated_at").notNull(),
 	userId: text("user_id").notNull(),
+	organizationId: text("organization_id"),
+	createdBy: text("created_by"),
 	syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
 		.notNull()
 		.default("pending"),

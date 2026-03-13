@@ -6,6 +6,7 @@ import { TodoPage } from "@/widgets/todo-page";
 export default function TodosScreen() {
 	const { data: session, isPending } = authClient.useSession();
 	const userId = session?.user?.id;
+	const organizationId = session?.session?.activeOrganizationId ?? undefined;
 
 	if (isPending) {
 		return null;
@@ -17,7 +18,7 @@ export default function TodosScreen() {
 
 	return (
 		<Container>
-			<TodoPage userId={userId} />
+			<TodoPage userId={userId} organizationId={organizationId} />
 		</Container>
 	);
 }

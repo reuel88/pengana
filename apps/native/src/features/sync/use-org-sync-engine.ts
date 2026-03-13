@@ -13,7 +13,7 @@ import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/features/sync/entities/upload-queue";
-import { createSyncAdapter } from "@/features/todo/entities/todo";
+import { createDrizzleOrgSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 import { getServerUrl } from "@/shared/lib/server-url";
@@ -57,7 +57,7 @@ function getWsUrl() {
 }
 
 function createRealtimeTransport(
-	_userId: string,
+	_organizationId: string,
 	callbacks: { onNotify: () => void; onOpen?: () => void },
 ) {
 	return createWebSocketRealtimeTransport({
@@ -90,9 +90,27 @@ function useAppIsForeground() {
 const platformDeps: SyncEnginePlatformDeps = {
 	generateUUID: randomUUID,
 	createNotifyTransport: createRealtimeTransport,
-	createSyncAdapter: (userId) => createSyncAdapter(userId),
+	createSyncAdapter: (organizationId) =>
+		createDrizzleOrgSyncAdapter(organizationId),
 	createSyncTransport: () => ({
-		sync: async (input) => (await client.todo.sync(input)).data,
+		sync: async (input) => {
+			const orgInput = {
+				changes: input.changes.map((change) => ({
+					...change,
+					organizationId: change.userId,
+					createdBy: null as string | null,
+				})),
+				lastSyncedAt: input.lastSyncedAt,
+			};
+			const result = (await client.orgTodo.sync(orgInput)).data;
+			return {
+				...result,
+				serverChanges: result.serverChanges.map((change) => ({
+					...change,
+					userId: change.organizationId,
+				})),
+			};
+		},
 	}),
 	createUploadAdapter,
 	createUploadTransport,
@@ -105,9 +123,18 @@ const platformDeps: SyncEnginePlatformDeps = {
 	storageHealth: createNativeStorageHealthProvider(),
 };
 
-export function useSyncEngine(userId: string | undefined) {
+export function useOrgSyncEngine(
+	organizationId: string | undefined,
+	userId: string | undefined,
+) {
 	const { isOnline } = useNetworkStatus();
 	const isForeground = useAppIsForeground();
 
-	return useSyncEngineCore(userId, isOnline, platformDeps, isForeground);
+	return useSyncEngineCore(
+		organizationId,
+		isOnline,
+		platformDeps,
+		isForeground,
+		userId,
+	);
 }

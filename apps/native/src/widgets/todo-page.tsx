@@ -1,17 +1,31 @@
 import { useTranslation } from "@pengana/i18n";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { OrgSyncProvider } from "@/features/sync/org-sync-context";
 import { SyncProvider } from "@/features/sync/sync-context";
 import { db } from "@/features/todo/entities/todo";
 import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 import migrations from "../../drizzle/migrations";
-import { TodoContent } from "./todo-content";
+import {
+	OrganizationTodoContent,
+	PersonalTodoContent,
+	TodoShell,
+	type TodoTab,
+} from "./todo-content";
 
-export function TodoPage({ userId }: { userId: string }) {
+export function TodoPage({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
 	const { success, error } = useMigrations(db, migrations);
 	const { theme } = useTheme();
 	const { t } = useTranslation("errors");
+	const [activeTab, setActiveTab] = useState<TodoTab>("personal");
 
 	if (error) {
 		return (
@@ -34,9 +48,38 @@ export function TodoPage({ userId }: { userId: string }) {
 	}
 
 	return (
-		<SyncProvider userId={userId}>
-			<TodoContent userId={userId} />
-		</SyncProvider>
+		<View style={styles.page}>
+			<TodoShell
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				showTabs={Boolean(organizationId)}
+			/>
+			<SyncProvider userId={userId}>
+				<View
+					style={
+						activeTab !== "personal" && organizationId
+							? styles.hiddenPanel
+							: undefined
+					}
+				>
+					<PersonalTodoContent userId={userId} />
+				</View>
+			</SyncProvider>
+			{organizationId ? (
+				<OrgSyncProvider organizationId={organizationId} userId={userId}>
+					<View
+						style={
+							activeTab !== "organization" ? styles.hiddenPanel : undefined
+						}
+					>
+						<OrganizationTodoContent
+							organizationId={organizationId}
+							userId={userId}
+						/>
+					</View>
+				</OrgSyncProvider>
+			) : null}
+		</View>
 	);
 }
 
@@ -45,5 +88,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	page: {
+		flex: 1,
+	},
+	hiddenPanel: {
+		display: "none",
 	},
 });

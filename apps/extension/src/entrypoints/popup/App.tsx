@@ -83,7 +83,12 @@ function App() {
 		);
 	}
 
-	return <TodoPage userId={session.user.id} />;
+	return (
+		<TodoPage
+			userId={session.user.id}
+			organizationId={session.session.activeOrganizationId ?? undefined}
+		/>
+	);
 }
 
 export default App;

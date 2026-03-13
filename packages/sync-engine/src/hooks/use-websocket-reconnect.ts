@@ -6,16 +6,16 @@ import { createWebSocketRealtimeTransport } from "../realtime/websocket-realtime
 import { useRealtimeTransport } from "./use-realtime-transport";
 
 export function useWebSocketReconnect(
-	userId: string | undefined,
+	notifyKey: string | undefined,
 	isOnline: boolean,
 	engineRef: RefObject<SyncEngine | null>,
 	getWsUrl: () => string | Promise<string>,
 	onSyncNotify?: () => void,
 ) {
-	const createRealtimeTransport = useMemo(
+	const createNotifyTransport = useMemo(
 		() =>
 			(
-				_userId: string,
+				_notifyKey: string,
 				callbacks: { onNotify: () => void; onOpen?: () => void },
 			) =>
 				createWebSocketRealtimeTransport({
@@ -43,10 +43,10 @@ export function useWebSocketReconnect(
 	);
 
 	useRealtimeTransport(
-		userId,
+		notifyKey,
 		isOnline,
 		engineRef,
-		createRealtimeTransport,
+		createNotifyTransport,
 		onSyncNotify,
 	);
 }

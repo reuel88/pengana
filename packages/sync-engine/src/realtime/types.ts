@@ -12,6 +12,8 @@ export interface RealtimeTransportCallbacks {
 	onOpen?: () => void;
 }
 
+export type NotifyTransportCallbacks = RealtimeTransportCallbacks;
+
 export interface RealtimeTransport {
 	start(): void;
 	stop(): void;
@@ -19,7 +21,9 @@ export interface RealtimeTransport {
 	subscribe(listener: (status: RealtimeTransportStatus) => void): () => void;
 }
 
-export type CreateRealtimeTransport = (
-	userId: string,
-	callbacks: RealtimeTransportCallbacks,
+export type CreateNotifyTransport = (
+	notifyKey: string,
+	callbacks: NotifyTransportCallbacks,
 ) => RealtimeTransport;
+
+export type CreateRealtimeTransport = CreateNotifyTransport;

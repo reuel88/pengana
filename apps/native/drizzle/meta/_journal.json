@@ -15,6 +15,13 @@
 			"when": 1772617936150,
 			"tag": "0001_add_upload_queue",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "6",
+			"when": 1773400000000,
+			"tag": "0002_add_org_todos",
+			"breakpoints": true
 		}
 	]
 }

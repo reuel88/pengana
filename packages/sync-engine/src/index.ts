@@ -41,8 +41,14 @@ export { useStorageHealth } from "./hooks/use-storage-health";
 export type { SyncEnginePlatformDeps } from "./hooks/use-sync-engine-core";
 export { useSyncEngineCore } from "./hooks/use-sync-engine-core";
 export { useWebSocketReconnect } from "./hooks/use-websocket-reconnect";
+export {
+	resetSharedNotifyChannels,
+	subscribeToSharedNotifyChannel,
+} from "./realtime/shared-notify-manager";
 export type {
+	CreateNotifyTransport,
 	CreateRealtimeTransport,
+	NotifyTransportCallbacks,
 	RealtimeMessageKind,
 	RealtimeTransport,
 	RealtimeTransportCallbacks,
