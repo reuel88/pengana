@@ -16,15 +16,24 @@ export function AttachmentIndicator({
 
 	if (attachmentUrl && (!status || status === "uploaded")) {
 		return (
-			<Text style={styles.attachmentIcon}>{t("attachment.attached")}</Text>
+			<Text style={styles.attachmentIcon} accessible>
+				{t("attachment.attached")}
+			</Text>
 		);
 	}
 	if (status === "queued" || status === "uploading") {
-		return <ActivityIndicator size="small" />;
+		return (
+			<ActivityIndicator
+				size="small"
+				accessibilityLabel={t("attachment.uploading")}
+			/>
+		);
 	}
 	if (status === "failed") {
 		return (
-			<Text style={styles.attachmentFailed}>{t("attachment.failed")}</Text>
+			<Text style={styles.attachmentFailed} accessible>
+				{t("attachment.failed")}
+			</Text>
 		);
 	}
 	return null;

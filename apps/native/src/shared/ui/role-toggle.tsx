@@ -33,6 +33,9 @@ export function RoleToggle({
 				]}
 				onPress={() => onChange("member")}
 				disabled={disabled}
+				accessibilityRole="radio"
+				accessibilityState={{ disabled, selected: role === "member" }}
+				accessibilityLabel={t("roles.member")}
 			>
 				<Text style={{ color: theme.text }}>{t("roles.member")}</Text>
 			</TouchableOpacity>
@@ -48,6 +51,9 @@ export function RoleToggle({
 				]}
 				onPress={() => onChange("admin")}
 				disabled={disabled}
+				accessibilityRole="radio"
+				accessibilityState={{ disabled, selected: role === "admin" }}
+				accessibilityLabel={t("roles.admin")}
 			>
 				<Text style={{ color: theme.text }}>{t("roles.admin")}</Text>
 			</TouchableOpacity>

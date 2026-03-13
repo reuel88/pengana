@@ -98,6 +98,7 @@
 		"deleteSuccess": "팀이 삭제되었습니다",
 		"addMemberSuccess": "팀에 멤버가 추가되었습니다",
 		"removeMemberSuccess": "팀에서 멤버가 제거되었습니다",
+		"removeMemberHint": "이 사용자를 팀에서 제거합니다",
 		"error": "팀 관리에 실패했습니다",
 		"noTeams": "아직 팀이 없습니다",
 		"noMembers": "팀 멤버가 없습니다",

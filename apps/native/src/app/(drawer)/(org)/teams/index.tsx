@@ -69,6 +69,7 @@ export default function TeamsIndexScreen() {
 								style={{ flex: 1 }}
 								value={teamName}
 								onChangeText={setTeamName}
+								label={t("teams.namePlaceholder")}
 								placeholder={t("teams.namePlaceholder")}
 							/>
 							<TouchableOpacity

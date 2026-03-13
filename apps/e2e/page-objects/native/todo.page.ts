@@ -21,7 +21,7 @@ export class NativeTodoPage extends BaseTodoPage {
 	}
 
 	async toggleTodo(title: string) {
-		await this.todoRow(title).getByRole("switch").click();
+		await this.todoRow(title).getByTestId("todo-toggle").click();
 	}
 
 	completedTodoLocator(title: string) {

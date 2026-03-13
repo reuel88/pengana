@@ -98,6 +98,7 @@
 		"deleteSuccess": "团队已删除",
 		"addMemberSuccess": "成员已添加到团队",
 		"removeMemberSuccess": "成员已从团队移除",
+		"removeMemberHint": "将此用户从团队中移除",
 		"error": "管理团队失败",
 		"noTeams": "暂无团队",
 		"noMembers": "暂无团队成员",

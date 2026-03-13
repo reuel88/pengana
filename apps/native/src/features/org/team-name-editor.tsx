@@ -1,10 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@pengana/i18n";
-import {
-	teamNameSchema,
-	useTeamNameEditor,
-	useZodForm,
-} from "@pengana/org-client";
+import { makeTeamNameSchema } from "@pengana/i18n/zod";
+import { useTeamNameEditor, useZodForm } from "@pengana/org-client";
 import { useState } from "react";
 import {
 	Alert,
@@ -29,8 +26,34 @@ export function TeamNameEditor({
 	orgId: string;
 	isAdmin: boolean;
 }) {
+	const { i18n, t } = useTranslation("organization");
+
+	return (
+		<TeamNameEditorContent
+			key={i18n.language}
+			teamId={teamId}
+			teamName={teamName}
+			orgId={orgId}
+			isAdmin={isAdmin}
+			t={t}
+		/>
+	);
+}
+
+function TeamNameEditorContent({
+	teamId,
+	teamName,
+	orgId,
+	isAdmin,
+	t,
+}: {
+	teamId: string;
+	teamName: string;
+	orgId: string;
+	isAdmin: boolean;
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+}) {
 	const { theme } = useTheme();
-	const { t } = useTranslation("organization");
 	const [editing, setEditing] = useState(false);
 
 	const { handleSave, loading } = useTeamNameEditor({
@@ -42,7 +65,7 @@ export function TeamNameEditor({
 	});
 
 	const form = useZodForm({
-		schema: teamNameSchema,
+		schema: makeTeamNameSchema(t),
 		defaultValues: { name: teamName },
 		onSubmit: async ({ value }) => {
 			await handleSave(teamId, orgId, value.name);
@@ -59,6 +82,7 @@ export function TeamNameEditor({
 							value={field.state.value}
 							onChangeText={field.handleChange}
 							onBlur={field.handleBlur}
+							error={field.state.meta.errors[0]?.message}
 						/>
 					)}
 				</form.Field>

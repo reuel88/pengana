@@ -1,20 +1,26 @@
 import { useTranslation } from "@pengana/i18n";
+import { makeNativeInviteSchema } from "@pengana/i18n/zod";
 import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { z } from "zod";
 import { useTheme } from "@/shared/lib/theme";
 import { sharedStyles } from "@/shared/styles/shared";
 import { RoleToggle } from "@/shared/ui/role-toggle";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
-const inviteSchema = z.object({
-	email: z.string().email(),
-	role: z.enum(["member", "admin"]),
-});
-
 export function InviteForm({ orgId }: { orgId: string }) {
+	const { i18n, t } = useTranslation("organization");
+
+	return <InviteFormContent key={i18n.language} orgId={orgId} t={t} />;
+}
+
+function InviteFormContent({
+	orgId,
+	t,
+}: {
+	orgId: string;
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+}) {
 	const { theme } = useTheme();
-	const { t } = useTranslation("organization");
 
 	const { inviteMember, loading } = useInviteMember({
 		onSuccess: () => Alert.alert("", t("invitations.sendSuccess")),
@@ -22,7 +28,7 @@ export function InviteForm({ orgId }: { orgId: string }) {
 	});
 
 	const form = useZodForm({
-		schema: inviteSchema,
+		schema: makeNativeInviteSchema(t),
 		defaultValues: { email: "", role: "member" as "member" | "admin" },
 		onSubmit: async ({ value }) => {
 			await inviteMember({ ...value, organizationId: orgId });
@@ -41,6 +47,7 @@ export function InviteForm({ orgId }: { orgId: string }) {
 						placeholder={t("invitations.emailPlaceholder")}
 						keyboardType="email-address"
 						autoCapitalize="none"
+						error={field.state.meta.errors[0]?.message}
 					/>
 				)}
 			</form.Field>

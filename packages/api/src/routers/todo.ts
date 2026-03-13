@@ -1,4 +1,3 @@
-import { isMemberSeatedByUserId } from "@pengana/db/seat-queries";
 import { updateTodoForUser } from "@pengana/db/todo-queries";
 import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
@@ -18,13 +17,7 @@ export const todoRouter = {
 		.output(envelopeOutput(syncOutputSchema))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
-			const orgId = context.session.session.activeOrganizationId;
-			const isSeated = orgId
-				? await isMemberSeatedByUserId(orgId, userId)
-				: false;
-			return envelope(
-				await handleSync(input, userId, context.notifyUser, isSeated),
-			);
+			return envelope(await handleSync(input, userId, context.notifyUser));
 		}),
 
 	forceConflict: seatedProcedure

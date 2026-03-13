@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { makeNativeInviteMembersSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
 import {
 	ActivityIndicator,
@@ -8,7 +9,6 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { z } from "zod";
 import { useBatchInvite } from "@/shared/hooks/use-batch-invite";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
@@ -18,15 +18,6 @@ import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 import { onboardingStyles } from "./onboarding-styles";
 
-const inviteMembersSchema = z.object({
-	members: z.array(
-		z.object({
-			email: z.union([z.string().trim().email(), z.literal("")]),
-			role: z.enum(["member", "admin"]),
-		}),
-	),
-});
-
 export function OnboardingInviteMembers({
 	onInvited,
 	onSkip,
@@ -34,7 +25,27 @@ export function OnboardingInviteMembers({
 	onInvited: () => void;
 	onSkip: () => void;
 }) {
-	const { t } = useTranslation("onboarding");
+	const { i18n, t } = useTranslation("onboarding");
+
+	return (
+		<OnboardingInviteMembersContent
+			key={i18n.language}
+			onInvited={onInvited}
+			onSkip={onSkip}
+			t={t}
+		/>
+	);
+}
+
+function OnboardingInviteMembersContent({
+	onInvited,
+	onSkip,
+	t,
+}: {
+	onInvited: () => void;
+	onSkip: () => void;
+	t: ReturnType<typeof useTranslation<"onboarding">>["t"];
+}) {
 	const { theme } = useTheme();
 	const { data: activeOrg } = useActiveOrg();
 
@@ -45,7 +56,7 @@ export function OnboardingInviteMembers({
 	});
 
 	const form = useZodForm({
-		schema: inviteMembersSchema,
+		schema: makeNativeInviteMembersSchema(t),
 		defaultValues: {
 			members: [{ email: "", role: "member" as "member" | "admin" }],
 		},
@@ -83,31 +94,21 @@ export function OnboardingInviteMembers({
 							<View key={index} style={styles.entryRow}>
 								<form.Field name={`members[${index}].email`}>
 									{(emailField) => (
-										<>
-											<ThemedTextInput
-												testID={`invite-email-input-${index}`}
-												style={{
-													backgroundColor: theme.background,
-													marginBottom: 8,
-												}}
-												value={emailField.state.value as string}
-												onChangeText={emailField.handleChange}
-												placeholder={t("invite.emailPlaceholder")}
-												keyboardType="email-address"
-												autoCapitalize="none"
-											/>
-											{emailField.state.meta.errors.length > 0 && (
-												<Text
-													style={{
-														color: theme.notification,
-														fontSize: 12,
-														marginTop: 4,
-													}}
-												>
-													{emailField.state.meta.errors[0]?.message}
-												</Text>
-											)}
-										</>
+										<ThemedTextInput
+											testID={`invite-email-input-${index}`}
+											style={{
+												backgroundColor: theme.background,
+												marginBottom: 8,
+											}}
+											value={emailField.state.value as string}
+											onChangeText={emailField.handleChange}
+											onBlur={emailField.handleBlur}
+											label={t("invite.emailPlaceholder")}
+											placeholder={t("invite.emailPlaceholder")}
+											keyboardType="email-address"
+											autoCapitalize="none"
+											error={emailField.state.meta.errors[0]?.message}
+										/>
 									)}
 								</form.Field>
 								<form.Field name={`members[${index}].role`}>

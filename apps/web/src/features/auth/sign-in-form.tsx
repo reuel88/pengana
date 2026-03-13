@@ -4,6 +4,7 @@ import { useZodForm } from "@pengana/org-client";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useInvalidateOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
 import { AuthFormShell } from "./auth-form-shell";
@@ -12,6 +13,7 @@ export function SignInForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const [error, setError] = useState<string | null>(null);
+	const { invalidateAll } = useInvalidateOrg();
 
 	const form = useZodForm({
 		schema: makeSignInSchema(t),
@@ -27,11 +29,12 @@ export function SignInForm() {
 					password: value.password,
 				},
 				{
-					onSuccess: () => {
+					onSuccess: async () => {
+						await invalidateAll();
+						toast.success(t("auth:signIn.success"));
 						navigate({
 							to: "/",
 						});
-						toast.success(t("auth:signIn.success"));
 					},
 					onError: () => {
 						setError(t("errors:failedToSignIn"));

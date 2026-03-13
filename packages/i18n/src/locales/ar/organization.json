@@ -98,6 +98,7 @@
 		"deleteSuccess": "تم حذف الفريق",
 		"addMemberSuccess": "تمت إضافة العضو إلى الفريق",
 		"removeMemberSuccess": "تمت إزالة العضو من الفريق",
+		"removeMemberHint": "يزيل هذا المستخدم من الفريق",
 		"error": "فشل في إدارة الفريق",
 		"noTeams": "لا توجد فرق بعد",
 		"noMembers": "لا يوجد أعضاء في الفريق",

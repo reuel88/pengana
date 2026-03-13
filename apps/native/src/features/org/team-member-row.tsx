@@ -33,7 +33,7 @@ export function TeamMemberRow({
 					accessible
 					accessibilityRole="button"
 					accessibilityLabel={t("teams.removeMember")}
-					accessibilityHint="Removes this user from the team"
+					accessibilityHint={t("teams.removeMemberHint")}
 					onPress={onRemove}
 					style={[styles.removeButton, { backgroundColor: theme.notification }]}
 				>

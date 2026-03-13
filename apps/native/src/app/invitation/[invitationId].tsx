@@ -56,6 +56,8 @@ export default function InvitationScreen() {
 					<TouchableOpacity
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => refetch()}
+						accessibilityRole="button"
+						accessibilityLabel={t("invitations.retry")}
 					>
 						<Text style={sharedStyles.buttonText}>
 							{t("invitations.retry")}
@@ -111,6 +113,9 @@ export default function InvitationScreen() {
 									handleAccept(invitation.id, invitation.organizationId)
 								}
 								disabled={acting}
+								accessibilityRole="button"
+								accessibilityLabel={t("invitations.accept")}
+								accessibilityState={{ disabled: acting, busy: acting }}
 							>
 								<Text style={sharedStyles.buttonText}>
 									{t("invitations.accept")}
@@ -120,6 +125,9 @@ export default function InvitationScreen() {
 								style={[styles.rejectButton, { borderColor: theme.border }]}
 								onPress={() => handleReject(invitation.id)}
 								disabled={acting}
+								accessibilityRole="button"
+								accessibilityLabel={t("invitations.reject")}
+								accessibilityState={{ disabled: acting, busy: acting }}
 							>
 								<Text style={{ color: theme.text }}>
 									{t("invitations.reject")}

@@ -1,9 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	addMemberSchema,
-	useTeamMemberAdd,
-	useZodForm,
-} from "@pengana/org-client";
+import { makeAddMemberSchema } from "@pengana/i18n/zod";
+import { useTeamMemberAdd, useZodForm } from "@pengana/org-client";
 import {
 	ActivityIndicator,
 	Alert,
@@ -23,8 +20,28 @@ export function TeamMemberAddForm({
 	teamId: string;
 	members: Array<{ userId: string; user: { email: string } }> | undefined;
 }) {
+	const { i18n, t } = useTranslation("organization");
+
+	return (
+		<TeamMemberAddFormContent
+			key={i18n.language}
+			teamId={teamId}
+			members={members}
+			t={t}
+		/>
+	);
+}
+
+function TeamMemberAddFormContent({
+	teamId,
+	members,
+	t,
+}: {
+	teamId: string;
+	members: Array<{ userId: string; user: { email: string } }> | undefined;
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+}) {
 	const { theme } = useTheme();
-	const { t } = useTranslation("organization");
 
 	const { handleAdd, loading } = useTeamMemberAdd({
 		onSuccess: () => Alert.alert("", t("teams.addMemberSuccess")),
@@ -33,7 +50,7 @@ export function TeamMemberAddForm({
 	});
 
 	const form = useZodForm({
-		schema: addMemberSchema,
+		schema: makeAddMemberSchema(t),
 		defaultValues: { email: "" },
 		onSubmit: async ({ value }) => {
 			const success = await handleAdd(teamId, members ?? [], value.email);
@@ -53,6 +70,7 @@ export function TeamMemberAddForm({
 						placeholder={t("invitations.emailPlaceholder")}
 						keyboardType="email-address"
 						autoCapitalize="none"
+						error={field.state.meta.errors[0]?.message}
 					/>
 				)}
 			</form.Field>

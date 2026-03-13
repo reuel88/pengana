@@ -41,7 +41,13 @@ function CreateOrgModal({
 				loading={loading}
 				submitLabel={t("create.submit")}
 			>
-				<TouchableOpacity onPress={onBack} disabled={loading}>
+				<TouchableOpacity
+					onPress={onBack}
+					disabled={loading}
+					accessibilityRole="button"
+					accessibilityLabel={t("switcher.back")}
+					accessibilityState={{ disabled: loading }}
+				>
 					<Text style={[styles.linkText, { color: theme.primary }]}>
 						{t("switcher.back")}
 					</Text>
@@ -89,6 +95,9 @@ export function OrgSwitcher() {
 			<TouchableOpacity
 				style={[styles.trigger, { borderColor: theme.border }]}
 				onPress={() => setModal("picker")}
+				accessibilityRole="button"
+				accessibilityLabel={t("switcher.label")}
+				accessibilityState={{ expanded: modal !== "closed" }}
 			>
 				<Text style={[styles.triggerText, { color: theme.text }]}>
 					{activeOrg?.name || t("switcher.label")}
@@ -100,6 +109,7 @@ export function OrgSwitcher() {
 				transparent
 				animationType="slide"
 				onRequestClose={handleClose}
+				accessibilityViewIsModal
 			>
 				<View style={styles.modalOverlay}>
 					<View
@@ -133,6 +143,11 @@ export function OrgSwitcher() {
 												},
 											]}
 											onPress={() => handleSwitch(org.id)}
+											accessibilityRole="button"
+											accessibilityLabel={org.name}
+											accessibilityState={{
+												selected: activeOrg?.id === org.id,
+											}}
 										>
 											<Text style={{ color: theme.text }}>{org.name}</Text>
 										</TouchableOpacity>
@@ -145,6 +160,8 @@ export function OrgSwitcher() {
 								<TouchableOpacity
 									style={[styles.orgItem, { borderColor: theme.border }]}
 									onPress={() => setModal("create")}
+									accessibilityRole="button"
+									accessibilityLabel={t("switcher.create")}
 								>
 									<Text style={{ color: theme.primary }}>
 										+ {t("switcher.create")}
@@ -157,6 +174,11 @@ export function OrgSwitcher() {
 							style={styles.closeButton}
 							disabled={switchingId !== null || modal === "create"}
 							onPress={handleClose}
+							accessibilityRole="button"
+							accessibilityLabel={t("switcher.close")}
+							accessibilityState={{
+								disabled: switchingId !== null || modal === "create",
+							}}
 						>
 							<Text style={{ color: theme.text }}>{t("switcher.close")}</Text>
 						</TouchableOpacity>

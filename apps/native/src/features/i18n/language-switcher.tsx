@@ -72,19 +72,30 @@ export function LanguageSwitcher() {
 
 	return (
 		<>
-			<Pressable onPress={() => setVisible(true)} style={styles.trigger}>
-				<Ionicons name="globe-outline" size={24} color={theme.text} />
-			</Pressable>
+			<View style={{ paddingHorizontal: 12 }}>
+				<Pressable
+					onPress={() => setVisible(true)}
+					style={styles.trigger}
+					accessibilityRole="button"
+					accessibilityLabel="Change language"
+					accessibilityHint="Opens the language picker"
+					accessibilityState={{ expanded: visible }}
+				>
+					<Ionicons name="globe-outline" size={24} color={theme.text} />
+				</Pressable>
+			</View>
 			<Modal
 				visible={visible}
 				transparent
 				animationType="fade"
 				onRequestClose={() => setVisible(false)}
+				accessibilityViewIsModal
 			>
 				<Pressable style={styles.overlay} onPress={() => setVisible(false)}>
 					<View
 						style={[styles.modal, { backgroundColor: theme.background }]}
 						onStartShouldSetResponder={() => true}
+						accessibilityRole="menu"
 					>
 						<FlatList
 							data={SUPPORTED_LOCALES as unknown as SupportedLocale[]}
@@ -93,6 +104,9 @@ export function LanguageSwitcher() {
 								<Pressable
 									onPress={() => handleSelect(item)}
 									style={[styles.item, { borderBottomColor: theme.border }]}
+									accessibilityRole="menuitem"
+									accessibilityLabel={LOCALE_LABELS[item]}
+									accessibilityState={{ selected: item === currentLocale }}
 								>
 									<Text style={[styles.label, { color: theme.text }]}>
 										{LOCALE_LABELS[item]}
@@ -115,10 +129,7 @@ export function LanguageSwitcher() {
 }
 
 const styles = StyleSheet.create({
-	trigger: {
-		marginRight: 12,
-		padding: 4,
-	},
+	trigger: {},
 	overlay: {
 		flex: 1,
 		backgroundColor: "rgba(0,0,0,0.4)",

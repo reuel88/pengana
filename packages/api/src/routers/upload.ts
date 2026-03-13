@@ -1,6 +1,10 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { findOrgTodoById } from "@pengana/db/org-todo-queries";
+import {
+	autoSeatOwner,
+	isMemberSeatedByUserId,
+} from "@pengana/db/seat-queries";
 import { findTodoById } from "@pengana/db/todo-queries";
 import {
 	ALLOWED_MIME_TYPES,
@@ -10,12 +14,12 @@ import {
 import { z } from "zod";
 
 import { apiError } from "../errors";
-import { envelope, envelopeOutput, seatedProcedure } from "../index";
+import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
 
 export const uploadRouter = {
-	upload: seatedProcedure
+	upload: protectedProcedure
 		.route({
 			method: "POST",
 			path: "/upload",
@@ -33,6 +37,7 @@ export const uploadRouter = {
 		.output(envelopeOutput(z.object({ attachmentUrl: z.string() })))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
+			const activeOrgId = context.session.session.activeOrganizationId;
 
 			const todo = await findTodoById(input.todoId);
 			if (todo && todo.userId !== userId) {
@@ -41,12 +46,24 @@ export const uploadRouter = {
 
 			if (!todo) {
 				const orgTodo = await findOrgTodoById(input.todoId);
-				if (
-					!orgTodo ||
-					orgTodo.organizationId !==
-						context.session.session.activeOrganizationId
-				) {
+				if (!orgTodo || orgTodo.organizationId !== activeOrgId) {
 					throw apiError("NOT_FOUND", context.t("todoNotFound"));
+				}
+
+				if (!activeOrgId) {
+					throw apiError("BAD_REQUEST", "No active organization");
+				}
+
+				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
+				if (!seated) {
+					seated = await autoSeatOwner(activeOrgId, userId);
+				}
+
+				if (!seated) {
+					throw apiError(
+						"FORBIDDEN",
+						"A seat is required for write operations. Contact your organization owner.",
+					);
 				}
 			}
 

@@ -12,6 +12,12 @@ import {
 } from "@/shared/ui/auth-form";
 
 function SignUp() {
+	const { i18n } = useTranslation();
+
+	return <SignUpForm key={i18n.language} />;
+}
+
+function SignUpForm() {
 	const { t } = useTranslation();
 	const showCheckEmail = () => {
 		Alert.alert(t("auth:signUp.checkEmail"));
@@ -54,6 +60,7 @@ function SignUp() {
 						{(field) => (
 							<AuthFormField
 								testID="auth-name-input"
+								label={t("auth:fields.name")}
 								placeholder={t("auth:fields.name")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -66,6 +73,7 @@ function SignUp() {
 						{(field) => (
 							<AuthFormField
 								testID="auth-email-input"
+								label={t("auth:fields.email")}
 								placeholder={t("auth:fields.email")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
@@ -80,6 +88,7 @@ function SignUp() {
 						{(field) => (
 							<AuthFormField
 								testID="auth-password-input"
+								label={t("auth:fields.password")}
 								placeholder={t("auth:fields.password")}
 								value={field.state.value}
 								onBlur={field.handleBlur}

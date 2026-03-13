@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import { createOrgSchema, useZodForm } from "@pengana/org-client";
+import { makeCreateOrgSchema } from "@pengana/i18n/zod";
+import { useZodForm } from "@pengana/org-client";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
@@ -38,11 +39,40 @@ export function OrgForm({
 	children,
 	testIDs,
 }: OrgFormProps) {
+	const { i18n, t } = useTranslation("organization");
+
+	return (
+		<OrgFormContent
+			key={i18n.language}
+			defaultValues={defaultValues}
+			onSubmit={onSubmit}
+			loading={loading}
+			submitLabel={submitLabel}
+			inputStyle={inputStyle}
+			testIDs={testIDs}
+			t={t}
+		>
+			{children}
+		</OrgFormContent>
+	);
+}
+
+function OrgFormContent({
+	defaultValues,
+	onSubmit,
+	loading,
+	submitLabel,
+	inputStyle,
+	children,
+	testIDs,
+	t,
+}: OrgFormProps & {
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+}) {
 	const { theme } = useTheme();
-	const { t } = useTranslation("organization");
 
 	const form = useZodForm({
-		schema: createOrgSchema,
+		schema: makeCreateOrgSchema(t),
 		defaultValues: {
 			name: defaultValues?.name ?? "",
 			slug: defaultValues?.slug ?? "",
@@ -74,7 +104,9 @@ export function OrgForm({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
+						label={t("create.namePlaceholder")}
 						placeholder={t("create.namePlaceholder")}
+						error={field.state.meta.errors[0]?.message}
 					/>
 				)}
 			</form.Field>
@@ -86,7 +118,9 @@ export function OrgForm({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
+						label={t("create.slugPlaceholder")}
 						placeholder={t("create.slugPlaceholder")}
+						error={field.state.meta.errors[0]?.message}
 					/>
 				)}
 			</form.Field>
@@ -98,7 +132,9 @@ export function OrgForm({
 						value={field.state.value}
 						onChangeText={field.handleChange}
 						onBlur={field.handleBlur}
+						label={t("create.logoPlaceholder")}
 						placeholder={t("create.logoPlaceholder")}
+						error={field.state.meta.errors[0]?.message}
 					/>
 				)}
 			</form.Field>

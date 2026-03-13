@@ -9,7 +9,12 @@ export function AttachButton({ onPress }: { onPress: () => void }) {
 	const { t } = useTranslation("todos");
 
 	return (
-		<TouchableOpacity onPress={onPress} style={styles.attachButton}>
+		<TouchableOpacity
+			onPress={onPress}
+			style={styles.attachButton}
+			accessibilityRole="button"
+			accessibilityLabel={t("actions.attach")}
+		>
 			<Text style={[styles.attachText, { color: theme.primary }]}>
 				{t("actions.attach")}
 			</Text>
@@ -21,7 +26,12 @@ export function RetryButton({ onPress }: { onPress: () => void }) {
 	const { t } = useTranslation("todos");
 
 	return (
-		<TouchableOpacity onPress={onPress} style={styles.attachButton}>
+		<TouchableOpacity
+			onPress={onPress}
+			style={styles.attachButton}
+			accessibilityRole="button"
+			accessibilityLabel={t("actions.retry")}
+		>
 			<Text style={styles.retryText}>{t("actions.retry")}</Text>
 		</TouchableOpacity>
 	);

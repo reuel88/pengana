@@ -98,6 +98,7 @@
 		"deleteSuccess": "Nabura ang koponan",
 		"addMemberSuccess": "Naidagdag ang miyembro sa koponan",
 		"removeMemberSuccess": "Naalis ang miyembro sa koponan",
+		"removeMemberHint": "Inaalis ang user na ito mula sa koponan",
 		"error": "Nabigong pamahalaan ang koponan",
 		"noTeams": "Wala pang mga koponan",
 		"noMembers": "Walang mga miyembro sa koponan",

@@ -10,7 +10,10 @@ import {
 
 export interface FileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
-	createFileRef: (id: string, file: File) => string;
+	createFileRef: (
+		id: string,
+		file: File,
+	) => { uri: string; revoke?: () => void };
 }
 
 export interface TodoActions {
@@ -110,14 +113,17 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 
 	const handleFileSelected = useCallback(
 		async (id: string, file: File) => {
+			let fileRef: ReturnType<typeof createFileRef> | null = null;
 			try {
 				clearError(id);
 				await storeFile(id, file);
-				const fileRef = createFileRef(id, file);
-				await actions.attachFile(id, fileRef);
-				enqueueUpload(id, fileRef, file.type);
+				fileRef = createFileRef(id, file);
+				await actions.attachFile(id, fileRef.uri);
+				enqueueUpload(id, fileRef.uri, file.type);
+				fileRef = null;
 				triggerSync();
 			} catch (e) {
+				fileRef?.revoke?.();
 				onError(
 					id,
 					isQuotaError(e)
