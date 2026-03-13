@@ -1,11 +1,15 @@
-import { todoDb } from "../lib/db";
+import { createDexieActions, type EntityDatabase } from "@pengana/entity-store";
+
+import type { WebOrgTodo } from "./db";
 
 export async function addOrgTodo(
+	db: EntityDatabase,
 	organizationId: string,
 	userId: string,
 	title: string,
 ): Promise<void> {
-	await todoDb.orgTodos.add({
+	const actions = createDexieActions<WebOrgTodo>(db, "orgTodos");
+	await actions.add({
 		id: crypto.randomUUID(),
 		title,
 		completed: false,
@@ -21,47 +25,41 @@ export async function addOrgTodo(
 	});
 }
 
-export async function toggleOrgTodo(id: string): Promise<void> {
-	const todo = await todoDb.orgTodos.get(id);
+export async function toggleOrgTodo(
+	db: EntityDatabase,
+	id: string,
+): Promise<void> {
+	const todo = await db.getTable<WebOrgTodo>("orgTodos").get(id);
 	if (!todo) throw new Error(`Org todo not found: ${id}`);
 
-	await todoDb.orgTodos.update(id, {
-		completed: !todo.completed,
-		updatedAt: new Date().toISOString(),
-		syncStatus: "pending",
-	});
+	const actions = createDexieActions<WebOrgTodo>(db, "orgTodos");
+	await actions.update(id, { completed: !todo.completed });
 }
 
-export async function deleteOrgTodo(id: string): Promise<void> {
-	await todoDb.orgTodos.update(id, {
-		deleted: true,
-		updatedAt: new Date().toISOString(),
-		syncStatus: "pending",
-	});
+export async function deleteOrgTodo(
+	db: EntityDatabase,
+	id: string,
+): Promise<void> {
+	const actions = createDexieActions<WebOrgTodo>(db, "orgTodos");
+	await actions.softDelete(id);
 }
 
 export async function attachOrgFile(
+	db: EntityDatabase,
 	todoId: string,
 	localUri: string,
 ): Promise<void> {
-	await todoDb.orgTodos.update(todoId, {
+	await db.getTable<WebOrgTodo>("orgTodos").update(todoId, {
 		attachmentLocalUri: localUri,
 		attachmentStatus: "queued",
-	});
+	} as never);
 }
 
 export async function resolveOrgConflict(
+	db: EntityDatabase,
 	id: string,
 	resolution: "local" | "server",
 ): Promise<void> {
-	if (resolution === "local") {
-		await todoDb.orgTodos.update(id, {
-			updatedAt: new Date().toISOString(),
-			syncStatus: "pending",
-		});
-	} else {
-		await todoDb.orgTodos.update(id, {
-			syncStatus: "synced",
-		});
-	}
+	const actions = createDexieActions<WebOrgTodo>(db, "orgTodos");
+	await actions.resolveConflict(id, resolution);
 }

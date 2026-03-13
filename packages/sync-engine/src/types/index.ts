@@ -39,18 +39,18 @@ export interface UploadTransport {
 	onFailed?(todoId: string, fileUri: string): void | Promise<void>;
 }
 
-export interface SyncAdapter {
-	getPendingChanges(): Promise<Todo[]>;
-	applyServerChanges(todos: Todo[], conflictIds?: string[]): Promise<void>;
-	markAsSynced(pushedItems: Todo[]): Promise<void>;
+export interface SyncAdapter<T extends { id: string } = Todo> {
+	getPendingChanges(): Promise<T[]>;
+	applyServerChanges(todos: T[], conflictIds?: string[]): Promise<void>;
+	markAsSynced(pushedItems: T[]): Promise<void>;
 	markAsConflict(ids: string[]): Promise<void>;
 	getLastSyncedAt(): Promise<string | null>;
 	setLastSyncedAt(timestamp: string): Promise<void>;
 }
 
-export interface SyncTransport {
-	sync(input: { changes: Todo[]; lastSyncedAt: string | null }): Promise<{
-		serverChanges: Todo[];
+export interface SyncTransport<T extends { id: string } = Todo> {
+	sync(input: { changes: T[]; lastSyncedAt: string | null }): Promise<{
+		serverChanges: T[];
 		conflicts: string[];
 		syncedAt: string;
 	}>;

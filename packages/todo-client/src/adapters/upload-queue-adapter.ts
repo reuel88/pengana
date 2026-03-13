@@ -1,10 +1,13 @@
+import type { EntityDatabase } from "@pengana/entity-store";
 import type { UploadAdapter, UploadItem } from "@pengana/sync-engine";
 import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
-import { todoDb } from "../lib/db";
+import type { WebOrgTodo, WebTodo } from "../lib/db";
 import { uploadQueueDb } from "../lib/upload-queue-db";
 
-export function createWebUploadAdapter(): UploadAdapter {
+export function createWebUploadAdapter(db: EntityDatabase): UploadAdapter {
+	const todosTable = db.getTable<WebTodo>("todos");
+	const orgTodosTable = db.getTable<WebOrgTodo>("orgTodos");
 	return {
 		async addToQueue(item: UploadItem): Promise<void> {
 			try {
@@ -53,11 +56,11 @@ export function createWebUploadAdapter(): UploadAdapter {
 				syncStatus: "pending" as const,
 			};
 
-			const personalTodo = await todoDb.todos.get(item.todoId);
+			const personalTodo = await todosTable.get(item.todoId);
 			if (personalTodo) {
-				await todoDb.todos.update(item.todoId, updateData);
+				await todosTable.update(item.todoId, updateData as never);
 			} else {
-				await todoDb.orgTodos.update(item.todoId, updateData);
+				await orgTodosTable.update(item.todoId, updateData as never);
 			}
 		},
 
@@ -74,11 +77,11 @@ export function createWebUploadAdapter(): UploadAdapter {
 				updatedAt: new Date().toISOString(),
 			};
 
-			const personalTodo = await todoDb.todos.get(item.todoId);
+			const personalTodo = await todosTable.get(item.todoId);
 			if (personalTodo) {
-				await todoDb.todos.update(item.todoId, updateData);
+				await todosTable.update(item.todoId, updateData as never);
 			} else {
-				await todoDb.orgTodos.update(item.todoId, updateData);
+				await orgTodosTable.update(item.todoId, updateData as never);
 			}
 		},
 

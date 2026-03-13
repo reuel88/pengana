@@ -19,6 +19,7 @@
 		"@orpc/client": "catalog:",
 		"@orpc/tanstack-query": "catalog:",
 		"@pengana/api": "workspace:*",
+		"@pengana/entity-store": "workspace:*",
 		"@pengana/env": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/org-client": "workspace:*",

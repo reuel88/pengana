@@ -5,6 +5,7 @@ import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInMemory } from "@/features/sync/entities/upload-queue";
+import { appDb } from "@/shared/db";
 
 export function TodoListConnected({
 	todos,
@@ -43,6 +44,7 @@ export function TodoListConnected({
 			fileStorage,
 			t,
 			actions,
+			db: appDb,
 		});
 
 	return (

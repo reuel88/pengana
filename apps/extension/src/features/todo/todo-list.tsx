@@ -6,6 +6,7 @@ import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useState } from "react";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";
 import { useSync } from "@/features/sync/sync-context";
+import { appDb } from "@/shared/db";
 
 const fileStorage = {
 	storeFile: storeFileInIndexedDB,
@@ -35,6 +36,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 			fileStorage,
 			t,
 			onDeleteSuccess: clearError,
+			db: appDb,
 		});
 
 	return (

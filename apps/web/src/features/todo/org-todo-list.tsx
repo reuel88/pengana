@@ -6,13 +6,15 @@ import {
 	toggleOrgTodo,
 } from "@pengana/todo-client";
 import { useOrgSync } from "@/features/sync/org-sync-context";
+import { appDb } from "@/shared/db";
 import { TodoListConnected } from "./todo-list-connected";
 
 const orgActions: TodoActions = {
-	toggleTodo: toggleOrgTodo,
-	deleteTodo: deleteOrgTodo,
-	resolveConflict: resolveOrgConflict,
-	attachFile: attachOrgFile,
+	toggleTodo: (id) => toggleOrgTodo(appDb, id),
+	deleteTodo: (id) => deleteOrgTodo(appDb, id),
+	resolveConflict: (id, resolution) =>
+		resolveOrgConflict(appDb, id, resolution),
+	attachFile: (id, localUri) => attachOrgFile(appDb, id, localUri),
 };
 
 export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {

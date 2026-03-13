@@ -1,3 +1,4 @@
+import type { EntityDatabase } from "@pengana/entity-store";
 import { useMemo } from "react";
 
 import type {
@@ -15,7 +16,10 @@ export interface UseTodoListWiringConfig {
 	clearError: (id: string) => void;
 	onDeleteSuccess?: (id: string) => void;
 	t: (key: string) => string;
+	/** Pre-bound actions. When omitted, `db` must be provided to construct defaults. */
 	actions?: TodoActions;
+	/** EntityDatabase instance, required when `actions` is not provided. */
+	db?: EntityDatabase;
 }
 
 export function useTodoListWiring(config: UseTodoListWiringConfig) {
@@ -28,6 +32,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		onDeleteSuccess,
 		t,
 		actions,
+		db,
 	} = config;
 
 	const deps: TodoHandlerDeps = useMemo(
@@ -40,6 +45,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			t,
 			onDeleteSuccess,
 			actions,
+			db,
 		}),
 		[
 			triggerSync,
@@ -50,6 +56,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			t,
 			onDeleteSuccess,
 			actions,
+			db,
 		],
 	);
 

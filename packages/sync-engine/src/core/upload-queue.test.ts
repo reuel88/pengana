@@ -29,6 +29,7 @@ function createMockUploadAdapter(): UploadAdapter {
 		markCompleted: vi.fn().mockResolvedValue(undefined),
 		markFailed: vi.fn().mockResolvedValue(undefined),
 		getQueueItems: vi.fn().mockResolvedValue([]),
+		removeItem: vi.fn().mockResolvedValue(undefined),
 	};
 }
 

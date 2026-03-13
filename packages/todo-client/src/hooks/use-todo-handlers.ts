@@ -1,3 +1,4 @@
+import type { EntityDatabase } from "@pengana/entity-store";
 import { isQuotaError } from "@pengana/sync-engine";
 import { useCallback, useMemo } from "react";
 
@@ -26,12 +27,29 @@ export interface TodoActions {
 	attachFile: (id: string, localUri: string) => Promise<void>;
 }
 
-const defaultActions: TodoActions = {
-	toggleTodo,
-	deleteTodo,
-	resolveConflict,
-	attachFile,
-};
+function createDefaultActions(db: EntityDatabase): TodoActions {
+	return {
+		toggleTodo: (id) => toggleTodo(db, id),
+		deleteTodo: (id) => deleteTodo(db, id),
+		resolveConflict: (id, resolution) => resolveConflict(db, id, resolution),
+		attachFile: (id, localUri) => attachFile(db, id, localUri),
+	};
+}
+
+function resolveActions({
+	actions,
+	db,
+}: Pick<TodoHandlerDeps, "actions" | "db">): TodoActions {
+	if (actions) {
+		return actions;
+	}
+
+	if (!db) {
+		throw new Error("useTodoHandlers requires either actions or db");
+	}
+
+	return createDefaultActions(db);
+}
 
 export interface TodoHandlerDeps {
 	triggerSync: () => void;
@@ -41,7 +59,10 @@ export interface TodoHandlerDeps {
 	fileStorage: FileStorageStrategy;
 	t: (key: string) => string;
 	onDeleteSuccess?: (id: string) => void;
+	/** Pre-bound actions. When omitted, `db` must be provided to construct defaults. */
 	actions?: TodoActions;
+	/** EntityDatabase instance, required when `actions` is not provided. */
+	db?: EntityDatabase;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {
@@ -53,8 +74,8 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		fileStorage: { storeFile, createFileRef },
 		t,
 		onDeleteSuccess,
-		actions = defaultActions,
 	} = deps;
+	const actions = resolveActions(deps);
 
 	const handleToggle = useCallback(
 		async (id: string) => {

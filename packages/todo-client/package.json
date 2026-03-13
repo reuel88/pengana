@@ -17,6 +17,7 @@
 	},
 	"scripts": {},
 	"dependencies": {
+		"@pengana/entity-store": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
 		"dexie": "^4.0.11",
 		"dexie-react-hooks": "^4.2.0"

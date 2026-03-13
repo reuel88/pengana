@@ -133,6 +133,9 @@ importers:
       '@pengana/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@pengana/entity-store':
+        specifier: workspace:*
+        version: link:../../packages/entity-store
       '@pengana/env':
         specifier: workspace:*
         version: link:../../packages/env
@@ -218,6 +221,9 @@ importers:
       '@pengana/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@pengana/entity-store':
+        specifier: workspace:*
+        version: link:../../packages/entity-store
       '@pengana/env':
         specifier: workspace:*
         version: link:../../packages/env
@@ -469,6 +475,9 @@ importers:
       '@pengana/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@pengana/entity-store':
+        specifier: workspace:*
+        version: link:../../packages/entity-store
       '@pengana/env':
         specifier: workspace:*
         version: link:../../packages/env
@@ -741,6 +750,34 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/entity-store:
+    dependencies:
+      '@pengana/sync-engine':
+        specifier: workspace:*
+        version: link:../sync-engine
+      dexie:
+        specifier: ^4.0.11
+        version: 4.3.0
+      dexie-react-hooks:
+        specifier: ^4.2.0
+        version: 4.2.0(@types/react@19.2.14)(dexie@4.3.0)(react@19.2.4)
+      drizzle-orm:
+        specifier: ^0.45.1
+        version: 0.45.1(@electric-sql/pglite@0.3.15)(@neondatabase/serverless@1.0.2)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@types/pg@8.18.0)(expo-sqlite@55.0.10(expo@55.0.5)(react-native@0.84.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.4))(react@19.2.4))(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@pengana/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/env:
     dependencies:
       '@t3-oss/env-core':
@@ -849,6 +886,9 @@ importers:
 
   packages/todo-client:
     dependencies:
+      '@pengana/entity-store':
+        specifier: workspace:*
+        version: link:../entity-store
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../sync-engine

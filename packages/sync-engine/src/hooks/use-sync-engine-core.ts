@@ -7,6 +7,7 @@ import type {
 	SyncAdapter,
 	SyncEvent,
 	SyncTransport,
+	Todo,
 	UploadAdapter,
 	UploadTransport,
 } from "../types";
@@ -17,14 +18,14 @@ import { useStorageHealth } from "./use-storage-health";
 import { useUploadQueue } from "./use-upload-queue";
 
 // --- Types ---
-export interface SyncEnginePlatformDeps {
+export interface SyncEnginePlatformDeps<T extends { id: string } = Todo> {
 	generateUUID: () => string;
 	onSyncNotify?: () => void;
 	createNotifyTransport: CreateRealtimeTransport;
 
 	// Adapter/transport factories
-	createSyncAdapter: (userId: string) => SyncAdapter;
-	createSyncTransport: () => SyncTransport;
+	createSyncAdapter: (userId: string) => SyncAdapter<T>;
+	createSyncTransport: () => SyncTransport<T>;
 	createUploadAdapter: () => UploadAdapter;
 	createUploadTransport: () => UploadTransport;
 
@@ -37,15 +38,15 @@ export interface SyncEnginePlatformDeps {
 	onStorageCritical?: () => void;
 }
 
-export function useSyncEngineCore(
+export function useSyncEngineCore<T extends { id: string } = Todo>(
 	scopeId: string | undefined,
 	isOnline: boolean,
-	deps: SyncEnginePlatformDeps,
+	deps: SyncEnginePlatformDeps<T>,
 	isForeground = true,
 	notifyKey = scopeId,
 ) {
 	// --- State ---
-	const engineRef = useRef<SyncEngine | null>(null);
+	const engineRef = useRef<SyncEngine<T> | null>(null);
 	const [events, setEvents] = useState<SyncEvent[]>([]);
 	const [isSyncing, setIsSyncing] = useState(false);
 

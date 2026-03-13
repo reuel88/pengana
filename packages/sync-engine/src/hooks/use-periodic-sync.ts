@@ -1,14 +1,17 @@
 import type { RefObject } from "react";
 import { useEffect, useRef } from "react";
 
-import type { SyncEngine } from "../core/engine";
 import { useStableSyncRef } from "./use-stable-sync-ref";
 
 export const SYNC_INTERVAL_MS = 5 * 60_000;
 
+interface Syncable {
+	sync(): Promise<void>;
+}
+
 export function usePeriodicSync(
 	isOnline: boolean,
-	engineRef: RefObject<SyncEngine | null>,
+	engineRef: RefObject<Syncable | null>,
 ) {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const syncRef = useStableSyncRef(engineRef);

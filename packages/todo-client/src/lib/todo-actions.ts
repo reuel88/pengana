@@ -1,7 +1,14 @@
-import { todoDb } from "../lib/db";
+import { createDexieActions, type EntityDatabase } from "@pengana/entity-store";
 
-export async function addTodo(userId: string, title: string): Promise<void> {
-	await todoDb.todos.add({
+import type { WebTodo } from "./db";
+
+export async function addTodo(
+	db: EntityDatabase,
+	userId: string,
+	title: string,
+): Promise<void> {
+	const actions = createDexieActions<WebTodo>(db, "todos");
+	await actions.add({
 		id: crypto.randomUUID(),
 		title,
 		completed: false,
@@ -15,48 +22,42 @@ export async function addTodo(userId: string, title: string): Promise<void> {
 	});
 }
 
-export async function toggleTodo(id: string): Promise<void> {
-	const todo = await todoDb.todos.get(id);
+export async function toggleTodo(
+	db: EntityDatabase,
+	id: string,
+): Promise<void> {
+	const todo = await db.getTable<WebTodo>("todos").get(id);
 	if (!todo) throw new Error(`Todo not found: ${id}`);
 
-	await todoDb.todos.update(id, {
-		completed: !todo.completed,
-		updatedAt: new Date().toISOString(),
-		syncStatus: "pending",
-	});
+	const actions = createDexieActions<WebTodo>(db, "todos");
+	await actions.update(id, { completed: !todo.completed });
 }
 
-export async function deleteTodo(id: string): Promise<void> {
-	await todoDb.todos.update(id, {
-		deleted: true,
-		updatedAt: new Date().toISOString(),
-		syncStatus: "pending",
-	});
+export async function deleteTodo(
+	db: EntityDatabase,
+	id: string,
+): Promise<void> {
+	const actions = createDexieActions<WebTodo>(db, "todos");
+	await actions.softDelete(id);
 }
 
 export async function resolveConflict(
+	db: EntityDatabase,
 	id: string,
 	resolution: "local" | "server",
 ): Promise<void> {
-	if (resolution === "local") {
-		await todoDb.todos.update(id, {
-			updatedAt: new Date().toISOString(),
-			syncStatus: "pending",
-		});
-	} else {
-		// Mark as synced so the next sync pull overwrites with server data
-		await todoDb.todos.update(id, {
-			syncStatus: "synced",
-		});
-	}
+	const actions = createDexieActions<WebTodo>(db, "todos");
+	await actions.resolveConflict(id, resolution);
 }
 
 export async function attachFile(
+	db: EntityDatabase,
 	todoId: string,
 	localUri: string,
 ): Promise<void> {
-	await todoDb.todos.update(todoId, {
+	// attachFile doesn't go through sync — it only updates local fields
+	await db.getTable<WebTodo>("todos").update(todoId, {
 		attachmentLocalUri: localUri,
 		attachmentStatus: "queued",
-	});
+	} as never);
 }

@@ -26,6 +26,7 @@ export function TodoPage({
 			/>
 			<SyncProvider userId={userId}>
 				<div
+					data-testid="personal-todo-panel"
 					style={{
 						display:
 							activeTab !== "personal" && organizationId ? "none" : undefined,
@@ -37,6 +38,7 @@ export function TodoPage({
 			{organizationId ? (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
+						data-testid="organization-todo-panel"
 						style={{
 							display: activeTab !== "organization" ? "none" : undefined,
 						}}

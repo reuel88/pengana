@@ -7,7 +7,7 @@ import { todoDb } from "@/features/todo/entities/todo";
 
 export function useTodos(userId: string) {
 	const todos = useLiveQuery(
-		() => todoDb.todos.where({ userId }).toArray(),
+		() => todoDb.getTable<Todo>("todos").where({ userId }).toArray(),
 		[userId],
 		[] as Todo[],
 	);
@@ -19,7 +19,11 @@ export function useTodos(userId: string) {
 
 export function useOrgTodos(organizationId: string) {
 	const todos = useLiveQuery(
-		() => todoDb.orgTodos.where({ userId: organizationId }).toArray(),
+		() =>
+			todoDb
+				.getTable<WebOrgTodo>("orgTodos")
+				.where({ userId: organizationId })
+				.toArray(),
 		[organizationId],
 		[] as WebOrgTodo[],
 	);

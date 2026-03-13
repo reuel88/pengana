@@ -1,9 +1,10 @@
-import { todoDb } from "@pengana/todo-client";
+import type { WebTodo } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
 import { client } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 
 export function SyncDevtoolsImpl() {
 	const { isOnline, isSyncing, triggerSync } = useSync();
@@ -15,7 +16,10 @@ export function SyncDevtoolsImpl() {
 		try {
 			const trimmed = forceConflictId.trim();
 			if (!trimmed) {
-				const firstTodo = await todoDb.todos.toCollection().first();
+				const firstTodo = await appDb
+					.getTable<WebTodo>("todos")
+					.toCollection()
+					.first();
 				if (!firstTodo) return;
 				await client.todo.forceConflict({ todoId: firstTodo.id });
 			} else {

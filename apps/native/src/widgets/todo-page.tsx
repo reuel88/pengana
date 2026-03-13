@@ -56,6 +56,7 @@ export function TodoPage({
 			/>
 			<SyncProvider userId={userId}>
 				<View
+					testID="personal-todo-panel"
 					style={
 						activeTab !== "personal" && organizationId
 							? styles.hiddenPanel
@@ -68,6 +69,7 @@ export function TodoPage({
 			{organizationId ? (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<View
+						testID="organization-todo-panel"
 						style={
 							activeTab !== "organization" ? styles.hiddenPanel : undefined
 						}
