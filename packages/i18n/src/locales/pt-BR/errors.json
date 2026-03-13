@@ -15,5 +15,7 @@
 	"todoNotFound": "Tarefa não encontrada",
 	"unauthorized": "Não autorizado",
 	"paymentError": "Algo deu errado com o pagamento. Por favor, tente novamente.",
-	"migrationError": "Erro de migração: {{message}}. Tente reiniciar o aplicativo."
+	"migrationError": "Erro de migração: {{message}}. Tente reiniciar o aplicativo.",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }

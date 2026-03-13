@@ -33,7 +33,7 @@ export class TodoPage extends BaseTodoPage {
 			.filter({ has: this.page.locator("span", { hasText: title }) });
 	}
 
-	todoLocator(title: string) {
+	todoRowLocator(title: string) {
 		return this.todoRow(title);
 	}
 }

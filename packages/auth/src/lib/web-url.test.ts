@@ -38,6 +38,23 @@ describe("resolveWebBaseUrl", () => {
 			}),
 		).toThrow("WEB_URL must use http or https");
 	});
+
+	it("rejects non-http APP_URL values", () => {
+		expect(() =>
+			resolveWebBaseUrl({
+				APP_URL: "ftp://app.example.com",
+				CORS_ORIGIN: "https://app.example.com",
+			}),
+		).toThrow("APP_URL must use http or https");
+	});
+
+	it("fails when CORS_ORIGIN has no valid http origins", () => {
+		expect(() =>
+			resolveWebBaseUrl({
+				CORS_ORIGIN: "pengana://, file://local",
+			}),
+		).toThrow("Unable to resolve web URL");
+	});
 });
 
 describe("normalizeSeatCount", () => {
@@ -48,5 +65,9 @@ describe("normalizeSeatCount", () => {
 	it("returns null for missing seats", () => {
 		expect(normalizeSeatCount(null)).toBeNull();
 		expect(normalizeSeatCount(undefined)).toBeNull();
+	});
+
+	it("stringifies positive seats", () => {
+		expect(normalizeSeatCount(5)).toBe("5");
 	});
 });

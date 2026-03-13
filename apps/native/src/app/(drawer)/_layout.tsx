@@ -67,7 +67,7 @@ const DrawerLayout = () => {
 					),
 					headerRight: () => (
 						<Link href="/modal" asChild>
-							<HeaderButton />
+							<HeaderButton accessibilityLabel={t("common:modalOpen")} />
 						</Link>
 					),
 				}}

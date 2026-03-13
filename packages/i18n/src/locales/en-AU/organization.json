@@ -1,6 +1,5 @@
 {
 	"title": "Organisation",
-	"noOrganization": "No active organisation found.",
 	"switcher": {
 		"label": "Organisations",
 		"create": "Create Organisation",
@@ -132,5 +131,6 @@
 		"markReadError": "Failed to mark notification as read",
 		"markAllReadError": "Failed to mark all notifications as read"
 	},
-	"noActiveOrg": "No active organisation. Select or create one to get started."
+	"noActiveOrg": "No active organisation. Select or create one to get started.",
+	"noActiveOrgFound": "No active organisation found."
 }

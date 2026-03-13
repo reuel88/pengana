@@ -1,36 +1,37 @@
 {
-	"title": "C\u00f4ng vi\u1ec7c",
+	"title": "Công việc",
 	"tabs": {
 		"personal": "Cá nhân",
 		"organization": "Tổ chức"
 	},
-	"addPlaceholder": "Th\u00eam c\u00f4ng vi\u1ec7c m\u1edbi...",
-	"addButton": "Th\u00eam",
-	"empty": "Ch\u01b0a c\u00f3 c\u00f4ng vi\u1ec7c n\u00e0o",
+	"addPlaceholder": "Thêm công việc mới...",
+	"addButton": "Thêm",
+	"empty": "Chưa có công việc nào",
 	"sync": {
-		"synced": "\u0110\u00e3 \u0111\u1ed3ng b\u1ed9",
-		"pending": "Ch\u1edd \u0111\u1ed3ng b\u1ed9",
-		"conflict": "Xung \u0111\u1ed9t"
+		"synced": "Đã đồng bộ",
+		"pending": "Chờ đồng bộ",
+		"conflict": "Xung đột"
 	},
 	"attachment": {
-		"attached": "\u0111\u00e3 \u0111\u00ednh k\u00e8m",
-		"uploading": "\u0111ang t\u1ea3i l\u00ean...",
-		"failed": "th\u1ea5t b\u1ea1i",
-		"fileAttached": "\u0110\u00e3 \u0111\u00ednh k\u00e8m t\u1ec7p",
+		"attached": "đã đính kèm",
+		"uploading": "đang tải lên...",
+		"failed": "thất bại",
+		"fileAttached": "Đã đính kèm tệp",
 		"invalidFile": "Tệp không hợp lệ",
 		"cameraUnavailable": "Camera không khả dụng",
 		"cameraNotAvailable": "Camera không khả dụng trên thiết bị này."
 	},
 	"actions": {
-		"keepLocal": "Gi\u1eef b\u1ea3n c\u1ee5c b\u1ed9",
-		"useServer": "D\u00f9ng b\u1ea3n m\u00e1y ch\u1ee7",
-		"attach": "\u0110\u00ednh k\u00e8m",
-		"retry": "Th\u1eed l\u1ea1i",
-		"delete": "X\u00f3a",
+		"keepLocal": "Giữ bản cục bộ",
+		"useServer": "Dùng bản máy chủ",
+		"attach": "Đính kèm",
+		"retry": "Thử lại",
+		"delete": "Xóa",
 		"takePhoto": "Chụp ảnh",
 		"chooseFromLibrary": "Chọn từ thư viện",
 		"choosePdf": "Chọn PDF",
 		"cancel": "Hủy",
 		"chooseOption": "Chọn một tùy chọn"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

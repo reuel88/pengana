@@ -1,5 +1,6 @@
 import { call } from "@orpc/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Context } from "../context";
 
 vi.mock("@pengana/db/todo-queries", () => ({
 	findTodoById: vi.fn(),
@@ -45,7 +46,7 @@ import {
 import { findTodoById } from "@pengana/db/todo-queries";
 import { uploadRouter } from "./upload";
 
-function makeContext(overrides: Record<string, unknown> = {}) {
+function makeContext(overrides: Partial<Context> = {}): Context {
 	return {
 		session: {
 			user: {
@@ -60,7 +61,7 @@ function makeContext(overrides: Record<string, unknown> = {}) {
 		locale: "en-US",
 		t: (key: string) => key,
 		...overrides,
-	} as never;
+	} as Context;
 }
 
 function makeInput(overrides: Record<string, unknown> = {}) {
@@ -133,8 +134,10 @@ describe("upload.upload", () => {
 					},
 				}),
 			}),
-		).rejects.toThrow();
+		).rejects.toThrow("seatRequiredForWrite");
 
 		expect(isMemberSeatedByUserId).toHaveBeenCalledWith("org-1", "user-1");
+		expect(fsMocks.mkdir).not.toHaveBeenCalled();
+		expect(fsMocks.writeFile).not.toHaveBeenCalled();
 	});
 });

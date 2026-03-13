@@ -1,36 +1,37 @@
 {
-	"title": "\u0627\u0644\u0645\u0647\u0627\u0645",
+	"title": "المهام",
 	"tabs": {
 		"personal": "شخصي",
 		"organization": "المنظمة"
 	},
-	"addPlaceholder": "\u0623\u0636\u0641 \u0645\u0647\u0645\u0629 \u062c\u062f\u064a\u062f\u0629...",
-	"addButton": "\u0625\u0636\u0627\u0641\u0629",
-	"empty": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0647\u0627\u0645 \u0628\u0639\u062f",
+	"addPlaceholder": "أضف مهمة جديدة...",
+	"addButton": "إضافة",
+	"empty": "لا توجد مهام بعد",
 	"sync": {
-		"synced": "\u0645\u062a\u0632\u0627\u0645\u0646",
-		"pending": "\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629",
-		"conflict": "\u062a\u0639\u0627\u0631\u0636"
+		"synced": "متزامن",
+		"pending": "بانتظار المزامنة",
+		"conflict": "تعارض"
 	},
 	"attachment": {
-		"attached": "\u0645\u0631\u0641\u0642",
-		"uploading": "\u062c\u0627\u0631\u064a \u0627\u0644\u0631\u0641\u0639...",
-		"failed": "\u0641\u0634\u0644",
-		"fileAttached": "\u0645\u0644\u0641 \u0645\u0631\u0641\u0642",
+		"attached": "مرفق",
+		"uploading": "جاري الرفع...",
+		"failed": "فشل",
+		"fileAttached": "ملف مرفق",
 		"invalidFile": "ملف غير صالح",
 		"cameraUnavailable": "الكاميرا غير متاحة",
 		"cameraNotAvailable": "الكاميرا غير متاحة على هذا الجهاز."
 	},
 	"actions": {
-		"keepLocal": "\u0627\u062d\u062a\u0641\u0638 \u0628\u0627\u0644\u0645\u062d\u0644\u064a",
-		"useServer": "\u0627\u0633\u062a\u062e\u062f\u0645 \u0627\u0644\u062e\u0627\u062f\u0645",
-		"attach": "\u0625\u0631\u0641\u0627\u0642",
-		"retry": "\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629",
-		"delete": "\u062d\u0630\u0641",
+		"keepLocal": "احتفظ بالمحلي",
+		"useServer": "استخدم الخادم",
+		"attach": "إرفاق",
+		"retry": "إعادة المحاولة",
+		"delete": "حذف",
 		"takePhoto": "التقاط صورة",
 		"chooseFromLibrary": "اختيار من المكتبة",
 		"choosePdf": "اختيار PDF",
 		"cancel": "إلغاء",
 		"chooseOption": "اختر خياراً"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

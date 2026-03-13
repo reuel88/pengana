@@ -15,5 +15,7 @@
 	"todoNotFound": "Задача не найдена",
 	"unauthorized": "Не авторизован",
 	"paymentError": "Произошла ошибка при оплате. Пожалуйста, попробуйте снова.",
-	"migrationError": "Ошибка миграции: {{message}}. Попробуйте перезапустить приложение."
+	"migrationError": "Ошибка миграции: {{message}}. Попробуйте перезапустить приложение.",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }

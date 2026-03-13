@@ -9,7 +9,13 @@ function trimTrailingSlash(value: string) {
 }
 
 function validateHttpUrl(value: string, source: string) {
-	const parsed = new URL(value);
+	let parsed: URL;
+	try {
+		parsed = new URL(value);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		throw new Error(`${source} is invalid: ${value}. ${message}`);
+	}
 	if (!["http:", "https:"].includes(parsed.protocol)) {
 		throw new Error(`${source} must use http or https`);
 	}

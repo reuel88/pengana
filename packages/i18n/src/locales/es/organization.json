@@ -1,6 +1,5 @@
 {
 	"title": "Organización",
-	"noOrganization": "No se encontró una organización activa.",
 	"switcher": {
 		"label": "Organizaciones",
 		"create": "Crear organización",
@@ -130,5 +129,6 @@
 		"markReadError": "Error al marcar la notificación como leída",
 		"markAllReadError": "Error al marcar todas las notificaciones como leídas"
 	},
-	"noActiveOrg": "No hay organización activa. Selecciona o crea una para comenzar."
+	"noActiveOrg": "No hay organización activa. Selecciona o crea una para comenzar.",
+	"noActiveOrgFound": "No se encontró una organización activa."
 }

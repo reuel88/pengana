@@ -1,6 +1,5 @@
 {
 	"title": "조직",
-	"noOrganization": "활성화된 조직을 찾을 수 없습니다.",
 	"switcher": {
 		"label": "조직",
 		"create": "조직 만들기",
@@ -130,5 +129,6 @@
 		"markReadError": "알림을 읽음으로 표시하지 못했습니다",
 		"markAllReadError": "모든 알림을 읽음으로 표시하지 못했습니다"
 	},
-	"noActiveOrg": "활성 조직이 없습니다. 시작하려면 조직을 선택하거나 만드세요."
+	"noActiveOrg": "활성 조직이 없습니다. 시작하려면 조직을 선택하거나 만드세요.",
+	"noActiveOrgFound": "활성화된 조직을 찾을 수 없습니다."
 }

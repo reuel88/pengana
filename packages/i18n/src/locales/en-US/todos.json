@@ -32,5 +32,6 @@
 		"choosePdf": "Choose PDF",
 		"cancel": "Cancel",
 		"chooseOption": "Choose an option"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

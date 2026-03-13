@@ -76,9 +76,10 @@ export function LanguageSwitcher() {
 				<Pressable
 					onPress={() => setVisible(true)}
 					style={styles.trigger}
+					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 					accessibilityRole="button"
-					accessibilityLabel="Change language"
-					accessibilityHint="Opens the language picker"
+					accessibilityLabel={t("common:language.changeLabel")}
+					accessibilityHint={t("common:language.changeHint")}
 					accessibilityState={{ expanded: visible }}
 				>
 					<Ionicons name="globe-outline" size={24} color={theme.text} />
@@ -129,7 +130,12 @@ export function LanguageSwitcher() {
 }
 
 const styles = StyleSheet.create({
-	trigger: {},
+	trigger: {
+		minWidth: 44,
+		minHeight: 44,
+		alignItems: "center",
+		justifyContent: "center",
+	},
 	overlay: {
 		flex: 1,
 		backgroundColor: "rgba(0,0,0,0.4)",

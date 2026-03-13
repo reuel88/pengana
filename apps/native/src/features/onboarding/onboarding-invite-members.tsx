@@ -25,11 +25,10 @@ export function OnboardingInviteMembers({
 	onInvited: () => void;
 	onSkip: () => void;
 }) {
-	const { i18n, t } = useTranslation("onboarding");
+	const { t } = useTranslation("onboarding");
 
 	return (
 		<OnboardingInviteMembersContent
-			key={i18n.language}
 			onInvited={onInvited}
 			onSkip={onSkip}
 			t={t}
@@ -51,7 +50,6 @@ function OnboardingInviteMembersContent({
 
 	const { batchInvite, loading } = useBatchInvite({
 		organizationId: activeOrg?.id,
-		onSuccess: () => onInvited(),
 		onError: () => Alert.alert(t("invite.error")),
 	});
 
@@ -62,7 +60,19 @@ function OnboardingInviteMembersContent({
 		},
 		onSubmit: async ({ value }) => {
 			const valid = value.members.filter((m) => m.email.trim());
-			await batchInvite(valid);
+			const result = await batchInvite(valid);
+			if (!result || result.failures.length === 0) {
+				onInvited();
+				return;
+			}
+			if (result.successes.length === 0) {
+				return;
+			}
+
+			Alert.alert(
+				t("invite.error"),
+				result.failures.map((failure) => failure.email).join("\n"),
+			);
 		},
 	});
 

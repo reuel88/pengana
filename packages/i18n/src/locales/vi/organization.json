@@ -1,6 +1,5 @@
 {
 	"title": "Tổ chức",
-	"noOrganization": "Không tìm thấy tổ chức đang hoạt động.",
 	"switcher": {
 		"label": "Tổ chức",
 		"create": "Tạo tổ chức",
@@ -130,5 +129,6 @@
 		"markReadError": "Không thể đánh dấu thông báo là đã đọc",
 		"markAllReadError": "Không thể đánh dấu tất cả thông báo là đã đọc"
 	},
-	"noActiveOrg": "Không có tổ chức đang hoạt động. Chọn hoặc tạo một tổ chức để bắt đầu."
+	"noActiveOrg": "Không có tổ chức đang hoạt động. Chọn hoặc tạo một tổ chức để bắt đầu.",
+	"noActiveOrgFound": "Không tìm thấy tổ chức đang hoạt động."
 }

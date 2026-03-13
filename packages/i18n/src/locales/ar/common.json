@@ -49,8 +49,8 @@
 			"title": "التبويب الأول",
 			"subtitle": "استكشف القسم الأول من تطبيقك"
 		},
-		"two": {
-			"title": "التبويب الثاني",
+		"explore": {
+			"title": "استكشاف",
 			"subtitle": "اكتشف المزيد من الميزات والمحتوى"
 		}
 	},
@@ -67,5 +67,10 @@
 	"restartRequired": {
 		"title": "إعادة التشغيل مطلوبة",
 		"message": "يحتاج التطبيق إلى إعادة التشغيل لتطبيق تغيير اتجاه التخطيط. يرجى إغلاق التطبيق وإعادة فتحه."
-	}
+	},
+	"language": {
+		"changeLabel": "Change language",
+		"changeHint": "Opens the language picker"
+	},
+	"modalOpen": "Open modal"
 }

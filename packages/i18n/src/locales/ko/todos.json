@@ -32,5 +32,6 @@
 		"choosePdf": "PDF 선택",
 		"cancel": "취소",
 		"chooseOption": "옵션 선택"
-	}
+	},
+	"addInputHint": "Enter a todo and press return to add"
 }

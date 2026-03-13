@@ -19,7 +19,9 @@ export function useBatchInvite({
 	const batchInvite = async (
 		entries: Array<{ email: string; role: "member" | "admin" }>,
 	) => {
-		if (!organizationId || entries.length === 0) return;
+		if (!organizationId || entries.length === 0) {
+			return { successes: [], failures: [] };
+		}
 
 		setLoading(true);
 		try {
@@ -34,15 +36,26 @@ export function useBatchInvite({
 				}),
 			);
 
-			const failed = results.filter((r) => r.status === "rejected");
-			if (failed.length === results.length) {
-				onError?.("All invitations failed");
-			} else {
+			const successes = entries.filter(
+				(_entry, index) => results[index]?.status === "fulfilled",
+			);
+			const failures = entries.filter(
+				(_entry, index) => results[index]?.status === "rejected",
+			);
+
+			if (successes.length > 0) {
 				await invalidateActiveOrg();
+			}
+
+			if (failures.length === results.length) {
+				onError?.("All invitations failed");
+			} else if (failures.length === 0) {
 				onSuccess?.();
 			}
+			return { successes, failures };
 		} catch {
 			onError?.("Failed to send invitations");
+			return { successes: [], failures: entries };
 		} finally {
 			setLoading(false);
 		}

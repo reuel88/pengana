@@ -15,5 +15,7 @@
 	"todoNotFound": "Tarea no encontrada",
 	"unauthorized": "No autorizado",
 	"paymentError": "Algo salió mal con el pago. Por favor, inténtelo de nuevo.",
-	"migrationError": "Error de migración: {{message}}. Intenta reiniciar la aplicación."
+	"migrationError": "Error de migración: {{message}}. Intenta reiniciar la aplicación.",
+	"noActiveOrganization": "No active organization",
+	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
 }
