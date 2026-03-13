@@ -13,10 +13,10 @@ import type {
 
 interface WebSocketLike {
 	close(): void;
-	onclose: ((...args: any[]) => void) | null;
-	onerror: ((...args: any[]) => void) | null;
-	onmessage: ((...args: any[]) => void) | null;
-	onopen: ((...args: any[]) => void) | null;
+	onclose: ((event: CloseEvent) => void) | null;
+	onerror: ((event: Event) => void) | null;
+	onmessage: ((event: MessageEvent<unknown>) => void) | null;
+	onopen: ((event: Event) => void) | null;
 }
 
 interface CreateWebSocketRealtimeTransportOptions
@@ -178,7 +178,7 @@ export function createWebSocketRealtimeTransport(
 				scheduleHealthCheck();
 			};
 
-			nextSocket.onmessage = (event: { data: unknown }) => {
+			nextSocket.onmessage = (event: MessageEvent<unknown>) => {
 				const kind = options.decodeMessage(event.data);
 				if (!kind) return;
 				lastMessageAt = Date.now();

@@ -13,3 +13,13 @@ export function useTodos(userId: string) {
 
 	return { todos: activeTodos, conflictTodos };
 }
+
+export function useOrgTodos(organizationId: string) {
+	const { data: allTodos } = useLiveQuery(
+		db.select().from(todos).where(eq(todos.userId, organizationId)),
+	);
+
+	const { activeTodos, conflictTodos } = filterTodos(allTodos ?? []);
+
+	return { todos: activeTodos, conflictTodos };
+}

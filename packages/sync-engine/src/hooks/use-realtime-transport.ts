@@ -2,30 +2,35 @@ import type { RefObject } from "react";
 import { useEffect, useRef } from "react";
 
 import type { SyncEngine } from "../core/engine";
-import type {
-	CreateRealtimeTransport,
-	RealtimeTransport,
-} from "../realtime/types";
+import { subscribeToSharedNotifyChannel } from "../realtime/shared-notify-manager";
+import type { CreateNotifyTransport } from "../realtime/types";
 
 export function useRealtimeTransport(
-	userId: string | undefined,
+	notifyKey: string | undefined,
 	enabled: boolean,
 	engineRef: RefObject<SyncEngine | null>,
-	createRealtimeTransport: CreateRealtimeTransport,
+	createNotifyTransport: CreateNotifyTransport,
 	onSyncNotify?: () => void,
 ) {
-	const transportRef = useRef<RealtimeTransport | null>(null);
+	const subscriptionRef = useRef<ReturnType<
+		typeof subscribeToSharedNotifyChannel
+	> | null>(null);
+	const enabledRef = useRef(enabled);
+	enabledRef.current = enabled;
 	const onSyncNotifyRef = useRef(onSyncNotify);
 	onSyncNotifyRef.current = onSyncNotify;
 
 	useEffect(() => {
-		if (!userId) {
-			transportRef.current?.stop();
-			transportRef.current = null;
+		if (!notifyKey) {
+			subscriptionRef.current?.unsubscribe();
+			subscriptionRef.current = null;
 			return;
 		}
 
-		const transport = createRealtimeTransport(userId, {
+		const subscription = subscribeToSharedNotifyChannel({
+			notifyKey,
+			createNotifyTransport,
+			enabled: enabledRef.current,
 			onNotify: () => {
 				engineRef.current?.sync();
 				onSyncNotifyRef.current?.();
@@ -35,22 +40,16 @@ export function useRealtimeTransport(
 			},
 		});
 
-		transportRef.current = transport;
+		subscriptionRef.current = subscription;
 		return () => {
-			transport.stop();
-			if (transportRef.current === transport) {
-				transportRef.current = null;
+			subscription.unsubscribe();
+			if (subscriptionRef.current === subscription) {
+				subscriptionRef.current = null;
 			}
 		};
-	}, [userId, createRealtimeTransport, engineRef]);
+	}, [notifyKey, createNotifyTransport, engineRef]);
 
 	useEffect(() => {
-		const transport = transportRef.current;
-		if (!transport) return;
-		if (enabled) {
-			transport.start();
-			return;
-		}
-		transport.stop();
-	}, [enabled, userId]);
+		subscriptionRef.current?.setEnabled(enabled);
+	}, [enabled]);
 }

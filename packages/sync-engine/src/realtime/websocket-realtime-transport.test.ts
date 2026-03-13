@@ -2,28 +2,28 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWebSocketRealtimeTransport } from "./websocket-realtime-transport";
 
 class FakeSocket {
-	public onopen: (() => void) | null = null;
-	public onmessage: ((event: { data: unknown }) => void) | null = null;
-	public onerror: (() => void) | null = null;
-	public onclose: (() => void) | null = null;
+	public onopen: ((event: Event) => void) | null = null;
+	public onmessage: ((event: MessageEvent<unknown>) => void) | null = null;
+	public onerror: ((event: Event) => void) | null = null;
+	public onclose: ((event: CloseEvent) => void) | null = null;
 	public close = vi.fn(() => {
-		this.onclose?.();
+		this.onclose?.({} as CloseEvent);
 	});
 
 	emitOpen() {
-		this.onopen?.();
+		this.onopen?.({} as Event);
 	}
 
 	emitMessage(data: unknown) {
-		this.onmessage?.({ data });
+		this.onmessage?.({ data } as MessageEvent<unknown>);
 	}
 
 	emitError() {
-		this.onerror?.();
+		this.onerror?.({} as Event);
 	}
 
 	emitClose() {
-		this.onclose?.();
+		this.onclose?.({} as CloseEvent);
 	}
 }
 

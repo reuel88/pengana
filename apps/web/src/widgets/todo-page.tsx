@@ -108,7 +108,7 @@ export function TodoPage({
 			</SyncProvider>
 
 			{organizationId && (
-				<OrgSyncProvider organizationId={organizationId}>
+				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
 						id="panel-organization"
 						role="tabpanel"

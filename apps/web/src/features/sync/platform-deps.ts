@@ -42,7 +42,7 @@ export function createWebPlatformDeps(
 	createSyncTransport: TransportFactory,
 ): SyncEnginePlatformDeps {
 	return {
-		createRealtimeTransport,
+		createNotifyTransport: createRealtimeTransport,
 		generateUUID: () => crypto.randomUUID(),
 		onSyncNotify: () => {
 			queryClient.invalidateQueries({

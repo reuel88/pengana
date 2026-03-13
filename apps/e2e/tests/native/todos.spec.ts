@@ -13,7 +13,9 @@ test.describe("Todos", () => {
 		const todoPage = new NativeTodoPage(page);
 		await todoPage.navigate();
 		await expect(page.getByRole("heading", { name: "Todos" })).toBeVisible();
-		await expect(page.getByPlaceholder("Add a new todo...")).toBeVisible();
+		await expect(
+			page.getByTestId("todo-input").locator("visible=true"),
+		).toBeVisible();
 	});
 
 	test("add a todo", async ({ authenticatedWithOrgPage: { page } }) => {

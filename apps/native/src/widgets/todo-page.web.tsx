@@ -1,10 +1,53 @@
+import { useState } from "react";
+import { OrgSyncProvider } from "@/features/sync/org-sync-context";
 import { SyncProvider } from "@/features/sync/sync-context";
-import { TodoContent } from "./todo-content";
+import {
+	OrganizationTodoContent,
+	PersonalTodoContent,
+	TodoShell,
+	type TodoTab,
+} from "./todo-content";
 
-export function TodoPage({ userId }: { userId: string }) {
+export function TodoPage({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
+	const [activeTab, setActiveTab] = useState<TodoTab>("personal");
+
 	return (
-		<SyncProvider userId={userId}>
-			<TodoContent userId={userId} />
-		</SyncProvider>
+		<>
+			<TodoShell
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				showTabs={Boolean(organizationId)}
+			/>
+			<SyncProvider userId={userId}>
+				<div
+					style={{
+						display:
+							activeTab !== "personal" && organizationId ? "none" : undefined,
+					}}
+				>
+					<PersonalTodoContent userId={userId} />
+				</div>
+			</SyncProvider>
+			{organizationId ? (
+				<OrgSyncProvider organizationId={organizationId} userId={userId}>
+					<div
+						style={{
+							display: activeTab !== "organization" ? "none" : undefined,
+						}}
+					>
+						<OrganizationTodoContent
+							organizationId={organizationId}
+							userId={userId}
+						/>
+					</div>
+				</OrgSyncProvider>
+			) : null}
+		</>
 	);
 }

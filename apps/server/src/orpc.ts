@@ -35,7 +35,7 @@ const rpcHandler = new RPCHandler(appRouter, {
 // subsequent requests pick up the real implementation.
 const notifyRef: {
 	notifyUser: (userId: string) => void;
-	notifyOrgMembers: (orgId: string, excludeUserId: string) => void;
+	notifyOrgMembers: (orgId: string) => void;
 } = {
 	notifyUser: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
@@ -47,7 +47,7 @@ const notifyRef: {
 
 export function wireNotifications(
 	notifyUser: (userId: string) => void,
-	notifyOrgMembers: (orgId: string, excludeUserId: string) => void,
+	notifyOrgMembers: (orgId: string) => void,
 ) {
 	notifyRef.notifyUser = notifyUser;
 	notifyRef.notifyOrgMembers = notifyOrgMembers;

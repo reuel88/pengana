@@ -4,28 +4,36 @@ import type {
 	UploadEvent,
 } from "@pengana/sync-engine";
 
+export type SyncScopeType = "personal" | "organization";
+
+export interface SyncScope {
+	scopeType: SyncScopeType;
+	scopeId: string;
+}
+
 // Messages from popup → background
 export type BackgroundMessage =
-	| { type: "init"; userId: string }
-	| { type: "sync:trigger" }
+	| ({ type: "init" } & SyncScope)
+	| ({ type: "sync:trigger" } & SyncScope)
 	| {
 			type: "upload:enqueue";
+			scopeType: SyncScopeType;
+			scopeId: string;
 			payload: { todoId: string; fileUri: string; mimeType: string };
 	  }
-	| { type: "status:get" };
+	| ({ type: "status:get" } & SyncScope);
 
 // Messages from background → popup (via sendMessage broadcast)
 export type BackgroundBroadcast =
-	| { type: "sync:event"; event: SyncEvent }
-	| { type: "upload:event"; event: UploadEvent }
+	| ({ type: "sync:event"; event: SyncEvent } & SyncScope)
+	| ({ type: "upload:event"; event: UploadEvent } & SyncScope)
 	| { type: "status:update"; status: SyncStatus }
-	| { type: "storage:critical" };
+	| ({ type: "storage:critical" } & SyncScope);
 
-export interface SyncStatus {
+export interface SyncStatus extends SyncScope {
 	isOnline: boolean;
 	isSyncing: boolean;
 	isUploading: boolean;
-	userId: string | null;
 	storageLevel: StorageLevel;
 }
 
