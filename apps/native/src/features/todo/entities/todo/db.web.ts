@@ -1,7 +1,7 @@
 import { EntityDatabase } from "@pengana/entity-store";
 import { orgTodoEntity, todoEntity } from "@pengana/todo-client";
 
-export const todoDb = new EntityDatabase("TodoDatabase")
+export const appDb = new EntityDatabase("AppDatabase")
 	.applySchema(1, [todoEntity])
 	.applySchema(2, [todoEntity])
 	.applySchema(3, [todoEntity, orgTodoEntity]);

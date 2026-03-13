@@ -11,7 +11,7 @@ import {
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/features/sync/entities/upload-queue";
-import { todoDb } from "@/features/todo/entities/todo";
+import { appDb } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { getServerUrl } from "@/shared/lib/server-url";
 
@@ -56,7 +56,7 @@ const platformDeps: SyncEnginePlatformDeps = {
 	generateUUID: () => crypto.randomUUID(),
 	createNotifyTransport: createRealtimeTransport,
 	createSyncAdapter: (organizationId) =>
-		createDexieOrgSyncAdapter(todoDb, organizationId),
+		createDexieOrgSyncAdapter(appDb, organizationId),
 	createSyncTransport: () => ({
 		sync: async (input) => {
 			const orgInput = {
