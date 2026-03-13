@@ -3,6 +3,7 @@ import { useTranslation } from "@pengana/i18n";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { consumePendingInvitation } from "@/shared/lib/auth-flow";
 import { Loader } from "@/shared/ui/loader";
 
 export function VerifyEmailCallback() {
@@ -29,6 +30,15 @@ export function VerifyEmailCallback() {
 			.then((res) => {
 				if (res.ok) {
 					toast.success(t("auth:verifyEmail.success"));
+					const invitationId = consumePendingInvitation();
+					if (invitationId) {
+						navigate({
+							to: "/invitation/$invitationId",
+							params: { invitationId },
+							replace: true,
+						});
+						return;
+					}
 					navigate({ to: "/", replace: true });
 				} else {
 					setError(t("auth:verifyEmail.invalidToken"));

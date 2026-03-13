@@ -63,6 +63,28 @@ export async function getInvitationWithOrg(invitationId: string) {
 	return rows[0] ?? null;
 }
 
+export async function getPublicInvitationSummary(invitationId: string) {
+	const rows = await db
+		.select({
+			id: invitation.id,
+			email: invitation.email,
+			role: invitation.role,
+			status: invitation.status,
+			expiresAt: invitation.expiresAt,
+			organizationId: invitation.organizationId,
+			organizationName: organization.name,
+			teamId: invitation.teamId,
+			inviterEmail: user.email,
+		})
+		.from(invitation)
+		.innerJoin(organization, eq(invitation.organizationId, organization.id))
+		.innerJoin(user, eq(invitation.inviterId, user.id))
+		.where(eq(invitation.id, invitationId))
+		.limit(1);
+
+	return rows[0] ?? null;
+}
+
 export async function findNotificationByTypeAndInvitation(
 	userId: string,
 	invitationId: string,

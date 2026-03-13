@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { SignUpForm } from "@/features/auth/sign-up-form";
 import { AuthLayout } from "@/widgets/auth-layout";
 
 export const Route = createFileRoute("/(auth)/sign-up")({
 	component: SignUpPage,
+	validateSearch: z.object({
+		invitationId: z.string().optional(),
+	}),
 	head: () => ({
 		meta: [
 			{ title: "Sign Up | pengana" },

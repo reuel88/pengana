@@ -14,6 +14,12 @@ function redactId(id: string): string {
 	return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
+function sendMessage(ws: WebSocket, payload: WsMessage) {
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(JSON.stringify(payload));
+	}
+}
+
 async function authenticateRequest(
 	req: IncomingMessage,
 	url: URL,
@@ -71,6 +77,8 @@ export function setupWebSocket(server: ServerType) {
 		ws.on("error", () => {
 			ws.close();
 		});
+
+		sendMessage(ws, { type: "connected" });
 	}
 
 	server.on("upgrade", async (req, socket, head) => {
@@ -119,6 +127,7 @@ export function setupWebSocket(server: ServerType) {
 				}
 				aliveSet.delete(ws);
 				if (ws.readyState === WebSocket.OPEN) {
+					sendMessage(ws, { type: "keepalive" });
 					ws.ping();
 				}
 			}
@@ -137,11 +146,10 @@ export function setupWebSocket(server: ServerType) {
 		}
 
 		const payload: WsMessage = { type: "sync-notify" };
-		const message = JSON.stringify(payload);
 		let sentCount = 0;
 		for (const ws of sockets) {
 			if (ws.readyState === WebSocket.OPEN) {
-				ws.send(message);
+				sendMessage(ws, payload);
 				sentCount++;
 			}
 		}

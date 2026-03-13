@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignUpSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
+import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
@@ -11,14 +12,15 @@ import {
 	AuthSubmitButton,
 } from "@/shared/ui/auth-form";
 
-function SignUp() {
+function SignUp({ redirectTo }: { redirectTo?: string }) {
 	const { i18n } = useTranslation();
 
-	return <SignUpForm key={i18n.language} />;
+	return <SignUpForm key={i18n.language} redirectTo={redirectTo} />;
 }
 
-function SignUpForm() {
+function SignUpForm({ redirectTo }: { redirectTo?: string }) {
 	const { t } = useTranslation();
+	const router = useRouter();
 	const showCheckEmail = () => {
 		Alert.alert(t("auth:signUp.checkEmail"));
 	};
@@ -42,6 +44,7 @@ function SignUpForm() {
 						form.reset();
 						queryClient.refetchQueries();
 						showCheckEmail();
+						router.replace((redirectTo ?? "/(auth)/login") as never);
 					},
 				},
 			);

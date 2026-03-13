@@ -2,6 +2,7 @@ import { env } from "@pengana/env/web";
 import { useTranslation } from "@pengana/i18n";
 import { makeForgotPasswordSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
+import { useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";
@@ -9,6 +10,7 @@ import { AuthFormShell } from "./auth-form-shell";
 
 export function ForgotPasswordForm() {
 	const { t } = useTranslation();
+	const { invitationId } = useSearch({ strict: false });
 
 	const form = useZodForm({
 		schema: makeForgotPasswordSchema(t),
@@ -40,6 +42,7 @@ export function ForgotPasswordForm() {
 			submitLabel={t("auth:forgotPassword.submit")}
 			switchLabel={t("auth:forgotPassword.switchToSignIn")}
 			switchTo="/login"
+			switchSearch={{ invitationId }}
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>

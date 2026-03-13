@@ -7,6 +7,7 @@ export const Route = createFileRoute("/(auth)/verify-email/")({
 	component: VerifyEmailPage,
 	validateSearch: z.object({
 		email: z.string().optional(),
+		invitationId: z.string().optional(),
 	}),
 	head: () => ({
 		meta: [

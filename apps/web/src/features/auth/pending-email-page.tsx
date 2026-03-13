@@ -17,7 +17,7 @@ export function PendingEmailPage({
 	onResend: (email: string) => Promise<unknown>;
 }) {
 	const { t } = useTranslation();
-	const { email } = useSearch({ strict: false });
+	const { email, invitationId } = useSearch({ strict: false });
 	const [isResending, setIsResending] = useState(false);
 	const resendEmail =
 		typeof email === "string" && email.trim().length > 0 ? email : null;
@@ -54,7 +54,11 @@ export function PendingEmailPage({
 				</Button>
 			)}
 
-			<Link to="/login" className="text-primary text-sm hover:text-primary/80">
+			<Link
+				to="/login"
+				search={{ invitationId }}
+				className="text-primary text-sm hover:text-primary/80"
+			>
 				{t("auth:verifyEmail.backToSignIn")}
 			</Link>
 		</div>

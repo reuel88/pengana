@@ -17,12 +17,14 @@ export const HeaderButton = forwardRef<
 			accessibilityRole="button"
 			accessibilityLabel={accessibilityLabel}
 			hitSlop={8}
-			style={({ pressed }) => [
-				styles.button,
-				{
-					backgroundColor: pressed ? theme.background : theme.card,
-				},
-			]}
+			style={({ pressed }) =>
+				StyleSheet.flatten([
+					styles.button,
+					{
+						backgroundColor: pressed ? theme.background : theme.card,
+					},
+				])
+			}
 		>
 			{({ pressed }) => (
 				<FontAwesome

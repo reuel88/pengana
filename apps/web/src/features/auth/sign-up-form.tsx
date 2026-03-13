@@ -1,17 +1,19 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignUpSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { authClient } from "@/shared/lib/auth-client";
+import { persistPendingInvitation } from "@/shared/lib/auth-flow";
 import { FormField } from "@/shared/ui/form-field";
 import { AuthFormShell } from "./auth-form-shell";
 
 export function SignUpForm() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+	const { invitationId } = useSearch({ strict: false });
 
 	const navigateWithCheckEmail = (email?: string) => {
-		navigate({ to: "/verify-email", search: { email } });
+		navigate({ to: "/verify-email", search: { email, invitationId } });
 	};
 
 	const form = useZodForm({
@@ -22,6 +24,7 @@ export function SignUpForm() {
 			name: "",
 		},
 		onSubmit: async ({ value }) => {
+			persistPendingInvitation(invitationId);
 			await authClient.signUp.email(
 				{
 					email: value.email,
@@ -47,6 +50,7 @@ export function SignUpForm() {
 			submitLabel={t("auth:signUp.submit")}
 			switchLabel={t("auth:signUp.switchToSignIn")}
 			switchTo="/login"
+			switchSearch={{ invitationId }}
 			onSubmit={() => form.handleSubmit()}
 			form={form}
 		>

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeSignInSchema } from "@pengana/i18n/zod";
 import { useZodForm } from "@pengana/org-client";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 
 import { queryClient } from "@/shared/api/orpc";
@@ -12,15 +13,16 @@ import {
 	AuthSubmitButton,
 } from "@/shared/ui/auth-form";
 
-function SignIn() {
+function SignIn({ redirectTo }: { redirectTo?: string }) {
 	const { i18n } = useTranslation();
 
-	return <SignInForm key={i18n.language} />;
+	return <SignInForm key={i18n.language} redirectTo={redirectTo} />;
 }
 
-function SignInForm() {
+function SignInForm({ redirectTo }: { redirectTo?: string }) {
 	const [error, setError] = useState<string | null>(null);
 	const { t } = useTranslation();
+	const router = useRouter();
 
 	const form = useZodForm({
 		schema: makeNativeSignInSchema(t),
@@ -36,6 +38,7 @@ function SignInForm() {
 						setError(null);
 						form.reset();
 						queryClient.refetchQueries();
+						router.replace((redirectTo ?? "/") as never);
 					},
 				},
 			);

@@ -1,6 +1,10 @@
+import { parseWsMessage } from "@pengana/api/ws-types";
 import { env } from "@pengana/env/web";
 import { orgQueryKeys } from "@pengana/org-client";
-import type { SyncEnginePlatformDeps } from "@pengana/sync-engine";
+import {
+	createWebSocketRealtimeTransport,
+	type SyncEnginePlatformDeps,
+} from "@pengana/sync-engine";
 import { removeFileFromIndexedDB } from "@pengana/todo-client";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
@@ -14,6 +18,22 @@ function getWsUrl() {
 	return `${env.VITE_SERVER_URL.replace(/^http/, "ws")}/ws`;
 }
 
+function createRealtimeTransport(
+	_userId: string,
+	callbacks: { onNotify: () => void; onOpen?: () => void },
+) {
+	return createWebSocketRealtimeTransport({
+		getUrl: getWsUrl,
+		decodeMessage: (data) => {
+			const message = parseWsMessage(data);
+			if (!message) return null;
+			return message.type === "sync-notify" ? "notify" : "heartbeat";
+		},
+		onNotify: callbacks.onNotify,
+		onOpen: callbacks.onOpen,
+	});
+}
+
 type AdapterFactory = SyncEnginePlatformDeps["createSyncAdapter"];
 type TransportFactory = SyncEnginePlatformDeps["createSyncTransport"];
 
@@ -22,7 +42,7 @@ export function createWebPlatformDeps(
 	createSyncTransport: TransportFactory,
 ): SyncEnginePlatformDeps {
 	return {
-		getWsUrl,
+		createRealtimeTransport,
 		generateUUID: () => crypto.randomUUID(),
 		onSyncNotify: () => {
 			queryClient.invalidateQueries({

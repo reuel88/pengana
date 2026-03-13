@@ -1,4 +1,6 @@
 import { auth } from "@pengana/auth";
+import { resolveWebBaseUrl } from "@pengana/auth/lib/web-url";
+import { env } from "@pengana/env/server";
 import { getServerT } from "@pengana/i18n/server";
 import type { Context as HonoContext } from "hono";
 
@@ -16,6 +18,7 @@ export async function createContext({ context }: CreateContextOptions) {
 		locale,
 		t: getServerT(locale),
 		headers: context.req.raw.headers,
+		webBaseUrl: resolveWebBaseUrl(env),
 	};
 }
 
