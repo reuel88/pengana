@@ -57,7 +57,7 @@ export function useOrgFilePicker() {
 
 	const attachAsset = async (todoId: string, uri: string, mimeType: string) => {
 		await attachOrgFile(todoId, uri);
-		enqueueUpload(todoId, uri, mimeType);
+		enqueueUpload("orgTodo", todoId, uri, mimeType);
 	};
 
 	const invalidFileTitle = t("todos:attachment.invalidFile");

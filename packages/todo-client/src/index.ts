@@ -4,9 +4,13 @@ export {
 	removeFileFromIndexedDB,
 	storeFileInIndexedDB,
 } from "./adapters/dexie-file-store";
+export { createIndexedDbUploadTransport } from "./adapters/indexeddb-upload-transport";
 export { createDexieOrgSyncAdapter } from "./adapters/org-adapter";
 export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
-export { createUploadTransport } from "./adapters/upload-transport";
+export {
+	createUploadTransport,
+	type UploadTransportInput,
+} from "./adapters/upload-transport";
 export { useOrgTodos } from "./hooks/use-org-todos";
 export type {
 	FileStorageStrategy,
@@ -35,5 +39,6 @@ export {
 	toggleTodo,
 } from "./lib/todo-actions";
 export { orgTodoEntity, todoEntity } from "./lib/todo-entity";
+export { createTodoUploadLifecycleCallbacks } from "./lib/upload-lifecycle-callbacks";
 export type { FileDataRecord } from "./lib/upload-queue-db";
 export { UploadQueueDatabase, uploadQueueDb } from "./lib/upload-queue-db";

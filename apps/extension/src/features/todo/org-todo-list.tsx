@@ -50,6 +50,7 @@ export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
 			t,
 			onDeleteSuccess: clearError,
 			actions: orgActions,
+			entityType: "orgTodo",
 		});
 
 	return (

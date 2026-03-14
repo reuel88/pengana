@@ -7,6 +7,7 @@ export {
 	removeFileFromIndexedDB,
 	storeFileInIndexedDB,
 } from "./file-store.web";
+export { createNativeUploadLifecycleCallbacks } from "./lifecycle-callbacks.web";
 export {
 	createIndexedDbUploadTransport,
 	createIndexedDbUploadTransport as createUploadTransport,

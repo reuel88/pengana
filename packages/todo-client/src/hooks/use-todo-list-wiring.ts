@@ -10,7 +10,13 @@ import { useTodoHandlers } from "./use-todo-handlers";
 
 export interface UseTodoListWiringConfig {
 	triggerSync: () => void;
-	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
+	enqueueUpload: (
+		entityType: string,
+		entityId: string,
+		fileUri: string,
+		mimeType: string,
+	) => void;
+	entityType?: string;
 	fileStorage: FileStorageStrategy;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
@@ -33,6 +39,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		t,
 		actions,
 		db,
+		entityType,
 	} = config;
 
 	const deps: TodoHandlerDeps = useMemo(
@@ -46,6 +53,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			onDeleteSuccess,
 			actions,
 			db,
+			entityType,
 		}),
 		[
 			triggerSync,
@@ -57,6 +65,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			onDeleteSuccess,
 			actions,
 			db,
+			entityType,
 		],
 	);
 

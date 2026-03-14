@@ -9,7 +9,7 @@ import {
 	View,
 } from "react-native";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
-import { db, todos } from "@/features/todo/entities/todo";
+import { appDb, todos } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
@@ -38,7 +38,7 @@ function SyncDevtoolsContent() {
 	const handleForceConflict = async () => {
 		const trimmed = forceConflictId.trim();
 		if (!trimmed) {
-			const [firstTodo] = await db.select().from(todos);
+			const [firstTodo] = await appDb.select().from(todos);
 			if (!firstTodo) return;
 			await client.todo.forceConflict({ todoId: firstTodo.id });
 		} else {

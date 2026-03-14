@@ -1,7 +1,7 @@
 import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/entity-store/drizzle/create-drizzle-sync-adapter";
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 
-import { db } from "./db";
+import { appDb } from "./db";
 import { syncMeta, todos } from "./schema";
 
 function rowToTodo(row: typeof todos.$inferSelect): Todo {
@@ -38,7 +38,7 @@ function todoToRow(todo: Todo, syncStatus: string) {
 }
 
 const drizzleAdapterConfig = {
-	db,
+	db: appDb,
 	table: todos,
 	syncMetaTable: syncMeta,
 	columns: {

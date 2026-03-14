@@ -4,6 +4,7 @@ import {
 	type SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
 import {
+	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/features/sync/entities/upload-queue";
@@ -43,6 +44,7 @@ export function createPlatformDeps(
 		createSyncTransport,
 		createUploadAdapter,
 		createUploadTransport,
+		uploadLifecycleCallbacks: createNativeUploadLifecycleCallbacks(),
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {
 				if (document.visibilityState === "visible") triggerSync();

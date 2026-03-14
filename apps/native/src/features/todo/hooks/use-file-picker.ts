@@ -57,7 +57,7 @@ export function useFilePicker() {
 
 	const attachAsset = async (todoId: string, uri: string, mimeType: string) => {
 		await attachFile(todoId, uri);
-		enqueueUpload(todoId, uri, mimeType);
+		enqueueUpload("todo", todoId, uri, mimeType);
 	};
 
 	const invalidFileTitle = t("todos:attachment.invalidFile");

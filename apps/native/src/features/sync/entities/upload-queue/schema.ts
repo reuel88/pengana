@@ -2,7 +2,8 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const uploadQueue = sqliteTable("upload_queue", {
 	id: text("id").primaryKey(),
-	todoId: text("todo_id").notNull(),
+	entityType: text("entity_type").notNull().default("todo"),
+	entityId: text("entity_id").notNull(),
 	fileUri: text("file_uri").notNull(),
 	mimeType: text("mime_type").notNull(),
 	status: text("status", {

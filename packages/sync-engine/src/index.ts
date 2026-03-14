@@ -90,6 +90,7 @@ export type {
 	UploadEvent,
 	UploadEventType,
 	UploadItem,
+	UploadLifecycleCallbacks,
 	UploadStatus,
 	UploadTransport,
 } from "./types";

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
-import { db, todos } from "@/features/todo/entities/todo";
+import { appDb, todos } from "@/features/todo/entities/todo";
 import { pendingUpdate } from "./lib/pending-update";
 
 export async function addOrgTodo(
@@ -9,7 +9,7 @@ export async function addOrgTodo(
 	userId: string,
 	title: string,
 ): Promise<void> {
-	await db.insert(todos).values({
+	await appDb.insert(todos).values({
 		id: randomUUID(),
 		title,
 		completed: false,
@@ -26,7 +26,7 @@ export async function addOrgTodo(
 }
 
 export async function toggleOrgTodo(id: string): Promise<void> {
-	const [todo] = await db.select().from(todos).where(eq(todos.id, id));
+	const [todo] = await appDb.select().from(todos).where(eq(todos.id, id));
 	if (!todo) throw new Error(`Org todo not found: ${id}`);
 
 	await pendingUpdate(id, { completed: !todo.completed });
@@ -43,7 +43,7 @@ export async function resolveOrgConflict(
 	if (resolution === "local") {
 		await pendingUpdate(id, {});
 	} else {
-		await db
+		await appDb
 			.update(todos)
 			.set({ syncStatus: "synced" })
 			.where(eq(todos.id, id));
@@ -54,7 +54,7 @@ export async function attachOrgFile(
 	todoId: string,
 	localUri: string,
 ): Promise<void> {
-	await db
+	await appDb
 		.update(todos)
 		.set({
 			attachmentLocalUri: localUri,

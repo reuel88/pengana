@@ -9,6 +9,7 @@ import type {
 	SyncTransport,
 	Todo,
 	UploadAdapter,
+	UploadLifecycleCallbacks,
 	UploadTransport,
 } from "../types";
 import type { StorageHealthProvider } from "../types/storage-health";
@@ -34,8 +35,11 @@ export interface SyncEnginePlatformDeps<T extends { id: string } = Todo> {
 
 	// Optional storage health monitoring
 	storageHealth?: StorageHealthProvider;
-	removeFile?: (todoId: string) => Promise<void>;
+	removeFile?: (entityId: string) => Promise<void>;
 	onStorageCritical?: () => void;
+
+	// Upload lifecycle callbacks for entity-specific side effects
+	uploadLifecycleCallbacks?: UploadLifecycleCallbacks;
 }
 
 export interface SyncEngineOptions<T extends { id: string } = Todo> {
@@ -96,6 +100,7 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 		deps.generateUUID,
 		deps.createUploadAdapter,
 		deps.createUploadTransport,
+		deps.uploadLifecycleCallbacks,
 	);
 
 	// --- Storage Health ---

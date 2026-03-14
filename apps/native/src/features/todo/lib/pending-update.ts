@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { db, todos } from "@/features/todo/entities/todo";
+import { appDb, todos } from "@/features/todo/entities/todo";
 
 type PendingTodoUpdate = Partial<{
 	title: string;
@@ -12,7 +12,7 @@ type PendingTodoUpdate = Partial<{
 }>;
 
 export async function pendingUpdate(id: string, fields: PendingTodoUpdate) {
-	await db
+	await appDb
 		.update(todos)
 		.set({
 			...fields,

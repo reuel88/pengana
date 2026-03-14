@@ -27,7 +27,8 @@ export const uploadRouter = {
 		})
 		.input(
 			z.object({
-				todoId: z.string(),
+				entityType: z.string(),
+				entityId: z.string(),
 				fileName: z.string(),
 				mimeType: z.enum(ALLOWED_MIME_TYPES),
 				data: z.string(),
@@ -39,17 +40,12 @@ export const uploadRouter = {
 			const userId = context.session.user.id;
 			const activeOrgId = context.session.session.activeOrganizationId;
 
-			const todo = await findTodoById(input.todoId);
-			if (todo && todo.userId !== userId) {
-				throw apiError("NOT_FOUND", context.t("todoNotFound"));
-			}
-
-			if (!todo) {
+			if (input.entityType === "orgTodo") {
 				if (!activeOrgId) {
 					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
 				}
 
-				const orgTodo = await findOrgTodoById(input.todoId);
+				const orgTodo = await findOrgTodoById(input.entityId);
 				if (!orgTodo || orgTodo.organizationId !== activeOrgId) {
 					throw apiError("NOT_FOUND", context.t("todoNotFound"));
 				}
@@ -61,6 +57,11 @@ export const uploadRouter = {
 
 				if (!seated) {
 					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
+				}
+			} else {
+				const todo = await findTodoById(input.entityId);
+				if (!todo || todo.userId !== userId) {
+					throw apiError("NOT_FOUND", context.t("todoNotFound"));
 				}
 			}
 

@@ -15,7 +15,9 @@
 			"default": "./src/hooks/*.ts"
 		}
 	},
-	"scripts": {},
+	"scripts": {
+		"test": "vitest run"
+	},
 	"dependencies": {
 		"@pengana/entity-store": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
@@ -28,6 +30,7 @@
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
 		"@types/react": "^19.2.14",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

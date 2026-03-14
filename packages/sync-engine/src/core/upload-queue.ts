@@ -2,6 +2,7 @@ import type {
 	UploadAdapter,
 	UploadEvent,
 	UploadItem,
+	UploadLifecycleCallbacks,
 	UploadTransport,
 } from "../types";
 import { createEventEmitter } from "./event-emitter";
@@ -9,6 +10,7 @@ import { createEventEmitter } from "./event-emitter";
 export interface UploadQueueConfig {
 	maxRetries?: number;
 	baseBackoffMs?: number;
+	lifecycleCallbacks?: UploadLifecycleCallbacks;
 }
 
 export class UploadQueue {
@@ -19,6 +21,7 @@ export class UploadQueue {
 	private paused = false;
 	private maxRetries: number;
 	private baseBackoffMs: number;
+	private lifecycleCallbacks?: UploadLifecycleCallbacks;
 
 	onEvent = this.events.onEvent;
 
@@ -31,6 +34,7 @@ export class UploadQueue {
 		this.transport = transport;
 		this.maxRetries = config.maxRetries ?? 3;
 		this.baseBackoffMs = config.baseBackoffMs ?? 1000;
+		this.lifecycleCallbacks = config.lifecycleCallbacks;
 	}
 
 	get isProcessing() {
@@ -48,7 +52,8 @@ export class UploadQueue {
 
 	async enqueue(item: {
 		id: string;
-		todoId: string;
+		entityType: string;
+		entityId: string;
 		fileUri: string;
 		mimeType: string;
 	}): Promise<void> {
@@ -73,27 +78,35 @@ export class UploadQueue {
 		this.events.emit({
 			type: "upload:start",
 			timestamp: new Date().toISOString(),
-			detail: `Uploading file for todo ${item.todoId}`,
+			detail: `Uploading file for ${item.entityType} ${item.entityId}`,
 			itemId: item.id,
-			todoId: item.todoId,
+			entityType: item.entityType,
+			entityId: item.entityId,
 		});
 
 		try {
 			const result = await this.transport.upload({
-				todoId: item.todoId,
+				entityType: item.entityType,
+				entityId: item.entityId,
 				fileUri: item.fileUri,
 				mimeType: item.mimeType,
 				idempotencyKey: item.id,
 			});
 
 			await this.adapter.markCompleted(item.id, result.attachmentUrl);
+			await this.lifecycleCallbacks?.onCompleted(
+				item.entityType,
+				item.entityId,
+				result.attachmentUrl,
+			);
 
 			this.events.emit({
 				type: "upload:complete",
 				timestamp: new Date().toISOString(),
 				detail: `Upload complete: ${result.attachmentUrl}`,
 				itemId: item.id,
-				todoId: item.todoId,
+				entityType: item.entityType,
+				entityId: item.entityId,
 			});
 		} catch (error) {
 			await this.handleUploadError(item, error);
@@ -110,9 +123,18 @@ export class UploadQueue {
 			await this.adapter.updateRetry(item.id, newRetryCount);
 			await this.adapter.markFailed(item.id);
 			try {
-				await this.transport.onFailed?.(item.todoId, item.fileUri);
+				await this.transport.onFailed?.(
+					item.entityType,
+					item.entityId,
+					item.fileUri,
+				);
 			} catch (onFailedError) {
 				console.error("transport.onFailed threw:", onFailedError);
+			}
+			try {
+				await this.lifecycleCallbacks?.onFailed(item.entityType, item.entityId);
+			} catch (lcError) {
+				console.error("lifecycleCallbacks.onFailed threw:", lcError);
 			}
 
 			this.events.emit({
@@ -120,7 +142,8 @@ export class UploadQueue {
 				timestamp: new Date().toISOString(),
 				detail: `Upload failed after ${this.maxRetries} attempts: ${error instanceof Error ? error.message : "Unknown error"}`,
 				itemId: item.id,
-				todoId: item.todoId,
+				entityType: item.entityType,
+				entityId: item.entityId,
 			});
 		} else {
 			await this.adapter.updateStatus(item.id, "queued");
@@ -134,7 +157,8 @@ export class UploadQueue {
 				timestamp: new Date().toISOString(),
 				detail: `Upload attempt ${newRetryCount} failed, retrying in ${backoff}ms`,
 				itemId: item.id,
-				todoId: item.todoId,
+				entityType: item.entityType,
+				entityId: item.entityId,
 			});
 		}
 	}

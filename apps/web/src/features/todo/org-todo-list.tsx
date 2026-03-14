@@ -26,6 +26,7 @@ export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
 			triggerSync={triggerSync}
 			enqueueUpload={enqueueUpload}
 			actions={orgActions}
+			entityType="orgTodo"
 		/>
 	);
 }

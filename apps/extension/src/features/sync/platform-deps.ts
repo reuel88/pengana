@@ -3,6 +3,7 @@ import type {
 	SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
 import {
+	createTodoUploadLifecycleCallbacks,
 	createWebUploadAdapter,
 	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
@@ -35,7 +36,7 @@ export function createExtensionPlatformDeps(
 		generateUUID: () => crypto.randomUUID(),
 		createSyncAdapter,
 		createSyncTransport,
-		createUploadAdapter: () => createWebUploadAdapter(appDb),
+		createUploadAdapter: () => createWebUploadAdapter(),
 		createUploadTransport: createIndexedDbUploadTransport,
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {
@@ -46,5 +47,6 @@ export function createExtensionPlatformDeps(
 		},
 		storageHealth: createWebStorageHealthProvider(),
 		removeFile: removeFileFromIndexedDB,
+		uploadLifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
 	};
 }

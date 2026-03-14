@@ -27,6 +27,13 @@ export async function requireAuth() {
 	return { session: { ...session, data: session.data } };
 }
 
+export async function redirectIfAuthenticated() {
+	const session = await authClient.getSession();
+	if (session.data) {
+		throw redirect({ to: "/" });
+	}
+}
+
 export async function requireAuthAndOrg() {
 	let { session } = await requireAuth();
 	const { hasOrganization, organizations } =

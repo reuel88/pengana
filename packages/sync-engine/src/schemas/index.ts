@@ -22,7 +22,8 @@ export const todoSchema = z.object({
 
 export const uploadItemSchema = z.object({
 	id: z.string(),
-	todoId: z.string(),
+	entityType: z.string(),
+	entityId: z.string(),
 	fileUri: z.string(),
 	mimeType: z.string(),
 	status: uploadStatusSchema,

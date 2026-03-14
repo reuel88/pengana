@@ -2,7 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
 import { UploadQueue } from "../core/upload-queue";
-import type { UploadAdapter, UploadEvent, UploadTransport } from "../types";
+import type {
+	UploadAdapter,
+	UploadEvent,
+	UploadLifecycleCallbacks,
+	UploadTransport,
+} from "../types";
 import { useStableSyncRef } from "./use-stable-sync-ref";
 
 interface Syncable {
@@ -16,6 +21,7 @@ export function useUploadQueue(
 	generateUUID: () => string,
 	createUploadAdapter: () => UploadAdapter,
 	createUploadTransport: () => UploadTransport,
+	lifecycleCallbacks?: UploadLifecycleCallbacks,
 ) {
 	// --- State ---
 	const uploadQueueRef = useRef<UploadQueue | null>(null);
@@ -35,7 +41,9 @@ export function useUploadQueue(
 
 		const uploadAdapter = createUploadAdapter();
 		const uploadTransport = createUploadTransport();
-		const queue = new UploadQueue(uploadAdapter, uploadTransport);
+		const queue = new UploadQueue(uploadAdapter, uploadTransport, {
+			lifecycleCallbacks,
+		});
 		uploadQueueRef.current = queue;
 
 		const unsubscribe = queue.onEvent((event) => {
@@ -73,10 +81,16 @@ export function useUploadQueue(
 	}, [isOnline]);
 
 	const enqueueUpload = useCallback(
-		(todoId: string, fileUri: string, mimeType: string) => {
+		(
+			entityType: string,
+			entityId: string,
+			fileUri: string,
+			mimeType: string,
+		) => {
 			uploadQueueRef.current?.enqueue({
 				id: generateUUID(),
-				todoId,
+				entityType,
+				entityId,
 				fileUri,
 				mimeType,
 			});
