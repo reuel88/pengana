@@ -8,6 +8,7 @@ import {
 import { randomUUID } from "expo-crypto";
 import { AppState, Platform } from "react-native";
 import {
+	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
 	createUploadTransport,
 } from "@/features/sync/entities/upload-queue";
@@ -91,5 +92,6 @@ export function createPlatformDeps(
 			return () => subscription.remove();
 		},
 		storageHealth: createNativeStorageHealthProvider(),
+		uploadLifecycleCallbacks: createNativeUploadLifecycleCallbacks(),
 	};
 }

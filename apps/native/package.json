@@ -11,7 +11,10 @@
 		"web": "expo start --web",
 		"test": "vitest run",
 		"check-types": "tsc --noEmit",
-		"db:generate": "drizzle-kit generate"
+		"db:generate": "pnpm db:generate:sql && pnpm db:generate:manifest && pnpm db:check",
+		"db:generate:sql": "drizzle-kit generate",
+		"db:generate:manifest": "node ./scripts/generate-drizzle-migrations-manifest.mjs",
+		"db:check": "node ./scripts/check-drizzle-migrations.mjs"
 	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:",

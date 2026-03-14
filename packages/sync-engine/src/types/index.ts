@@ -31,12 +31,17 @@ export interface UploadAdapter {
 
 export interface UploadTransport {
 	upload(input: {
-		todoId: string;
+		entityType: string;
+		entityId: string;
 		fileUri: string;
 		mimeType: string;
 		idempotencyKey: string;
 	}): Promise<{ attachmentUrl: string }>;
-	onFailed?(todoId: string, fileUri: string): void | Promise<void>;
+	onFailed?(
+		entityType: string,
+		entityId: string,
+		fileUri: string,
+	): void | Promise<void>;
 }
 
 export interface SyncAdapter<T extends { id: string } = Todo> {
@@ -81,7 +86,17 @@ export interface UploadEvent {
 	timestamp: string;
 	detail: string;
 	itemId: string;
-	todoId: string;
+	entityType: string;
+	entityId: string;
+}
+
+export interface UploadLifecycleCallbacks {
+	onCompleted(
+		entityType: string,
+		entityId: string,
+		attachmentUrl: string,
+	): Promise<void>;
+	onFailed(entityType: string, entityId: string): Promise<void>;
 }
 
 import type { StorageLevel } from "./storage-health";
@@ -93,7 +108,12 @@ export interface SyncContextValue {
 	isUploading: boolean;
 	storageLevel: StorageLevel;
 	triggerSync: () => void;
-	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
+	enqueueUpload: (
+		entityType: string,
+		entityId: string,
+		fileUri: string,
+		mimeType: string,
+	) => void;
 }
 
 /** Devtools-only sync state (web/native only, not exposed via useSync). */

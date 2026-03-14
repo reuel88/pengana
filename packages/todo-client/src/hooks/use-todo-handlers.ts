@@ -53,7 +53,13 @@ function resolveActions({
 
 export interface TodoHandlerDeps {
 	triggerSync: () => void;
-	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
+	enqueueUpload: (
+		entityType: string,
+		entityId: string,
+		fileUri: string,
+		mimeType: string,
+	) => void;
+	entityType?: string;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
 	fileStorage: FileStorageStrategy;
@@ -74,6 +80,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		fileStorage: { storeFile, createFileRef },
 		t,
 		onDeleteSuccess,
+		entityType = "todo",
 	} = deps;
 	const actions = resolveActions(deps);
 
@@ -140,7 +147,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				await storeFile(id, file);
 				fileRef = createFileRef(id, file);
 				await actions.attachFile(id, fileRef.uri);
-				enqueueUpload(id, fileRef.uri, file.type);
+				enqueueUpload(entityType, id, fileRef.uri, file.type);
 				fileRef = null;
 				triggerSync();
 			} catch (e) {
@@ -158,6 +165,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			storeFile,
 			createFileRef,
 			actions,
+			entityType,
 			enqueueUpload,
 			triggerSync,
 			onError,

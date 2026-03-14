@@ -6,6 +6,8 @@ import { useCallback, useEffect, useReducer } from "react";
 
 import { authClient } from "@/shared/lib/auth-client";
 
+import { ensureActiveOrganizationForSession } from "./use-lifecycle-check.helpers";
+
 type State = {
 	lifecycleChecked: boolean;
 	needsOnboarding: boolean;
@@ -68,6 +70,13 @@ export function useLifecycleCheck({
 		(async () => {
 			try {
 				const data = await fetchUserLifecycleData(authClient);
+				await ensureActiveOrganizationForSession({
+					authClient,
+					session: session as {
+						session?: { activeOrganizationId?: string | null } | null;
+					},
+					lifecycleData: data,
+				});
 				if (cancelled) return;
 				dispatch({ type: "success", data });
 			} catch (err) {

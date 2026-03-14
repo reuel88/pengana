@@ -13,11 +13,18 @@ export function TodoListConnected({
 	triggerSync,
 	enqueueUpload,
 	actions,
+	entityType,
 }: {
 	todos: (WebTodo | WebOrgTodo)[];
 	triggerSync: () => void;
-	enqueueUpload: (todoId: string, fileUri: string, mimeType: string) => void;
+	enqueueUpload: (
+		entityType: string,
+		entityId: string,
+		fileUri: string,
+		mimeType: string,
+	) => void;
 	actions?: TodoActions;
+	entityType?: string;
 }) {
 	const { t } = useTranslation();
 
@@ -45,6 +52,7 @@ export function TodoListConnected({
 			t,
 			actions,
 			db: appDb,
+			entityType,
 		});
 
 	return (

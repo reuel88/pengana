@@ -37,7 +37,7 @@ export function useFilePicker() {
 			try {
 				await storeFileInIndexedDB(todoId, file);
 				await attachFile(todoId, localUri);
-				enqueueUpload(todoId, localUri, file.type);
+				enqueueUpload("todo", todoId, localUri, file.type);
 			} catch {
 				window.alert(t("errors:failedToAttachFile"));
 			}

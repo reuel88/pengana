@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite";
 
-const expoDb = openDatabaseSync("todos.db", { enableChangeListener: true });
+const expoDb = openDatabaseSync("app.db", { enableChangeListener: true });
 
-export const db = drizzle(expoDb);
+export const appDb = drizzle(expoDb);

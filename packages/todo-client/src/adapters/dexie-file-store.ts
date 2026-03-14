@@ -4,13 +4,13 @@ import { readFileAsBase64 } from "../lib/file-utils";
 import { uploadQueueDb } from "../lib/upload-queue-db";
 
 export async function storeFileInIndexedDB(
-	todoId: string,
+	entityId: string,
 	file: File,
 ): Promise<void> {
 	const base64 = await readFileAsBase64(file);
 	try {
 		await uploadQueueDb.fileData.put({
-			todoId,
+			entityId,
 			base64,
 			mimeType: file.type,
 			fileName: file.name,
@@ -22,11 +22,11 @@ export async function storeFileInIndexedDB(
 }
 
 export async function getFileFromIndexedDB(
-	todoId: string,
+	entityId: string,
 ): Promise<{ base64: string; mimeType: string; fileName: string } | undefined> {
-	return uploadQueueDb.fileData.get(todoId);
+	return uploadQueueDb.fileData.get(entityId);
 }
 
-export async function removeFileFromIndexedDB(todoId: string): Promise<void> {
-	await uploadQueueDb.fileData.delete(todoId);
+export async function removeFileFromIndexedDB(entityId: string): Promise<void> {
+	await uploadQueueDb.fileData.delete(entityId);
 }

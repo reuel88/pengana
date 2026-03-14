@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { OrgSyncProvider } from "@/features/sync/org-sync-context";
 import { SyncProvider } from "@/features/sync/sync-context";
-import { db } from "@/features/todo/entities/todo";
+import { appDb } from "@/features/todo/entities/todo";
 import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 import migrations from "../../drizzle/migrations";
@@ -22,7 +22,7 @@ export function TodoPage({
 	userId: string;
 	organizationId?: string;
 }) {
-	const { success, error } = useMigrations(db, migrations);
+	const { success, error } = useMigrations(appDb, migrations);
 	const { theme } = useTheme();
 	const { t } = useTranslation("errors");
 	const [activeTab, setActiveTab] = useState<TodoTab>("personal");

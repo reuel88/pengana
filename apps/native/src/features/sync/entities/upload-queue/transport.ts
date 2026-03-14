@@ -1,32 +1,16 @@
-import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
-import { MIME_TO_EXT } from "@pengana/sync-engine";
+import type { UploadTransport } from "@pengana/sync-engine";
+import { createUploadTransport } from "@pengana/todo-client";
 
 import { File } from "expo-file-system";
 
 import { client } from "@/shared/api/orpc";
 
 export function createNativeUploadTransport(): UploadTransport {
-	return {
-		async upload(input: {
-			todoId: string;
-			fileUri: string;
-			mimeType: string;
-			idempotencyKey: string;
-		}): Promise<{ attachmentUrl: string }> {
+	return createUploadTransport({
+		rpc: client.upload,
+		async getBase64(input) {
 			const file = new File(input.fileUri);
-			const data = await file.base64();
-
-			const ext = MIME_TO_EXT[input.mimeType] ?? "bin";
-
-			const result = await client.upload.upload({
-				todoId: input.todoId,
-				fileName: `attachment-${Date.now()}.${ext}`,
-				mimeType: input.mimeType as AllowedMimeType,
-				data,
-				idempotencyKey: input.idempotencyKey,
-			});
-
-			return result.data;
+			return file.base64();
 		},
-	};
+	});
 }

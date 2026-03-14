@@ -10,6 +10,7 @@ import {
 import {
 	createDexieOrgSyncAdapter,
 	createDexieSyncAdapter,
+	createTodoUploadLifecycleCallbacks,
 	createWebUploadAdapter,
 	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
@@ -36,7 +37,7 @@ const engines = new Map<
 >();
 
 const storageHealthProvider = createWebStorageHealthProvider();
-const uploadAdapter = createWebUploadAdapter(appDb);
+const uploadAdapter = createWebUploadAdapter();
 
 // --- Helpers ---
 
@@ -97,7 +98,9 @@ function createEngine(scope: SyncScope): {
 
 	const engine = new SyncEngine(adapter, transport);
 	const uploadTransport = createIndexedDbUploadTransport();
-	const uploadQueue = new UploadQueue(uploadAdapter, uploadTransport);
+	const uploadQueue = new UploadQueue(uploadAdapter, uploadTransport, {
+		lifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
+	});
 
 	uploadQueue.onEvent((event) => {
 		if (event.type === "upload:complete") {

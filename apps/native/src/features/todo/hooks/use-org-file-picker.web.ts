@@ -37,7 +37,7 @@ export function useOrgFilePicker() {
 			try {
 				await storeFileInIndexedDB(todoId, file);
 				await attachOrgFile(todoId, localUri);
-				enqueueUpload(todoId, localUri, file.type);
+				enqueueUpload("orgTodo", todoId, localUri, file.type);
 			} catch {
 				window.alert(t("errors:failedToAttachFile"));
 			}

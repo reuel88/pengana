@@ -10,7 +10,8 @@ import { UploadQueue } from "./upload-queue";
 function makeUploadItem(overrides: Partial<UploadItem> = {}): UploadItem {
 	return {
 		id: "upload-1",
-		todoId: "todo-1",
+		entityType: "todo",
+		entityId: "todo-1",
 		fileUri: "file:///test.jpg",
 		mimeType: "image/jpeg",
 		status: "queued",
@@ -63,7 +64,8 @@ describe("UploadQueue", () => {
 	it("enqueue adds item to adapter and triggers processQueue", async () => {
 		await queue.enqueue({
 			id: "u1",
-			todoId: "t1",
+			entityType: "todo",
+			entityId: "t1",
 			fileUri: "file:///a.jpg",
 			mimeType: "image/jpeg",
 		});
@@ -71,7 +73,8 @@ describe("UploadQueue", () => {
 		expect(adapter.addToQueue).toHaveBeenCalledWith(
 			expect.objectContaining({
 				id: "u1",
-				todoId: "t1",
+				entityType: "todo",
+				entityId: "t1",
 				status: "queued",
 				retryCount: 0,
 			}),
@@ -228,7 +231,11 @@ describe("UploadQueue", () => {
 		const events: UploadEvent[] = [];
 		queue.onEvent((e) => events.push(e));
 
-		const item = makeUploadItem({ id: "u1", todoId: "t1" });
+		const item = makeUploadItem({
+			id: "u1",
+			entityType: "todo",
+			entityId: "t1",
+		});
 		vi.mocked(adapter.getNextQueued)
 			.mockResolvedValueOnce(item)
 			.mockResolvedValueOnce(null);

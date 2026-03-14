@@ -3,7 +3,7 @@ import type { UploadItem } from "@pengana/sync-engine";
 import Dexie, { type EntityTable } from "dexie";
 
 export interface FileDataRecord {
-	todoId: string;
+	entityId: string;
 	base64: string;
 	mimeType: string;
 	fileName: string;
@@ -11,7 +11,7 @@ export interface FileDataRecord {
 
 export class UploadQueueDatabase extends Dexie {
 	uploadQueue!: EntityTable<UploadItem, "id">;
-	fileData!: EntityTable<FileDataRecord, "todoId">;
+	fileData!: EntityTable<FileDataRecord, "entityId">;
 
 	constructor() {
 		super("UploadQueueDatabase");
@@ -22,6 +22,30 @@ export class UploadQueueDatabase extends Dexie {
 		this.version(2).stores({
 			uploadQueue: "id, todoId, status, createdAt",
 			fileData: "todoId",
+		});
+		// v3: Migrate uploadQueue columns, drop fileData (Dexie can't change primary keys)
+		this.version(3)
+			.stores({
+				uploadQueue: "id, entityType, entityId, status, createdAt",
+				fileData: null,
+			})
+			.upgrade((tx) => {
+				return tx
+					.table("uploadQueue")
+					.toCollection()
+					.modify((item: Record<string, unknown>) => {
+						if (!item.entityType) {
+							item.entityType = "todo";
+						}
+						if (!item.entityId && item.todoId) {
+							item.entityId = item.todoId;
+						}
+						delete item.todoId;
+					});
+			});
+		// v4: Recreate fileData with entityId as primary key
+		this.version(4).stores({
+			fileData: "entityId",
 		});
 	}
 }

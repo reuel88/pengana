@@ -3,17 +3,17 @@ import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { asc, eq } from "drizzle-orm";
 
-import { db } from "@/features/todo/entities/todo/db";
-import { todos } from "@/features/todo/entities/todo/schema";
+import { appDb } from "@/features/todo/entities/todo/db";
 import { uploadQueue } from "./schema";
 
 export function createNativeUploadAdapter(): UploadAdapter {
 	return {
 		async addToQueue(item: UploadItem): Promise<void> {
 			try {
-				await db.insert(uploadQueue).values({
+				await appDb.insert(uploadQueue).values({
 					id: item.id,
-					todoId: item.todoId,
+					entityType: item.entityType,
+					entityId: item.entityId,
 					fileUri: item.fileUri,
 					mimeType: item.mimeType,
 					status: item.status,
@@ -27,7 +27,7 @@ export function createNativeUploadAdapter(): UploadAdapter {
 		},
 
 		async getNextQueued(): Promise<UploadItem | null> {
-			const [row] = await db
+			const [row] = await appDb
 				.select()
 				.from(uploadQueue)
 				.where(eq(uploadQueue.status, "queued"))
@@ -38,7 +38,8 @@ export function createNativeUploadAdapter(): UploadAdapter {
 
 			return {
 				id: row.id,
-				todoId: row.todoId,
+				entityType: row.entityType,
+				entityId: row.entityId,
 				fileUri: row.fileUri,
 				mimeType: row.mimeType,
 				status: row.status,
@@ -51,76 +52,43 @@ export function createNativeUploadAdapter(): UploadAdapter {
 			id: string,
 			status: UploadItem["status"],
 		): Promise<void> {
-			await db
+			await appDb
 				.update(uploadQueue)
 				.set({ status })
 				.where(eq(uploadQueue.id, id));
 		},
 
 		async updateRetry(id: string, retryCount: number): Promise<void> {
-			await db
+			await appDb
 				.update(uploadQueue)
 				.set({ retryCount })
 				.where(eq(uploadQueue.id, id));
 		},
 
-		async markCompleted(id: string, attachmentUrl: string): Promise<void> {
-			const [item] = await db
-				.select()
-				.from(uploadQueue)
-				.where(eq(uploadQueue.id, id));
-
-			if (!item) return;
-
-			await db
+		async markCompleted(id: string, _attachmentUrl: string): Promise<void> {
+			await appDb
 				.update(uploadQueue)
 				.set({ status: "uploaded" })
 				.where(eq(uploadQueue.id, id));
-
-			await db
-				.update(todos)
-				.set({
-					attachmentUrl,
-					attachmentStatus: "uploaded",
-					updatedAt: new Date().toISOString(),
-					syncStatus: "pending",
-				})
-				.where(eq(todos.id, item.todoId));
 		},
 
 		async markFailed(id: string): Promise<void> {
-			const [item] = await db
-				.select()
-				.from(uploadQueue)
-				.where(eq(uploadQueue.id, id));
-
-			if (!item) return;
-
-			await db
+			await appDb
 				.update(uploadQueue)
 				.set({ status: "failed" })
 				.where(eq(uploadQueue.id, id));
-
-			// Intentionally does NOT set syncStatus: 'pending'. A failed upload
-			// should not trigger sync — the user should retry the upload.
-			await db
-				.update(todos)
-				.set({
-					attachmentStatus: "failed",
-					updatedAt: new Date().toISOString(),
-				})
-				.where(eq(todos.id, item.todoId));
 		},
 
 		async getQueueItems(): Promise<UploadItem[]> {
-			const rows = await db
+			const rows = await appDb
 				.select()
 				.from(uploadQueue)
 				.orderBy(asc(uploadQueue.createdAt));
 
 			return rows.map((row) => ({
 				id: row.id,
-				todoId: row.todoId,
+				entityType: row.entityType,
+				entityId: row.entityId,
 				fileUri: row.fileUri,
 				mimeType: row.mimeType,
 				status: row.status,
@@ -130,7 +98,7 @@ export function createNativeUploadAdapter(): UploadAdapter {
 		},
 
 		async removeItem(id: string): Promise<void> {
-			await db.delete(uploadQueue).where(eq(uploadQueue.id, id));
+			await appDb.delete(uploadQueue).where(eq(uploadQueue.id, id));
 		},
 	};
 }
