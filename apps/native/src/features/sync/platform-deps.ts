@@ -36,12 +36,13 @@ async function getNativeWsUrl() {
 		throw new Error(`Failed to issue WebSocket ticket (${response.status})`);
 	}
 
-	const body = (await response.json()) as { ticket?: string };
-	if (!body.ticket) {
+	const body = (await response.json()) as { data: { ticket: string } };
+	const ticket = body.data.ticket;
+	if (!ticket) {
 		throw new Error("Missing WebSocket ticket");
 	}
 
-	return `${base}?ticket=${encodeURIComponent(body.ticket)}`;
+	return `${base}?ticket=${encodeURIComponent(ticket)}`;
 }
 
 function getWsUrl() {

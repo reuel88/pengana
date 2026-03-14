@@ -9,7 +9,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import { createAuthResponseGuard } from "./auth-response-guard";
-import { errorEnvelope } from "./error-envelope";
+import { errorEnvelope, successEnvelope } from "./error-envelope";
 import { initLogger, logger, requestLogger } from "./logger";
 import { handleOrpcRoutes, wireNotifications } from "./orpc";
 import {
@@ -27,6 +27,8 @@ const app = new Hono();
 
 app.use(requestLogger);
 const allowedOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
+// find(Boolean) picks the first non-empty origin string after splitting,
+// guarding against leading commas or whitespace-only entries in CORS_ORIGIN.
 const webUrl =
 	env.WEB_URL ?? allowedOrigins.find(Boolean) ?? "http://localhost:3001";
 
@@ -83,7 +85,7 @@ app.post("/api/ws-ticket", async (c) => {
 			401,
 		);
 	}
-	return c.json({ ticket: issueWsTicket(session.user.id) });
+	return c.json(successEnvelope({ ticket: issueWsTicket(session.user.id) }));
 });
 
 // handleOrpcRoutes only matches /rpc and /api-reference; all other paths fall through

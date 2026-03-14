@@ -18,6 +18,7 @@
 		"skip": "Pular por enquanto",
 		"success": "Convites enviados",
 		"error": "Falha ao enviar o convite",
+		"partialError": "Alguns convites falharam",
 		"remove": "Remover"
 	},
 	"create": {

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
+import { makeDeleteAccountSchema } from "@pengana/i18n/zod";
+import { useZodForm } from "@pengana/org-client";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
@@ -13,8 +14,28 @@ export default function DeleteAccountScreen() {
 	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const router = useRouter();
-	const [confirmation, setConfirmation] = useState("");
 	const confirmKeyword = t("auth:settings.deleteAccount.confirmKeyword");
+
+	const form = useZodForm({
+		schema: makeDeleteAccountSchema(t, confirmKeyword),
+		defaultValues: {
+			confirmation: "",
+		},
+		onSubmit: async () => {
+			await authClient.deleteUser(undefined, {
+				onSuccess: () => {
+					queryClient.clear();
+					router.replace("/(auth)/login");
+				},
+				onError: (err) => {
+					Alert.alert(
+						t("error:title"),
+						err.error.message || t("error:generic"),
+					);
+				},
+			});
+		},
+	});
 
 	return (
 		<Container>
@@ -22,41 +43,43 @@ export default function DeleteAccountScreen() {
 				<Text style={{ color: theme.notification }}>
 					{t("auth:settings.deleteAccount.warning")}
 				</Text>
-				<ThemedTextInput
-					label={t("auth:settings.deleteAccount.confirm", {
-						keyword: confirmKeyword,
+				<form.Field name="confirmation">
+					{(field) => (
+						<ThemedTextInput
+							label={t("auth:settings.deleteAccount.confirm", {
+								keyword: confirmKeyword,
+							})}
+							value={field.state.value}
+							onChangeText={field.handleChange}
+						/>
+					)}
+				</form.Field>
+				<form.Subscribe
+					selector={(state) => ({
+						canSubmit: state.canSubmit,
+						isSubmitting: state.isSubmitting,
 					})}
-					value={confirmation}
-					onChangeText={setConfirmation}
-				/>
-				<TouchableOpacity
-					style={[
-						styles.button,
-						{
-							backgroundColor: theme.notification,
-							opacity: confirmation === confirmKeyword ? 1 : 0.5,
-						},
-					]}
-					disabled={confirmation !== confirmKeyword}
-					onPress={async () => {
-						await authClient.deleteUser(undefined, {
-							onSuccess: () => {
-								queryClient.clear();
-								router.replace("/(auth)/login");
-							},
-							onError: (err) => {
-								Alert.alert(
-									t("error:title"),
-									err.error.message || t("error:generic"),
-								);
-							},
-						});
-					}}
 				>
-					<Text style={styles.buttonText}>
-						{t("auth:settings.deleteAccount.submit")}
-					</Text>
-				</TouchableOpacity>
+					{(state) => (
+						<TouchableOpacity
+							style={[
+								styles.button,
+								{
+									backgroundColor: theme.notification,
+									opacity: state.canSubmit && !state.isSubmitting ? 1 : 0.5,
+								},
+							]}
+							disabled={!state.canSubmit || state.isSubmitting}
+							onPress={form.handleSubmit}
+						>
+							<Text style={styles.buttonText}>
+								{state.isSubmitting
+									? t("submitting")
+									: t("auth:settings.deleteAccount.submit")}
+							</Text>
+						</TouchableOpacity>
+					)}
+				</form.Subscribe>
 			</View>
 		</Container>
 	);

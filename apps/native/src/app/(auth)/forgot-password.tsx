@@ -62,6 +62,9 @@ export default function ForgotPasswordScreen() {
 			setSubmitError(null);
 			setNotice(null);
 
+			// Anti-enumeration: always show the same generic success message regardless
+			// of whether the email exists. This prevents attackers from discovering
+			// which emails are registered in the system.
 			await authClient.requestPasswordReset(
 				{
 					email: value.email.trim(),

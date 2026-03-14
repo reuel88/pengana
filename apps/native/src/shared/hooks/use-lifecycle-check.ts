@@ -81,7 +81,7 @@ export function useLifecycleCheck({
 				dispatch({ type: "success", data });
 			} catch (err) {
 				if (!cancelled) {
-					console.error("Failed to check org lifecycle:", err);
+					if (__DEV__) console.error("Failed to check org lifecycle:", err);
 					dispatch({ type: "error" });
 				}
 			}

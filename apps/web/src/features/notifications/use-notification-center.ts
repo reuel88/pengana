@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { filterPendingInvitations } from "@pengana/org-client";
 import { toast } from "sonner";
 import {
 	useInvalidateNotifications,
@@ -7,6 +8,7 @@ import {
 import { client } from "@/shared/api/orpc";
 import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";
+
 export function useNotificationCenter() {
 	const { t } = useTranslation("organization");
 	const { data: invitations } = useUserInvitations();
@@ -14,10 +16,6 @@ export function useNotificationCenter() {
 	const { invalidateNotifications } = useInvalidateNotifications();
 
 	const invitationActions = useInvitationActions({
-		successMessage: t("invitations.acceptSuccess"),
-		errorMessage: t("invitations.error"),
-		rejectSuccessMessage: t("invitations.rejectSuccess"),
-		rejectErrorMessage: t("invitations.error"),
 		onAcceptSuccess: async (invitationId) => {
 			await client.notification
 				.onInvitationAccepted({ invitationId })
@@ -28,7 +26,7 @@ export function useNotificationCenter() {
 		},
 	});
 
-	const pending = invitations?.filter((i) => i.status === "pending") ?? [];
+	const pending = filterPendingInvitations(invitations ?? []);
 	const unreadNotifications = notifications ?? [];
 	const badgeCount = pending.length + unreadNotifications.length;
 

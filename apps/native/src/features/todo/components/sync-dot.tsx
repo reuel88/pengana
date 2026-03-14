@@ -15,6 +15,7 @@ export function SyncDot({ status }: { status: Todo["syncStatus"] }) {
 
 	return (
 		<View
+			testID="sync-dot"
 			style={[styles.syncDot, { backgroundColor: SYNC_STATUS_COLORS[status] }]}
 			accessibilityLabel={labels[status]}
 			accessible

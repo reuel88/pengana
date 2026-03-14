@@ -1,5 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCancelInvitation } from "@pengana/org-client";
+import {
+	filterPendingInvitations,
+	useCancelInvitation,
+} from "@pengana/org-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { InviteMemberForm } from "@/features/org-management/invite-member-form";
@@ -22,18 +25,17 @@ function InvitationsPage() {
 		onError: (message) => toast.error(message || t("invitations.error")),
 	});
 
-	const pendingUserInvitations = (myInvitations ?? []).filter(
-		(i) => i.status === "pending",
-	);
+	const pendingUserInvitations = filterPendingInvitations(myInvitations ?? []);
 
-	const { activeOrg, guardElement } = useOrgGuard();
-	if (guardElement || !activeOrg) return guardElement;
+	const guard = useOrgGuard();
+	if (!guard.ready) return guard.guardElement;
 
-	const invitations = activeOrg?.invitations || [];
+	const { activeOrg } = guard;
+	const invitations = activeOrg.invitations || [];
 
 	return (
 		<div className="flex flex-col gap-6">
-			{isAdmin && <InviteMemberForm organizationId={activeOrg?.id} />}
+			{isAdmin && <InviteMemberForm organizationId={activeOrg.id} />}
 			<OrgInvitationsTable
 				invitations={invitations}
 				isAdmin={isAdmin}

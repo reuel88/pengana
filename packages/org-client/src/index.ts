@@ -42,6 +42,7 @@ export type { UseZodFormOptions } from "./hooks/use-zod-form";
 export { useZodForm } from "./hooks/use-zod-form";
 export type { AuthMutationOptions, NotifyFn } from "./lib/auth-mutation";
 export { authMutation } from "./lib/auth-mutation";
+export { filterPendingInvitations } from "./lib/filter-pending-invitations";
 export { orgQueryKeys } from "./lib/org-query-keys";
 export {
 	addMemberSchema,

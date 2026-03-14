@@ -18,6 +18,7 @@
 		"skip": "나중에 하기",
 		"success": "초대가 전송되었습니다",
 		"error": "초대를 보내지 못했습니다",
+		"partialError": "일부 초대를 보내지 못했습니다",
 		"remove": "삭제"
 	},
 	"create": {

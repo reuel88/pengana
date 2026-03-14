@@ -27,11 +27,12 @@ function SuccessPage() {
 	});
 
 	const didConfirm = useRef(false);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ref guard prevents double-execution, empty deps is intentional for mount-only effect
 	useEffect(() => {
 		if (didConfirm.current) return;
 		didConfirm.current = true;
 		confirmCheckout.mutate();
-	}, [confirmCheckout.mutate]);
+	}, []);
 
 	return (
 		<div className="container mx-auto px-4 py-8">

@@ -1,32 +1,25 @@
+import { useTranslation } from "@pengana/i18n";
 import { useInvitationActions as useInvitationActionsBase } from "@pengana/org-client";
 import { toast } from "sonner";
 
 export function useInvitationActions({
-	successMessage,
-	errorMessage,
-	rejectSuccessMessage,
-	rejectErrorMessage,
 	onAcceptSuccess,
 	onRejectSuccess,
 }: {
-	successMessage: string;
-	errorMessage: string;
-	rejectSuccessMessage?: string;
-	rejectErrorMessage?: string;
 	onAcceptSuccess?: (invitationId: string) => void | Promise<void>;
 	onRejectSuccess?: () => void | Promise<void>;
-}) {
+} = {}) {
+	const { t } = useTranslation("organization");
+
 	return useInvitationActionsBase({
 		onAcceptSuccess: async (invitationId) => {
-			toast.success(successMessage);
+			toast.success(t("invitations.acceptSuccess"));
 			await onAcceptSuccess?.(invitationId);
 		},
-
 		onRejectSuccess: async () => {
-			toast.success(rejectSuccessMessage ?? successMessage);
+			toast.success(t("invitations.rejectSuccess"));
 			await onRejectSuccess?.();
 		},
-		onError: (message) =>
-			toast.error(message || rejectErrorMessage || errorMessage),
+		onError: (message) => toast.error(message || t("invitations.error")),
 	});
 }

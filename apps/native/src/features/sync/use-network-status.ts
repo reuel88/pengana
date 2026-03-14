@@ -2,7 +2,7 @@ import * as Network from "expo-network";
 import { useEffect, useState } from "react";
 
 export function useNetworkStatus() {
-	const [isOnline, setIsOnline] = useState(false);
+	const [isOnline, setIsOnline] = useState(true);
 	const [simulateOffline, setSimulateOffline] = useState(false);
 
 	useEffect(() => {

@@ -18,6 +18,7 @@
 		"skip": "暂时跳过",
 		"success": "邀请已发送",
 		"error": "发送邀请失败",
+		"partialError": "部分邀请发送失败",
 		"remove": "移除"
 	},
 	"create": {

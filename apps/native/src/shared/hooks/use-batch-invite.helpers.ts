@@ -1,6 +1,6 @@
-type BatchInviteEntry = { email: string; role: "member" | "admin" };
+export type BatchInviteEntry = { email: string; role: "member" | "admin" };
 
-type BatchInviteFailure = BatchInviteEntry & {
+export type BatchInviteFailure = BatchInviteEntry & {
 	reason?: "missing-organization";
 };
 

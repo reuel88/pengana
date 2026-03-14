@@ -53,16 +53,14 @@ export function OnboardingInviteMembers({
 			if (!result || result.failures.length === 0) {
 				return;
 			}
+			const failedEmails = result.failures
+				.map((failure) => failure.email)
+				.join(", ");
 			if (result.successes.length === 0) {
-				toast.error(
-					`${t("invite.error")}: ${result.failures.map((failure) => failure.email).join(", ")}`,
-				);
+				toast.error(`${t("invite.error")}: ${failedEmails}`);
 				return;
 			}
-
-			toast.error(
-				`${t("invite.error")}: ${result.failures.map((failure) => failure.email).join(", ")}`,
-			);
+			toast.warning(`${t("invite.partialError")}: ${failedEmails}`);
 		},
 	});
 
@@ -140,7 +138,7 @@ export function OnboardingInviteMembers({
 						onClick={() =>
 							form.pushFieldValue("members", {
 								email: "",
-								role: "member" as const,
+								role: "member" as "member" | "admin",
 							})
 						}
 					>

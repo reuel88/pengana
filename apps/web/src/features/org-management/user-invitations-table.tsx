@@ -12,11 +12,7 @@ export function UserInvitationsTable({
 }) {
 	const { t } = useTranslation("organization");
 
-	const { actingId, handleAccept, handleReject } = useInvitationActions({
-		successMessage: t("invitations.acceptSuccess"),
-		errorMessage: t("invitations.error"),
-		rejectSuccessMessage: t("invitations.rejectSuccess"),
-	});
+	const { actingId, handleAccept, handleReject } = useInvitationActions();
 
 	const columns: Column<UserInvitation>[] = [
 		{

@@ -97,7 +97,10 @@ export default function TeamsIndexScreen() {
 							{ borderColor: theme.border, backgroundColor: theme.card },
 						]}
 						onPress={() =>
-							router.push(`/(drawer)/(org)/teams/${team.id}` as never)
+							router.push({
+								pathname: "/(drawer)/(org)/teams/[teamId]",
+								params: { teamId: team.id },
+							})
 						}
 					>
 						<Text style={{ color: theme.text }}>{team.name}</Text>

@@ -14,10 +14,10 @@ function redactId(id: string): string {
 	return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
-function sendMessage(ws: WebSocket, payload: WsMessage) {
-	if (ws.readyState === WebSocket.OPEN) {
-		ws.send(JSON.stringify(payload));
-	}
+function sendMessage(ws: WebSocket, payload: WsMessage): boolean {
+	if (ws.readyState !== WebSocket.OPEN) return false;
+	ws.send(JSON.stringify(payload));
+	return true;
 }
 
 async function authenticateRequest(
@@ -148,20 +148,20 @@ export function setupWebSocket(server: ServerType) {
 		const payload: WsMessage = { type: "sync-notify" };
 		let sentCount = 0;
 		for (const ws of sockets) {
-			if (ws.readyState === WebSocket.OPEN) {
-				sendMessage(ws, payload);
-				sentCount++;
-			}
+			if (sendMessage(ws, payload)) sentCount++;
 		}
 		wsLogger.debug`notifyUser(${redactId(userId)}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
+	// Cached dynamic import avoids a circular dependency: db -> auth -> ws -> db
+	let seatQueriesPromise: Promise<
+		typeof import("@pengana/db/seat-queries")
+	> | null = null;
+
 	async function notifyOrgMembers(orgId: string) {
 		try {
-			// Dynamic import avoids a circular dependency: db -> auth -> ws -> db
-			const { getSeatedMemberUserIds } = await import(
-				"@pengana/db/seat-queries"
-			);
+			seatQueriesPromise ??= import("@pengana/db/seat-queries");
+			const { getSeatedMemberUserIds } = await seatQueriesPromise;
 			const memberUserIds = await getSeatedMemberUserIds(orgId);
 			for (const uid of memberUserIds) {
 				notifyUser(uid);

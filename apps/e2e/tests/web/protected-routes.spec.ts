@@ -48,20 +48,20 @@ test.describe("Protected Routes", () => {
 		authenticatedWithOrgPage: { page },
 	}) => {
 		await page.goto("/login");
-		await expect(page).toHaveURL(/\/$/);
+		await expect(page).toHaveURL(/:\d+\/$/);
 	});
 
 	test("authenticated user with org visiting /sign-up is sent to /", async ({
 		authenticatedWithOrgPage: { page },
 	}) => {
 		await page.goto("/sign-up");
-		await expect(page).toHaveURL(/\/$/);
+		await expect(page).toHaveURL(/:\d+\/$/);
 	});
 
 	test("authenticated user with org visiting /forgot-password is sent to /", async ({
 		authenticatedWithOrgPage: { page },
 	}) => {
 		await page.goto("/forgot-password");
-		await expect(page).toHaveURL(/\/$/);
+		await expect(page).toHaveURL(/:\d+\/$/);
 	});
 });

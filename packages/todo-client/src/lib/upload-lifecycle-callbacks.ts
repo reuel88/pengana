@@ -25,12 +25,7 @@ export function createTodoUploadLifecycleCallbacks(
 			if (entityType === "orgTodo") {
 				await orgTodosTable.update(entityId, updateData as never);
 			} else {
-				const personalTodo = await todosTable.get(entityId);
-				if (personalTodo) {
-					await todosTable.update(entityId, updateData as never);
-				} else {
-					await orgTodosTable.update(entityId, updateData as never);
-				}
+				await todosTable.update(entityId, updateData as never);
 			}
 		},
 
@@ -43,12 +38,7 @@ export function createTodoUploadLifecycleCallbacks(
 			if (entityType === "orgTodo") {
 				await orgTodosTable.update(entityId, updateData as never);
 			} else {
-				const personalTodo = await todosTable.get(entityId);
-				if (personalTodo) {
-					await todosTable.update(entityId, updateData as never);
-				} else {
-					await orgTodosTable.update(entityId, updateData as never);
-				}
+				await todosTable.update(entityId, updateData as never);
 			}
 		},
 	};

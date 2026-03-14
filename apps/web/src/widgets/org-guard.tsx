@@ -5,20 +5,25 @@ import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 
 export type ActiveOrg = NonNullable<ReturnType<typeof useActiveOrg>["data"]>;
 
-export function useOrgGuard() {
+type OrgGuardResult =
+	| { ready: true; activeOrg: ActiveOrg; guardElement?: undefined }
+	| { ready: false; activeOrg?: undefined; guardElement: ReactNode };
+
+export function useOrgGuard(): OrgGuardResult {
 	const { t } = useTranslation("organization");
 	const { data: activeOrg, isPending, isError } = useActiveOrg();
 
-	let guardElement: ReactNode = null;
 	if (isPending) {
-		guardElement = <p>{t("common:status.loading")}</p>;
-	} else if (isError) {
-		guardElement = <p>{t("common:status.error")}</p>;
-	} else if (!activeOrg) {
-		guardElement = <p>{t("noActiveOrgFound")}</p>;
+		return { ready: false, guardElement: <p>{t("common:status.loading")}</p> };
+	}
+	if (isError) {
+		return { ready: false, guardElement: <p>{t("common:status.error")}</p> };
+	}
+	if (!activeOrg) {
+		return { ready: false, guardElement: <p>{t("noActiveOrgFound")}</p> };
 	}
 
-	return { activeOrg, guardElement };
+	return { ready: true, activeOrg };
 }
 
 export function OrgGuard({
@@ -26,9 +31,9 @@ export function OrgGuard({
 }: {
 	children: (org: ActiveOrg) => ReactNode;
 }) {
-	const { activeOrg, guardElement } = useOrgGuard();
+	const guard = useOrgGuard();
 
-	if (guardElement || !activeOrg) return <>{guardElement}</>;
+	if (!guard.ready) return <>{guard.guardElement}</>;
 
-	return <>{children(activeOrg)}</>;
+	return <>{children(guard.activeOrg)}</>;
 }

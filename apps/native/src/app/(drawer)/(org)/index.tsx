@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { Href } from "expo-router";
 import { useRouter } from "expo-router";
 import {
 	ScrollView,
@@ -56,7 +57,7 @@ export default function OrgIndexScreen() {
 												backgroundColor: theme.card,
 											},
 										]}
-										onPress={() => router.push(route as never)}
+										onPress={() => router.push(route as Href)}
 									>
 										<Text style={{ color: theme.text }}>{label}</Text>
 									</TouchableOpacity>

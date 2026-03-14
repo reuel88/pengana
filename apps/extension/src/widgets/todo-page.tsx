@@ -1,29 +1,48 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgTodos, useTodos } from "@pengana/todo-client";
+import type { TodoActions } from "@pengana/todo-client";
+import {
+	addOrgTodo,
+	addTodo,
+	attachOrgFile,
+	deleteOrgTodo,
+	resolveOrgConflict,
+	toggleOrgTodo,
+	useOrgTodos,
+	useTodos,
+} from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { OrgSyncProvider, useOrgSync } from "@/features/sync/org-sync-context";
 import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { useBackgroundPort } from "@/features/sync/use-background-port";
-import { OrgTodoInput } from "@/features/todo/org-todo-input";
-import { OrgTodoList } from "@/features/todo/org-todo-list";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import type { SyncScope } from "@/shared/api/background-messages";
 import { appDb } from "@/shared/db";
 
+const orgActions: TodoActions = {
+	toggleTodo: (id) => toggleOrgTodo(appDb, id),
+	deleteTodo: (id) => deleteOrgTodo(appDb, id),
+	resolveConflict: (id, resolution) =>
+		resolveOrgConflict(appDb, id, resolution),
+	attachFile: (id, localUri) => attachOrgFile(appDb, id, localUri),
+};
+
 type Tab = "personal" | "organization";
 
 function TodoContent({ userId }: { userId: string }) {
 	const { todos } = useTodos(appDb, userId);
-	const { isOnline, isSyncing } = useSync();
+	const sync = useSync();
 
 	return (
 		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<TodoInput userId={userId} />
-			<TodoList todos={todos} />
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) => addTodo(appDb, userId, title)}
+				triggerSync={sync.triggerSync}
+			/>
+			<TodoList todos={todos} syncHook={sync} />
 		</div>
 	);
 }
@@ -36,13 +55,21 @@ function OrgTodoContent({
 	userId: string;
 }) {
 	const { todos } = useOrgTodos(appDb, organizationId);
-	const { isOnline, isSyncing } = useOrgSync();
+	const sync = useOrgSync();
 
 	return (
 		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList todos={todos} />
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) => addOrgTodo(appDb, organizationId, userId, title)}
+				triggerSync={sync.triggerSync}
+			/>
+			<TodoList
+				todos={todos}
+				syncHook={sync}
+				actions={orgActions}
+				entityType="orgTodo"
+			/>
 		</div>
 	);
 }

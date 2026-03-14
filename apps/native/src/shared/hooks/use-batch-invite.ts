@@ -1,14 +1,12 @@
 import { useAuthClient } from "@pengana/org-client";
 import { useState } from "react";
 
+import type {
+	BatchInviteEntry,
+	BatchInviteFailure,
+} from "./use-batch-invite.helpers";
 import { runBatchInvitePostProcessing } from "./use-batch-invite.helpers";
 import { useInvalidateOrg } from "./use-org-queries";
-
-type BatchInviteEntry = { email: string; role: "member" | "admin" };
-
-type BatchInviteFailure = BatchInviteEntry & {
-	reason?: "missing-organization";
-};
 
 export function useBatchInvite({
 	organizationId,

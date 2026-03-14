@@ -7,6 +7,7 @@ import {
 
 export const appDb = new EntityDatabase("AppDatabase")
 	.applySchema(1, [todoEntity])
+	// v2: no-op — kept for users who upgraded to v2 before v3 was added
 	.applySchema(2, [todoEntity])
 	.applySchema(3, [todoEntity, orgTodoEntity])
 	.applySchema(4, [todoEntity, orgTodoEntity], uploadRawStores);

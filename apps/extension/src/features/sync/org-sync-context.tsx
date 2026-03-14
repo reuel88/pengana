@@ -1,5 +1,8 @@
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
-import { createDexieOrgSyncAdapter } from "@pengana/todo-client";
+import {
+	createDexieOrgSyncAdapter,
+	createOrgSyncTransport,
+} from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 import { createExtensionPlatformDeps } from "./platform-deps";
@@ -12,28 +15,10 @@ export {
 
 const orgDeps = createExtensionPlatformDeps(
 	(organizationId) => createDexieOrgSyncAdapter(appDb, organizationId),
-	() => ({
-		sync: async (input) => {
-			const orgInput = {
-				changes: input.changes.map((change) => ({
-					...change,
-					organizationId: change.userId,
-					createdBy: null as string | null,
-				})),
-				lastSyncedAt: input.lastSyncedAt,
-			};
-			const result = (
-				await client.orgTodo.sync(orgInput, { signal: input.signal })
-			).data;
-			return {
-				...result,
-				serverChanges: result.serverChanges.map((change) => ({
-					...change,
-					userId: change.organizationId,
-				})),
-			};
-		},
-	}),
+	() =>
+		createOrgSyncTransport(async (input) => {
+			return (await client.orgTodo.sync(input, { signal: input.signal })).data;
+		}),
 );
 
 export function OrgSyncProvider({
