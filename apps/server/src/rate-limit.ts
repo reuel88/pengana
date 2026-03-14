@@ -6,8 +6,13 @@ import { errorEnvelope } from "./error-envelope";
 
 const HTTP_TOO_MANY_REQUESTS = 429;
 const isDev = env.NODE_ENV === "development";
+// Dev servers share an IP (localhost) and tools like HMR generate bursts of
+// requests, so rate limits are relaxed by this factor during development.
 const DEV_MULTIPLIER = 10;
 
+// NOTE: getConnInfo returns the direct connection address. Behind a reverse proxy
+// (e.g. nginx, CloudFront), this will be the proxy's IP, not the client's.
+// If deploying behind a proxy, replace with X-Forwarded-For / CF-Connecting-IP.
 const keyGenerator = (c: Context) => getConnInfo(c).remote.address ?? "unknown";
 
 const rateLimitExceededHandler = (c: Context) =>

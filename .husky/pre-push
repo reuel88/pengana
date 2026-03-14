@@ -6,4 +6,4 @@ pnpm check-types
 pnpm check:i18n
 pnpm build
 pnpm test
-pnpm e2e
+pnpm turbo e2e --cache=local:rw

@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { OrgMember } from "@pengana/org-client";
 import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Select } from "@pengana/ui/components/select";
@@ -15,28 +16,25 @@ export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
 });
 
-type Member = {
-	id: string;
-	userId: string;
-	role: string;
-	user: { name: string; email: string };
-};
-
 function MembersPage() {
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
 	const { session } = Route.useRouteContext();
 	const { isAdmin } = useOrgRole();
+	const guard = useOrgGuard();
+	if (!guard.ready) return guard.guardElement;
 
-	const { activeOrg, guardElement } = useOrgGuard();
+	const { activeOrg } = guard;
 
+	const orgId = activeOrg.id;
 	const removeMemberFn = useCallback(
-		(memberIdOrEmail: string) =>
-			client.billing.removeOrgMember({
+		(memberIdOrEmail: string) => {
+			return client.billing.removeOrgMember({
 				memberIdOrEmail,
-				organizationId: activeOrg?.id ?? "",
-			}),
-		[activeOrg?.id],
+				organizationId: orgId,
+			});
+		},
+		[orgId],
 	);
 
 	const { handleUpdateRole, handleRemove, handleLeave } = useMemberActions({
@@ -56,13 +54,14 @@ function MembersPage() {
 	});
 
 	const currentUserId = session.data.user.id;
+	const members = activeOrg.members ?? [];
 
 	const onRemove = async (memberIdOrEmail: string) => {
 		if (!confirm(t("members.removeConfirm"))) return;
 		await handleRemove(memberIdOrEmail);
 	};
 
-	const onLeave = async (members: Member[]) => {
+	const onLeave = async () => {
 		if (!currentUserId) return;
 		const currentMember = members.find((m) => m.userId === currentUserId);
 		if (!currentMember) return;
@@ -70,7 +69,7 @@ function MembersPage() {
 		await handleLeave(currentMember.id);
 	};
 
-	const columns: Column<Member>[] = [
+	const columns: Column<OrgMember>[] = [
 		{ id: "name", header: t("members.name"), cell: (m) => m.user.name },
 		{ id: "email", header: t("members.email"), cell: (m) => m.user.email },
 		{
@@ -113,15 +112,11 @@ function MembersPage() {
 		},
 	];
 
-	if (guardElement || !activeOrg) return guardElement;
-
-	const members = (activeOrg?.members || []) as Member[];
-
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex items-center justify-between">
 				<h2 className="font-medium text-sm">{t("members.title")}</h2>
-				<Button variant="outline" size="sm" onClick={() => onLeave(members)}>
+				<Button variant="outline" size="sm" onClick={() => onLeave()}>
 					{t("members.leave")}
 				</Button>
 			</div>

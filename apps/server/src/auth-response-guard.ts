@@ -6,6 +6,7 @@ import { findUserByEmail } from "@pengana/db/notification-queries";
 import { sendEmail } from "@pengana/email-dev/send-email";
 import type { Context } from "hono";
 import { authResponseGuardLogger as logger } from "./logger";
+import { tryParseJsonObject } from "./safe-json";
 
 type AuthRouteBehavior = "acknowledge" | "generic-sign-in-failure" | null;
 
@@ -29,10 +30,9 @@ const ENUMERATION_HINTS = [
 	"user not found",
 ];
 
-function getRouteBehavior(req: Request): AuthRouteBehavior {
-	if (req.method !== "POST") return null;
+function getRouteBehavior(method: string, pathname: string): AuthRouteBehavior {
+	if (method !== "POST") return null;
 
-	const pathname = new URL(req.url).pathname;
 	if (pathname === "/api/auth/sign-in/email") {
 		return "generic-sign-in-failure";
 	}
@@ -52,25 +52,23 @@ async function extractResponseStrings(response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
 
 	if (contentType.includes("application/json")) {
-		try {
-			const body = (await response.clone().json()) as Record<string, unknown>;
-			const strings = [
-				body.code,
-				body.error,
-				body.message,
-				typeof body.error === "object" && body.error !== null
-					? (body.error as Record<string, unknown>).code
-					: undefined,
-				typeof body.error === "object" && body.error !== null
-					? (body.error as Record<string, unknown>).message
-					: undefined,
-			]
-				.filter((value): value is string => typeof value === "string")
-				.map((value) => value.toLowerCase());
-			values.push(...strings);
-		} catch {
-			return values;
-		}
+		const body = await tryParseJsonObject(response);
+		if (Object.keys(body).length === 0) return values;
+
+		const nestedError =
+			typeof body.error === "object" && body.error !== null
+				? (body.error as Record<string, unknown>)
+				: undefined;
+		const strings = [
+			body.code,
+			body.error,
+			body.message,
+			nestedError?.code,
+			nestedError?.message,
+		]
+			.filter((value): value is string => typeof value === "string")
+			.map((value) => value.toLowerCase());
+		values.push(...strings);
 
 		return values;
 	}
@@ -85,18 +83,20 @@ async function extractResponseStrings(response: Response) {
 	return values;
 }
 
+const SIGN_IN_ENUMERATION_STATUSES = [400, 401, 403, 404];
+const CONFLICT_OR_NOT_FOUND_STATUSES = [404, 409];
+
 async function looksLikeEnumerationResponse(
-	req: Request,
+	behavior: AuthRouteBehavior,
 	response: Response,
 ): Promise<boolean> {
-	const behavior = getRouteBehavior(req);
 	if (!behavior || response.ok) return false;
 
 	if (behavior === "generic-sign-in-failure") {
-		return [400, 401, 403, 404].includes(response.status);
+		return SIGN_IN_ENUMERATION_STATUSES.includes(response.status);
 	}
 
-	if ([404, 409].includes(response.status)) {
+	if (CONFLICT_OR_NOT_FOUND_STATUSES.includes(response.status)) {
 		return true;
 	}
 
@@ -106,14 +106,11 @@ async function looksLikeEnumerationResponse(
 	);
 }
 
-async function maybeNotifyExistingUserOnDuplicateSignUp(
+async function notifyExistingUserOnDuplicateSignUp(
 	req: Request,
 	db: typeof Db,
 	webUrl: string,
 ) {
-	const pathname = new URL(req.url).pathname;
-	if (pathname !== "/api/auth/sign-up/email") return;
-
 	try {
 		const body = (await req.clone().json()) as { email?: string } | null;
 		const email = body?.email;
@@ -133,28 +130,25 @@ async function maybeNotifyExistingUserOnDuplicateSignUp(
 	}
 }
 
-function acknowledgedResponse(req: Request) {
-	const pathname = new URL(req.url).pathname;
-	const body =
-		pathname === "/api/auth/sign-up/email"
-			? { token: null, user: null }
-			: { ok: true };
+function jsonResponse(body: unknown, status = 200) {
 	return new Response(JSON.stringify(body), {
-		status: 200,
+		status,
 		headers: { "Content-Type": "application/json" },
 	});
 }
 
+function acknowledgedResponse(pathname: string) {
+	const body =
+		pathname === "/api/auth/sign-up/email"
+			? { token: null, user: null }
+			: { ok: true };
+	return jsonResponse(body);
+}
+
 function genericSignInFailureResponse() {
-	return new Response(
-		JSON.stringify({
-			code: "INVALID_CREDENTIALS",
-			message: "Invalid email or password",
-		}),
-		{
-			status: 401,
-			headers: { "Content-Type": "application/json" },
-		},
+	return jsonResponse(
+		{ code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
+		401,
 	);
 }
 
@@ -164,19 +158,24 @@ export function createAuthResponseGuard(
 	webUrl: string,
 ) {
 	return async (c: Context) => {
-		const authRequest = c.req.raw.clone();
+		const req = c.req.raw;
+		const pathname = new URL(req.url).pathname;
+		const behavior = getRouteBehavior(req.method, pathname);
+
+		const authRequest = req.clone();
 		const response = await auth.handler(authRequest);
-		if (!(await looksLikeEnumerationResponse(c.req.raw, response))) {
+		if (!(await looksLikeEnumerationResponse(behavior, response))) {
 			return response;
 		}
 
-		const behavior = getRouteBehavior(c.req.raw);
 		if (behavior === "generic-sign-in-failure") {
 			return genericSignInFailureResponse();
 		}
 
 		// Fire-and-forget: avoid timing side-channel that leaks email existence
-		void maybeNotifyExistingUserOnDuplicateSignUp(c.req.raw, db, webUrl);
-		return acknowledgedResponse(c.req.raw);
+		if (pathname === "/api/auth/sign-up/email") {
+			void notifyExistingUserOnDuplicateSignUp(req, db, webUrl);
+		}
+		return acknowledgedResponse(pathname);
 	};
 }

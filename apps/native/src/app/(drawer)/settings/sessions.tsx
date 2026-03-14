@@ -26,8 +26,10 @@ export default function SessionsScreen() {
 
 	const sessions = useQuery({
 		queryKey: ["native-sessions"],
-		queryFn: async () =>
-			((await authClient.listSessions()).data as Session[]) ?? [],
+		queryFn: async () => {
+			const { data } = await authClient.listSessions();
+			return Array.isArray(data) ? (data as Session[]) : [];
+		},
 	});
 
 	const revoke = useMutation({
@@ -67,10 +69,10 @@ export default function SessionsScreen() {
 								{ backgroundColor: theme.card, borderColor: theme.border },
 							]}
 						>
-							<Text style={{ color: theme.text, fontWeight: "600" }}>
+							<Text style={[styles.deviceText, { color: theme.text }]}>
 								{session.userAgent || t("auth:settings.sessions.device")}
 							</Text>
-							<Text style={{ color: theme.text, opacity: 0.7 }}>
+							<Text style={[styles.lastActiveText, { color: theme.text }]}>
 								{t("auth:settings.sessions.lastActive")}:{" "}
 								{new Date(session.updatedAt).toLocaleString()}
 							</Text>
@@ -116,6 +118,12 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
+	},
+	deviceText: {
+		fontWeight: "600",
+	},
+	lastActiveText: {
+		opacity: 0.7,
 	},
 	secondaryButton: {
 		padding: 10,

@@ -1,5 +1,8 @@
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
-import { createDexieSyncAdapter } from "@pengana/todo-client";
+import {
+	createDexieSyncAdapter,
+	createPersonalSyncTransport,
+} from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 import { createExtensionPlatformDeps } from "./platform-deps";
@@ -9,10 +12,11 @@ export { useSync, useSyncDevtools } from "@pengana/sync-engine";
 
 const personalDeps = createExtensionPlatformDeps(
 	(userId) => createDexieSyncAdapter(appDb, userId),
-	() => ({
-		sync: async (input) =>
-			(await client.todo.sync(input, { signal: input.signal })).data,
-	}),
+	() =>
+		createPersonalSyncTransport(
+			async (input) =>
+				(await client.todo.sync(input, { signal: input.signal })).data,
+		),
 );
 
 export function SyncProvider({

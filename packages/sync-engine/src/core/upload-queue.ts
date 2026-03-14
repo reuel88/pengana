@@ -94,11 +94,15 @@ export class UploadQueue {
 			});
 
 			await this.adapter.markCompleted(item.id, result.attachmentUrl);
-			await this.lifecycleCallbacks?.onCompleted(
-				item.entityType,
-				item.entityId,
-				result.attachmentUrl,
-			);
+			try {
+				await this.lifecycleCallbacks?.onCompleted(
+					item.entityType,
+					item.entityId,
+					result.attachmentUrl,
+				);
+			} catch (lcError) {
+				console.error("lifecycleCallbacks.onCompleted threw:", lcError);
+			}
 
 			this.events.emit({
 				type: "upload:complete",

@@ -24,6 +24,7 @@ export { useTodos } from "./hooks/use-todos";
 export type { WebOrgTodo, WebTodo } from "./lib/db";
 export { readFileAsBase64 } from "./lib/file-utils";
 export { filterTodos } from "./lib/filter-todos";
+export { createOrgSyncTransport } from "./lib/org-sync-transport";
 export {
 	addOrgTodo,
 	attachOrgFile,
@@ -31,6 +32,7 @@ export {
 	resolveOrgConflict,
 	toggleOrgTodo,
 } from "./lib/org-todo-actions";
+export { createPersonalSyncTransport } from "./lib/personal-sync-transport";
 export {
 	addTodo,
 	attachFile,

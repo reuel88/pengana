@@ -25,10 +25,11 @@ export function OnboardingInviteMembers({
 	onInvited: () => void;
 	onSkip: () => void;
 }) {
-	const { t } = useTranslation("onboarding");
+	const { t, i18n } = useTranslation("onboarding");
 
 	return (
 		<OnboardingInviteMembersContent
+			key={i18n.language}
 			onInvited={onInvited}
 			onSkip={onSkip}
 			t={t}

@@ -27,7 +27,7 @@ const updateOrgSchema = z.object({
 function OrgSettingsPage() {
 	const { t } = useTranslation("organization");
 	const { isOwner, isAdmin } = useOrgRole();
-	const { activeOrg, guardElement } = useOrgGuard();
+	const guard = useOrgGuard();
 
 	const { updateOrg, deleteOrg, loading } = useOrgSettings({
 		onUpdateSuccess: () => toast.success(t("settings.updateSuccess")),
@@ -38,31 +38,34 @@ function OrgSettingsPage() {
 	const form = useZodForm({
 		schema: updateOrgSchema,
 		defaultValues: {
-			name: activeOrg?.name ?? "",
-			slug: activeOrg?.slug ?? "",
-			logo: activeOrg?.logo ?? "",
+			name: guard.ready ? guard.activeOrg.name : "",
+			slug: guard.ready ? guard.activeOrg.slug : "",
+			logo: guard.ready ? (guard.activeOrg.logo ?? "") : "",
 		},
 		onSubmit: async ({ value }) => {
 			await updateOrg(value);
 		},
 	});
 
+	const orgId = guard.ready ? guard.activeOrg.id : undefined;
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
-		if (activeOrg) {
+		if (guard.ready) {
 			form.reset({
-				name: activeOrg.name,
-				slug: activeOrg.slug,
-				logo: activeOrg.logo ?? "",
+				name: guard.activeOrg.name,
+				slug: guard.activeOrg.slug,
+				logo: guard.activeOrg.logo ?? "",
 			});
 		}
-	}, [activeOrg?.id]);
+	}, [orgId]);
 
-	if (guardElement || !activeOrg) return guardElement;
+	if (!guard.ready) return guard.guardElement;
+
+	const { activeOrg } = guard;
 
 	const onDelete = async () => {
 		if (!confirm(t("settings.deleteConfirm"))) return;
-		await deleteOrg(activeOrg?.id);
+		await deleteOrg(activeOrg.id);
 	};
 
 	return (

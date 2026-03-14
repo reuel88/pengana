@@ -8,170 +8,193 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { queryClient } from "@/shared/api/orpc";
+import { useInvalidateOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
 import { Container } from "@/shared/ui/container";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
-export default function AccountSettingsScreen() {
+function ChangeNameCard() {
 	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
+	const { invalidateActiveOrg } = useInvalidateOrg();
 	const [name, setName] = useState(session?.user.name ?? "");
-	const [email, setEmail] = useState(session?.user.email ?? "");
-	const hasEditedName = useRef(false);
-	const hasEditedEmail = useRef(false);
+	const hasEdited = useRef(false);
 
 	useEffect(() => {
-		if (session?.user.name && !name && !hasEditedName.current) {
+		if (session?.user.name && !name && !hasEdited.current) {
 			setName(session.user.name);
 		}
 	}, [session?.user.name, name]);
 
+	return (
+		<View
+			style={[
+				styles.card,
+				{ backgroundColor: theme.card, borderColor: theme.border },
+			]}
+		>
+			<Text style={[styles.title, { color: theme.text }]}>
+				{t("auth:settings.account.changeName")}
+			</Text>
+			<ThemedTextInput
+				label={t("auth:fields.name")}
+				value={name}
+				onChangeText={(value) => {
+					hasEdited.current = true;
+					setName(value);
+				}}
+			/>
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: theme.primary }]}
+				onPress={async () => {
+					const result = await authClient.updateUser({ name: name.trim() });
+					if (result.error) {
+						Alert.alert(
+							t("error:title"),
+							result.error.message || t("error:generic"),
+						);
+						return;
+					}
+					await invalidateActiveOrg();
+					Alert.alert("", t("auth:settings.account.updateSuccess"));
+				}}
+			>
+				<Text style={styles.buttonText}>
+					{t("auth:settings.account.changeName")}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
+
+function ChangeEmailCard() {
+	const { t } = useTranslation();
+	const { theme } = useTheme();
+	const { data: session } = authClient.useSession();
+	const [email, setEmail] = useState(session?.user.email ?? "");
+	const hasEdited = useRef(false);
+
 	useEffect(() => {
-		if (session?.user.email && !email && !hasEditedEmail.current) {
+		if (session?.user.email && !email && !hasEdited.current) {
 			setEmail(session.user.email);
 		}
 	}, [session?.user.email, email]);
 
+	return (
+		<View
+			style={[
+				styles.card,
+				{ backgroundColor: theme.card, borderColor: theme.border },
+			]}
+		>
+			<Text style={[styles.title, { color: theme.text }]}>
+				{t("auth:settings.account.changeEmail")}
+			</Text>
+			<ThemedTextInput
+				label={t("auth:fields.email")}
+				value={email}
+				onChangeText={(value) => {
+					hasEdited.current = true;
+					setEmail(value);
+				}}
+				autoCapitalize="none"
+				keyboardType="email-address"
+				hint={t("auth:settings.account.changeEmailNote")}
+			/>
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: theme.primary }]}
+				onPress={async () => {
+					const result = await authClient.changeEmail({
+						newEmail: email.trim(),
+					});
+					if (result.error) {
+						Alert.alert(
+							t("error:title"),
+							result.error.message || t("error:generic"),
+						);
+						return;
+					}
+					Alert.alert("", t("auth:settings.account.updateSuccess"));
+				}}
+			>
+				<Text style={styles.buttonText}>
+					{t("auth:settings.account.changeEmail")}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
+
+function ChangePasswordCard() {
+	const { t } = useTranslation();
+	const { theme } = useTheme();
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 
 	return (
+		<View
+			style={[
+				styles.card,
+				{ backgroundColor: theme.card, borderColor: theme.border },
+			]}
+		>
+			<Text style={[styles.title, { color: theme.text }]}>
+				{t("auth:settings.account.changePassword")}
+			</Text>
+			<ThemedTextInput
+				label={t("auth:settings.account.currentPassword")}
+				value={currentPassword}
+				onChangeText={setCurrentPassword}
+				secureTextEntry
+			/>
+			<ThemedTextInput
+				label={t("auth:settings.account.newPassword")}
+				value={newPassword}
+				onChangeText={setNewPassword}
+				secureTextEntry
+			/>
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: theme.primary }]}
+				onPress={async () => {
+					await authClient.changePassword(
+						{
+							currentPassword,
+							newPassword,
+						},
+						{
+							onSuccess: () => {
+								setCurrentPassword("");
+								setNewPassword("");
+								Alert.alert("", t("auth:settings.account.passwordChanged"));
+							},
+							onError: (err) => {
+								Alert.alert(
+									t("error:title"),
+									err.error.message || t("error:generic"),
+								);
+							},
+						},
+					);
+				}}
+			>
+				<Text style={styles.buttonText}>
+					{t("auth:settings.account.changePassword")}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
+
+export default function AccountSettingsScreen() {
+	return (
 		<Container>
 			<ScrollView contentContainerStyle={styles.container}>
-				<View
-					style={[
-						styles.card,
-						{ backgroundColor: theme.card, borderColor: theme.border },
-					]}
-				>
-					<Text style={[styles.title, { color: theme.text }]}>
-						{t("auth:settings.account.changeName")}
-					</Text>
-					<ThemedTextInput
-						label={t("auth:fields.name")}
-						value={name}
-						onChangeText={(value) => {
-							hasEditedName.current = true;
-							setName(value);
-						}}
-					/>
-					<TouchableOpacity
-						style={[styles.button, { backgroundColor: theme.primary }]}
-						onPress={async () => {
-							const result = await authClient.updateUser({ name: name.trim() });
-							if (result.error) {
-								Alert.alert(
-									t("error:title"),
-									result.error.message || t("error:generic"),
-								);
-								return;
-							}
-							await queryClient.invalidateQueries();
-							Alert.alert("", t("auth:settings.account.updateSuccess"));
-						}}
-					>
-						<Text style={styles.buttonText}>
-							{t("auth:settings.account.changeName")}
-						</Text>
-					</TouchableOpacity>
-				</View>
-
-				<View
-					style={[
-						styles.card,
-						{ backgroundColor: theme.card, borderColor: theme.border },
-					]}
-				>
-					<Text style={[styles.title, { color: theme.text }]}>
-						{t("auth:settings.account.changeEmail")}
-					</Text>
-					<ThemedTextInput
-						label={t("auth:fields.email")}
-						value={email}
-						onChangeText={(value) => {
-							hasEditedEmail.current = true;
-							setEmail(value);
-						}}
-						autoCapitalize="none"
-						keyboardType="email-address"
-						hint={t("auth:settings.account.changeEmailNote")}
-					/>
-					<TouchableOpacity
-						style={[styles.button, { backgroundColor: theme.primary }]}
-						onPress={async () => {
-							const result = await authClient.changeEmail({
-								newEmail: email.trim(),
-							});
-							if (result.error) {
-								Alert.alert(
-									t("error:title"),
-									result.error.message || t("error:generic"),
-								);
-								return;
-							}
-							Alert.alert("", t("auth:settings.account.updateSuccess"));
-						}}
-					>
-						<Text style={styles.buttonText}>
-							{t("auth:settings.account.changeEmail")}
-						</Text>
-					</TouchableOpacity>
-				</View>
-
-				<View
-					style={[
-						styles.card,
-						{ backgroundColor: theme.card, borderColor: theme.border },
-					]}
-				>
-					<Text style={[styles.title, { color: theme.text }]}>
-						{t("auth:settings.account.changePassword")}
-					</Text>
-					<ThemedTextInput
-						label={t("auth:settings.account.currentPassword")}
-						value={currentPassword}
-						onChangeText={setCurrentPassword}
-						secureTextEntry
-					/>
-					<ThemedTextInput
-						label={t("auth:settings.account.newPassword")}
-						value={newPassword}
-						onChangeText={setNewPassword}
-						secureTextEntry
-					/>
-					<TouchableOpacity
-						style={[styles.button, { backgroundColor: theme.primary }]}
-						onPress={async () => {
-							await authClient.changePassword(
-								{
-									currentPassword,
-									newPassword,
-								},
-								{
-									onSuccess: () => {
-										setCurrentPassword("");
-										setNewPassword("");
-										Alert.alert("", t("auth:settings.account.passwordChanged"));
-									},
-									onError: (err) => {
-										Alert.alert(
-											t("error:title"),
-											err.error.message || t("error:generic"),
-										);
-									},
-								},
-							);
-						}}
-					>
-						<Text style={styles.buttonText}>
-							{t("auth:settings.account.changePassword")}
-						</Text>
-					</TouchableOpacity>
-				</View>
+				<ChangeNameCard />
+				<ChangeEmailCard />
+				<ChangePasswordCard />
 			</ScrollView>
 		</Container>
 	);

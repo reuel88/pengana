@@ -1,8 +1,6 @@
 import { env } from "@pengana/env/web";
-import type { SyncOutput, SyncTransport } from "@pengana/sync-engine";
 import {
 	cleanupUploaded,
-	STORAGE_CRITICAL_RATIO,
 	STORAGE_WARNING_RATIO,
 	SyncEngine,
 	UploadQueue,
@@ -10,6 +8,8 @@ import {
 import {
 	createDexieOrgSyncAdapter,
 	createDexieSyncAdapter,
+	createOrgSyncTransport,
+	createPersonalSyncTransport,
 	createTodoUploadLifecycleCallbacks,
 	createWebUploadAdapter,
 } from "@pengana/todo-client";
@@ -90,41 +90,15 @@ function createEngine(scope: SyncScope): {
 			? createDexieOrgSyncAdapter(appDb, scope.scopeId)
 			: createDexieSyncAdapter(appDb, scope.scopeId);
 
-	const transport: SyncTransport =
+	const transport =
 		scope.scopeType === "organization"
-			? {
-					async sync(input): Promise<SyncOutput> {
-						const orgInput = {
-							changes: input.changes.map((change) => ({
-								...change,
-								organizationId: change.userId,
-								createdBy: null as string | null,
-							})),
-							lastSyncedAt: input.lastSyncedAt,
-						};
-						const result = (
-							await client.orgTodo.sync(orgInput, {
-								signal: input.signal,
-							})
-						).data;
-						return {
-							...result,
-							serverChanges: result.serverChanges.map((change) => ({
-								...change,
-								userId: change.organizationId,
-							})),
-						};
-					},
-				}
-			: {
-					async sync(input): Promise<SyncOutput> {
-						return (
-							await client.todo.sync(input, {
-								signal: input.signal,
-							})
-						).data;
-					},
-				};
+			? createOrgSyncTransport(async (input) => {
+					return (await client.orgTodo.sync(input, { signal: input.signal }))
+						.data;
+				})
+			: createPersonalSyncTransport(async (input) => {
+					return (await client.todo.sync(input, { signal: input.signal })).data;
+				});
 
 	const engine = new SyncEngine(adapter, transport);
 	const uploadTransport = createIndexedDbUploadTransport();
@@ -186,7 +160,7 @@ async function checkStorageHealth() {
 		if (!estimate) return;
 
 		const ratio = estimate.usageRatio;
-		if (ratio >= STORAGE_WARNING_RATIO || ratio >= STORAGE_CRITICAL_RATIO) {
+		if (ratio >= STORAGE_WARNING_RATIO) {
 			await cleanupUploaded({
 				uploadAdapter,
 				removeFile: (entityId: string) =>
@@ -203,15 +177,35 @@ async function ensureEnginesFromStorage() {
 		await teardownPromise;
 	}
 
+	const userId = await fetchUserId();
+
+	// No session — clear stale scopes and stop
+	if (!userId) {
+		await browser.storage.local.remove(SCOPES_STORAGE_KEY);
+		if (engines.size > 0) {
+			await teardownAllEngines();
+		}
+		return;
+	}
+
 	const persistedScopes = await loadScopes();
-	const hasPersonalScope = persistedScopes.some(
-		(scope) => scope.scopeType === "personal",
+
+	// Replace any stale personal scopes with the current user's
+	const validatedScopes = persistedScopes.filter(
+		(s) => s.scopeType !== "personal" || s.scopeId === userId,
 	);
-	const userId = hasPersonalScope ? null : await fetchUserId();
-	const fallbackScopes = userId
-		? [{ scopeType: "personal", scopeId: userId } satisfies SyncScope]
-		: [];
-	const scopes = mergeScopes(persistedScopes, fallbackScopes);
+	const hasCurrentPersonal = validatedScopes.some(
+		(s) => s.scopeType === "personal",
+	);
+	const fallbackScopes: SyncScope[] = hasCurrentPersonal
+		? []
+		: [{ scopeType: "personal", scopeId: userId }];
+	const scopes = mergeScopes(validatedScopes, fallbackScopes);
+
+	// Persist validated scopes back
+	if (scopes.length !== persistedScopes.length || !hasCurrentPersonal) {
+		await browser.storage.local.set({ [SCOPES_STORAGE_KEY]: scopes });
+	}
 
 	if (scopes.length === 0) return;
 

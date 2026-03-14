@@ -51,6 +51,7 @@ export interface UserInvitation {
 	createdAt: Date;
 	teamId?: string;
 	inviterEmail?: string;
+	inviterName?: string;
 	organizationSlug?: string;
 	organizationLogo?: string | null;
 }

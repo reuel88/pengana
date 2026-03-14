@@ -19,6 +19,7 @@ const cleanupTimer = setInterval(() => {
 		}
 	}
 }, CLEANUP_INTERVAL_MS);
+cleanupTimer.unref();
 
 /** Stop the periodic cleanup timer (useful for test teardown). */
 export function stopTicketCleanup() {

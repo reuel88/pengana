@@ -18,6 +18,7 @@
 		"skip": "Bỏ qua",
 		"success": "Đã gửi lời mời",
 		"error": "Không thể gửi lời mời",
+		"partialError": "Một số lời mời không thể gửi",
 		"remove": "Xóa"
 	},
 	"create": {

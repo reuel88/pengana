@@ -40,10 +40,16 @@ test.describe("Todos", () => {
 		await page.getByTestId("todo-submit").filter({ visible: true }).click();
 		await expect(todoPage.todoRowLocator(title)).toBeVisible();
 
+		// Wait for the 2do item to finish loading before toggling
+		await expect(
+			todoPage.todoRowLocator(title).getByTestId("sync-dot"),
+		).toHaveCSS("background-color", "rgb(34, 197, 94)", { timeout: 15000 });
+
 		await todoPage.toggleTodo(title);
 		await expect(todoPage.completedTodoLocator(title)).toHaveCSS(
 			"opacity",
 			"0.5",
+			{ timeout: 15000 },
 		);
 
 		await todoPage.deleteTodo(title);

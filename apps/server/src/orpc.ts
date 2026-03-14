@@ -11,6 +11,7 @@ import type { Context, Next } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { errorEnvelope } from "./error-envelope";
 import { logger, orpcLogger } from "./logger";
+import { tryParseJsonObject } from "./safe-json";
 
 function logUnhandledError(error: unknown) {
 	orpcLogger.error`Unhandled error: ${error}`;
@@ -29,14 +30,16 @@ const rpcHandler = new RPCHandler(appRouter, {
 	interceptors: [onError(logUnhandledError)],
 });
 
+export interface NotificationHandlers {
+	notifyUser: (userId: string) => void;
+	notifyOrgMembers: (orgId: string) => void;
+}
+
 // Initialized after server starts — WebSocket setup needs the HTTP server
 // instance, but this middleware is created before the server exists. We use a
 // mutable ref so that once the server starts and notifyUser is wired up, all
 // subsequent requests pick up the real implementation.
-const notifyRef: {
-	notifyUser: (userId: string) => void;
-	notifyOrgMembers: (orgId: string) => void;
-} = {
+const notifyRef: NotificationHandlers = {
 	notifyUser: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
 	},
@@ -53,24 +56,9 @@ export function wireNotifications(
 	notifyRef.notifyOrgMembers = notifyOrgMembers;
 }
 
-async function tryParseJsonObject(
-	response: Response,
-): Promise<Record<string, unknown>> {
-	try {
-		const raw: unknown = await response.clone().json();
-		if (raw != null && typeof raw === "object" && !Array.isArray(raw)) {
-			return raw as Record<string, unknown>;
-		}
-		return {};
-	} catch (err) {
-		orpcLogger.warn`parseJsonObject failed: ${err}`;
-		return {};
-	}
-}
-
 const VALID_ERROR_CODES = new Set<string>(ERROR_CODES);
 
-async function ensureErrorEnvelope(c: Context, response: Response) {
+async function wrapApiErrorResponse(c: Context, response: Response) {
 	const contentType = response.headers.get("content-type") ?? "";
 	if (!contentType.includes("application/json") || response.status < 400) {
 		return c.newResponse(response.body, response);
@@ -116,7 +104,7 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 		context: orpcContext,
 	});
 	if (apiResult.matched) {
-		return ensureErrorEnvelope(c, apiResult.response);
+		return wrapApiErrorResponse(c, apiResult.response);
 	}
 
 	await next();

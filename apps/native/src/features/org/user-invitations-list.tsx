@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import { filterPendingInvitations } from "@pengana/org-client";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";
@@ -23,9 +24,7 @@ export function UserInvitationsList({
 		refetch: refetchMyInvitations,
 	} = useUserInvitations();
 
-	const pendingUserInvitations = (myInvitations ?? []).filter(
-		(i) => i.status === "pending",
-	);
+	const pendingUserInvitations = filterPendingInvitations(myInvitations ?? []);
 
 	return (
 		<>

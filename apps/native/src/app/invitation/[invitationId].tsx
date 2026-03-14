@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { UserInvitation } from "@pengana/org-client";
 import { useInvitationActions } from "@pengana/org-client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
@@ -10,76 +11,60 @@ import { useTheme } from "@/shared/lib/theme";
 import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 
-export default function InvitationScreen() {
+function UnauthenticatedInvitationView({
+	invitationId,
+}: {
+	invitationId: string;
+}) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("organization");
-	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
-	const router = useRouter();
-	const { data: session, isPending: sessionPending } = authClient.useSession();
 	const publicInvitation = useQuery(
 		orpc.invitationSummary.queryOptions({
-			input: { invitationId: invitationId ?? "" },
+			input: { invitationId },
 		}),
 	);
 
-	const { actingId, handleAccept, handleReject } = useInvitationActions({
-		onAcceptSuccess: () => router.replace("/(drawer)/(org)"),
-		onRejectSuccess: () => router.replace("/"),
-		onError: (msg) => Alert.alert(t("invitations.error"), msg),
-	});
-
-	const {
-		data: invitation,
-		isPending: loading,
-		isError: fetchError,
-		refetch,
-	} = useInvitation(invitationId ?? "", { enabled: !!session });
-
-	const acting = invitation ? actingId === invitation.id : false;
-
-	if (sessionPending) {
+	if (publicInvitation.isPending) {
 		return null;
 	}
 
-	if (!session) {
-		if (publicInvitation.isPending) {
-			return null;
-		}
-
-		const summary = publicInvitation.data?.data;
-		if (!summary) {
-			return (
-				<Container>
-					<Text style={[{ padding: 16 }, mutedText(theme)]}>
-						{t("invitations.fetchError")}
-					</Text>
-				</Container>
-			);
-		}
-
-		const redirectTo = `/invitation/${summary.id}`;
-
+	const summary = publicInvitation.data?.data;
+	if (!summary) {
 		return (
 			<Container>
-				<View style={styles.content}>
-					<View
-						style={[
-							styles.card,
-							{ backgroundColor: theme.card, borderColor: theme.border },
-						]}
-					>
-						<Text style={[styles.title, { color: theme.text }]}>
-							{t("invitations.title")}
-						</Text>
-						<Text style={{ color: theme.text, marginTop: 8 }}>
-							{t("invitations.invitedAs", {
-								org: summary.organizationName,
-								role: t(`roles.${summary.role ?? "member"}`),
-							})}
-						</Text>
-						<Text style={[secondaryText(theme), { marginTop: 4 }]}>
-							{t("invitations.invitedBy", { email: summary.inviterName })}
-						</Text>
+				<Text style={[{ padding: 16 }, mutedText(theme)]}>
+					{t("invitations.fetchError")}
+				</Text>
+			</Container>
+		);
+	}
+
+	const redirectTo = `/invitation/${summary.id}`;
+	const isExpired = new Date(summary.expiresAt) < new Date();
+	const isActionable = summary.status === "pending" && !isExpired;
+
+	return (
+		<Container>
+			<View style={styles.content}>
+				<View
+					style={[
+						styles.card,
+						{ backgroundColor: theme.card, borderColor: theme.border },
+					]}
+				>
+					<Text style={[styles.title, { color: theme.text }]}>
+						{t("invitations.title")}
+					</Text>
+					<Text style={{ color: theme.text, marginTop: 8 }}>
+						{t("invitations.invitedAs", {
+							org: summary.organizationName,
+							role: t(`roles.${summary.role ?? "member"}`),
+						})}
+					</Text>
+					<Text style={[secondaryText(theme), { marginTop: 4 }]}>
+						{t("invitations.invitedBy", { name: summary.inviterName })}
+					</Text>
+					{isActionable ? (
 						<View style={styles.actions}>
 							<Link
 								href={{
@@ -118,10 +103,129 @@ export default function InvitationScreen() {
 								</TouchableOpacity>
 							</Link>
 						</View>
-					</View>
+					) : (
+						<Text style={[mutedText(theme), { marginTop: 12 }]}>
+							{t(
+								`invitations.status.${isExpired ? "expired" : summary.status}`,
+							)}
+						</Text>
+					)}
 				</View>
-			</Container>
-		);
+			</View>
+		</Container>
+	);
+}
+
+function AuthenticatedInvitationView({
+	invitation,
+	acting,
+	onAccept,
+	onReject,
+}: {
+	invitation: UserInvitation;
+	acting: boolean;
+	onAccept: (id: string, organizationId: string) => void;
+	onReject: (id: string) => void;
+}) {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
+	const isPending = invitation.status === "pending";
+
+	return (
+		<Container>
+			<View style={styles.content}>
+				<View
+					style={[
+						styles.card,
+						{ backgroundColor: theme.card, borderColor: theme.border },
+					]}
+				>
+					<Text style={[styles.title, { color: theme.text }]}>
+						{t("invitations.title")}
+					</Text>
+					<Text style={{ color: theme.text, marginTop: 8 }}>
+						{t("invitations.invitedAs", {
+							org: invitation.organizationName,
+							role: t(`roles.${invitation.role}`),
+						})}
+					</Text>
+					<Text style={[secondaryText(theme), { marginTop: 4 }]}>
+						{t("invitations.invitedBy", {
+							name: invitation.inviterName ?? invitation.inviterEmail,
+						})}
+					</Text>
+
+					{isPending ? (
+						<View style={styles.actions}>
+							<TouchableOpacity
+								style={[
+									styles.acceptButton,
+									{ backgroundColor: theme.primary },
+								]}
+								onPress={() =>
+									onAccept(invitation.id, invitation.organizationId)
+								}
+								disabled={acting}
+								accessibilityRole="button"
+								accessibilityLabel={t("invitations.accept")}
+								accessibilityState={{ disabled: acting, busy: acting }}
+							>
+								<Text style={sharedStyles.buttonText}>
+									{t("invitations.accept")}
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={[styles.rejectButton, { borderColor: theme.border }]}
+								onPress={() => onReject(invitation.id)}
+								disabled={acting}
+								accessibilityRole="button"
+								accessibilityLabel={t("invitations.reject")}
+								accessibilityState={{ disabled: acting, busy: acting }}
+							>
+								<Text style={{ color: theme.text }}>
+									{t("invitations.reject")}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					) : (
+						<Text style={[mutedText(theme), { marginTop: 12 }]}>
+							{t(`invitations.status.${invitation.status}`)}
+						</Text>
+					)}
+				</View>
+			</View>
+		</Container>
+	);
+}
+
+export default function InvitationScreen() {
+	const { theme } = useTheme();
+	const { t } = useTranslation("organization");
+	const { invitationId } = useLocalSearchParams<{ invitationId: string }>();
+	const router = useRouter();
+	const { data: session, isPending: sessionPending } = authClient.useSession();
+
+	const { actingId, handleAccept, handleReject } = useInvitationActions({
+		onAcceptSuccess: () => router.replace("/(drawer)/(org)"),
+		onRejectSuccess: () => router.replace("/"),
+		onError: (msg) => Alert.alert(t("invitations.error"), msg),
+	});
+
+	const {
+		data: invitation,
+		isPending: loading,
+		isError: fetchError,
+		refetch,
+	} = useInvitation(invitationId ?? "", { enabled: !!session });
+
+	const acting = invitation ? actingId === invitation.id : false;
+
+	if (sessionPending) {
+		return null;
+	}
+
+	if (!session) {
+		return <UnauthenticatedInvitationView invitationId={invitationId ?? ""} />;
 	}
 
 	if (loading) {
@@ -164,70 +268,13 @@ export default function InvitationScreen() {
 		);
 	}
 
-	const isPending = invitation.status === "pending";
-
 	return (
-		<Container>
-			<View style={styles.content}>
-				<View
-					style={[
-						styles.card,
-						{ backgroundColor: theme.card, borderColor: theme.border },
-					]}
-				>
-					<Text style={[styles.title, { color: theme.text }]}>
-						{t("invitations.title")}
-					</Text>
-					<Text style={{ color: theme.text, marginTop: 8 }}>
-						{t("invitations.invitedAs", {
-							org: invitation.organizationName,
-							role: t(`roles.${invitation.role}`),
-						})}
-					</Text>
-					<Text style={[secondaryText(theme), { marginTop: 4 }]}>
-						{t("invitations.invitedBy", { email: invitation.inviterEmail })}
-					</Text>
-
-					{isPending ? (
-						<View style={styles.actions}>
-							<TouchableOpacity
-								style={[
-									styles.acceptButton,
-									{ backgroundColor: theme.primary },
-								]}
-								onPress={() =>
-									handleAccept(invitation.id, invitation.organizationId)
-								}
-								disabled={acting}
-								accessibilityRole="button"
-								accessibilityLabel={t("invitations.accept")}
-								accessibilityState={{ disabled: acting, busy: acting }}
-							>
-								<Text style={sharedStyles.buttonText}>
-									{t("invitations.accept")}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[styles.rejectButton, { borderColor: theme.border }]}
-								onPress={() => handleReject(invitation.id)}
-								disabled={acting}
-								accessibilityRole="button"
-								accessibilityLabel={t("invitations.reject")}
-								accessibilityState={{ disabled: acting, busy: acting }}
-							>
-								<Text style={{ color: theme.text }}>
-									{t("invitations.reject")}
-								</Text>
-							</TouchableOpacity>
-						</View>
-					) : (
-						<Text style={[mutedText(theme), { marginTop: 12 }]}>
-							{t(`invitations.status.${invitation.status}`)}
-						</Text>
-					)}
-				</View>
-			</View>
-		</Container>
+		<AuthenticatedInvitationView
+			invitation={invitation}
+			acting={acting}
+			onAccept={handleAccept}
+			onReject={handleReject}
+		/>
 	);
 }
 

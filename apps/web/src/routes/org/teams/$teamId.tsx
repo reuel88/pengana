@@ -234,13 +234,13 @@ function TeamDetailPage() {
 	const { teamId } = Route.useParams();
 	const { t } = useTranslation("organization");
 	const navigate = useNavigate();
-	const { activeOrg, guardElement } = useOrgGuard();
+	const guard = useOrgGuard();
 	const { isAdmin } = useOrgRole();
 	const {
 		data: teams,
 		isPending: teamsLoading,
 		isError: teamsError,
-	} = useTeams(activeOrg?.id);
+	} = useTeams(guard.ready ? guard.activeOrg.id : undefined);
 	const {
 		data: teamMembers,
 		isPending: membersLoading,
@@ -258,7 +258,9 @@ function TeamDetailPage() {
 
 	const team = teams?.find((tm) => tm.id === teamId);
 
-	if (guardElement || !activeOrg) return guardElement;
+	if (!guard.ready) return guard.guardElement;
+
+	const { activeOrg } = guard;
 
 	if (teamsLoading || membersLoading) {
 		return <p>{t("common:status.loading")}</p>;
@@ -276,13 +278,13 @@ function TeamDetailPage() {
 
 	const onDelete = async () => {
 		if (!confirm(t("teams.deleteConfirm"))) return;
-		await handleDeleteTeam(team.id, activeOrg?.id);
+		await handleDeleteTeam(team.id, activeOrg.id);
 	};
 
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center justify-between">
-				<TeamNameEditor team={team} orgId={activeOrg?.id} />
+				<TeamNameEditor team={team} orgId={activeOrg.id} />
 				{isAdmin && (
 					<Button variant="destructive" size="sm" onClick={onDelete}>
 						{t("teams.delete")}
@@ -291,13 +293,13 @@ function TeamDetailPage() {
 			</div>
 
 			{isAdmin && (
-				<TeamMemberAddForm teamId={teamId} members={activeOrg?.members ?? []} />
+				<TeamMemberAddForm teamId={teamId} members={activeOrg.members ?? []} />
 			)}
 
 			<TeamMembersTable
 				teamId={teamId}
 				teamMembers={teamMembers ?? []}
-				orgMembers={activeOrg?.members ?? []}
+				orgMembers={activeOrg.members ?? []}
 				onRemoveMember={handleRemoveMember}
 			/>
 		</div>

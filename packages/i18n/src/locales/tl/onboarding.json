@@ -18,6 +18,7 @@
 		"skip": "Laktawan muna",
 		"success": "Naipadala na ang mga imbitasyon",
 		"error": "Nabigong ipadala ang imbitasyon",
+		"partialError": "Nabigo ang ilang imbitasyon",
 		"remove": "Alisin"
 	},
 	"create": {

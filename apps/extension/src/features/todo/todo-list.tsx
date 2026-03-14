@@ -1,20 +1,40 @@
 import { useTranslation } from "@pengana/i18n";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
-import type { WebTodo } from "@pengana/todo-client";
+import type { TodoActions, WebOrgTodo, WebTodo } from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
+import { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useState } from "react";
-import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";
-import { useSync } from "@/features/sync/sync-context";
 import { appDb } from "@/shared/db";
 
 const fileStorage = {
-	storeFile: storeFileInIndexedDB,
+	storeFile: (entityId: string, file: File) =>
+		storeFileInIndexedDB(appDb, entityId, file),
 	createFileRef: (id: string) => ({ uri: `${INDEXEDDB_URI_PREFIX}${id}` }),
 };
 
-export function TodoList({ todos }: { todos: WebTodo[] }) {
-	const { triggerSync, enqueueUpload } = useSync();
+interface TodoListProps {
+	todos: WebTodo[] | WebOrgTodo[];
+	syncHook: {
+		triggerSync: () => void;
+		enqueueUpload: (
+			entityType: string,
+			entityId: string,
+			fileUri: string,
+			mimeType: string,
+		) => void;
+	};
+	actions?: TodoActions;
+	entityType?: string;
+}
+
+export function TodoList({
+	todos,
+	syncHook,
+	actions,
+	entityType,
+}: TodoListProps) {
+	const { triggerSync, enqueueUpload } = syncHook;
 	const { t } = useTranslation();
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -37,6 +57,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 			t,
 			onDeleteSuccess: clearError,
 			db: appDb,
+			...(actions ? { actions, entityType } : {}),
 		});
 
 	return (

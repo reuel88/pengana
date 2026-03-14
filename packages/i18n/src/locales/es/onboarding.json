@@ -18,6 +18,7 @@
 		"skip": "Omitir por ahora",
 		"success": "Invitaciones enviadas",
 		"error": "No se pudo enviar la invitación",
+		"partialError": "Algunas invitaciones fallaron",
 		"remove": "Eliminar"
 	},
 	"create": {
