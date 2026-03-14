@@ -1,3 +1,4 @@
+import type { EntityDatabase } from "@pengana/entity-store";
 import type { UploadTransport } from "@pengana/sync-engine";
 
 import {
@@ -19,15 +20,17 @@ interface UploadRpc {
 
 interface IndexedDbUploadTransportOptions {
 	rpc: UploadRpc;
+	db: EntityDatabase;
 }
 
 export function createIndexedDbUploadTransport({
 	rpc,
+	db,
 }: IndexedDbUploadTransportOptions): UploadTransport {
 	return createUploadTransport({
 		rpc,
 		async getBase64(input) {
-			const fileData = await getFileFromIndexedDB(input.entityId);
+			const fileData = await getFileFromIndexedDB(db, input.entityId);
 			if (!fileData) {
 				throw new Error(
 					"File not found in storage. It may have been lost. Please re-attach the file.",
@@ -36,10 +39,10 @@ export function createIndexedDbUploadTransport({
 			return fileData.base64;
 		},
 		onUploaded(_entityType, entityId) {
-			void removeFileFromIndexedDB(entityId);
+			void removeFileFromIndexedDB(db, entityId);
 		},
 		onFailed(_entityType, entityId) {
-			void removeFileFromIndexedDB(entityId);
+			void removeFileFromIndexedDB(db, entityId);
 		},
 	});
 }

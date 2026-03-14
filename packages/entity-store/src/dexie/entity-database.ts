@@ -2,6 +2,11 @@ import Dexie, { type EntityTable, type Table } from "dexie";
 
 import type { EntityDefinition } from "../define-entity";
 
+export interface RawStoreDefinition {
+	name: string;
+	indexes: string;
+}
+
 interface SyncMeta {
 	key: string;
 	value: string;
@@ -26,10 +31,19 @@ export class EntityDatabase extends Dexie {
 	 * Version bumping remains manual — Dexie versions are a browser contract
 	 * and should be explicitly controlled by the developer.
 	 */
-	applySchema(version: number, entities: EntityDefinition[]): this {
+	applySchema(
+		version: number,
+		entities: EntityDefinition[],
+		rawStores?: RawStoreDefinition[],
+	): this {
 		const stores: Record<string, string> = { syncMeta: "key" };
 		for (const entity of entities) {
 			stores[entity.name] = entity.indexes;
+		}
+		if (rawStores) {
+			for (const raw of rawStores) {
+				stores[raw.name] = raw.indexes;
+			}
 		}
 		this.version(version).stores(stores);
 		return this;

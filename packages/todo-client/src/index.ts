@@ -40,5 +40,5 @@ export {
 } from "./lib/todo-actions";
 export { orgTodoEntity, todoEntity } from "./lib/todo-entity";
 export { createTodoUploadLifecycleCallbacks } from "./lib/upload-lifecycle-callbacks";
-export type { FileDataRecord } from "./lib/upload-queue-db";
-export { UploadQueueDatabase, uploadQueueDb } from "./lib/upload-queue-db";
+export type { FileDataRecord } from "./lib/upload-queue-stores";
+export { uploadRawStores } from "./lib/upload-queue-stores";
