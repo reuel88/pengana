@@ -2,7 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import type { OrgMember } from "@pengana/org-client";
 import { useMemberActions } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
-import { Select } from "@pengana/ui/components/select";
+import { NativeSelect } from "@pengana/ui/components/native-select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -79,7 +79,7 @@ function MembersPage() {
 				m.role === "owner" ? (
 					<span className="text-xs">{t("roles.owner")}</span>
 				) : isAdmin ? (
-					<Select
+					<NativeSelect
 						value={m.role}
 						onChange={(e) =>
 							handleUpdateRole(m.id, e.target.value as "member" | "admin")
@@ -87,7 +87,7 @@ function MembersPage() {
 					>
 						<option value="admin">{t("roles.admin")}</option>
 						<option value="member">{t("roles.member")}</option>
-					</Select>
+					</NativeSelect>
 				) : (
 					<span className="text-xs">{t(`roles.${m.role}`)}</span>
 				),

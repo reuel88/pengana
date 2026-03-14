@@ -3,7 +3,7 @@ import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";
-import { Select } from "@pengana/ui/components/select";
+import { NativeSelect } from "@pengana/ui/components/native-select";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -59,7 +59,7 @@ export function InviteMemberForm({
 					{(field) => (
 						<div className="flex flex-col gap-1">
 							<Label htmlFor="invite-role">{t("invitations.role")}</Label>
-							<Select
+							<NativeSelect
 								id="invite-role"
 								value={field.state.value}
 								onChange={(e) =>
@@ -68,7 +68,7 @@ export function InviteMemberForm({
 							>
 								<option value="admin">{t("roles.admin")}</option>
 								<option value="member">{t("roles.member")}</option>
-							</Select>
+							</NativeSelect>
 						</div>
 					)}
 				</form.Field>
