@@ -75,7 +75,7 @@ export function extractVerificationUrl(email: string, html: string): string {
 }
 
 export function extractResetPasswordUrl(email: string, html: string): string {
-	const match = html.match(/href="([^"]+)"/i);
+	const match = html.match(/href="([^"]*\/reset-password[^"]+)"/i);
 	if (!match?.[1]) {
 		throw new Error(
 			`Reset password email for ${email} did not contain a valid reset URL.`,
@@ -85,7 +85,7 @@ export function extractResetPasswordUrl(email: string, html: string): string {
 }
 
 export function extractMagicLinkUrl(email: string, html: string): string {
-	const match = html.match(/href="([^"]+)"/i);
+	const match = html.match(/href="([^"]*\/magic-link\/verify[^"]+)"/i);
 	if (!match?.[1]) {
 		throw new Error(
 			`Magic link email for ${email} did not contain a valid sign-in URL.`,

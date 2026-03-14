@@ -54,7 +54,11 @@ export interface SyncAdapter<T extends { id: string } = Todo> {
 }
 
 export interface SyncTransport<T extends { id: string } = Todo> {
-	sync(input: { changes: T[]; lastSyncedAt: string | null }): Promise<{
+	sync(input: {
+		changes: T[];
+		lastSyncedAt: string | null;
+		signal?: AbortSignal;
+	}): Promise<{
 		serverChanges: T[];
 		conflicts: string[];
 		syncedAt: string;

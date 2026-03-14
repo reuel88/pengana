@@ -16,7 +16,7 @@ test.describe("Todos", () => {
 			page.getByTestId("todo-page").getByRole("heading", { name: "Todos" }),
 		).toBeVisible();
 		await expect(
-			page.getByTestId("todo-input").locator("visible=true"),
+			page.getByTestId("personal-todo-panel").getByTestId("todo-input"),
 		).toBeVisible();
 	});
 
@@ -35,17 +35,15 @@ test.describe("Todos", () => {
 
 		await todoPage.navigate();
 		await page.getByTestId("todo-tab-organization").click();
-		await expect(
-			page.getByTestId("organization-todo-panel").locator("visible=true"),
-		).toBeVisible();
-		await page.getByTestId("todo-input").locator("visible=true").fill(title);
-		await page.getByTestId("todo-submit").locator("visible=true").click();
+		await expect(page.getByTestId("organization-todo-panel")).toBeVisible();
+		await page.getByTestId("todo-input").filter({ visible: true }).fill(title);
+		await page.getByTestId("todo-submit").filter({ visible: true }).click();
 		await expect(todoPage.todoRowLocator(title)).toBeVisible();
 
 		await todoPage.toggleTodo(title);
 		await expect(todoPage.completedTodoLocator(title)).toHaveCSS(
-			"text-decoration-line",
-			"line-through",
+			"opacity",
+			"0.5",
 		);
 
 		await todoPage.deleteTodo(title);
@@ -58,8 +56,8 @@ test.describe("Todos", () => {
 		await todoPage.addTodo("Exercise");
 		await todoPage.toggleTodo("Exercise");
 		await expect(todoPage.completedTodoLocator("Exercise")).toHaveCSS(
-			"text-decoration-line",
-			"line-through",
+			"opacity",
+			"0.5",
 		);
 	});
 

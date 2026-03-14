@@ -1,5 +1,5 @@
 import { env } from "@pengana/env/web";
-import type { SyncInput, SyncOutput } from "@pengana/sync-engine";
+import type { SyncOutput, SyncTransport } from "@pengana/sync-engine";
 import {
 	cleanupUploaded,
 	STORAGE_CRITICAL_RATIO,
@@ -35,6 +35,7 @@ const engines = new Map<
 	string,
 	{ engine: SyncEngine; uploadQueue: UploadQueue }
 >();
+let teardownPromise: Promise<void> | null = null;
 
 const storageHealthProvider = createWebStorageHealthProvider();
 const uploadAdapter = createWebUploadAdapter(appDb);
@@ -43,6 +44,27 @@ const uploadAdapter = createWebUploadAdapter(appDb);
 
 function scopeKey(scope: SyncScope): string {
 	return `${scope.scopeType}:${scope.scopeId}`;
+}
+
+function isSyncScope(value: unknown): value is SyncScope {
+	if (!value || typeof value !== "object") return false;
+
+	const scope = value as Partial<SyncScope>;
+	return (
+		(scope.scopeType === "personal" || scope.scopeType === "organization") &&
+		typeof scope.scopeId === "string" &&
+		scope.scopeId.length > 0
+	);
+}
+
+function mergeScopes(...groups: SyncScope[][]): SyncScope[] {
+	const merged = new Map<string, SyncScope>();
+	for (const scopes of groups) {
+		for (const scope of scopes) {
+			merged.set(scopeKey(scope), scope);
+		}
+	}
+	return [...merged.values()];
 }
 
 async function fetchUserId(): Promise<string | null> {
@@ -68,10 +90,10 @@ function createEngine(scope: SyncScope): {
 			? createDexieOrgSyncAdapter(appDb, scope.scopeId)
 			: createDexieSyncAdapter(appDb, scope.scopeId);
 
-	const transport =
+	const transport: SyncTransport =
 		scope.scopeType === "organization"
 			? {
-					async sync(input: SyncInput): Promise<SyncOutput> {
+					async sync(input): Promise<SyncOutput> {
 						const orgInput = {
 							changes: input.changes.map((change) => ({
 								...change,
@@ -80,7 +102,11 @@ function createEngine(scope: SyncScope): {
 							})),
 							lastSyncedAt: input.lastSyncedAt,
 						};
-						const result = (await client.orgTodo.sync(orgInput)).data;
+						const result = (
+							await client.orgTodo.sync(orgInput, {
+								signal: input.signal,
+							})
+						).data;
 						return {
 							...result,
 							serverChanges: result.serverChanges.map((change) => ({
@@ -91,8 +117,12 @@ function createEngine(scope: SyncScope): {
 					},
 				}
 			: {
-					async sync(input: SyncInput): Promise<SyncOutput> {
-						return (await client.todo.sync(input)).data;
+					async sync(input): Promise<SyncOutput> {
+						return (
+							await client.todo.sync(input, {
+								signal: input.signal,
+							})
+						).data;
 					},
 				};
 
@@ -111,11 +141,23 @@ function createEngine(scope: SyncScope): {
 	return { engine, uploadQueue };
 }
 
-function teardownAllEngines() {
-	for (const { uploadQueue } of engines.values()) {
-		uploadQueue.pause();
+async function teardownAllEngines() {
+	if (teardownPromise) {
+		return teardownPromise;
 	}
-	engines.clear();
+
+	const entries = Array.from(engines.values());
+	teardownPromise = (async () => {
+		for (const { uploadQueue } of entries) {
+			uploadQueue.pause();
+		}
+		await Promise.all(entries.map(({ engine }) => engine.shutdown()));
+		engines.clear();
+	})().finally(() => {
+		teardownPromise = null;
+	});
+
+	return teardownPromise;
 }
 
 function startEnginesForScopes(scopes: SyncScope[]) {
@@ -131,8 +173,11 @@ function startEnginesForScopes(scopes: SyncScope[]) {
 }
 
 async function loadScopes(): Promise<SyncScope[]> {
-	const data = await browser.storage.session.get(SCOPES_STORAGE_KEY);
-	return (data[SCOPES_STORAGE_KEY] as SyncScope[] | undefined) ?? [];
+	const data = await browser.storage.local.get(SCOPES_STORAGE_KEY);
+	const stored = data[SCOPES_STORAGE_KEY];
+	if (!Array.isArray(stored)) return [];
+
+	return stored.filter(isSyncScope);
 }
 
 async function checkStorageHealth() {
@@ -154,15 +199,22 @@ async function checkStorageHealth() {
 }
 
 async function ensureEnginesFromStorage() {
-	const scopes = await loadScopes();
-	if (scopes.length === 0) {
-		// Fallback: try fetching userId for personal scope
-		const userId = await fetchUserId();
-		if (userId) {
-			startEnginesForScopes([{ scopeType: "personal", scopeId: userId }]);
-		}
-		return;
+	if (teardownPromise) {
+		await teardownPromise;
 	}
+
+	const persistedScopes = await loadScopes();
+	const hasPersonalScope = persistedScopes.some(
+		(scope) => scope.scopeType === "personal",
+	);
+	const userId = hasPersonalScope ? null : await fetchUserId();
+	const fallbackScopes = userId
+		? [{ scopeType: "personal", scopeId: userId } satisfies SyncScope]
+		: [];
+	const scopes = mergeScopes(persistedScopes, fallbackScopes);
+
+	if (scopes.length === 0) return;
+
 	startEnginesForScopes(scopes);
 }
 
@@ -180,22 +232,30 @@ export default defineBackground(() => {
 		if (port.name !== "popup-sync") return;
 
 		popupAlive = true;
-		teardownAllEngines();
+		void teardownAllEngines().catch((err) =>
+			console.error("[background] failed to tear down engines:", err),
+		);
 
 		port.onMessage.addListener((msg: { scopes?: SyncScope[] }) => {
 			if (msg.scopes) {
-				browser.storage.session.set({ [SCOPES_STORAGE_KEY]: msg.scopes });
+				browser.storage.local
+					.set({ [SCOPES_STORAGE_KEY]: msg.scopes.filter(isSyncScope) })
+					.catch((err) =>
+						console.error("[background] failed to persist sync scopes:", err),
+					);
 			}
 		});
 
 		port.onDisconnect.addListener(() => {
 			popupAlive = false;
-			ensureEnginesFromStorage().catch((err) =>
-				console.error(
-					"[background] failed to start engines on popup close:",
-					err,
-				),
-			);
+			void Promise.resolve(teardownPromise)
+				.then(() => ensureEnginesFromStorage())
+				.catch((err) =>
+					console.error(
+						"[background] failed to start engines on popup close:",
+						err,
+					),
+				);
 		});
 	});
 

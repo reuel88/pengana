@@ -8,9 +8,12 @@ export class TodoPage extends BaseTodoPage {
 	async addTodo(title: string) {
 		await this.page
 			.getByPlaceholder("Add a new todo...")
-			.locator("visible=true")
+			.filter({ visible: true })
 			.fill(title);
-		await this.page.getByTestId("todo-submit").locator("visible=true").click();
+		await this.page
+			.getByTestId("todo-submit")
+			.filter({ visible: true })
+			.click();
 	}
 
 	private todoRow(title: string) {

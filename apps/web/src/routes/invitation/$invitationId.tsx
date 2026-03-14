@@ -71,7 +71,7 @@ function InvitationPage() {
 			);
 		}
 
-		if (summaryQuery.isError || !summaryQuery.data?.data) {
+		if (summaryQuery.isError) {
 			return (
 				<div className="flex flex-col items-center justify-center gap-3 p-8">
 					<p className="text-muted-foreground">{t("invitations.fetchError")}</p>
@@ -82,7 +82,20 @@ function InvitationPage() {
 			);
 		}
 
+		if (!summaryQuery.data?.data) {
+			return (
+				<div className="flex flex-col items-center justify-center gap-3 p-8">
+					<p className="text-muted-foreground">{t("invitations.notFound")}</p>
+					<Link to="/" className={buttonVariants({ variant: "outline" })}>
+						{t("common:nav.home", { defaultValue: "Home" })}
+					</Link>
+				</div>
+			);
+		}
+
 		const summary = summaryQuery.data.data;
+		const isExpired = new Date(summary.expiresAt) < new Date();
+		const isActionable = summary.status === "pending" && !isExpired;
 
 		return (
 			<div className="flex items-center justify-center p-8">
@@ -99,25 +112,33 @@ function InvitationPage() {
 						</p>
 						<p className="text-muted-foreground">
 							{t("invitations.invitedBy", {
-								email: summary.inviterEmail,
+								name: summary.inviterName,
 							})}
 						</p>
-						<div className="flex gap-2">
-							<Link
-								to="/login"
-								search={{ invitationId }}
-								className={buttonVariants({ variant: "default" })}
-							>
-								{t("common:user.signIn")}
-							</Link>
-							<Link
-								to="/sign-up"
-								search={{ invitationId }}
-								className={buttonVariants({ variant: "outline" })}
-							>
-								{t("auth:signUp.submit")}
-							</Link>
-						</div>
+						{isActionable ? (
+							<div className="flex gap-2">
+								<Link
+									to="/login"
+									search={{ invitationId }}
+									className={buttonVariants({ variant: "default" })}
+								>
+									{t("common:user.signIn")}
+								</Link>
+								<Link
+									to="/sign-up"
+									search={{ invitationId }}
+									className={buttonVariants({ variant: "outline" })}
+								>
+									{t("auth:signUp.submit")}
+								</Link>
+							</div>
+						) : (
+							<p className="text-muted-foreground">
+								{t(
+									`invitations.status.${isExpired ? "expired" : summary.status}`,
+								)}
+							</p>
+						)}
 					</CardContent>
 				</Card>
 			</div>

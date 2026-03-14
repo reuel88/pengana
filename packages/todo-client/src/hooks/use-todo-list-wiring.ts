@@ -8,7 +8,7 @@ import type {
 } from "./use-todo-handlers";
 import { useTodoHandlers } from "./use-todo-handlers";
 
-export interface UseTodoListWiringConfig {
+interface UseTodoListWiringConfigBase {
 	triggerSync: () => void;
 	enqueueUpload: (
 		entityType: string,
@@ -22,11 +22,17 @@ export interface UseTodoListWiringConfig {
 	clearError: (id: string) => void;
 	onDeleteSuccess?: (id: string) => void;
 	t: (key: string) => string;
-	/** Pre-bound actions. When omitted, `db` must be provided to construct defaults. */
-	actions?: TodoActions;
-	/** EntityDatabase instance, required when `actions` is not provided. */
-	db?: EntityDatabase;
 }
+
+export type UseTodoListWiringConfig =
+	| (UseTodoListWiringConfigBase & {
+			actions: TodoActions;
+			db?: EntityDatabase;
+	  })
+	| (UseTodoListWiringConfigBase & {
+			actions?: undefined;
+			db: EntityDatabase;
+	  });
 
 export function useTodoListWiring(config: UseTodoListWiringConfig) {
 	const {

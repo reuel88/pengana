@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -21,6 +21,21 @@ export default function AccountSettingsScreen() {
 	const { data: session } = authClient.useSession();
 	const [name, setName] = useState(session?.user.name ?? "");
 	const [email, setEmail] = useState(session?.user.email ?? "");
+	const hasEditedName = useRef(false);
+	const hasEditedEmail = useRef(false);
+
+	useEffect(() => {
+		if (session?.user.name && !name && !hasEditedName.current) {
+			setName(session.user.name);
+		}
+	}, [session?.user.name, name]);
+
+	useEffect(() => {
+		if (session?.user.email && !email && !hasEditedEmail.current) {
+			setEmail(session.user.email);
+		}
+	}, [session?.user.email, email]);
+
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 
@@ -39,7 +54,10 @@ export default function AccountSettingsScreen() {
 					<ThemedTextInput
 						label={t("auth:fields.name")}
 						value={name}
-						onChangeText={setName}
+						onChangeText={(value) => {
+							hasEditedName.current = true;
+							setName(value);
+						}}
 					/>
 					<TouchableOpacity
 						style={[styles.button, { backgroundColor: theme.primary }]}
@@ -74,7 +92,10 @@ export default function AccountSettingsScreen() {
 					<ThemedTextInput
 						label={t("auth:fields.email")}
 						value={email}
-						onChangeText={setEmail}
+						onChangeText={(value) => {
+							hasEditedEmail.current = true;
+							setEmail(value);
+						}}
 						autoCapitalize="none"
 						keyboardType="email-address"
 						hint={t("auth:settings.account.changeEmailNote")}

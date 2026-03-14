@@ -2,11 +2,11 @@ import { BaseTodoPage } from "../base/todo.page.js";
 
 export class NativeTodoPage extends BaseTodoPage {
 	private todoInput() {
-		return this.page.getByTestId("todo-input").locator("visible=true");
+		return this.page.getByTestId("todo-input").filter({ visible: true });
 	}
 
 	private todoSubmit() {
-		return this.page.getByTestId("todo-submit").locator("visible=true");
+		return this.page.getByTestId("todo-submit").filter({ visible: true });
 	}
 
 	async navigate() {
@@ -31,7 +31,7 @@ export class NativeTodoPage extends BaseTodoPage {
 	async toggleTodo(title: string) {
 		await this.todoRow(title)
 			.getByTestId("todo-toggle")
-			.locator("visible=true")
+			.filter({ visible: true })
 			.click();
 	}
 

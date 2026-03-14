@@ -74,7 +74,7 @@ export async function getPublicInvitationSummary(invitationId: string) {
 			organizationId: invitation.organizationId,
 			organizationName: organization.name,
 			teamId: invitation.teamId,
-			inviterEmail: user.email,
+			inviterName: user.name,
 		})
 		.from(invitation)
 		.innerJoin(organization, eq(invitation.organizationId, organization.id))

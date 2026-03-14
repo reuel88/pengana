@@ -21,13 +21,22 @@ export function LanguageSwitcher() {
 			nextLocale: locale,
 			i18n,
 			isWeb: Platform.OS === "web",
-			persistLocale: (nextLocale) => {
+			storeLocale: async (nextLocale) => {
 				if (Platform.OS === "web") {
-					localStorage.setItem(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
-					return;
+					try {
+						localStorage.setItem(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
+						return true;
+					} catch {
+						return false;
+					}
 				}
 
-				return SecureStore.setItemAsync(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
+				try {
+					await SecureStore.setItemAsync(LOCALE_STORAGE_KEY_NATIVE, nextLocale);
+					return true;
+				} catch {
+					return false;
+				}
 			},
 			reload: () => window.location.reload(),
 			allowRTL: (allow) => I18nManager.allowRTL(allow),

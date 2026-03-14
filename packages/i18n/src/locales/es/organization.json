@@ -79,10 +79,11 @@
 			"expired": "Expirada"
 		},
 		"invitedAs": "Has sido invitado a unirte a {{org}} como {{role}}.",
-		"invitedBy": "Invitado por: {{email}}",
+		"invitedBy": "Invitado por: {{name}}",
 		"fetchError": "Algo salió mal al cargar las invitaciones",
 		"retry": "Reintentar",
-		"unknownError": "Ocurrió un error inesperado"
+		"unknownError": "Ocurrió un error inesperado",
+		"notFound": "Este enlace de invitación no es válido o ya no existe."
 	},
 	"teams": {
 		"title": "Equipos",

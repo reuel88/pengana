@@ -78,7 +78,7 @@ export default function InvitationScreen() {
 							})}
 						</Text>
 						<Text style={[secondaryText(theme), { marginTop: 4 }]}>
-							{t("invitations.invitedBy", { email: summary.inviterEmail })}
+							{t("invitations.invitedBy", { email: summary.inviterName })}
 						</Text>
 						<View style={styles.actions}>
 							<Link

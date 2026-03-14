@@ -79,10 +79,11 @@
 			"expired": "Expirado"
 		},
 		"invitedAs": "Você foi convidado a participar de {{org}} como {{role}}.",
-		"invitedBy": "Convidado por: {{email}}",
+		"invitedBy": "Convidado por: {{name}}",
 		"fetchError": "Algo deu errado ao carregar os convites",
 		"retry": "Tentar novamente",
-		"unknownError": "Ocorreu um erro inesperado"
+		"unknownError": "Ocorreu um erro inesperado",
+		"notFound": "Este link de convite é inválido ou não existe mais."
 	},
 	"teams": {
 		"title": "Equipes",

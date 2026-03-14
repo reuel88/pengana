@@ -21,6 +21,10 @@ export function PendingEmailPage({
 	const [isResending, setIsResending] = useState(false);
 	const resendEmail =
 		typeof email === "string" && email.trim().length > 0 ? email : null;
+	const validatedInvitationId =
+		typeof invitationId === "string" && invitationId.trim().length > 0
+			? invitationId.trim()
+			: null;
 
 	const handleResend = async () => {
 		if (!resendEmail) return;
@@ -56,7 +60,7 @@ export function PendingEmailPage({
 
 			<Link
 				to="/login"
-				search={{ invitationId }}
+				search={{ invitationId: validatedInvitationId ?? undefined }}
 				className="text-primary text-sm hover:text-primary/80"
 			>
 				{t("auth:verifyEmail.backToSignIn")}

@@ -7,6 +7,9 @@ export class SyncEngine<T extends { id: string } = Todo> {
 	private events = createEventEmitter<SyncEvent>();
 	private syncing = false;
 	private syncRequested = false;
+	private shuttingDown = false;
+	private activeSyncPromise: Promise<void> | null = null;
+	private activeController: AbortController | null = null;
 
 	onEvent = this.events.onEvent;
 
@@ -19,14 +22,41 @@ export class SyncEngine<T extends { id: string } = Todo> {
 		return this.syncing;
 	}
 
+	get isShuttingDown() {
+		return this.shuttingDown;
+	}
+
 	async sync(): Promise<void> {
+		if (this.shuttingDown) {
+			return;
+		}
 		if (this.syncing) {
 			this.syncRequested = true;
 			return;
 		}
+
+		this.activeSyncPromise = this.runSync();
+		return this.activeSyncPromise;
+	}
+
+	async shutdown(): Promise<void> {
+		this.shuttingDown = true;
+		this.syncRequested = false;
+		this.activeController?.abort();
+		await this.activeSyncPromise;
+	}
+
+	private async runSync(): Promise<void> {
 		this.syncing = true;
+		const controller = new AbortController();
+		this.activeController = controller;
 
 		const now = () => new Date().toISOString();
+		const throwIfAborted = () => {
+			if (this.shuttingDown || controller.signal.aborted) {
+				throw createAbortError();
+			}
+		};
 
 		this.events.emit({
 			type: "sync:start",
@@ -36,7 +66,9 @@ export class SyncEngine<T extends { id: string } = Todo> {
 
 		try {
 			const pendingChanges = await this.adapter.getPendingChanges();
+			throwIfAborted();
 			const lastSyncedAt = await this.adapter.getLastSyncedAt();
+			throwIfAborted();
 
 			this.events.emit({
 				type: "sync:push",
@@ -47,7 +79,9 @@ export class SyncEngine<T extends { id: string } = Todo> {
 			const result = await this.transport.sync({
 				changes: pendingChanges,
 				lastSyncedAt,
+				signal: controller.signal,
 			});
+			throwIfAborted();
 
 			if (result.serverChanges.length > 0) {
 				this.events.emit({
@@ -59,6 +93,7 @@ export class SyncEngine<T extends { id: string } = Todo> {
 					result.serverChanges,
 					result.conflicts,
 				);
+				throwIfAborted();
 			}
 
 			if (result.conflicts.length > 0) {
@@ -68,6 +103,7 @@ export class SyncEngine<T extends { id: string } = Todo> {
 					detail: `${result.conflicts.length} conflicts detected`,
 				});
 				await this.adapter.markAsConflict(result.conflicts);
+				throwIfAborted();
 			}
 
 			const pushedItemsMarkSynced = pendingChanges.filter(
@@ -76,9 +112,11 @@ export class SyncEngine<T extends { id: string } = Todo> {
 
 			if (pushedItemsMarkSynced.length > 0) {
 				await this.adapter.markAsSynced(pushedItemsMarkSynced);
+				throwIfAborted();
 			}
 
 			await this.adapter.setLastSyncedAt(result.syncedAt);
+			throwIfAborted();
 
 			this.events.emit({
 				type: "sync:complete",
@@ -86,16 +124,23 @@ export class SyncEngine<T extends { id: string } = Todo> {
 				detail: `Sync complete. Pushed: ${pendingChanges.length}, Pulled: ${result.serverChanges.length}, Conflicts: ${result.conflicts.length}`,
 			});
 		} catch (error) {
-			this.events.emit({
-				type: "sync:error",
-				timestamp: now(),
-				detail: error instanceof Error ? error.message : "Unknown sync error",
-			});
+			if (!isAbortError(error)) {
+				this.events.emit({
+					type: "sync:error",
+					timestamp: now(),
+					detail: error instanceof Error ? error.message : "Unknown sync error",
+				});
+			}
 		} finally {
 			this.syncing = false;
-			if (this.syncRequested) {
+			this.activeController = null;
+			this.activeSyncPromise = null;
+			if (this.syncRequested && !this.shuttingDown) {
 				this.syncRequested = false;
 				this.sync().catch((error) => {
+					if (isAbortError(error)) {
+						return;
+					}
 					this.events.emit({
 						type: "sync:error",
 						timestamp: new Date().toISOString(),
@@ -106,4 +151,20 @@ export class SyncEngine<T extends { id: string } = Todo> {
 			}
 		}
 	}
+}
+
+function isAbortError(error: unknown): boolean {
+	return error instanceof DOMException
+		? error.name === "AbortError"
+		: error instanceof Error && error.name === "AbortError";
+}
+
+function createAbortError(): Error {
+	if (typeof DOMException !== "undefined") {
+		return new DOMException("Sync aborted", "AbortError");
+	}
+
+	const error = new Error("Sync aborted");
+	error.name = "AbortError";
+	return error;
 }

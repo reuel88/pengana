@@ -80,11 +80,7 @@ export function OnboardingInviteMembers({
 						{(membersField) => (
 							<>
 								{membersField.state.value.map((_entry, index) => (
-									<div
-										// biome-ignore lint/suspicious/noArrayIndexKey: array index is stable for invite rows
-										key={index}
-										className="flex items-center gap-2"
-									>
+									<div key={index} className="flex items-center gap-2">
 										<form.Field name={`members[${index}].email`}>
 											{(emailField) => (
 												<Input

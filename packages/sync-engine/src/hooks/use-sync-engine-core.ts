@@ -88,6 +88,7 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 
 		return () => {
 			unsubscribeSyncEvents();
+			void engine.shutdown();
 			engineRef.current = null;
 		};
 	}, [scopeId, deps]);

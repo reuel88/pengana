@@ -17,12 +17,15 @@ export function useDexieEntity<TLocal extends SyncableBase>(
 ) {
 	const allItems = useLiveQuery(
 		() => db.getTable<TLocal>(tableName).where({ userId: scopeId }).toArray(),
-		[tableName, scopeId],
+		[db, tableName, scopeId],
 		[],
 	);
 
 	const items = useMemo(
-		() => allItems.filter((item) => !item.deleted),
+		() =>
+			allItems.filter(
+				(item) => !item.deleted && item.syncStatus !== "conflict",
+			),
 		[allItems],
 	);
 

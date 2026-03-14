@@ -79,10 +79,11 @@
 			"expired": "Đã hết hạn"
 		},
 		"invitedAs": "Bạn đã được mời tham gia {{org}} với vai trò {{role}}.",
-		"invitedBy": "Được mời bởi: {{email}}",
+		"invitedBy": "Được mời bởi: {{name}}",
 		"fetchError": "Đã xảy ra lỗi khi tải lời mời",
 		"retry": "Thử lại",
-		"unknownError": "Đã xảy ra lỗi không mong muốn"
+		"unknownError": "Đã xảy ra lỗi không mong muốn",
+		"notFound": "Liên kết lời mời này không hợp lệ hoặc không còn tồn tại."
 	},
 	"teams": {
 		"title": "Nhóm",

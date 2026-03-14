@@ -9,7 +9,8 @@ export { useSync, useSyncDevtools } from "@pengana/sync-engine";
 const personalDeps = createPlatformDeps(
 	(userId) => createSyncAdapter(userId),
 	() => ({
-		sync: async (input) => (await client.todo.sync(input)).data,
+		sync: async (input) =>
+			(await client.todo.sync(input, { signal: input.signal })).data,
 	}),
 );
 

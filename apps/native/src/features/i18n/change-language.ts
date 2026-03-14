@@ -8,7 +8,7 @@ interface ChangeLanguageDependencies {
 		changeLanguage: (locale: SupportedLocale) => Promise<unknown> | unknown;
 	};
 	isWeb: boolean;
-	persistLocale: (locale: SupportedLocale) => Promise<void> | void;
+	storeLocale: (locale: SupportedLocale) => Promise<boolean> | boolean;
 	reload: () => void;
 	allowRTL: (allow: boolean) => void;
 	forceRTL: (rtl: boolean) => void;
@@ -20,7 +20,7 @@ export async function changeLanguage({
 	nextLocale,
 	i18n,
 	isWeb,
-	persistLocale,
+	storeLocale,
 	reload,
 	allowRTL,
 	forceRTL,
@@ -30,7 +30,18 @@ export async function changeLanguage({
 		return;
 	}
 
-	await persistLocale(nextLocale);
+	let storageSucceeded = false;
+	try {
+		storageSucceeded = await storeLocale(nextLocale);
+	} catch {
+		storageSucceeded = false;
+	}
+
+	if (!storageSucceeded) {
+		console.warn("[i18n] failed to persist locale preference", {
+			locale: nextLocale,
+		});
+	}
 
 	if (isWeb) {
 		reload();

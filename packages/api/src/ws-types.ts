@@ -5,11 +5,38 @@ export type WsMessage =
 	| { type: "keepalive" }
 	| { type: "sync-notify" };
 
+function decodeWsMessageData(data: unknown): string | null {
+	if (typeof data === "string") {
+		return data;
+	}
+
+	if (typeof Buffer !== "undefined" && Buffer.isBuffer(data)) {
+		return data.toString("utf8");
+	}
+
+	if (data instanceof Uint8Array) {
+		return new TextDecoder().decode(data);
+	}
+
+	if (data instanceof ArrayBuffer) {
+		return new TextDecoder().decode(new Uint8Array(data));
+	}
+
+	if (typeof Blob !== "undefined" && data instanceof Blob) {
+		return null;
+	}
+
+	return null;
+}
+
 export function parseWsMessage(data: unknown): WsMessage | null {
 	try {
-		const parsed = JSON.parse(
-			typeof data === "string" ? data : String(data),
-		) as { type?: string };
+		const decoded = decodeWsMessageData(data);
+		if (!decoded) {
+			return null;
+		}
+
+		const parsed = JSON.parse(decoded) as { type?: string };
 
 		if (
 			parsed.type === "connected" ||

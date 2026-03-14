@@ -10,7 +10,8 @@ export { useSync, useSyncDevtools } from "@pengana/sync-engine";
 const personalDeps = createExtensionPlatformDeps(
 	(userId) => createDexieSyncAdapter(appDb, userId),
 	() => ({
-		sync: async (input) => (await client.todo.sync(input)).data,
+		sync: async (input) =>
+			(await client.todo.sync(input, { signal: input.signal })).data,
 	}),
 );
 

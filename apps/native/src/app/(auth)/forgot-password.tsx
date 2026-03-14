@@ -20,20 +20,47 @@ import { AuthFormCard, AuthSubmitButton } from "@/shared/ui/auth-form";
 import { Container } from "@/shared/ui/container";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
+function getAuthConfigErrorMessage(
+	error: unknown,
+	fallbackMessage: string,
+): string {
+	if (error instanceof Error && error.message.trim()) {
+		return error.message;
+	}
+
+	return fallbackMessage;
+}
+
 export default function ForgotPasswordScreen() {
 	const { t } = useTranslation();
 	const { theme } = useTheme();
 	const params = useLocalSearchParams<{ invitationId?: string | string[] }>();
 	const invitationId = normalizeRedirectTarget(params.invitationId);
 	const [notice, setNotice] = useState<string | null>(null);
-	const authConfig = useQuery(orpc.authConfig.queryOptions());
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const authConfig = useQuery({
+		...orpc.authConfig.queryOptions(),
+		retry: false,
+	});
+	const webBaseUrl = authConfig.data?.data.webBaseUrl;
+	const authConfigErrorMessage = authConfig.isError
+		? getAuthConfigErrorMessage(authConfig.error, t("common:generic"))
+		: null;
+	const errorMessage = authConfigErrorMessage ?? submitError;
 
 	const form = useZodForm({
 		schema: makeForgotPasswordSchema(t),
 		defaultValues: { email: "" },
 		onSubmit: async ({ value }) => {
-			const webBaseUrl = authConfig.data?.data.webBaseUrl;
-			if (!webBaseUrl) return;
+			if (!webBaseUrl) {
+				setSubmitError(
+					getAuthConfigErrorMessage(authConfig.error, t("common:generic")),
+				);
+				throw new Error("Missing web base URL for password reset.");
+			}
+
+			setSubmitError(null);
+			setNotice(null);
 
 			await authClient.requestPasswordReset(
 				{
@@ -42,9 +69,11 @@ export default function ForgotPasswordScreen() {
 				},
 				{
 					onSuccess: () => {
+						setSubmitError(null);
 						setNotice(t("auth:forgotPassword.success"));
 					},
 					onError: () => {
+						setSubmitError(null);
 						setNotice(t("auth:forgotPassword.success"));
 					},
 				},
@@ -58,7 +87,10 @@ export default function ForgotPasswordScreen() {
 				style={authScreenStyles.scrollView}
 				contentContainerStyle={authScreenStyles.content}
 			>
-				<AuthFormCard title={t("auth:forgotPassword.title")}>
+				<AuthFormCard
+					title={t("auth:forgotPassword.title")}
+					error={errorMessage}
+				>
 					<form.Field name="email">
 						{(field) => (
 							<ThemedTextInput
@@ -66,7 +98,12 @@ export default function ForgotPasswordScreen() {
 								label={t("auth:fields.email")}
 								value={field.state.value}
 								onBlur={field.handleBlur}
-								onChangeText={field.handleChange}
+								onChangeText={(text) => {
+									field.handleChange(text);
+									if (submitError) {
+										setSubmitError(null);
+									}
+								}}
 								keyboardType="email-address"
 								autoCapitalize="none"
 								error={field.state.meta.errors[0]?.message}
@@ -80,17 +117,18 @@ export default function ForgotPasswordScreen() {
 						<View style={styles.loading}>
 							<ActivityIndicator color={theme.primary} />
 						</View>
-					) : (
-						<form.Subscribe selector={(state) => state.isSubmitting}>
-							{(isSubmitting) => (
-								<AuthSubmitButton
-									onPress={form.handleSubmit}
-									isSubmitting={isSubmitting}
-									label={t("auth:forgotPassword.submit")}
-								/>
-							)}
-						</form.Subscribe>
-					)}
+					) : null}
+					<form.Subscribe selector={(state) => state.isSubmitting}>
+						{(isSubmitting) => (
+							<AuthSubmitButton
+								onPress={form.handleSubmit}
+								isSubmitting={isSubmitting}
+								disabled={!authConfig.isSuccess || !webBaseUrl}
+								label={t("auth:forgotPassword.submit")}
+								testID="auth-submit"
+							/>
+						)}
+					</form.Subscribe>
 				</AuthFormCard>
 				<Link
 					href={{ pathname: "/(auth)/login", params: { invitationId } }}

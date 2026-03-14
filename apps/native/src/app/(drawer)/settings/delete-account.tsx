@@ -14,6 +14,7 @@ export default function DeleteAccountScreen() {
 	const { theme } = useTheme();
 	const router = useRouter();
 	const [confirmation, setConfirmation] = useState("");
+	const confirmKeyword = t("auth:settings.deleteAccount.confirmKeyword");
 
 	return (
 		<Container>
@@ -22,7 +23,9 @@ export default function DeleteAccountScreen() {
 					{t("auth:settings.deleteAccount.warning")}
 				</Text>
 				<ThemedTextInput
-					label={t("auth:settings.deleteAccount.confirm")}
+					label={t("auth:settings.deleteAccount.confirm", {
+						keyword: confirmKeyword,
+					})}
 					value={confirmation}
 					onChangeText={setConfirmation}
 				/>
@@ -31,10 +34,10 @@ export default function DeleteAccountScreen() {
 						styles.button,
 						{
 							backgroundColor: theme.notification,
-							opacity: confirmation === "DELETE" ? 1 : 0.5,
+							opacity: confirmation === confirmKeyword ? 1 : 0.5,
 						},
 					]}
-					disabled={confirmation !== "DELETE"}
+					disabled={confirmation !== confirmKeyword}
 					onPress={async () => {
 						await authClient.deleteUser(undefined, {
 							onSuccess: () => {

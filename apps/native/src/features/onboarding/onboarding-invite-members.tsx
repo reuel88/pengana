@@ -100,7 +100,7 @@ function OnboardingInviteMembersContent({
 				{(membersField) => (
 					<>
 						{membersField.state.value.map((_entry, index) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: array index is stable for invite rows
+							// biome-ignore lint/suspicious/noArrayIndexKey: simple form list, not re-orderable
 							<View key={index} style={styles.entryRow}>
 								<form.Field name={`members[${index}].email`}>
 									{(emailField) => (

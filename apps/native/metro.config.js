@@ -16,4 +16,26 @@ config.resolver.nodeModulesPaths = [
 	path.resolve(monorepoRoot, "node_modules"),
 ];
 
+// Force singleton resolution for packages that rely on React context.
+// Without this, pnpm's isolated linker creates separate instances per peer-dep set
+// (e.g. react@19.2.0 vs react@19.2.4), breaking context sharing.
+// Using require.resolve to get exact file paths bypasses Metro's walk-up resolution entirely.
+const singletonPkgs = {
+	react: require.resolve("react", { paths: [__dirname] }),
+	"react-dom": require.resolve("react-dom", { paths: [__dirname] }),
+	"@tanstack/react-query": require.resolve("@tanstack/react-query", {
+		paths: [__dirname],
+	}),
+};
+const originalResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+	if (singletonPkgs[moduleName]) {
+		return { type: "sourceFile", filePath: singletonPkgs[moduleName] };
+	}
+	if (originalResolveRequest) {
+		return originalResolveRequest(context, moduleName, platform);
+	}
+	return context.resolveRequest(context, moduleName, platform);
+};
+
 module.exports = config;

@@ -124,10 +124,12 @@ export function makeChangePasswordSchema(t: TFunction) {
 		});
 }
 
-export function makeDeleteAccountSchema(t: TFunction) {
+export function makeDeleteAccountSchema(t: TFunction, confirmKeyword: string) {
 	return z.object({
-		confirmation: z.string().refine((val) => val === "DELETE", {
-			message: t("auth:validation.deleteConfirmRequired"),
+		confirmation: z.string().refine((val) => val === confirmKeyword, {
+			message: t("auth:validation.deleteConfirmRequired", {
+				keyword: confirmKeyword,
+			}),
 		}),
 	});
 }
