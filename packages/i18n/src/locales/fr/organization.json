@@ -79,10 +79,11 @@
 			"expired": "Expirée"
 		},
 		"invitedAs": "Vous avez reçu une invitation à rejoindre {{org}} en tant que {{role}}.",
-		"invitedBy": "Invitation envoyée par : {{email}}",
+		"invitedBy": "Invitation envoyée par : {{name}}",
 		"fetchError": "Une erreur est survenue lors du chargement des invitations",
 		"retry": "Réessayer",
-		"unknownError": "Une erreur inattendue s'est produite"
+		"unknownError": "Une erreur inattendue s'est produite",
+		"notFound": "Ce lien d'invitation est invalide ou n'existe plus."
 	},
 	"teams": {
 		"title": "Équipes",

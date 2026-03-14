@@ -68,7 +68,7 @@ export const appRouter = {
 						organizationId: z.string(),
 						organizationName: z.string(),
 						teamId: z.string().nullable(),
-						inviterEmail: z.string().email(),
+						inviterName: z.string(),
 					})
 					.nullable(),
 			),

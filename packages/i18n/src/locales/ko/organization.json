@@ -79,10 +79,11 @@
 			"expired": "만료됨"
 		},
 		"invitedAs": "{{org}}에 {{role}}(으)로 초대되었습니다.",
-		"invitedBy": "초대한 사람: {{email}}",
+		"invitedBy": "초대한 사람: {{name}}",
 		"fetchError": "초대를 불러오는 중 오류가 발생했습니다",
 		"retry": "다시 시도",
-		"unknownError": "예기치 않은 오류가 발생했습니다"
+		"unknownError": "예기치 않은 오류가 발생했습니다",
+		"notFound": "이 초대 링크는 유효하지 않거나 더 이상 존재하지 않습니다."
 	},
 	"teams": {
 		"title": "팀",

@@ -70,6 +70,19 @@ test.describe("Authentication", () => {
 		await expect(page.getByTestId("auth-error")).toBeVisible();
 	});
 
+	test("forgot password shows auth config failure and keeps submit disabled", async ({
+		page,
+	}) => {
+		await page.route("**/rpc/authConfig*", async (route) => {
+			await route.abort();
+		});
+
+		await page.goto("/forgot-password");
+
+		await expect(page.getByTestId("auth-error")).toBeVisible();
+		await expect(page.getByTestId("auth-submit")).toBeDisabled();
+	});
+
 	test("sign-in validation is translated after switching to Arabic", async ({
 		page,
 	}) => {

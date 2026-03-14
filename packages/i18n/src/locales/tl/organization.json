@@ -79,10 +79,11 @@
 			"expired": "Nag-expire na"
 		},
 		"invitedAs": "Inimbitahan kang sumali sa {{org}} bilang {{role}}.",
-		"invitedBy": "Inimbitahan ni: {{email}}",
+		"invitedBy": "Inimbitahan ni: {{name}}",
 		"fetchError": "May nangyaring mali sa pagkarga ng mga imbitasyon",
 		"retry": "Subukan muli",
-		"unknownError": "May naganap na hindi inaasahang error"
+		"unknownError": "May naganap na hindi inaasahang error",
+		"notFound": "Ang link ng imbitasyon na ito ay hindi wasto o wala na."
 	},
 	"teams": {
 		"title": "Mga Koponan",

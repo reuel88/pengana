@@ -12,9 +12,10 @@ import { FormField } from "@/shared/ui/form-field";
 export function DeleteAccountForm() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const confirmKeyword = t("auth:settings.deleteAccount.confirmKeyword");
 
 	const form = useZodForm({
-		schema: makeDeleteAccountSchema(t),
+		schema: makeDeleteAccountSchema(t, confirmKeyword),
 		defaultValues: {
 			confirmation: "",
 		},
@@ -53,7 +54,9 @@ export function DeleteAccountForm() {
 					{(field) => (
 						<FormField
 							field={field}
-							label={t("auth:settings.deleteAccount.confirm")}
+							label={t("auth:settings.deleteAccount.confirm", {
+								keyword: confirmKeyword,
+							})}
 						/>
 					)}
 				</form.Field>

@@ -131,28 +131,31 @@ export function AuthFormField({
 export function AuthSubmitButton({
 	onPress,
 	isSubmitting,
+	disabled = false,
 	label,
 	testID,
 }: {
 	onPress: () => void;
 	isSubmitting: boolean;
+	disabled?: boolean;
 	label: string;
 	testID?: string;
 }) {
 	const { theme } = useTheme();
+	const isDisabled = isSubmitting || disabled;
 	return (
 		<TouchableOpacity
 			testID={testID}
 			onPress={onPress}
-			disabled={isSubmitting}
+			disabled={isDisabled}
 			accessibilityRole="button"
 			accessibilityLabel={label}
-			accessibilityState={{ disabled: isSubmitting, busy: isSubmitting }}
+			accessibilityState={{ disabled: isDisabled, busy: isSubmitting }}
 			style={[
 				styles.button,
 				{
 					backgroundColor: theme.primary,
-					opacity: isSubmitting ? 0.5 : 1,
+					opacity: isDisabled ? 0.5 : 1,
 				},
 			]}
 		>

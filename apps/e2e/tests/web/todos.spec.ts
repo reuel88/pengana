@@ -13,7 +13,7 @@ test.describe("Todos", () => {
 		await todoPage.navigate();
 		await expect(page.getByRole("heading", { name: "Todos" })).toBeVisible();
 		await expect(
-			page.getByPlaceholder("Add a new todo...").locator("visible=true"),
+			page.getByPlaceholder("Add a new todo...").first(),
 		).toBeVisible();
 	});
 
@@ -36,9 +36,9 @@ test.describe("Todos", () => {
 		).toBeVisible();
 		await page
 			.getByPlaceholder("Add a new todo...")
-			.locator("visible=true")
+			.filter({ visible: true })
 			.fill(title);
-		await page.getByTestId("todo-submit").locator("visible=true").click();
+		await page.getByTestId("todo-submit").filter({ visible: true }).click();
 		await expect(todoPage.todoRowLocator(title)).toBeVisible();
 
 		await todoPage.toggleTodo(title);

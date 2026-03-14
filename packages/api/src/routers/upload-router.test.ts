@@ -66,7 +66,8 @@ function makeContext(overrides: Partial<Context> = {}): Context {
 
 function makeInput(overrides: Record<string, unknown> = {}) {
 	return {
-		todoId: "todo-1",
+		entityType: "todo" as const,
+		entityId: "todo-1",
 		fileName: "photo.jpg",
 		mimeType: "image/jpeg" as const,
 		data: Buffer.from("test").toString("base64"),
@@ -120,7 +121,7 @@ describe("upload.upload", () => {
 		});
 
 		await expect(
-			call(uploadRouter.upload, makeInput(), {
+			call(uploadRouter.upload, makeInput({ entityType: "orgTodo" as const }), {
 				context: makeContext({
 					session: {
 						user: {

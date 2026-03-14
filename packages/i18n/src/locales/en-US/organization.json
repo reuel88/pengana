@@ -79,10 +79,11 @@
 			"expired": "Expired"
 		},
 		"invitedAs": "You have been invited to join {{org}} as {{role}}.",
-		"invitedBy": "Invited by: {{email}}",
+		"invitedBy": "Invited by: {{name}}",
 		"fetchError": "Something went wrong loading invitations",
 		"retry": "Retry",
-		"unknownError": "An unexpected error occurred"
+		"unknownError": "An unexpected error occurred",
+		"notFound": "This invitation link is invalid or no longer exists."
 	},
 	"teams": {
 		"title": "Teams",

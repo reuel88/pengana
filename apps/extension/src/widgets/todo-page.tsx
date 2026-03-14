@@ -99,16 +99,20 @@ export function TodoPage({
 				</div>
 			) : null}
 			<SyncProvider userId={userId}>
-				<div
-					id="panel-personal"
-					role="tabpanel"
-					aria-labelledby="tab-personal"
-					className={
-						activeTab !== "personal" && organizationId ? "hidden" : undefined
-					}
-				>
-					<TodoContent userId={userId} />
-				</div>
+				{organizationId ? (
+					<div
+						id="panel-personal"
+						role="tabpanel"
+						aria-labelledby="tab-personal"
+						className={activeTab !== "personal" ? "hidden" : undefined}
+					>
+						<TodoContent userId={userId} />
+					</div>
+				) : (
+					<div>
+						<TodoContent userId={userId} />
+					</div>
+				)}
 			</SyncProvider>
 			{organizationId ? (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>

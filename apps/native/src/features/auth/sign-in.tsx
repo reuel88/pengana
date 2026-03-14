@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
+import { getSafeRedirectPath } from "@/shared/lib/auth-flow";
 
 import {
 	AuthFormCard,
@@ -38,7 +39,7 @@ function SignInForm({ redirectTo }: { redirectTo?: string }) {
 						setError(null);
 						form.reset();
 						queryClient.refetchQueries();
-						router.replace((redirectTo ?? "/") as never);
+						router.replace(getSafeRedirectPath(redirectTo, "/") as never);
 					},
 				},
 			);

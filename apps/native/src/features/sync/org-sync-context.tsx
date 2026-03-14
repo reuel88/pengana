@@ -21,7 +21,9 @@ const orgDeps = createPlatformDeps(
 				})),
 				lastSyncedAt: input.lastSyncedAt,
 			};
-			const result = (await client.orgTodo.sync(orgInput)).data;
+			const result = (
+				await client.orgTodo.sync(orgInput, { signal: input.signal })
+			).data;
 			return {
 				...result,
 				serverChanges: result.serverChanges.map((change) => ({

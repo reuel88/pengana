@@ -56,16 +56,46 @@ function collectEvents(engine: SyncEngine): SyncEvent[] {
 
 function mockTransportSyncDeferred(transport: SyncTransport) {
 	let resolveSync!: (value: ReturnType<typeof makeSyncResult>) => void;
-	vi.mocked(transport.sync).mockImplementation(
-		() =>
-			new Promise((resolve) => {
-				resolveSync = resolve;
-			}),
-	);
+	let rejectSync!: (reason?: unknown) => void;
+	let lastSignal: AbortSignal | undefined;
+	vi.mocked(transport.sync).mockImplementation((input) => {
+		lastSignal = input.signal;
+		return new Promise((resolve, reject) => {
+			resolveSync = resolve;
+			rejectSync = reject;
+			input.signal?.addEventListener(
+				"abort",
+				() => reject(createAbortError()),
+				{ once: true },
+			);
+		});
+	});
 	return {
 		resolve: (overrides?: Parameters<typeof makeSyncResult>[0]) =>
 			resolveSync(makeSyncResult(overrides)),
+		reject: (reason?: unknown) => rejectSync(reason),
+		getSignal: () => lastSignal,
 	};
+}
+
+function deferredPromise<T>() {
+	let resolve!: (value: T) => void;
+	let reject!: (reason?: unknown) => void;
+	const promise = new Promise<T>((res, rej) => {
+		resolve = res;
+		reject = rej;
+	});
+	return { promise, resolve, reject };
+}
+
+function createAbortError() {
+	if (typeof DOMException !== "undefined") {
+		return new DOMException("Sync aborted", "AbortError");
+	}
+
+	const error = new Error("Sync aborted");
+	error.name = "AbortError";
+	return error;
 }
 
 describe("SyncEngine", () => {
@@ -101,6 +131,7 @@ describe("SyncEngine", () => {
 		expect(transport.sync).toHaveBeenCalledWith({
 			changes: pending,
 			lastSyncedAt: "2025-01-01T00:00:00Z",
+			signal: expect.any(AbortSignal),
 		});
 	});
 
@@ -220,5 +251,73 @@ describe("SyncEngine", () => {
 
 		await syncPromise;
 		expect(engine.isSyncing).toBe(false);
+	});
+
+	it("shutdown aborts an in-flight transport and skips applying results", async () => {
+		const serverTodos = [makeTodo({ id: "server-1", syncStatus: "synced" })];
+		const deferred = mockTransportSyncDeferred(transport);
+		const events = collectEvents(engine);
+
+		const syncPromise = engine.sync();
+		await vi.waitFor(() => {
+			expect(transport.sync).toHaveBeenCalledTimes(1);
+		});
+
+		const shutdownPromise = engine.shutdown();
+
+		await vi.waitFor(() => {
+			expect(deferred.getSignal()?.aborted).toBe(true);
+		});
+
+		deferred.resolve({ serverChanges: serverTodos });
+
+		await shutdownPromise;
+		await syncPromise;
+
+		expect(adapter.applyServerChanges).not.toHaveBeenCalled();
+		expect(events.some((event) => event.type === "sync:error")).toBe(false);
+		expect(engine.isSyncing).toBe(false);
+	});
+
+	it("shutdown waits for non-abortable work already in progress", async () => {
+		const pendingChanges = deferredPromise<Todo[]>();
+		vi.mocked(adapter.getPendingChanges).mockReturnValueOnce(
+			pendingChanges.promise,
+		);
+
+		const syncPromise = engine.sync();
+		await vi.waitFor(() => {
+			expect(adapter.getPendingChanges).toHaveBeenCalledTimes(1);
+		});
+
+		let shutdownResolved = false;
+		const shutdownPromise = engine.shutdown().then(() => {
+			shutdownResolved = true;
+		});
+
+		await Promise.resolve();
+		expect(shutdownResolved).toBe(false);
+
+		pendingChanges.resolve([]);
+
+		await shutdownPromise;
+		await syncPromise;
+		expect(shutdownResolved).toBe(true);
+		expect(transport.sync).not.toHaveBeenCalled();
+	});
+
+	it("shutdown suppresses queued follow-up syncs", async () => {
+		mockTransportSyncDeferred(transport);
+		const syncPromise = engine.sync();
+
+		await vi.waitFor(() => {
+			expect(transport.sync).toHaveBeenCalledTimes(1);
+		});
+
+		void engine.sync();
+		await engine.shutdown();
+		await syncPromise;
+
+		expect(transport.sync).toHaveBeenCalledTimes(1);
 	});
 });

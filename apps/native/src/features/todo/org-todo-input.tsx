@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { useState } from "react";
 import {
+	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -38,6 +39,8 @@ export function OrgTodoInput({
 			await addOrgTodo(organizationId, userId, trimmed);
 			setTitle("");
 			triggerSync();
+		} catch {
+			Alert.alert(t("common:error.title"), t("errors:failedToAddTodo"));
 		} finally {
 			setSubmitting(false);
 		}
