@@ -71,6 +71,30 @@
 			"quoteStyle": "double"
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["packages/ui/src/components/**"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useSemanticElements": "off",
+						"useFocusableInteractive": "off",
+						"noLabelWithoutControl": "off",
+						"useKeyWithClickEvents": "off",
+						"useAriaPropsForRole": "off",
+						"noRedundantRoles": "off"
+					},
+					"suspicious": {
+						"noDocumentCookie": "off",
+						"noArrayIndexKey": "off"
+					},
+					"security": {
+						"noDangerouslySetInnerHtml": "off"
+					}
+				}
+			}
+		}
+	],
 	"css": {
 		"parser": {
 			"tailwindDirectives": true

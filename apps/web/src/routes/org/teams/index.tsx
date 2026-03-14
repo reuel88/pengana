@@ -3,8 +3,7 @@ import { useZodForm } from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Dialog,
-	DialogCloseButton,
-	DialogPopup,
+	DialogContent,
 	DialogTitle,
 	DialogTrigger,
 } from "@pengana/ui/components/dialog";
@@ -61,8 +60,7 @@ function CreateTeamDialog({
 	});
 
 	return (
-		<DialogPopup>
-			<DialogCloseButton />
+		<DialogContent>
 			<DialogTitle>{t("teams.create")}</DialogTitle>
 			<FormRoot form={form} className="mt-4 flex flex-col gap-3">
 				<form.Field name="teamName">
@@ -93,7 +91,7 @@ function CreateTeamDialog({
 					)}
 				</form.Subscribe>
 			</FormRoot>
-		</DialogPopup>
+		</DialogContent>
 	);
 }
 

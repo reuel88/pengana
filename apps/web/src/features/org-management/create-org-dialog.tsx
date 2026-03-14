@@ -1,9 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import {
 	Dialog,
-	DialogCloseButton,
+	DialogContent,
 	DialogDescription,
-	DialogPopup,
 	DialogTitle,
 } from "@pengana/ui/components/dialog";
 import { useNavigate } from "@tanstack/react-router";
@@ -22,8 +21,7 @@ export function CreateOrgDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogPopup>
-				<DialogCloseButton />
+			<DialogContent>
 				<DialogTitle>{t("create.title")}</DialogTitle>
 				<DialogDescription className="mt-1">
 					{t("create.description")}
@@ -35,7 +33,7 @@ export function CreateOrgDialog({
 						idPrefix="dialog"
 					/>
 				</div>
-			</DialogPopup>
+			</DialogContent>
 		</Dialog>
 	);
 }

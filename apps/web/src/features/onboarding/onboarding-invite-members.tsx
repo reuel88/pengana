@@ -8,7 +8,7 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 import { Input } from "@pengana/ui/components/input";
-import { Select } from "@pengana/ui/components/select";
+import { NativeSelect } from "@pengana/ui/components/native-select";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
@@ -97,7 +97,7 @@ export function OnboardingInviteMembers({
 										</form.Field>
 										<form.Field name={`members[${index}].role`}>
 											{(roleField) => (
-												<Select
+												<NativeSelect
 													aria-label={t("organization:invitations.role")}
 													value={roleField.state.value as string}
 													onChange={(e) =>
@@ -113,7 +113,7 @@ export function OnboardingInviteMembers({
 													<option value="admin">
 														{t("organization:roles.admin")}
 													</option>
-												</Select>
+												</NativeSelect>
 											)}
 										</form.Field>
 										{membersField.state.value.length > 1 && (
