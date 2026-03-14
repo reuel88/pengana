@@ -4,7 +4,7 @@ import {
 	isAllowedMimeType,
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/sync-engine";
-import { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
+import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file-store.web";
 
 import { useOrgSync } from "@/features/sync/org-sync-context";
 

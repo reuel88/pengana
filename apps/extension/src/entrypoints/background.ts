@@ -12,8 +12,8 @@ import {
 	createDexieSyncAdapter,
 	createTodoUploadLifecycleCallbacks,
 	createWebUploadAdapter,
-	removeFileFromIndexedDB,
 } from "@pengana/todo-client";
+import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import type { SyncScope } from "@/shared/api/background-messages";
@@ -37,7 +37,7 @@ const engines = new Map<
 >();
 
 const storageHealthProvider = createWebStorageHealthProvider();
-const uploadAdapter = createWebUploadAdapter();
+const uploadAdapter = createWebUploadAdapter(appDb);
 
 // --- Helpers ---
 
@@ -144,7 +144,8 @@ async function checkStorageHealth() {
 		if (ratio >= STORAGE_WARNING_RATIO || ratio >= STORAGE_CRITICAL_RATIO) {
 			await cleanupUploaded({
 				uploadAdapter,
-				removeFile: removeFileFromIndexedDB,
+				removeFile: (entityId: string) =>
+					removeFileFromIndexedDB(appDb, entityId),
 			});
 		}
 	} catch (err) {

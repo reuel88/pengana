@@ -5,10 +5,8 @@ import {
 	createWebSocketRealtimeTransport,
 	type SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
-import {
-	createTodoUploadLifecycleCallbacks,
-	removeFileFromIndexedDB,
-} from "@pengana/todo-client";
+import { createTodoUploadLifecycleCallbacks } from "@pengana/todo-client";
+import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
 import {
@@ -58,7 +56,7 @@ export function createWebPlatformDeps(
 		},
 		createSyncAdapter,
 		createSyncTransport,
-		createUploadAdapter: () => createWebUploadAdapter(),
+		createUploadAdapter: () => createWebUploadAdapter(appDb),
 		createUploadTransport: createIndexedDbUploadTransport,
 		onFocusSubscribe: (triggerSync) => {
 			const handler = () => {
@@ -68,7 +66,7 @@ export function createWebPlatformDeps(
 			return () => document.removeEventListener("visibilitychange", handler);
 		},
 		storageHealth: createWebStorageHealthProvider(),
-		removeFile: removeFileFromIndexedDB,
+		removeFile: (entityId: string) => removeFileFromIndexedDB(appDb, entityId),
 		uploadLifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
 	};
 }

@@ -12,6 +12,8 @@ vi.mock("./dexie-file-store", () => ({
 
 import { createIndexedDbUploadTransport } from "./indexeddb-upload-transport";
 
+const fakeDb = {} as Parameters<typeof createIndexedDbUploadTransport>[0]["db"];
+
 describe("createIndexedDbUploadTransport", () => {
 	beforeEach(() => {
 		getFileFromIndexedDB.mockReset();
@@ -26,7 +28,7 @@ describe("createIndexedDbUploadTransport", () => {
 		};
 		getFileFromIndexedDB.mockResolvedValue({ base64: "YWJj" });
 
-		const transport = createIndexedDbUploadTransport({ rpc });
+		const transport = createIndexedDbUploadTransport({ rpc, db: fakeDb });
 
 		await transport.upload({
 			entityType: "todo",
@@ -36,7 +38,7 @@ describe("createIndexedDbUploadTransport", () => {
 			idempotencyKey: "idem-1",
 		});
 
-		expect(getFileFromIndexedDB).toHaveBeenCalledWith("todo-1");
+		expect(getFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
 		expect(rpc.upload).toHaveBeenCalledWith({
 			entityType: "todo",
 			entityId: "todo-1",
@@ -45,13 +47,14 @@ describe("createIndexedDbUploadTransport", () => {
 			data: "YWJj",
 			idempotencyKey: "idem-1",
 		});
-		expect(removeFileFromIndexedDB).toHaveBeenCalledWith("todo-1");
+		expect(removeFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
 	});
 
 	it("throws the storage-specific missing file error", async () => {
 		getFileFromIndexedDB.mockResolvedValue(undefined);
 		const transport = createIndexedDbUploadTransport({
 			rpc: { upload: vi.fn() },
+			db: fakeDb,
 		});
 
 		await expect(
@@ -70,10 +73,11 @@ describe("createIndexedDbUploadTransport", () => {
 	it("removes the stored file when upload fails permanently", async () => {
 		const transport = createIndexedDbUploadTransport({
 			rpc: { upload: vi.fn() },
+			db: fakeDb,
 		});
 
 		await transport.onFailed?.("todo", "todo-1", "blob:file");
 
-		expect(removeFileFromIndexedDB).toHaveBeenCalledWith("todo-1");
+		expect(removeFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
 	});
 });

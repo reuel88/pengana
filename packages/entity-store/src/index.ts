@@ -15,7 +15,10 @@ export {
 	type DexieSyncAdapterConfig,
 } from "./dexie/create-dexie-sync-adapter";
 // Dexie (web)
-export { EntityDatabase } from "./dexie/entity-database";
+export {
+	EntityDatabase,
+	type RawStoreDefinition,
+} from "./dexie/entity-database";
 export {
 	createDrizzleActions,
 	type DrizzleActions,

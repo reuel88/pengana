@@ -1,15 +1,17 @@
+import type { EntityDatabase } from "@pengana/entity-store";
 import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
 
 import { readFileAsBase64 } from "../lib/file-utils";
-import { uploadQueueDb } from "../lib/upload-queue-db";
+import type { FileDataRecord } from "../lib/upload-queue-stores";
 
 export async function storeFileInIndexedDB(
+	db: EntityDatabase,
 	entityId: string,
 	file: File,
 ): Promise<void> {
 	const base64 = await readFileAsBase64(file);
 	try {
-		await uploadQueueDb.fileData.put({
+		await db.getTable<FileDataRecord>("fileData").put({
 			entityId,
 			base64,
 			mimeType: file.type,
@@ -22,11 +24,15 @@ export async function storeFileInIndexedDB(
 }
 
 export async function getFileFromIndexedDB(
+	db: EntityDatabase,
 	entityId: string,
 ): Promise<{ base64: string; mimeType: string; fileName: string } | undefined> {
-	return uploadQueueDb.fileData.get(entityId);
+	return db.getTable<FileDataRecord>("fileData").get(entityId);
 }
 
-export async function removeFileFromIndexedDB(entityId: string): Promise<void> {
-	await uploadQueueDb.fileData.delete(entityId);
+export async function removeFileFromIndexedDB(
+	db: EntityDatabase,
+	entityId: string,
+): Promise<void> {
+	await db.getTable<FileDataRecord>("fileData").delete(entityId);
 }
