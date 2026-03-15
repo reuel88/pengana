@@ -1,4 +1,4 @@
-import { createWebUploadAdapter as createTodoClientWebUploadAdapter } from "@pengana/todo-client";
+import { createWebUploadAdapter as createTodoClientWebUploadAdapter } from "@pengana/upload-client";
 
 import { appDb } from "@/features/todo/entities/todo/db.web";
 

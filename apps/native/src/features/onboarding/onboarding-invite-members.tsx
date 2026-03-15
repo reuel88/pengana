@@ -12,40 +12,25 @@ import {
 import { useBatchInvite } from "@/shared/hooks/use-batch-invite";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 import { useTheme } from "@/shared/lib/theme";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 import { primaryButtonText } from "@/shared/styles/shared";
 import { RoleToggle } from "@/shared/ui/role-toggle";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 import { onboardingStyles } from "./onboarding-styles";
 
-export function OnboardingInviteMembers({
-	onInvited,
-	onSkip,
-}: {
-	onInvited: () => void;
-	onSkip: () => void;
-}) {
-	const { t, i18n } = useTranslation("onboarding");
-
-	return (
-		<OnboardingInviteMembersContent
-			key={i18n.language}
-			onInvited={onInvited}
-			onSkip={onSkip}
-			t={t}
-		/>
-	);
-}
+export const OnboardingInviteMembers = withLanguageKey(
+	OnboardingInviteMembersContent,
+);
 
 function OnboardingInviteMembersContent({
 	onInvited,
 	onSkip,
-	t,
 }: {
 	onInvited: () => void;
 	onSkip: () => void;
-	t: ReturnType<typeof useTranslation<"onboarding">>["t"];
 }) {
+	const { t } = useTranslation("onboarding");
 	const { theme } = useTheme();
 	const { data: activeOrg } = useActiveOrg();
 

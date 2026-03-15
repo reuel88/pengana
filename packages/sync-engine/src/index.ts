@@ -32,12 +32,14 @@ export {
 export type { UploadQueueConfig } from "./core/upload-queue";
 export { UploadQueue } from "./core/upload-queue";
 export { isQuotaError, StorageFullError } from "./errors/storage-error";
+export { createSyncProviders } from "./factories/create-sync-providers";
 export { useNetworkStatus } from "./hooks/use-network-status";
 export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
 export { useRealtimeTransport } from "./hooks/use-realtime-transport";
 export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
 export type { UseStorageHealthOptions } from "./hooks/use-storage-health";
 export { useStorageHealth } from "./hooks/use-storage-health";
+export { useSyncEngine } from "./hooks/use-sync-engine";
 export type {
 	SyncEngineOptions,
 	SyncEnginePlatformDeps,
@@ -60,9 +62,6 @@ export type {
 export { createWebSocketRealtimeTransport } from "./realtime/websocket-realtime-transport";
 export {
 	mediaSchema,
-	orgSyncInputSchema,
-	orgSyncOutputSchema,
-	orgTodoSchema,
 	syncInputSchema,
 	syncOutputSchema,
 	syncStatusSchema,
@@ -72,9 +71,6 @@ export {
 } from "./schemas";
 export type {
 	Media,
-	OrgSyncInput,
-	OrgSyncOutput,
-	OrgTodo,
 	StorageEstimate,
 	StorageHealthProvider,
 	StorageLevel,

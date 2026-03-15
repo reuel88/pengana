@@ -1,4 +1,5 @@
 import { env } from "@pengana/env/web";
+import { createSyncTransport } from "@pengana/sync-client";
 import {
 	cleanupUploaded,
 	STORAGE_WARNING_RATIO,
@@ -6,16 +7,17 @@ import {
 	UploadQueue,
 } from "@pengana/sync-engine";
 import {
-	createDexieOrgSyncAdapter,
-	createDexieSyncAdapter,
-	createOrgSyncTransport,
-	createPersonalSyncTransport,
+	createTodoSyncAdapter,
+	orgTodoConfig,
+	personalTodoConfig,
+} from "@pengana/todo-client";
+import {
 	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
 	reconcileMedia,
-} from "@pengana/todo-client";
-import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
-import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
+} from "@pengana/upload-client";
+import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import type { SyncScope } from "@/shared/api/background-messages";
 import { client } from "@/shared/api/orpc";
@@ -86,25 +88,23 @@ function createEngine(scope: SyncScope): {
 	engine: SyncEngine;
 	uploadQueue: UploadQueue;
 } {
-	const adapter =
-		scope.scopeType === "organization"
-			? createDexieOrgSyncAdapter(appDb, scope.scopeId)
-			: createDexieSyncAdapter(appDb, scope.scopeId);
+	const isOrg = scope.scopeType === "organization";
+	const config = isOrg ? orgTodoConfig : personalTodoConfig;
+	const adapter = createTodoSyncAdapter(appDb, scope.scopeId, config);
 
 	const onMedia = (
 		media: import("@pengana/sync-engine").Media[],
 		entityIds: string[],
 	) => reconcileMedia(appDb, media, entityIds);
 
-	const transport =
-		scope.scopeType === "organization"
-			? createOrgSyncTransport(async (input) => {
-					return (await client.orgTodo.sync(input, { signal: input.signal }))
-						.data;
-				}, onMedia)
-			: createPersonalSyncTransport(async (input) => {
-					return (await client.todo.sync(input, { signal: input.signal })).data;
-				}, onMedia);
+	const transport = isOrg
+		? createSyncTransport(async (input) => {
+				return (await client.orgTodo.sync(input, { signal: input.signal }))
+					.data;
+			}, onMedia)
+		: createSyncTransport(async (input) => {
+				return (await client.todo.sync(input, { signal: input.signal })).data;
+			}, onMedia);
 
 	const engine = new SyncEngine(adapter, transport);
 	const uploadTransport = createIndexedDbUploadTransport();

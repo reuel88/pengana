@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as OrgRouteRouteImport } from './routes/org/route'
+import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgIndexRouteImport } from './routes/org/index'
 import { Route as SettingsSessionsRouteImport } from './routes/settings/sessions'
@@ -51,6 +52,10 @@ const SettingsRouteRoute = SettingsRouteRouteImport.update({
 const OrgRouteRoute = OrgRouteRouteImport.update({
   id: '/org',
   path: '/org',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authRouteRoute = authRouteRouteImport.update({
+  id: '/(auth)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -104,29 +109,29 @@ const InvitationInvitationIdRoute = InvitationInvitationIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const authSignUpRoute = authSignUpRouteImport.update({
-  id: '/(auth)/sign-up',
+  id: '/sign-up',
   path: '/sign-up',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authResetPasswordRoute = authResetPasswordRouteImport.update({
-  id: '/(auth)/reset-password',
+  id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authLoginRoute = authLoginRouteImport.update({
-  id: '/(auth)/login',
+  id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
-  id: '/(auth)/forgot-password',
+  id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authAuthErrorRoute = authAuthErrorRouteImport.update({
-  id: '/(auth)/auth-error',
+  id: '/auth-error',
   path: '/auth-error',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const accountSuccessRoute = accountSuccessRouteImport.update({
   id: '/(account)/success',
@@ -149,14 +154,14 @@ const OrgTeamsIndexRoute = OrgTeamsIndexRouteImport.update({
   getParentRoute: () => OrgTeamsRouteRoute,
 } as any)
 const authVerifyEmailIndexRoute = authVerifyEmailIndexRouteImport.update({
-  id: '/(auth)/verify-email/',
+  id: '/verify-email/',
   path: '/verify-email/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authMagicLinkIndexRoute = authMagicLinkIndexRouteImport.update({
-  id: '/(auth)/magic-link/',
+  id: '/magic-link/',
   path: '/magic-link/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const OrgTeamsTeamIdRoute = OrgTeamsTeamIdRouteImport.update({
   id: '/$teamId',
@@ -164,19 +169,19 @@ const OrgTeamsTeamIdRoute = OrgTeamsTeamIdRouteImport.update({
   getParentRoute: () => OrgTeamsRouteRoute,
 } as any)
 const authVerifyEmailCallbackRoute = authVerifyEmailCallbackRouteImport.update({
-  id: '/(auth)/verify-email/callback',
+  id: '/verify-email/callback',
   path: '/verify-email/callback',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authMagicLinkVerifyRoute = authMagicLinkVerifyRouteImport.update({
-  id: '/(auth)/magic-link/verify',
+  id: '/magic-link/verify',
   path: '/magic-link/verify',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authMagicLinkPendingRoute = authMagicLinkPendingRouteImport.update({
-  id: '/(auth)/magic-link/pending',
+  id: '/magic-link/pending',
   path: '/magic-link/pending',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => authRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -240,6 +245,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/(auth)': typeof authRouteRouteWithChildren
   '/org': typeof OrgRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/todos': typeof TodosRoute
@@ -330,6 +336,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/(auth)'
     | '/org'
     | '/settings'
     | '/todos'
@@ -361,22 +368,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  authRouteRoute: typeof authRouteRouteWithChildren
   OrgRouteRoute: typeof OrgRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   TodosRoute: typeof TodosRoute
   accountOnboardingRoute: typeof accountOnboardingRoute
   accountSuccessRoute: typeof accountSuccessRoute
-  authAuthErrorRoute: typeof authAuthErrorRoute
-  authForgotPasswordRoute: typeof authForgotPasswordRoute
-  authLoginRoute: typeof authLoginRoute
-  authResetPasswordRoute: typeof authResetPasswordRoute
-  authSignUpRoute: typeof authSignUpRoute
   InvitationInvitationIdRoute: typeof InvitationInvitationIdRoute
-  authMagicLinkPendingRoute: typeof authMagicLinkPendingRoute
-  authMagicLinkVerifyRoute: typeof authMagicLinkVerifyRoute
-  authVerifyEmailCallbackRoute: typeof authVerifyEmailCallbackRoute
-  authMagicLinkIndexRoute: typeof authMagicLinkIndexRoute
-  authVerifyEmailIndexRoute: typeof authVerifyEmailIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -400,6 +398,13 @@ declare module '@tanstack/react-router' {
       path: '/org'
       fullPath: '/org'
       preLoaderRoute: typeof OrgRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)': {
+      id: '/(auth)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -477,35 +482,35 @@ declare module '@tanstack/react-router' {
       path: '/sign-up'
       fullPath: '/sign-up'
       preLoaderRoute: typeof authSignUpRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/reset-password': {
       id: '/(auth)/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof authResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/login': {
       id: '/(auth)/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof authLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/forgot-password': {
       id: '/(auth)/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof authForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/auth-error': {
       id: '/(auth)/auth-error'
       path: '/auth-error'
       fullPath: '/auth-error'
       preLoaderRoute: typeof authAuthErrorRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(account)/success': {
       id: '/(account)/success'
@@ -540,14 +545,14 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email/'
       preLoaderRoute: typeof authVerifyEmailIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/magic-link/': {
       id: '/(auth)/magic-link/'
       path: '/magic-link'
       fullPath: '/magic-link/'
       preLoaderRoute: typeof authMagicLinkIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/org/teams/$teamId': {
       id: '/org/teams/$teamId'
@@ -561,24 +566,54 @@ declare module '@tanstack/react-router' {
       path: '/verify-email/callback'
       fullPath: '/verify-email/callback'
       preLoaderRoute: typeof authVerifyEmailCallbackRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/magic-link/verify': {
       id: '/(auth)/magic-link/verify'
       path: '/magic-link/verify'
       fullPath: '/magic-link/verify'
       preLoaderRoute: typeof authMagicLinkVerifyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/magic-link/pending': {
       id: '/(auth)/magic-link/pending'
       path: '/magic-link/pending'
       fullPath: '/magic-link/pending'
       preLoaderRoute: typeof authMagicLinkPendingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof authRouteRoute
     }
   }
 }
+
+interface authRouteRouteChildren {
+  authAuthErrorRoute: typeof authAuthErrorRoute
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authLoginRoute: typeof authLoginRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
+  authSignUpRoute: typeof authSignUpRoute
+  authMagicLinkPendingRoute: typeof authMagicLinkPendingRoute
+  authMagicLinkVerifyRoute: typeof authMagicLinkVerifyRoute
+  authVerifyEmailCallbackRoute: typeof authVerifyEmailCallbackRoute
+  authMagicLinkIndexRoute: typeof authMagicLinkIndexRoute
+  authVerifyEmailIndexRoute: typeof authVerifyEmailIndexRoute
+}
+
+const authRouteRouteChildren: authRouteRouteChildren = {
+  authAuthErrorRoute: authAuthErrorRoute,
+  authForgotPasswordRoute: authForgotPasswordRoute,
+  authLoginRoute: authLoginRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
+  authSignUpRoute: authSignUpRoute,
+  authMagicLinkPendingRoute: authMagicLinkPendingRoute,
+  authMagicLinkVerifyRoute: authMagicLinkVerifyRoute,
+  authVerifyEmailCallbackRoute: authVerifyEmailCallbackRoute,
+  authMagicLinkIndexRoute: authMagicLinkIndexRoute,
+  authVerifyEmailIndexRoute: authVerifyEmailIndexRoute,
+}
+
+const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
+  authRouteRouteChildren,
+)
 
 interface OrgTeamsRouteRouteChildren {
   OrgTeamsTeamIdRoute: typeof OrgTeamsTeamIdRoute
@@ -634,22 +669,13 @@ const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  authRouteRoute: authRouteRouteWithChildren,
   OrgRouteRoute: OrgRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   TodosRoute: TodosRoute,
   accountOnboardingRoute: accountOnboardingRoute,
   accountSuccessRoute: accountSuccessRoute,
-  authAuthErrorRoute: authAuthErrorRoute,
-  authForgotPasswordRoute: authForgotPasswordRoute,
-  authLoginRoute: authLoginRoute,
-  authResetPasswordRoute: authResetPasswordRoute,
-  authSignUpRoute: authSignUpRoute,
   InvitationInvitationIdRoute: InvitationInvitationIdRoute,
-  authMagicLinkPendingRoute: authMagicLinkPendingRoute,
-  authMagicLinkVerifyRoute: authMagicLinkVerifyRoute,
-  authVerifyEmailCallbackRoute: authVerifyEmailCallbackRoute,
-  authMagicLinkIndexRoute: authMagicLinkIndexRoute,
-  authVerifyEmailIndexRoute: authVerifyEmailIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

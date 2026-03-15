@@ -1,4 +1,4 @@
-import { storeFileInIndexedDB as storeFile } from "@pengana/todo-client/adapters/dexie-file-store";
+import { storeFileInIndexedDB as storeFile } from "@pengana/upload-client/adapters/dexie-file-store";
 
 import { appDb } from "@/shared/db";
 

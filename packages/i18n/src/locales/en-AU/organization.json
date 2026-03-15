@@ -31,7 +31,20 @@
 		"deleteSuccess": "Organisation deleted",
 		"error": "Failed to manage organisation",
 		"updateError": "Failed to update organisation",
-		"deleteError": "Failed to delete organisation"
+		"deleteError": "Failed to delete organisation",
+		"appearance": {
+			"title": "Appearance",
+			"description": "Organisation-wide design preset. Light and dark mode stay personal.",
+			"style": "Style",
+			"baseColor": "Base Colour",
+			"accentTheme": "Accent Theme",
+			"iconLibrary": "Icon Library",
+			"font": "Font",
+			"radius": "Radius",
+			"menu": "Menu",
+			"menuAccent": "Menu Accent",
+			"save": "Save Appearance"
+		}
 	},
 	"members": {
 		"title": "Members",

@@ -1,10 +1,10 @@
 import { env } from "@pengana/env/web";
 import { authClient } from "@/shared/lib/auth-client";
-import { PendingEmailPage } from "./pending-email-page";
+import { EmailSentNotice } from "./email-sent-notice";
 
 export function MagicLinkPending() {
 	return (
-		<PendingEmailPage
+		<EmailSentNotice
 			titleKey="auth:magicLink.pending.title"
 			descriptionKey="auth:magicLink.pending.description"
 			resendButtonKey="auth:magicLink.pending.resend"

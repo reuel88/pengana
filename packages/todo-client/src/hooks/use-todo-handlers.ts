@@ -1,12 +1,14 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import { isQuotaError } from "@pengana/sync-engine";
-import { useCallback, useMemo } from "react";
 import {
 	addMedia,
 	getMediaCountForEntity,
 	removeMedia,
-} from "../lib/media-actions";
-import { deleteTodo, resolveConflict, toggleTodo } from "../lib/todo-actions";
+} from "@pengana/upload-client";
+import { useCallback, useMemo } from "react";
+import { createTodoActions } from "../lib/todo-actions";
+import type { TodoConfig } from "../lib/todo-config";
+import { personalTodoConfig } from "../lib/todo-config";
 
 const MAX_ATTACHMENTS = 10;
 
@@ -27,18 +29,24 @@ export interface TodoActions {
 	) => Promise<void>;
 }
 
-function createDefaultActions(db: EntityDatabase): TodoActions {
+function createDefaultActions(
+	db: EntityDatabase,
+	config: TodoConfig,
+): TodoActions {
+	const actions = createTodoActions(db, config);
 	return {
-		toggleTodo: (id) => toggleTodo(db, id),
-		deleteTodo: (id) => deleteTodo(db, id),
-		resolveConflict: (id, resolution) => resolveConflict(db, id, resolution),
+		toggleTodo: (id) => actions.toggleTodo(id),
+		deleteTodo: (id) => actions.deleteTodo(id),
+		resolveConflict: (id, resolution) =>
+			actions.resolveConflict(id, resolution),
 	};
 }
 
 function resolveActions({
 	actions,
 	db,
-}: Pick<TodoHandlerDeps, "actions" | "db">): TodoActions {
+	config,
+}: Pick<TodoHandlerDeps, "actions" | "db" | "config">): TodoActions {
 	if (actions) {
 		return actions;
 	}
@@ -47,7 +55,7 @@ function resolveActions({
 		throw new Error("useTodoHandlers requires either actions or db");
 	}
 
-	return createDefaultActions(db);
+	return createDefaultActions(db, config ?? personalTodoConfig);
 }
 
 export interface TodoHandlerDeps {
@@ -69,6 +77,7 @@ export interface TodoHandlerDeps {
 	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	actions?: TodoActions;
 	db?: EntityDatabase;
+	config?: TodoConfig;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {

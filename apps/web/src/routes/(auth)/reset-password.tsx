@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ResetPasswordForm } from "@/features/auth/reset-password-form";
 
 export const Route = createFileRoute("/(auth)/reset-password")({
-	component: ResetPasswordPage,
+	component: ResetPasswordForm,
 	validateSearch: z.object({
 		token: z.string().optional(),
 		error: z.string().optional(),
@@ -18,7 +18,3 @@ export const Route = createFileRoute("/(auth)/reset-password")({
 		],
 	}),
 });
-
-function ResetPasswordPage() {
-	return <ResetPasswordForm />;
-}

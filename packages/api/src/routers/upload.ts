@@ -122,7 +122,10 @@ export const uploadRouter = {
 			const now = new Date();
 			if (input.entityType === "orgTodo") {
 				await updateOrgTodo(input.entityId, { updatedAt: now });
-				context.notifyOrgMembers(activeOrgId!);
+				if (!activeOrgId) {
+					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
+				}
+				context.notifyOrgMembers(activeOrgId);
 			} else {
 				await updateTodo(input.entityId, { updatedAt: now });
 				context.notifyUser(userId);

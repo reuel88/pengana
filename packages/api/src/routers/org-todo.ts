@@ -1,5 +1,5 @@
 import { updateOrgTodoForOrg } from "@pengana/db/org-todo-queries";
-import { orgSyncInputSchema, orgSyncOutputSchema } from "@pengana/sync-engine";
+import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { apiError } from "../errors";
@@ -13,8 +13,8 @@ export const orgTodoRouter = {
 			path: "/org-todo/sync",
 			summary: "Sync organization todos",
 		})
-		.input(orgSyncInputSchema)
-		.output(envelopeOutput(orgSyncOutputSchema))
+		.input(syncInputSchema)
+		.output(envelopeOutput(syncOutputSchema))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
 			const orgId = context.session.session.activeOrganizationId;

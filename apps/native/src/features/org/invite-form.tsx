@@ -3,6 +3,7 @@ import { makeNativeInviteSchema } from "@pengana/i18n/zod";
 import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 import {
 	primaryButton,
 	primaryButtonText,
@@ -11,19 +12,10 @@ import {
 import { RoleToggle } from "@/shared/ui/role-toggle";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
-export function InviteForm({ orgId }: { orgId: string }) {
-	const { i18n, t } = useTranslation("organization");
+export const InviteForm = withLanguageKey(InviteFormContent);
 
-	return <InviteFormContent key={i18n.language} orgId={orgId} t={t} />;
-}
-
-function InviteFormContent({
-	orgId,
-	t,
-}: {
-	orgId: string;
-	t: ReturnType<typeof useTranslation<"organization">>["t"];
-}) {
+function InviteFormContent({ orgId }: { orgId: string }) {
+	const { t } = useTranslation("organization");
 	const { theme } = useTheme();
 
 	const { inviteMember, loading } = useInviteMember({

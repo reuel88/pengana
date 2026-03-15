@@ -29,7 +29,20 @@
 		"deleteConfirm": "Tem certeza? Esta ação não pode ser desfeita.",
 		"updateSuccess": "Organização atualizada",
 		"deleteSuccess": "Organização excluída",
-		"error": "Falha ao atualizar organização"
+		"error": "Falha ao atualizar organização",
+		"appearance": {
+			"title": "Aparência",
+			"description": "Preset de design para toda a organização. Os modos claro e escuro permanecem pessoais.",
+			"style": "Estilo",
+			"baseColor": "Cor base",
+			"accentTheme": "Tema de destaque",
+			"iconLibrary": "Biblioteca de ícones",
+			"font": "Fonte",
+			"radius": "Raio",
+			"menu": "Menu",
+			"menuAccent": "Destaque do menu",
+			"save": "Salvar aparência"
+		}
 	},
 	"members": {
 		"title": "Membros",

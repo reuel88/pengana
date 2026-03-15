@@ -28,6 +28,8 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		deleted: false,
 		updatedAt: "2025-06-01T00:00:10.000Z",
 		userId: "test-user",
+		organizationId: "",
+		createdBy: null as string | null,
 		syncStatus: "pending" as const,
 		...overrides,
 	};
@@ -41,6 +43,8 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 		deleted: false,
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
 		userId: "test-user",
+		organizationId: null,
+		createdBy: null,
 		...overrides,
 	};
 }
@@ -157,6 +161,8 @@ describe("handleSync", () => {
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
 			userId: "test-user",
+			organizationId: "",
+			createdBy: null,
 			syncStatus: "synced",
 		});
 	});

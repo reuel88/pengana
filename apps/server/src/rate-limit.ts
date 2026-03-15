@@ -3,6 +3,7 @@ import { env } from "@pengana/env/server";
 import type { Context } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { errorEnvelope } from "./error-envelope";
+import { logger } from "./logger";
 
 const HTTP_TOO_MANY_REQUESTS = 429;
 const isDev = env.NODE_ENV === "development";
@@ -13,7 +14,13 @@ const DEV_MULTIPLIER = 10;
 // NOTE: getConnInfo returns the direct connection address. Behind a reverse proxy
 // (e.g. nginx, CloudFront), this will be the proxy's IP, not the client's.
 // If deploying behind a proxy, replace with X-Forwarded-For / CF-Connecting-IP.
-const keyGenerator = (c: Context) => getConnInfo(c).remote.address ?? "unknown";
+const keyGenerator = (c: Context) => {
+	const address = getConnInfo(c).remote.address;
+	if (!address) {
+		logger.warn`Rate-limit: request with undefined remote address, using shared bucket`;
+	}
+	return address ?? "unknown";
+};
 
 const rateLimitExceededHandler = (c: Context) =>
 	c.json(

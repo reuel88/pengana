@@ -1,9 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
-import { addOrgTodo } from "@pengana/todo-client";
+import { createTodoActions, orgTodoConfig } from "@pengana/todo-client";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { toast } from "sonner";
-import { useOrgSync } from "@/features/sync/org-sync-context";
+import { useOrgSync } from "@/features/sync/sync-context";
 import { appDb } from "@/shared/db";
+
+const todoActions = createTodoActions(appDb, orgTodoConfig);
 
 export function OrgTodoInput({
 	organizationId,
@@ -18,7 +20,12 @@ export function OrgTodoInput({
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await addOrgTodo(appDb, organizationId, userId, title);
+				await todoActions.addTodo(
+					organizationId,
+					userId,
+					organizationId,
+					title,
+				);
 				triggerSync();
 			}}
 			onError={() => toast.error(t("errors:failedToAddTodo"))}

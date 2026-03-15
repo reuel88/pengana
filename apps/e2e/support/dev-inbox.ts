@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { DEV_INBOX_URL } from "./constants.js";
+import { DEV_INBOX_URL } from "../constants.js";
 
 interface EmailSummary {
 	id: number;

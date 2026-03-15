@@ -177,168 +177,75 @@ const tablerComponents: Partial<Record<AppIconName, IconComponent>> = {
 	sun: IconSun,
 };
 
+function toPhosphorProps(
+	props: LucideProps,
+): ComponentProps<typeof PhosphorBell> {
+	return {
+		size:
+			typeof props.size === "number" || typeof props.size === "string"
+				? props.size
+				: undefined,
+		color: props.color,
+		className: props.className,
+		style: props.style,
+		weight: "regular",
+	};
+}
+
 const phosphorComponents: Partial<Record<AppIconName, IconComponent>> = {
 	alert: ((props) => (
-		<PhosphorWarningCircle
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorWarningCircle {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	bell: ((props) => (
-		<PhosphorBell
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorBell {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	check: ((props) => (
-		<PhosphorCheck
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorCheck {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"chevron-down": ((props) => (
-		<PhosphorCaretDown
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorCaretDown {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"chevron-left": ((props) => (
-		<PhosphorCaretLeft
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorCaretLeft {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"chevron-right": ((props) => (
-		<PhosphorCaretRight
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorCaretRight {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"chevron-up": ((props) => (
-		<PhosphorCaretUp
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorCaretUp {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	close: ((props) => (
-		<PhosphorX
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorX {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	globe: ((props) => (
-		<PhosphorGlobe
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorGlobe {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	loader: ((props) => (
-		<PhosphorSpinnerGap
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorSpinnerGap {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	mail: ((props) => (
-		<PhosphorEnvelope
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorEnvelope {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	minus: ((props) => (
-		<PhosphorMinus
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorMinus {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	moon: ((props) => (
-		<PhosphorMoon
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorMoon {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"more-horizontal": ((props) => (
-		<PhosphorDotsThree
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorDotsThree {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	"menu-panel-left": ((props) => (
-		<PhosphorSidebarSimple
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorSidebarSimple {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	plus: ((props) => (
-		<PhosphorPlus
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorPlus {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	search: ((props) => (
-		<PhosphorMagnifyingGlass
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorMagnifyingGlass {...toPhosphorProps(props)} />
 	)) as IconComponent,
 	sun: ((props) => (
-		<PhosphorSun
-			size={props.size}
-			color={props.color}
-			className={props.className}
-			style={props.style}
-			weight="regular"
-		/>
+		<PhosphorSun {...toPhosphorProps(props)} />
 	)) as IconComponent,
 };
 
@@ -445,32 +352,28 @@ function useCurrentIconLibrary() {
 	);
 }
 
+const libraryComponentMap: Record<
+	WebIconLibrary,
+	Partial<Record<AppIconName, IconComponent>> | null
+> = {
+	lucide: null,
+	tabler: tablerComponents,
+	phosphor: phosphorComponents,
+	remixicon: remixiconComponents,
+	hugeicons: null,
+};
+
 function renderIcon(
 	name: keyof typeof lucideComponents,
 	props: LucideProps,
 	library: WebIconLibrary,
 ) {
 	const semanticName = iconNameMap[name];
+	const components = libraryComponentMap[library];
+	const Component = components?.[semanticName];
 
-	if (library === "tabler") {
-		const Component = tablerComponents[semanticName];
-		if (Component) {
-			return <Component {...props} />;
-		}
-	}
-
-	if (library === "phosphor") {
-		const Component = phosphorComponents[semanticName];
-		if (Component) {
-			return <Component {...props} />;
-		}
-	}
-
-	if (library === "remixicon") {
-		const Component = remixiconComponents[semanticName];
-		if (Component) {
-			return <Component {...props} />;
-		}
+	if (Component) {
+		return <Component {...props} />;
 	}
 
 	const LucideComponent = lucideComponents[name];

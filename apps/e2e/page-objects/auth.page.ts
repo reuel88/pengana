@@ -58,7 +58,7 @@ export class AuthPage extends BaseAuthPage {
 		}
 
 		await this.page.locator("header").getByRole("button").last().click();
-		await this.page.getByRole("menuitem", { name: "Sign Out" }).click();
+		await this.page.getByTestId("sign-out-trigger").click();
 	}
 
 	async requestPasswordReset(email: string) {

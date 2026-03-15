@@ -29,7 +29,20 @@
 		"deleteConfirm": "¿Estás seguro? Esta acción no se puede deshacer.",
 		"updateSuccess": "Organización actualizada",
 		"deleteSuccess": "Organización eliminada",
-		"error": "Error al actualizar la organización"
+		"error": "Error al actualizar la organización",
+		"appearance": {
+			"title": "Apariencia",
+			"description": "Diseño predefinido para toda la organización. El modo claro y oscuro es personal.",
+			"style": "Estilo",
+			"baseColor": "Color base",
+			"accentTheme": "Tema de acento",
+			"iconLibrary": "Biblioteca de iconos",
+			"font": "Fuente",
+			"radius": "Radio",
+			"menu": "Menú",
+			"menuAccent": "Acento del menú",
+			"save": "Guardar apariencia"
+		}
 	},
 	"members": {
 		"title": "Miembros",

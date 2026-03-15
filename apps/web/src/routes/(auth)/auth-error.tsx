@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthErrorPage } from "@/features/auth/auth-error-page";
-import { AuthLayout } from "@/widgets/auth-layout";
 
 export const Route = createFileRoute("/(auth)/auth-error")({
-	component: AuthErrorRoute,
+	component: AuthErrorPage,
 	validateSearch: z.object({
 		error: z.string().optional(),
 		message: z.string().optional(),
@@ -19,11 +18,3 @@ export const Route = createFileRoute("/(auth)/auth-error")({
 		],
 	}),
 });
-
-function AuthErrorRoute() {
-	return (
-		<AuthLayout>
-			<AuthErrorPage />
-		</AuthLayout>
-	);
-}

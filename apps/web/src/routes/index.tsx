@@ -1,9 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
-import { useActiveOrg } from "@pengana/org-client";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { SubscriptionCard } from "@/features/billing/subscription-card";
 import { orpc } from "@/shared/api/orpc";
+import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 import { requireAuthAndOrg } from "@/shared/lib/auth-client";
 
 export const Route = createFileRoute("/")({

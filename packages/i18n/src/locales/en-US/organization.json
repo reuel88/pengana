@@ -29,7 +29,20 @@
 		"deleteConfirm": "Are you sure? This action cannot be undone.",
 		"updateSuccess": "Organization updated",
 		"deleteSuccess": "Organization deleted",
-		"error": "Failed to manage organization"
+		"error": "Failed to manage organization",
+		"appearance": {
+			"title": "Appearance",
+			"description": "Organization-wide design preset. Light and dark mode stay personal.",
+			"style": "Style",
+			"baseColor": "Base Color",
+			"accentTheme": "Accent Theme",
+			"iconLibrary": "Icon Library",
+			"font": "Font",
+			"radius": "Radius",
+			"menu": "Menu",
+			"menuAccent": "Menu Accent",
+			"save": "Save Appearance"
+		}
 	},
 	"members": {
 		"title": "Members",

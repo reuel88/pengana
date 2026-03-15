@@ -46,7 +46,11 @@ export function UserMenu() {
 						{t("user.settings")}
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+					<DropdownMenuItem
+						variant="destructive"
+						onClick={handleSignOut}
+						data-testid="sign-out-trigger"
+					>
 						{t("user.signOut")}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>

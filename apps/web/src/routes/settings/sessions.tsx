@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SessionsList } from "@/features/auth/sessions-list";
 
 export const Route = createFileRoute("/settings/sessions")({
-	component: SessionsPage,
+	component: SessionsList,
 	head: () => ({
 		meta: [
 			{ title: "Sessions | pengana" },
@@ -13,7 +13,3 @@ export const Route = createFileRoute("/settings/sessions")({
 		],
 	}),
 });
-
-function SessionsPage() {
-	return <SessionsList />;
-}

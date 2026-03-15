@@ -5,9 +5,9 @@ import type {
 import {
 	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
-} from "@pengana/todo-client";
-import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
-import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
+} from "@pengana/upload-client";
+import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import { appDb } from "@/shared/db";
 

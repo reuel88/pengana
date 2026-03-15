@@ -76,21 +76,17 @@ type ThemeChrome = Pick<
 
 export function themedSurface(theme: ThemeChrome) {
 	const radius = Math.max(theme.radius, 0);
+	const base = {
+		backgroundColor: theme.card,
+		borderColor: theme.border,
+		borderRadius: radius,
+		borderWidth: 1,
+	} as const;
 
 	switch (theme.style) {
-		case "maia":
-			return {
-				backgroundColor: theme.card,
-				borderColor: theme.border,
-				borderRadius: radius,
-				borderWidth: 1,
-			} as const;
 		case "lyra":
 			return {
-				backgroundColor: theme.card,
-				borderColor: theme.border,
-				borderRadius: radius,
-				borderWidth: 1,
+				...base,
 				shadowColor: theme.text,
 				shadowOpacity: 0.12,
 				shadowRadius: 16,
@@ -99,30 +95,15 @@ export function themedSurface(theme: ThemeChrome) {
 			} as const;
 		case "mira":
 			return {
-				backgroundColor: theme.card,
-				borderColor: theme.border,
-				borderRadius: radius,
-				borderWidth: 1,
+				...base,
 				shadowColor: theme.text,
 				shadowOpacity: 0.08,
 				shadowRadius: 22,
 				shadowOffset: { width: 0, height: 10 },
 				elevation: 3,
 			} as const;
-		case "nova":
-			return {
-				backgroundColor: theme.card,
-				borderColor: theme.border,
-				borderRadius: radius,
-				borderWidth: 1,
-			} as const;
 		default:
-			return {
-				backgroundColor: theme.card,
-				borderColor: theme.border,
-				borderRadius: radius,
-				borderWidth: 1,
-			} as const;
+			return base;
 	}
 }
 

@@ -1,9 +1,4 @@
-import {
-	addOrgTodo as _addOrgTodo,
-	deleteOrgTodo as _deleteOrgTodo,
-	resolveOrgConflict as _resolveOrgConflict,
-	toggleOrgTodo as _toggleOrgTodo,
-} from "@pengana/todo-client";
+import { createTodoActions, orgTodoConfig } from "@pengana/todo-client";
 import { appDb } from "@/features/todo/entities/todo";
 import {
 	addMedia,
@@ -13,20 +8,22 @@ import {
 	updateMediaUploaded,
 } from "./todo-actions.web";
 
+const actions = createTodoActions(appDb, orgTodoConfig);
+
 export const addOrgTodo = (
 	organizationId: string,
 	userId: string,
 	title: string,
-) => _addOrgTodo(appDb, organizationId, userId, title);
+) => actions.addTodo(organizationId, userId, organizationId, title);
 
-export const toggleOrgTodo = (id: string) => _toggleOrgTodo(appDb, id);
+export const toggleOrgTodo = (id: string) => actions.toggleTodo(id);
 
-export const deleteOrgTodo = (id: string) => _deleteOrgTodo(appDb, id);
+export const deleteOrgTodo = (id: string) => actions.deleteTodo(id);
 
 export const resolveOrgConflict = (
 	id: string,
 	resolution: "local" | "server",
-) => _resolveOrgConflict(appDb, id, resolution);
+) => actions.resolveConflict(id, resolution);
 
 export {
 	addMedia as addOrgMedia,

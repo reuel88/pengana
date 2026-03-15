@@ -1,9 +1,9 @@
 import { authClient } from "@/shared/lib/auth-client";
-import { PendingEmailPage } from "./pending-email-page";
+import { EmailSentNotice } from "./email-sent-notice";
 
 export function VerifyEmailPending() {
 	return (
-		<PendingEmailPage
+		<EmailSentNotice
 			titleKey="auth:verifyEmail.title"
 			descriptionKey="auth:verifyEmail.description"
 			resendButtonKey="auth:verifyEmail.resend"

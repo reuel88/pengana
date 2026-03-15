@@ -5,9 +5,9 @@ import {
 	createWebSocketRealtimeTransport,
 	type SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
-import { createUploadLifecycleCallbacks } from "@pengana/todo-client";
-import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
-import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
+import { createUploadLifecycleCallbacks } from "@pengana/upload-client";
+import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
 import {
 	createIndexedDbUploadTransport,

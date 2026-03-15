@@ -17,6 +17,9 @@ export const orgTodo = pgTable(
 		createdBy: text("created_by").references(() => user.id, {
 			onDelete: "set null",
 		}),
+		userId: text("user_id").references(() => user.id, {
+			onDelete: "set null",
+		}),
 	},
 	(table) => [
 		index("org_todo_organizationId_idx").on(table.organizationId),

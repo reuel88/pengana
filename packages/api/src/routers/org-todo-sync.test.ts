@@ -27,8 +27,9 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		completed: false,
 		deleted: false,
 		updatedAt: "2025-06-01T00:00:10.000Z",
+		userId: "user-1",
 		organizationId: "org-1",
-		createdBy: "user-1",
+		createdBy: "user-1" as string | null,
 		syncStatus: "pending" as const,
 		...overrides,
 	};
@@ -43,6 +44,7 @@ function makeServerRow(overrides: Partial<OrgTodoRow> = {}): OrgTodoRow {
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
 		organizationId: "org-1",
 		createdBy: "user-1",
+		userId: "user-1",
 		...overrides,
 	};
 }
@@ -133,6 +135,7 @@ describe("handleOrgSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
+			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 			syncStatus: "synced",

@@ -1,14 +1,15 @@
 import {
-	createDexieOrgSyncAdapter as _createDexieOrgSyncAdapter,
-	createDexieSyncAdapter as _createDexieSyncAdapter,
+	createTodoSyncAdapter,
+	orgTodoConfig,
+	personalTodoConfig,
 } from "@pengana/todo-client";
 
 import { appDb } from "./db.web";
 
 export function createDexieSyncAdapter(userId: string) {
-	return _createDexieSyncAdapter(appDb, userId);
+	return createTodoSyncAdapter(appDb, userId, personalTodoConfig);
 }
 
 export function createDexieOrgSyncAdapter(organizationId: string) {
-	return _createDexieOrgSyncAdapter(appDb, organizationId);
+	return createTodoSyncAdapter(appDb, organizationId, orgTodoConfig);
 }

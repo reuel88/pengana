@@ -29,7 +29,20 @@
 		"deleteConfirm": "确定吗？此操作无法撤销。",
 		"updateSuccess": "组织已更新",
 		"deleteSuccess": "组织已删除",
-		"error": "管理组织失败"
+		"error": "管理组织失败",
+		"appearance": {
+			"title": "外观",
+			"description": "适用于整个组织的设计预设。亮色和暗色模式保持个人设置。",
+			"style": "风格",
+			"baseColor": "基础颜色",
+			"accentTheme": "强调主题",
+			"iconLibrary": "图标库",
+			"font": "字体",
+			"radius": "圆角",
+			"menu": "菜单",
+			"menuAccent": "菜单强调色",
+			"save": "保存外观"
+		}
 	},
 	"members": {
 		"title": "成员",

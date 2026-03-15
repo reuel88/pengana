@@ -1,4 +1,6 @@
-import type { WebMedia, WebTodo } from "@pengana/todo-client";
+import type { WebTodo } from "@pengana/todo-client";
+import { personalTodoConfig } from "@pengana/todo-client";
+import type { WebMedia } from "@pengana/upload-client";
 import { useSync } from "@/features/sync/sync-context";
 import { TodoListConnected } from "./todo-list-connected";
 
@@ -17,6 +19,7 @@ export function TodoList({
 			triggerSync={triggerSync}
 			enqueueUpload={enqueueUpload}
 			userId={userId}
+			config={personalTodoConfig}
 		/>
 	);
 }

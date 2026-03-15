@@ -1,36 +1,11 @@
-import type { UploadStatus } from "@pengana/sync-engine";
-
 export interface WebTodo {
 	id: string;
 	title: string;
 	completed: boolean;
 	updatedAt: string;
-	userId: string;
+	userId: string; // sync engine scope key (userId for personal, organizationId for org)
+	organizationId: string; // always present — all todos belong to an org
+	createdBy: string; // always present — who created the 2do
 	syncStatus: "synced" | "pending" | "conflict";
 	deleted: boolean;
-}
-
-export interface WebOrgTodo {
-	id: string;
-	title: string;
-	completed: boolean;
-	updatedAt: string;
-	userId: string; // stores organizationId for sync engine compatibility
-	organizationId: string;
-	createdBy: string | null;
-	syncStatus: "synced" | "pending" | "conflict";
-	deleted: boolean;
-}
-
-export interface WebMedia {
-	id: string;
-	entityId: string | null;
-	entityType: string | null;
-	userId: string;
-	url: string | null;
-	localUri: string | null;
-	status: UploadStatus | null;
-	mimeType: string;
-	position: number;
-	createdAt: string;
 }

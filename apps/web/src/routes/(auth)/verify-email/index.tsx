@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { VerifyEmailPending } from "@/features/auth/verify-email-pending";
-import { AuthLayout } from "@/widgets/auth-layout";
 
 export const Route = createFileRoute("/(auth)/verify-email/")({
-	component: VerifyEmailPage,
+	component: VerifyEmailPending,
 	validateSearch: z.object({
 		email: z.string().optional(),
 		invitationId: z.string().optional(),
@@ -19,11 +18,3 @@ export const Route = createFileRoute("/(auth)/verify-email/")({
 		],
 	}),
 });
-
-function VerifyEmailPage() {
-	return (
-		<AuthLayout>
-			<VerifyEmailPending />
-		</AuthLayout>
-	);
-}

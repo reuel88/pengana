@@ -1,9 +1,17 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgTodos, useTodos } from "@pengana/todo-client";
+import {
+	orgTodoConfig,
+	personalTodoConfig,
+	useTodos,
+} from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useState } from "react";
-import { OrgSyncProvider, useOrgSync } from "@/features/sync/org-sync-context";
-import { SyncProvider, useSync } from "@/features/sync/sync-context";
+import {
+	OrgSyncProvider,
+	SyncProvider,
+	useOrgSync,
+	useSync,
+} from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { OrgTodoInput } from "@/features/todo/org-todo-input";
 import { OrgTodoList } from "@/features/todo/org-todo-list";
@@ -14,7 +22,7 @@ import { appDb } from "@/shared/db";
 type Tab = "personal" | "organization";
 
 function PersonalTodoContent({ userId }: { userId: string }) {
-	const { todos } = useTodos(appDb, userId);
+	const { todos } = useTodos(appDb, personalTodoConfig, userId);
 	const { isOnline, isSyncing } = useSync();
 
 	return (
@@ -31,14 +39,10 @@ function OrgTodoContent({
 	organizationId,
 	userId,
 }: {
-	organizationId?: string;
+	organizationId: string;
 	userId: string;
 }) {
-	if (!organizationId) {
-		return null;
-	}
-
-	const { todos } = useOrgTodos(appDb, organizationId);
+	const { todos } = useTodos(appDb, orgTodoConfig, organizationId);
 	const { isOnline, isSyncing } = useOrgSync();
 
 	return (
@@ -112,18 +116,20 @@ export function TodoPage({
 				)}
 			</SyncProvider>
 
-			<OrgSyncProvider organizationId={organizationId} userId={userId}>
-				<div
-					id="panel-organization"
-					role="tabpanel"
-					aria-labelledby="tab-organization"
-					className={
-						!showTabs || activeTab !== "organization" ? "hidden" : undefined
-					}
-				>
-					<OrgTodoContent organizationId={organizationId} userId={userId} />
-				</div>
-			</OrgSyncProvider>
+			{organizationId && (
+				<OrgSyncProvider organizationId={organizationId} userId={userId}>
+					<div
+						id="panel-organization"
+						role="tabpanel"
+						aria-labelledby="tab-organization"
+						className={
+							!showTabs || activeTab !== "organization" ? "hidden" : undefined
+						}
+					>
+						<OrgTodoContent organizationId={organizationId} userId={userId} />
+					</div>
+				</OrgSyncProvider>
+			)}
 		</div>
 	);
 }

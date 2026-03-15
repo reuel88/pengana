@@ -1,9 +1,7 @@
+import { createSyncTransport } from "@pengana/sync-client";
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
-import {
-	createDexieOrgSyncAdapter,
-	createOrgSyncTransport,
-	reconcileMedia,
-} from "@pengana/todo-client";
+import { createTodoSyncAdapter, orgTodoConfig } from "@pengana/todo-client";
+import { reconcileMedia } from "@pengana/upload-client";
 import { appDb } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
@@ -15,9 +13,10 @@ export {
 } from "@pengana/sync-engine";
 
 const orgDeps = createPlatformDeps(
-	(organizationId) => createDexieOrgSyncAdapter(appDb, organizationId),
+	(organizationId) =>
+		createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
 	() =>
-		createOrgSyncTransport(
+		createSyncTransport(
 			async (input) => {
 				return (await client.orgTodo.sync(input, { signal: input.signal }))
 					.data;

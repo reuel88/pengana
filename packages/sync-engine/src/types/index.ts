@@ -1,8 +1,5 @@
 export type {
 	Media,
-	OrgSyncInput,
-	OrgSyncOutput,
-	OrgTodo,
 	SyncInput,
 	SyncOutput,
 	SyncStatus,

@@ -92,24 +92,44 @@ export default function OrgSettingsScreen() {
 	);
 
 	const sections = [
-		{ key: "style", label: "Style", options: ORG_STYLE_OPTIONS },
-		{ key: "baseColor", label: "Base Color", options: ORG_BASE_COLOR_OPTIONS },
+		{
+			key: "style",
+			label: t("settings.appearance.style"),
+			options: ORG_STYLE_OPTIONS,
+		},
+		{
+			key: "baseColor",
+			label: t("settings.appearance.baseColor"),
+			options: ORG_BASE_COLOR_OPTIONS,
+		},
 		{
 			key: "accentTheme",
-			label: "Accent Theme",
+			label: t("settings.appearance.accentTheme"),
 			options: ORG_ACCENT_THEME_OPTIONS,
 		},
 		{
 			key: "iconLibrary",
-			label: "Icon Library",
+			label: t("settings.appearance.iconLibrary"),
 			options: ORG_ICON_LIBRARY_OPTIONS,
 		},
-		{ key: "font", label: "Font", options: ORG_FONT_OPTIONS },
-		{ key: "radius", label: "Radius", options: ORG_RADIUS_OPTIONS },
-		{ key: "menu", label: "Menu", options: ORG_MENU_OPTIONS },
+		{
+			key: "font",
+			label: t("settings.appearance.font"),
+			options: ORG_FONT_OPTIONS,
+		},
+		{
+			key: "radius",
+			label: t("settings.appearance.radius"),
+			options: ORG_RADIUS_OPTIONS,
+		},
+		{
+			key: "menu",
+			label: t("settings.appearance.menu"),
+			options: ORG_MENU_OPTIONS,
+		},
 		{
 			key: "menuAccent",
-			label: "Menu Accent",
+			label: t("settings.appearance.menuAccent"),
 			options: ORG_MENU_ACCENT_OPTIONS,
 		},
 	] as const;
@@ -149,11 +169,10 @@ export default function OrgSettingsScreen() {
 						]}
 					>
 						<Text style={[styles.sectionTitle, { color: theme.text }]}>
-							Appearance
+							{t("settings.appearance.title")}
 						</Text>
 						<Text style={[styles.sectionDescription, mutedText(theme)]}>
-							Organization-wide design preset. Light and dark mode stay
-							personal.
+							{t("settings.appearance.description")}
 						</Text>
 						{sections.map((section) => (
 							<View key={section.key} style={styles.group}>
@@ -210,7 +229,9 @@ export default function OrgSettingsScreen() {
 								onPress={() => void updateOrg({ designPreset })}
 								disabled={loading || !designPresetChanged}
 							>
-								<Text style={primaryButtonText(theme)}>Save Appearance</Text>
+								<Text style={primaryButtonText(theme)}>
+									{t("settings.appearance.save")}
+								</Text>
 							</TouchableOpacity>
 						)}
 					</View>

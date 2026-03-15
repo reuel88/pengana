@@ -1,0 +1,28 @@
+{
+	"name": "@pengana/upload-client",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./lib/*": {
+			"default": "./src/lib/*.ts"
+		},
+		"./adapters/*": {
+			"default": "./src/adapters/*.ts"
+		}
+	},
+	"scripts": {
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@pengana/entity-store": "workspace:*",
+		"@pengana/sync-engine": "workspace:*",
+		"dexie": "^4.0.11"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

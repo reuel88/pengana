@@ -1,38 +1,46 @@
-import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
+import { createSyncTransport } from "@pengana/sync-client";
+import { createSyncProviders } from "@pengana/sync-engine";
 import {
-	createDexieSyncAdapter,
-	createPersonalSyncTransport,
-	reconcileMedia,
+	createTodoSyncAdapter,
+	orgTodoConfig,
+	personalTodoConfig,
 } from "@pengana/todo-client";
+import { reconcileMedia } from "@pengana/upload-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 import { createWebPlatformDeps } from "./platform-deps";
-import { useSyncEngine } from "./use-sync-engine";
 
-export { useSync, useSyncDevtools } from "@pengana/sync-engine";
+export {
+	useSync,
+	useSync as useOrgSync,
+	useSyncDevtools,
+	useSyncDevtools as useOrgSyncDevtools,
+} from "@pengana/sync-engine";
 
 const personalDeps = createWebPlatformDeps(
-	(userId) => createDexieSyncAdapter(appDb, userId),
+	(userId) => createTodoSyncAdapter(appDb, userId, personalTodoConfig),
 	() =>
-		createPersonalSyncTransport(
+		createSyncTransport(
 			async (input) =>
 				(await client.todo.sync(input, { signal: input.signal })).data,
 			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
 		),
 );
 
-export function SyncProvider({
-	userId,
-	children,
-}: {
-	userId: string;
-	children: React.ReactNode;
-}) {
-	const { core, devtools } = useSyncEngine(userId, personalDeps);
+const orgDeps = createWebPlatformDeps(
+	(organizationId) =>
+		createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
+	() =>
+		createSyncTransport(
+			async (input) => {
+				return (await client.orgTodo.sync(input, { signal: input.signal }))
+					.data;
+			},
+			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
+		),
+);
 
-	return (
-		<SyncContext value={core}>
-			<SyncDevtoolsContext value={devtools}>{children}</SyncDevtoolsContext>
-		</SyncContext>
-	);
-}
+export const { SyncProvider, OrgSyncProvider } = createSyncProviders(
+	personalDeps,
+	orgDeps,
+);

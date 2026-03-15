@@ -3,26 +3,25 @@
 // different update API than the native Drizzle layer. The native counterpart
 // in `todo-actions.ts` operates directly on SQLite via Drizzle.
 import type { WebTodo } from "@pengana/todo-client";
+import { createTodoActions, personalTodoConfig } from "@pengana/todo-client";
 import {
 	addMedia as _addMedia,
-	addTodo as _addTodo,
-	deleteTodo as _deleteTodo,
 	getMediaCountForEntity as _getMediaCount,
 	markMediaFailed as _markMediaFailed,
 	removeMedia as _removeMedia,
-	resolveConflict as _resolveConflict,
-	toggleTodo as _toggleTodo,
 	updateMediaUploaded as _updateMediaUploaded,
-} from "@pengana/todo-client";
+} from "@pengana/upload-client";
 
 import { appDb } from "@/features/todo/entities/todo";
 
+const actions = createTodoActions(appDb, personalTodoConfig);
+
 export const addTodo = (userId: string, title: string) =>
-	_addTodo(appDb, userId, title);
-export const toggleTodo = (id: string) => _toggleTodo(appDb, id);
-export const deleteTodo = (id: string) => _deleteTodo(appDb, id);
+	actions.addTodo(userId, userId, "", title);
+export const toggleTodo = (id: string) => actions.toggleTodo(id);
+export const deleteTodo = (id: string) => actions.deleteTodo(id);
 export const resolveConflict = (id: string, resolution: "local" | "server") =>
-	_resolveConflict(appDb, id, resolution);
+	actions.resolveConflict(id, resolution);
 export const addMedia = (
 	entityId: string,
 	entityType: string,

@@ -1,4 +1,4 @@
-import { type TFunction, useTranslation } from "@pengana/i18n";
+import { useTranslation } from "@pengana/i18n";
 import { makeTeamNameSchema } from "@pengana/i18n/zod";
 import { useTeamNameEditor, useZodForm } from "@pengana/org-client";
 import { useState } from "react";
@@ -11,48 +11,25 @@ import {
 	View,
 } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 import { outlineButton, smallPrimaryButtonText } from "@/shared/styles/shared";
 import { AppIcon } from "@/shared/ui/app-icon";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
-export function TeamNameEditor({
-	teamId,
-	teamName,
-	orgId,
-	isAdmin,
-}: {
-	teamId: string;
-	teamName: string;
-	orgId: string;
-	isAdmin: boolean;
-}) {
-	const { i18n, t } = useTranslation("organization");
-
-	return (
-		<TeamNameEditorContent
-			key={i18n.language}
-			teamId={teamId}
-			teamName={teamName}
-			orgId={orgId}
-			isAdmin={isAdmin}
-			t={t}
-		/>
-	);
-}
+export const TeamNameEditor = withLanguageKey(TeamNameEditorContent);
 
 function TeamNameEditorContent({
 	teamId,
 	teamName,
 	orgId,
 	isAdmin,
-	t,
 }: {
 	teamId: string;
 	teamName: string;
 	orgId: string;
 	isAdmin: boolean;
-	t: TFunction;
 }) {
+	const { t } = useTranslation("organization");
 	const { theme } = useTheme();
 	const [editing, setEditing] = useState(false);
 

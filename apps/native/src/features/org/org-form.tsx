@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 import {
 	primaryButton,
 	primaryButtonText,
@@ -33,32 +34,7 @@ interface OrgFormProps {
 	};
 }
 
-export function OrgForm({
-	defaultValues,
-	onSubmit,
-	loading,
-	submitLabel,
-	inputStyle,
-	children,
-	testIDs,
-}: OrgFormProps) {
-	const { i18n, t } = useTranslation("organization");
-
-	return (
-		<OrgFormContent
-			key={i18n.language}
-			defaultValues={defaultValues}
-			onSubmit={onSubmit}
-			loading={loading}
-			submitLabel={submitLabel}
-			inputStyle={inputStyle}
-			testIDs={testIDs}
-			t={t}
-		>
-			{children}
-		</OrgFormContent>
-	);
-}
+export const OrgForm = withLanguageKey(OrgFormContent);
 
 function OrgFormContent({
 	defaultValues,
@@ -68,10 +44,8 @@ function OrgFormContent({
 	inputStyle,
 	children,
 	testIDs,
-	t,
-}: OrgFormProps & {
-	t: ReturnType<typeof useTranslation<"organization">>["t"];
-}) {
+}: OrgFormProps) {
+	const { t } = useTranslation("organization");
 	const { theme } = useTheme();
 
 	const form = useZodForm({

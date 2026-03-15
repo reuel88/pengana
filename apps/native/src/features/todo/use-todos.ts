@@ -32,6 +32,8 @@ function useTodosWithAttachments(scopeId: string) {
 
 		return (allTodos ?? []).map((t) => ({
 			...t,
+			organizationId: t.organizationId ?? t.userId,
+			createdBy: t.createdBy ?? null,
 			attachments: (attachmentsByTodo.get(t.id) ?? []).map((a) => ({
 				id: a.id,
 				url: a.url,
