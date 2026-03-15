@@ -3,7 +3,6 @@ import type { TodoActions } from "@pengana/todo-client";
 import {
 	addOrgTodo,
 	addTodo,
-	attachOrgFile,
 	deleteOrgTodo,
 	resolveOrgConflict,
 	toggleOrgTodo,
@@ -16,6 +15,7 @@ import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { OrgSyncProvider, useOrgSync } from "@/features/sync/org-sync-context";
 import { SyncProvider, useSync } from "@/features/sync/sync-context";
 import { useBackgroundPort } from "@/features/sync/use-background-port";
+import { ModeToggle } from "@/features/theme/mode-toggle";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import type { SyncScope } from "@/shared/api/background-messages";
@@ -26,7 +26,6 @@ const orgActions: TodoActions = {
 	deleteTodo: (id) => deleteOrgTodo(appDb, id),
 	resolveConflict: (id, resolution) =>
 		resolveOrgConflict(appDb, id, resolution),
-	attachFile: (id, localUri) => attachOrgFile(appDb, id, localUri),
 };
 
 type Tab = "personal" | "organization";
@@ -42,7 +41,7 @@ function TodoContent({ userId }: { userId: string }) {
 				onAdd={(title) => addTodo(appDb, userId, title)}
 				triggerSync={sync.triggerSync}
 			/>
-			<TodoList todos={todos} syncHook={sync} />
+			<TodoList todos={todos} syncHook={sync} userId={userId} />
 		</div>
 	);
 }
@@ -69,6 +68,7 @@ function OrgTodoContent({
 				syncHook={sync}
 				actions={orgActions}
 				entityType="orgTodo"
+				userId={userId}
 			/>
 		</div>
 	);
@@ -98,7 +98,10 @@ export function TodoPage({
 		<div className="flex flex-col gap-4 p-4" data-testid="todo-page">
 			<div className="flex items-center justify-between">
 				<h1 className="font-bold text-xl">{t("title")}</h1>
-				<LanguageSwitcher />
+				<div className="flex items-center gap-2">
+					<ModeToggle />
+					<LanguageSwitcher />
+				</div>
 			</div>
 			{organizationId ? (
 				<div className="flex gap-2 border-b" role="tablist">

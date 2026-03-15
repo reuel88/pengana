@@ -11,20 +11,27 @@ import {
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
 import { appDb, todos } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
-import { PLACEHOLDER_COLORS, STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import {
+	inputThemed,
+	outlineButton,
+	placeholderColor,
+	themedControl,
+	themedSurface,
+	themedText,
+} from "@/shared/styles/shared";
 
 function getLogEntryStyle(
 	eventType: string,
-	textColor: string,
+	colors: { text: string; danger: string; warning: string },
 ): { color: string; opacity: number } {
 	if (eventType === "sync:error") {
-		return { color: STATUS_COLORS.error, opacity: 1 };
+		return { color: colors.danger, opacity: 1 };
 	}
 	if (eventType === "sync:conflict") {
-		return { color: STATUS_COLORS.warning, opacity: 1 };
+		return { color: colors.warning, opacity: 1 };
 	}
-	return { color: textColor, opacity: 0.5 };
+	return { color: colors.text, opacity: 0.5 };
 }
 
 function SyncDevtoolsContent() {
@@ -32,7 +39,7 @@ function SyncDevtoolsContent() {
 	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
-	const { theme, colorScheme } = useTheme();
+	const { theme } = useTheme();
 	const { t } = useTranslation("sync");
 
 	const handleForceConflict = async () => {
@@ -48,22 +55,22 @@ function SyncDevtoolsContent() {
 	};
 
 	return (
-		<View style={[styles.container, { borderColor: theme.border }]}>
+		<View style={[styles.container, themedSurface(theme)]}>
 			<TouchableOpacity
 				onPress={() => setIsOpen(!isOpen)}
 				style={[styles.header, { backgroundColor: theme.card }]}
 			>
-				<Text style={[styles.headerText, { color: theme.text }]}>
+				<Text style={[styles.headerText, themedText(theme)]}>
 					{t("devtools.title")}
 				</Text>
-				<Text style={[styles.headerText, { color: theme.text }]}>
+				<Text style={[styles.headerText, themedText(theme)]}>
 					{isOpen ? "\u25B2" : "\u25BC"}
 				</Text>
 			</TouchableOpacity>
 
 			{isOpen && (
 				<View style={styles.content}>
-					<Text style={[styles.statusText, { color: theme.text }]}>
+					<Text style={[styles.statusText, themedText(theme)]}>
 						{t("devtools.status")}{" "}
 						{isOnline
 							? t("devtools.statusOnline")
@@ -73,10 +80,10 @@ function SyncDevtoolsContent() {
 
 					<View style={styles.buttonRow}>
 						<TouchableOpacity
-							style={[styles.devButton, { borderColor: theme.border }]}
+							style={[styles.devButton, outlineButton(theme)]}
 							onPress={() => setSimulateOffline(!simulateOffline)}
 						>
-							<Text style={[styles.devButtonText, { color: theme.text }]}>
+							<Text style={[styles.devButtonText, themedText(theme)]}>
 								{simulateOffline
 									? t("devtools.goOnline")
 									: t("devtools.simulateOffline")}
@@ -86,13 +93,13 @@ function SyncDevtoolsContent() {
 						<TouchableOpacity
 							style={[
 								styles.devButton,
-								{ borderColor: theme.border },
+								outlineButton(theme),
 								!isOnline && styles.disabledButton,
 							]}
 							onPress={triggerSync}
 							disabled={!isOnline}
 						>
-							<Text style={[styles.devButtonText, { color: theme.text }]}>
+							<Text style={[styles.devButtonText, themedText(theme)]}>
 								{t("devtools.manualSync")}
 							</Text>
 						</TouchableOpacity>
@@ -100,48 +107,40 @@ function SyncDevtoolsContent() {
 						<TouchableOpacity
 							style={[
 								styles.devButton,
-								{ borderColor: theme.border },
+								outlineButton(theme),
 								!isOnline && styles.disabledButton,
 							]}
 							onPress={handleForceConflict}
 							disabled={!isOnline}
 						>
-							<Text style={[styles.devButtonText, { color: theme.text }]}>
+							<Text style={[styles.devButtonText, themedText(theme)]}>
 								{t("devtools.forceConflict")}
 							</Text>
 						</TouchableOpacity>
 					</View>
 
 					<View>
-						<Text style={[styles.label, { color: theme.text }]}>
+						<Text style={[styles.label, themedText(theme)]}>
 							{t("devtools.forceConflictLabel")}
 						</Text>
 						<TextInput
 							value={forceConflictId}
 							onChangeText={setForceConflictId}
 							placeholder={t("devtools.forceConflictPlaceholder")}
-							placeholderTextColor={
-								colorScheme === "dark"
-									? PLACEHOLDER_COLORS.dark
-									: PLACEHOLDER_COLORS.light
-							}
+							placeholderTextColor={placeholderColor(theme)}
 							style={[
 								styles.textInput,
-								{
-									color: theme.text,
-									borderColor: theme.border,
-								},
+								themedControl(theme),
+								inputThemed(theme),
 							]}
 						/>
 					</View>
 
 					<View>
-						<Text style={[styles.label, { color: theme.text }]}>
+						<Text style={[styles.label, themedText(theme)]}>
 							{t("devtools.syncLog")} ({events.length} {t("devtools.events")})
 						</Text>
-						<ScrollView
-							style={[styles.logContainer, { borderColor: theme.border }]}
-						>
+						<ScrollView style={[styles.logContainer, outlineButton(theme)]}>
 							{events.length === 0 && (
 								<Text
 									style={[styles.logText, { opacity: 0.5, color: theme.text }]}
@@ -157,7 +156,7 @@ function SyncDevtoolsContent() {
 									<Text
 										style={[
 											styles.logText,
-											getLogEntryStyle(event.type, theme.text),
+											getLogEntryStyle(event.type, theme),
 										]}
 									>
 										{new Date(event.timestamp).toLocaleTimeString()} [

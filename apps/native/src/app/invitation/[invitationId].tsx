@@ -8,7 +8,14 @@ import { orpc } from "@/shared/api/orpc";
 import { useInvitation } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import {
+	mutedText,
+	outlineButton,
+	primaryButton,
+	primaryButtonText,
+	secondaryText,
+	themedText,
+} from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 
 function UnauthenticatedInvitationView({
@@ -74,12 +81,9 @@ function UnauthenticatedInvitationView({
 								asChild
 							>
 								<TouchableOpacity
-									style={StyleSheet.flatten([
-										styles.acceptButton,
-										{ backgroundColor: theme.primary },
-									])}
+									style={[styles.acceptButton, primaryButton(theme)]}
 								>
-									<Text style={sharedStyles.buttonText}>
+									<Text style={primaryButtonText(theme)}>
 										{t("common:user.signIn")}
 									</Text>
 								</TouchableOpacity>
@@ -92,12 +96,9 @@ function UnauthenticatedInvitationView({
 								asChild
 							>
 								<TouchableOpacity
-									style={StyleSheet.flatten([
-										styles.rejectButton,
-										{ borderColor: theme.border },
-									])}
+									style={[styles.rejectButton, outlineButton(theme)]}
 								>
-									<Text style={{ color: theme.text }}>
+									<Text style={themedText(theme)}>
 										{t("auth:signUp.submit")}
 									</Text>
 								</TouchableOpacity>
@@ -160,7 +161,7 @@ function AuthenticatedInvitationView({
 							<TouchableOpacity
 								style={[
 									styles.acceptButton,
-									{ backgroundColor: theme.primary },
+									primaryButton(theme, { disabled: acting }),
 								]}
 								onPress={() =>
 									onAccept(invitation.id, invitation.organizationId)
@@ -170,21 +171,22 @@ function AuthenticatedInvitationView({
 								accessibilityLabel={t("invitations.accept")}
 								accessibilityState={{ disabled: acting, busy: acting }}
 							>
-								<Text style={sharedStyles.buttonText}>
+								<Text style={primaryButtonText(theme)}>
 									{t("invitations.accept")}
 								</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								style={[styles.rejectButton, { borderColor: theme.border }]}
+								style={[
+									styles.rejectButton,
+									outlineButton(theme, { disabled: acting }),
+								]}
 								onPress={() => onReject(invitation.id)}
 								disabled={acting}
 								accessibilityRole="button"
 								accessibilityLabel={t("invitations.reject")}
 								accessibilityState={{ disabled: acting, busy: acting }}
 							>
-								<Text style={{ color: theme.text }}>
-									{t("invitations.reject")}
-								</Text>
+								<Text style={themedText(theme)}>{t("invitations.reject")}</Text>
 							</TouchableOpacity>
 						</View>
 					) : (
@@ -244,12 +246,12 @@ export default function InvitationScreen() {
 				<View style={{ padding: 16, gap: 12 }}>
 					<Text style={mutedText(theme)}>{t("invitations.fetchError")}</Text>
 					<TouchableOpacity
-						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
+						style={[styles.acceptButton, primaryButton(theme)]}
 						onPress={() => refetch()}
 						accessibilityRole="button"
 						accessibilityLabel={t("invitations.retry")}
 					>
-						<Text style={sharedStyles.buttonText}>
+						<Text style={primaryButtonText(theme)}>
 							{t("invitations.retry")}
 						</Text>
 					</TouchableOpacity>

@@ -4,13 +4,7 @@ import { initNativeI18n } from "@pengana/i18n/native";
 import { LOCALE_STORAGE_KEY_NATIVE } from "@pengana/i18n/persistence";
 import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
-
-import {
-	DarkTheme,
-	DefaultTheme,
-	type Theme,
-	ThemeProvider,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { getLocales } from "expo-localization";
 import { Stack, useRouter, useSegments } from "expo-router";
@@ -28,10 +22,14 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { queryClient } from "@/shared/api/orpc";
 import { useLifecycleCheck } from "@/shared/hooks/use-lifecycle-check";
+import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
-import { NAV_THEME } from "@/shared/lib/constants";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { LifecycleContext } from "@/shared/lib/lifecycle-context";
+import {
+	OrgDesignPresetPreviewProvider,
+	useOrgDesignPresetPreview,
+} from "@/shared/lib/org-design-preset-preview";
+import { buildNavigationTheme, createThemeColors } from "@/shared/lib/theme";
 import { useColorScheme } from "@/shared/lib/use-color-scheme";
 
 type RouteTarget = "/(auth)/login" | "/onboarding" | "/(drawer)" | null;
@@ -65,15 +63,6 @@ function resolveRoute(
 	return null;
 }
 
-const LIGHT_THEME: Theme = {
-	...DefaultTheme,
-	colors: NAV_THEME.light,
-};
-const DARK_THEME: Theme = {
-	...DarkTheme,
-	colors: NAV_THEME.dark,
-};
-
 export const unstable_settings = {
 	initialRouteName: "(drawer)",
 };
@@ -96,18 +85,20 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		paddingVertical: 10,
 		borderRadius: 6,
-		backgroundColor: "#007AFF",
 	},
 	retryText: {
-		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 	},
 });
 
 function RootLayoutInner() {
-	const { isDarkColorScheme } = useColorScheme();
+	const { colorScheme, isDarkColorScheme } = useColorScheme();
 	const { t } = useTranslation("common");
 	const { data: session, isPending } = authClient.useSession();
+	const { data: activeOrg } = useActiveOrg({
+		enabled: Boolean(session?.session?.activeOrganizationId),
+	});
+	const { previewDesignPreset } = useOrgDesignPresetPreview();
 	const segments = useSegments();
 	const router = useRouter();
 	const {
@@ -118,6 +109,10 @@ function RootLayoutInner() {
 		retryLifecycleCheck,
 		completeOnboarding,
 	} = useLifecycleCheck({ isPending, session });
+	const retryTheme = createThemeColors(
+		colorScheme,
+		previewDesignPreset ?? activeOrg?.designPreset,
+	);
 
 	const lifecycleContextValue = useMemo(
 		() => ({ lifecycleData, completeOnboarding }),
@@ -152,15 +147,33 @@ function RootLayoutInner() {
 		return (
 			<View style={styles.errorContainer}>
 				<Text style={styles.errorText}>{t("error.generic")}</Text>
-				<Pressable style={styles.retryButton} onPress={retryLifecycleCheck}>
-					<Text style={styles.retryText}>{t("error.retry")}</Text>
+				<Pressable
+					style={[styles.retryButton, { backgroundColor: retryTheme.primary }]}
+					onPress={retryLifecycleCheck}
+				>
+					<Text
+						style={[
+							styles.retryText,
+							{
+								color: retryTheme.primaryForeground,
+								fontFamily: retryTheme.fontFamily,
+							},
+						]}
+					>
+						{t("error.retry")}
+					</Text>
 				</Pressable>
 			</View>
 		);
 	}
 
 	return (
-		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+		<ThemeProvider
+			value={buildNavigationTheme(
+				colorScheme,
+				previewDesignPreset ?? activeOrg?.designPreset,
+			)}
+		>
 			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
 			<LifecycleContext.Provider value={lifecycleContextValue}>
 				<GestureHandlerRootView style={styles.container}>
@@ -211,7 +224,9 @@ export default function RootLayout() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<AuthClientProvider client={authClient}>
-				{i18nReady ? <RootLayoutInner /> : null}
+				<OrgDesignPresetPreviewProvider>
+					{i18nReady ? <RootLayoutInner /> : null}
+				</OrgDesignPresetPreviewProvider>
 			</AuthClientProvider>
 		</QueryClientProvider>
 	);

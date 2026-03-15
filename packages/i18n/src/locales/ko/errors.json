@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "할 일 상태 변경에 실패했습니다",
 	"failedToDeleteTodo": "할 일 삭제에 실패했습니다",
+	"failedToDeleteAttachment": "첨부 파일 삭제에 실패했습니다",
 	"failedToResolveConflict": "충돌 해결에 실패했습니다",
 	"invalidFileType": "JPEG, PNG, HEIC 이미지와 PDF 파일만 허용됩니다.",
 	"fileTooLarge": "파일이 최대 크기 10MB를 초과합니다.",

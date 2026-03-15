@@ -12,11 +12,12 @@ export default function TabLayout() {
 			screenOptions={{
 				headerShown: false,
 				tabBarActiveTintColor: theme.primary,
-				tabBarInactiveTintColor: theme.text,
+				tabBarInactiveTintColor: theme.menuForeground,
 				tabBarStyle: {
-					backgroundColor: theme.background,
-					borderTopColor: theme.border,
+					backgroundColor: theme.menuBackground,
+					borderTopColor: theme.menuBorder,
 				},
+				tabBarLabelStyle: { fontFamily: theme.fontFamily },
 			}}
 		>
 			<Tabs.Screen

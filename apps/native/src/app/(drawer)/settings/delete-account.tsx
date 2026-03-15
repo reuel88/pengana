@@ -5,8 +5,8 @@ import { useRouter } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { primaryButtonText } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
@@ -72,7 +72,7 @@ export default function DeleteAccountScreen() {
 							disabled={!state.canSubmit || state.isSubmitting}
 							onPress={form.handleSubmit}
 						>
-							<Text style={styles.buttonText}>
+							<Text style={[styles.buttonText, primaryButtonText(theme)]}>
 								{state.isSubmitting
 									? t("submitting")
 									: t("auth:settings.deleteAccount.submit")}
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	buttonText: {
-		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 	},
 });

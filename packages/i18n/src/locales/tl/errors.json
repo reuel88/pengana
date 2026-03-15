@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Hindi ma-update ang status ng gawain",
 	"failedToDeleteTodo": "Nabigong tanggalin ang gawain",
+	"failedToDeleteAttachment": "Nabigong tanggalin ang kalakip",
 	"failedToResolveConflict": "Hindi maresolba ang salungatan",
 	"invalidFileType": "Tanging JPEG, PNG, HEIC na mga larawan at PDF lamang ang pinapayagan.",
 	"fileTooLarge": "Lumampas ang file sa maximum na laki na 10MB.",

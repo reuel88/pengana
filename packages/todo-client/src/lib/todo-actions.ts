@@ -16,9 +16,6 @@ export async function addTodo(
 		userId,
 		syncStatus: "pending",
 		deleted: false,
-		attachmentUrl: null,
-		attachmentLocalUri: null,
-		attachmentStatus: null,
 	});
 }
 
@@ -48,16 +45,4 @@ export async function resolveConflict(
 ): Promise<void> {
 	const actions = createDexieActions<WebTodo>(db, "todos");
 	await actions.resolveConflict(id, resolution);
-}
-
-export async function attachFile(
-	db: EntityDatabase,
-	todoId: string,
-	localUri: string,
-): Promise<void> {
-	// attachFile doesn't go through sync — it only updates local fields
-	await db.getTable<WebTodo>("todos").update(todoId, {
-		attachmentLocalUri: localUri,
-		attachmentStatus: "queued",
-	} as never);
 }

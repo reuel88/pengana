@@ -65,7 +65,7 @@ export function createNativeUploadAdapter(): UploadAdapter {
 				.where(eq(uploadQueue.id, id));
 		},
 
-		async markCompleted(id: string, _attachmentUrl: string): Promise<void> {
+		async markCompleted(id: string, _url: string): Promise<void> {
 			await appDb
 				.update(uploadQueue)
 				.set({ status: "uploaded" })

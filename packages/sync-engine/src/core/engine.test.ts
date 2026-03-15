@@ -11,7 +11,6 @@ function makeTodo(overrides: Partial<Todo> = {}): Todo {
 		userId: "user-1",
 		syncStatus: "pending",
 		deleted: false,
-		attachmentUrl: null,
 		...overrides,
 	};
 }

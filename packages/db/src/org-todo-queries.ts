@@ -8,7 +8,6 @@ export interface OrgTodoRow {
 	title: string;
 	completed: boolean;
 	deleted: boolean;
-	attachmentUrl: string | null;
 	updatedAt: Date;
 	organizationId: string;
 	createdBy: string | null;
@@ -26,7 +25,6 @@ export async function insertOrgTodo(values: {
 	title: string;
 	completed: boolean;
 	deleted: boolean;
-	attachmentUrl?: string | null;
 	updatedAt: Date;
 	organizationId: string;
 	createdBy: string | null;
@@ -40,7 +38,6 @@ export async function updateOrgTodo(
 		title: string;
 		completed: boolean;
 		deleted: boolean;
-		attachmentUrl: string | null;
 		updatedAt: Date;
 	}>,
 ): Promise<void> {

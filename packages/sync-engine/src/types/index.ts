@@ -1,4 +1,5 @@
 export type {
+	Media,
 	OrgSyncInput,
 	OrgSyncOutput,
 	OrgTodo,
@@ -23,7 +24,7 @@ export interface UploadAdapter {
 	getNextQueued(): Promise<UploadItem | null>;
 	updateStatus(id: string, status: UploadStatus): Promise<void>;
 	updateRetry(id: string, retryCount: number): Promise<void>;
-	markCompleted(id: string, attachmentUrl: string): Promise<void>;
+	markCompleted(id: string, url: string): Promise<void>;
 	markFailed(id: string): Promise<void>;
 	getQueueItems(): Promise<UploadItem[]>;
 	removeItem(id: string): Promise<void>;
@@ -36,7 +37,7 @@ export interface UploadTransport {
 		fileUri: string;
 		mimeType: string;
 		idempotencyKey: string;
-	}): Promise<{ attachmentUrl: string }>;
+	}): Promise<{ url: string }>;
 	onFailed?(
 		entityType: string,
 		entityId: string,
@@ -99,8 +100,13 @@ export interface UploadLifecycleCallbacks {
 		entityType: string,
 		entityId: string,
 		attachmentUrl: string,
+		uploadItemId: string,
 	): Promise<void>;
-	onFailed(entityType: string, entityId: string): Promise<void>;
+	onFailed(
+		entityType: string,
+		entityId: string,
+		uploadItemId: string,
+	): Promise<void>;
 }
 
 import type { StorageLevel } from "./storage-health";
@@ -117,6 +123,7 @@ export interface SyncContextValue {
 		entityId: string,
 		fileUri: string,
 		mimeType: string,
+		mediaId: string,
 	) => void;
 }
 

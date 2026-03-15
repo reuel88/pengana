@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Error al cambiar la tarea",
 	"failedToDeleteTodo": "Error al eliminar la tarea",
+	"failedToDeleteAttachment": "Error al eliminar el archivo adjunto",
 	"failedToResolveConflict": "Error al resolver el conflicto",
 	"invalidFileType": "Solo se permiten imagenes JPEG, PNG, HEIC y PDFs.",
 	"fileTooLarge": "El archivo excede el tamano maximo de 10MB.",

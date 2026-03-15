@@ -18,7 +18,7 @@ export function useUploadQueue(
 	userId: string | undefined,
 	isOnline: boolean,
 	engineRef: React.RefObject<Syncable | null>,
-	generateUUID: () => string,
+	_generateUUID: () => string,
 	createUploadAdapter: () => UploadAdapter,
 	createUploadTransport: () => UploadTransport,
 	lifecycleCallbacks?: UploadLifecycleCallbacks,
@@ -86,16 +86,17 @@ export function useUploadQueue(
 			entityId: string,
 			fileUri: string,
 			mimeType: string,
+			mediaId: string,
 		) => {
 			uploadQueueRef.current?.enqueue({
-				id: generateUUID(),
+				id: mediaId,
 				entityType,
 				entityId,
 				fileUri,
 				mimeType,
 			});
 		},
-		[generateUUID],
+		[],
 	);
 
 	return {

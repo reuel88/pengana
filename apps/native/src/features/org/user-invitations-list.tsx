@@ -4,7 +4,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import {
+	mutedText,
+	outlineButton,
+	secondaryText,
+	smallPrimaryButtonText,
+} from "@/shared/styles/shared";
 
 export function UserInvitationsList({
 	isPendingFor,
@@ -46,7 +51,7 @@ export function UserInvitationsList({
 						style={[styles.acceptButton, { backgroundColor: theme.primary }]}
 						onPress={() => refetchMyInvitations()}
 					>
-						<Text style={sharedStyles.smallButtonText}>
+						<Text style={smallPrimaryButtonText(theme)}>
 							{t("invitations.retry")}
 						</Text>
 					</TouchableOpacity>
@@ -76,7 +81,7 @@ export function UserInvitationsList({
 									isPendingFor(inv.id) && { opacity: 0.5 },
 								]}
 							>
-								<Text style={sharedStyles.smallButtonText}>
+								<Text style={smallPrimaryButtonText(theme)}>
 									{t("invitations.accept")}
 								</Text>
 							</TouchableOpacity>
@@ -85,11 +90,17 @@ export function UserInvitationsList({
 								disabled={isPendingFor(inv.id)}
 								style={[
 									styles.cancelButton,
-									{ borderColor: theme.border },
+									outlineButton(theme),
 									isPendingFor(inv.id) && { opacity: 0.5 },
 								]}
 							>
-								<Text style={{ color: theme.text, fontSize: 12 }}>
+								<Text
+									style={{
+										color: theme.text,
+										fontFamily: theme.fontFamily,
+										fontSize: 12,
+									}}
+								>
 									{t("invitations.reject")}
 								</Text>
 							</TouchableOpacity>

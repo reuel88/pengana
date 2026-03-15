@@ -3,7 +3,11 @@ import { makeNativeInviteSchema } from "@pengana/i18n/zod";
 import { useInviteMember, useZodForm } from "@pengana/org-client";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
-import { sharedStyles } from "@/shared/styles/shared";
+import {
+	primaryButton,
+	primaryButtonText,
+	sharedStyles,
+} from "@/shared/styles/shared";
 import { RoleToggle } from "@/shared/ui/role-toggle";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
@@ -70,11 +74,11 @@ function InviteFormContent({
 			>
 				{({ isSubmitting, email }) => (
 					<TouchableOpacity
-						style={[sharedStyles.button, { backgroundColor: theme.primary }]}
+						style={[sharedStyles.button, primaryButton(theme)]}
 						onPress={form.handleSubmit}
 						disabled={loading || isSubmitting || !email}
 					>
-						<Text style={sharedStyles.buttonText}>
+						<Text style={primaryButtonText(theme)}>
 							{loading ? t("common:submitting") : t("invitations.send")}
 						</Text>
 					</TouchableOpacity>

@@ -1,45 +1,27 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import type { UploadLifecycleCallbacks } from "@pengana/sync-engine";
 
-import type { WebOrgTodo, WebTodo } from "./db";
+import { markMediaFailed, updateMediaUploaded } from "./media-actions";
 
-export function createTodoUploadLifecycleCallbacks(
+export function createUploadLifecycleCallbacks(
 	db: EntityDatabase,
 ): UploadLifecycleCallbacks {
-	const todosTable = db.getTable<WebTodo>("todos");
-	const orgTodosTable = db.getTable<WebOrgTodo>("orgTodos");
-
 	return {
 		async onCompleted(
-			entityType: string,
-			entityId: string,
+			_entityType: string,
+			_entityId: string,
 			attachmentUrl: string,
+			uploadItemId: string,
 		): Promise<void> {
-			const updateData = {
-				attachmentUrl,
-				attachmentStatus: "uploaded" as const,
-				updatedAt: new Date().toISOString(),
-				syncStatus: "pending" as const,
-			};
-
-			if (entityType === "orgTodo") {
-				await orgTodosTable.update(entityId, updateData as never);
-			} else {
-				await todosTable.update(entityId, updateData as never);
-			}
+			await updateMediaUploaded(db, uploadItemId, attachmentUrl);
 		},
 
-		async onFailed(entityType: string, entityId: string): Promise<void> {
-			const updateData = {
-				attachmentStatus: "failed" as const,
-				updatedAt: new Date().toISOString(),
-			};
-
-			if (entityType === "orgTodo") {
-				await orgTodosTable.update(entityId, updateData as never);
-			} else {
-				await todosTable.update(entityId, updateData as never);
-			}
+		async onFailed(
+			_entityType: string,
+			_entityId: string,
+			uploadItemId: string,
+		): Promise<void> {
+			await markMediaFailed(db, uploadItemId);
 		},
 	};
 }

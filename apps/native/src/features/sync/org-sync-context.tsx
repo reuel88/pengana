@@ -3,6 +3,7 @@ import { createOrgSyncTransport } from "@pengana/todo-client";
 import { createOrgSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
+import { reconcileNativeMedia } from "./reconcile-media";
 import { useSyncEngine } from "./use-sync-engine";
 
 export {
@@ -15,7 +16,7 @@ const orgDeps = createPlatformDeps(
 	() =>
 		createOrgSyncTransport(async (input) => {
 			return (await client.orgTodo.sync(input, { signal: input.signal })).data;
-		}),
+		}, reconcileNativeMedia),
 );
 
 export function OrgSyncProvider({

@@ -2,6 +2,7 @@ import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
 import {
 	createDexieSyncAdapter,
 	createPersonalSyncTransport,
+	reconcileMedia,
 } from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
@@ -16,6 +17,7 @@ const personalDeps = createWebPlatformDeps(
 		createPersonalSyncTransport(
 			async (input) =>
 				(await client.todo.sync(input, { signal: input.signal })).data,
+			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
 		),
 );
 

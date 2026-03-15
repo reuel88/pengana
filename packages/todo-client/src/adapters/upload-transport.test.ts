@@ -6,7 +6,7 @@ describe("createUploadTransport", () => {
 	it("uploads base64 data through the rpc client", async () => {
 		const rpc = {
 			upload: vi.fn().mockResolvedValue({
-				data: { attachmentUrl: "https://cdn.example.com/file.png" },
+				data: { url: "https://cdn.example.com/file.png" },
 			}),
 		};
 		const transport = createUploadTransport({
@@ -29,9 +29,10 @@ describe("createUploadTransport", () => {
 			mimeType: "image/png",
 			data: "YWJj",
 			idempotencyKey: "idem-1",
+			attachmentId: "idem-1",
 		});
 		expect(result).toEqual({
-			attachmentUrl: "https://cdn.example.com/file.png",
+			url: "https://cdn.example.com/file.png",
 		});
 	});
 
@@ -59,7 +60,7 @@ describe("createUploadTransport", () => {
 		const transport = createUploadTransport({
 			rpc: {
 				upload: vi.fn().mockResolvedValue({
-					data: { attachmentUrl: "https://cdn.example.com/file.png" },
+					data: { url: "https://cdn.example.com/file.png" },
 				}),
 			},
 			getBase64: vi.fn().mockResolvedValue("YWJj"),

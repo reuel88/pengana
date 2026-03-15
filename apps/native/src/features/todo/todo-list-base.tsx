@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText } from "@/shared/styles/shared";
+import { mutedText, themedSurface } from "@/shared/styles/shared";
 
 import type { TodoItemRow } from "./components/todo-item";
 import { TodoItem } from "./components/todo-item";
@@ -24,11 +24,15 @@ export function TodoListBase({
 	triggerSync,
 	showPickerForTodo,
 	actions,
+	onRemoveAttachment,
+	onRetryAttachment,
 }: {
 	todos: TodoItemRow[];
 	triggerSync: () => void;
 	showPickerForTodo: (todoId: string) => void;
 	actions: TodoListActions;
+	onRemoveAttachment?: (attachmentId: string) => void;
+	onRetryAttachment?: (attachmentId: string) => void;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("todos");
@@ -76,10 +80,7 @@ export function TodoListBase({
 	}
 
 	return (
-		<View
-			style={[styles.list, { borderColor: theme.border }]}
-			testID="todo-list"
-		>
+		<View style={[styles.list, themedSurface(theme)]} testID="todo-list">
 			{todos.map((todo) => (
 				<TodoItem
 					key={todo.id}
@@ -88,6 +89,8 @@ export function TodoListBase({
 					onDelete={handleDelete}
 					onResolve={handleResolve}
 					onAttach={showPickerForTodo}
+					onRemoveAttachment={onRemoveAttachment}
+					onRetryAttachment={onRetryAttachment}
 				/>
 			))}
 		</View>
@@ -96,8 +99,7 @@ export function TodoListBase({
 
 const styles = StyleSheet.create({
 	list: {
-		borderWidth: 1,
-		borderRadius: 0,
+		overflow: "hidden",
 	},
 	emptyText: {
 		textAlign: "center",

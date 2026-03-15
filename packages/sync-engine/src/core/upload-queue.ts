@@ -92,13 +92,13 @@ export class UploadQueue {
 				mimeType: item.mimeType,
 				idempotencyKey: item.id,
 			});
-
-			await this.adapter.markCompleted(item.id, result.attachmentUrl);
+			await this.adapter.markCompleted(item.id, result.url);
 			try {
 				await this.lifecycleCallbacks?.onCompleted(
 					item.entityType,
 					item.entityId,
-					result.attachmentUrl,
+					result.url,
+					item.id,
 				);
 			} catch (lcError) {
 				console.error("lifecycleCallbacks.onCompleted threw:", lcError);
@@ -107,7 +107,7 @@ export class UploadQueue {
 			this.events.emit({
 				type: "upload:complete",
 				timestamp: new Date().toISOString(),
-				detail: `Upload complete: ${result.attachmentUrl}`,
+				detail: `Upload complete: ${result.url}`,
 				itemId: item.id,
 				entityType: item.entityType,
 				entityId: item.entityId,
@@ -136,7 +136,11 @@ export class UploadQueue {
 				console.error("transport.onFailed threw:", onFailedError);
 			}
 			try {
-				await this.lifecycleCallbacks?.onFailed(item.entityType, item.entityId);
+				await this.lifecycleCallbacks?.onFailed(
+					item.entityType,
+					item.entityId,
+					item.id,
+				);
 			} catch (lcError) {
 				console.error("lifecycleCallbacks.onFailed threw:", lcError);
 			}

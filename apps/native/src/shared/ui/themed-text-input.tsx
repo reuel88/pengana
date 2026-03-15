@@ -1,8 +1,11 @@
 import type { TextInputProps } from "react-native";
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import { PLACEHOLDER_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
-import { sharedStyles } from "@/shared/styles/shared";
+import {
+	inputThemed,
+	placeholderColor,
+	themedText,
+} from "@/shared/styles/shared";
 
 export function ThemedTextInput({
 	style,
@@ -17,18 +20,14 @@ export function ThemedTextInput({
 	hint?: string;
 	error?: string;
 }) {
-	const { theme, colorScheme } = useTheme();
+	const { theme } = useTheme();
 	return (
 		<View style={styles.field}>
 			{label ? (
-				<Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+				<Text style={[styles.label, themedText(theme)]}>{label}</Text>
 			) : null}
 			<TextInput
-				placeholderTextColor={
-					colorScheme === "dark"
-						? PLACEHOLDER_COLORS.dark
-						: PLACEHOLDER_COLORS.light
-				}
+				placeholderTextColor={placeholderColor(theme)}
 				accessibilityLabel={accessibilityLabel ?? label}
 				accessibilityHint={accessibilityHint ?? hint}
 				accessibilityState={{
@@ -36,20 +35,17 @@ export function ThemedTextInput({
 				}}
 				{...props}
 				style={[
-					sharedStyles.input,
-					{
-						color: theme.text,
-						borderColor: error ? theme.notification : theme.border,
-					},
+					styles.input,
+					inputThemed(theme, { isError: Boolean(error), danger: theme.danger }),
 					style,
 				]}
 			/>
 			{hint ? (
-				<Text style={[styles.hint, { color: theme.text }]}>{hint}</Text>
+				<Text style={[styles.hint, { color: theme.mutedText }]}>{hint}</Text>
 			) : null}
 			{error ? (
 				<Text
-					style={[styles.error, { color: theme.notification }]}
+					style={[styles.error, { color: theme.danger }]}
 					accessibilityLiveRegion="polite"
 				>
 					{error}
@@ -67,9 +63,13 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		fontWeight: "600",
 	},
+	input: {
+		borderWidth: 1,
+		padding: 12,
+		fontSize: 14,
+	},
 	hint: {
 		fontSize: 12,
-		opacity: 0.7,
 	},
 	error: {
 		fontSize: 12,

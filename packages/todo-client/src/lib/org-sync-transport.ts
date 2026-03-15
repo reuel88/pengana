@@ -1,12 +1,10 @@
-import type { SyncOutput, SyncTransport, Todo } from "@pengana/sync-engine";
+import type {
+	Media,
+	SyncOutput,
+	SyncTransport,
+	Todo,
+} from "@pengana/sync-engine";
 
-/**
- * Creates a SyncTransport that maps between the local 2do schema (keyed by userId)
- * and the server's OrgTodo schema (keyed by organizationId + createdBy).
- *
- * This remapping allows the sync engine to treat org todos identically to personal
- * todos locally, while the server stores them with organization-scoped fields.
- */
 export function createOrgSyncTransport(
 	serverSync: (input: {
 		changes: Array<
@@ -19,9 +17,11 @@ export function createOrgSyncTransport(
 		signal?: AbortSignal;
 	}) => Promise<{
 		serverChanges: Array<Omit<Todo, "userId"> & { organizationId: string }>;
+		media?: Media[];
 		conflicts: string[];
 		syncedAt: string;
 	}>,
+	onMedia?: (media: Media[], entityIds: string[]) => Promise<void>,
 ): SyncTransport {
 	return {
 		async sync(input): Promise<SyncOutput> {
@@ -35,8 +35,13 @@ export function createOrgSyncTransport(
 				signal: input.signal,
 			};
 			const result = await serverSync(orgInput);
+			const entityIds = result.serverChanges.map((c) => c.id);
+			if (onMedia && entityIds.length > 0) {
+				await onMedia(result.media ?? [], entityIds);
+			}
 			return {
 				...result,
+				media: result.media ?? [],
 				serverChanges: result.serverChanges.map((s) => ({
 					...s,
 					userId: s.organizationId,

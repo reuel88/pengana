@@ -1,12 +1,18 @@
 import { useTranslation } from "@pengana/i18n";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { OrgSyncProvider } from "@/features/sync/org-sync-context";
 import { SyncProvider } from "@/features/sync/sync-context";
 import { appDb } from "@/features/todo/entities/todo";
-import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { destructiveText } from "@/shared/styles/shared";
 import migrations from "../../drizzle/migrations";
 import {
 	OrganizationTodoContent,
@@ -30,7 +36,7 @@ export function TodoPage({
 	if (error) {
 		return (
 			<View style={styles.center}>
-				<Text style={{ color: STATUS_COLORS.error }}>
+				<Text style={destructiveText(theme)}>
 					{t("migrationError", {
 						message: String(error.message).slice(0, 200),
 					})}
@@ -49,38 +55,40 @@ export function TodoPage({
 
 	return (
 		<View style={styles.page}>
-			<TodoShell
-				activeTab={activeTab}
-				onTabChange={setActiveTab}
-				showTabs={Boolean(organizationId)}
-			/>
-			<SyncProvider userId={userId}>
-				<View
-					testID="personal-todo-panel"
-					style={
-						activeTab !== "personal" && organizationId
-							? styles.hiddenPanel
-							: undefined
-					}
-				>
-					<PersonalTodoContent userId={userId} />
-				</View>
-			</SyncProvider>
-			{organizationId ? (
-				<OrgSyncProvider organizationId={organizationId} userId={userId}>
+			<ScrollView style={styles.scroll}>
+				<TodoShell
+					activeTab={activeTab}
+					onTabChange={setActiveTab}
+					showTabs={Boolean(organizationId)}
+				/>
+				<SyncProvider userId={userId}>
 					<View
-						testID="organization-todo-panel"
+						testID="personal-todo-panel"
 						style={
-							activeTab !== "organization" ? styles.hiddenPanel : undefined
+							activeTab !== "personal" && organizationId
+								? styles.hiddenPanel
+								: undefined
 						}
 					>
-						<OrganizationTodoContent
-							organizationId={organizationId}
-							userId={userId}
-						/>
+						<PersonalTodoContent userId={userId} />
 					</View>
-				</OrgSyncProvider>
-			) : null}
+				</SyncProvider>
+				{organizationId ? (
+					<OrgSyncProvider organizationId={organizationId} userId={userId}>
+						<View
+							testID="organization-todo-panel"
+							style={
+								activeTab !== "organization" ? styles.hiddenPanel : undefined
+							}
+						>
+							<OrganizationTodoContent
+								organizationId={organizationId}
+								userId={userId}
+							/>
+						</View>
+					</OrgSyncProvider>
+				) : null}
+			</ScrollView>
 		</View>
 	);
 }
@@ -92,6 +100,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	page: {
+		flex: 1,
+	},
+	scroll: {
 		flex: 1,
 	},
 	hiddenPanel: {

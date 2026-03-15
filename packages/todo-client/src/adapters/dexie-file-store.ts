@@ -6,13 +6,13 @@ import type { FileDataRecord } from "../lib/upload-queue-stores";
 
 export async function storeFileInIndexedDB(
 	db: EntityDatabase,
-	entityId: string,
+	attachmentId: string,
 	file: File,
 ): Promise<void> {
 	const base64 = await readFileAsBase64(file);
 	try {
 		await db.getTable<FileDataRecord>("fileData").put({
-			entityId,
+			entityId: attachmentId,
 			base64,
 			mimeType: file.type,
 			fileName: file.name,
@@ -25,14 +25,14 @@ export async function storeFileInIndexedDB(
 
 export async function getFileFromIndexedDB(
 	db: EntityDatabase,
-	entityId: string,
+	attachmentId: string,
 ): Promise<{ base64: string; mimeType: string; fileName: string } | undefined> {
-	return db.getTable<FileDataRecord>("fileData").get(entityId);
+	return db.getTable<FileDataRecord>("fileData").get(attachmentId);
 }
 
 export async function removeFileFromIndexedDB(
 	db: EntityDatabase,
-	entityId: string,
+	attachmentId: string,
 ): Promise<void> {
-	await db.getTable<FileDataRecord>("fileData").delete(entityId);
+	await db.getTable<FileDataRecord>("fileData").delete(attachmentId);
 }

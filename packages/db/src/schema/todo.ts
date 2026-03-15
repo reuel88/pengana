@@ -10,7 +10,6 @@ export const todo = pgTable(
 		title: text("title").notNull(),
 		completed: boolean("completed").default(false).notNull(),
 		deleted: boolean("deleted").default(false).notNull(),
-		attachmentUrl: text("attachment_url"),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		userId: text("user_id")
 			.notNull()

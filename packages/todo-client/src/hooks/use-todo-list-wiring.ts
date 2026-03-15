@@ -15,12 +15,15 @@ interface UseTodoListWiringConfigBase {
 		entityId: string,
 		fileUri: string,
 		mimeType: string,
+		mediaId: string,
 	) => void;
 	entityType?: string;
+	userId?: string;
 	fileStorage: FileStorageStrategy;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
 	onDeleteSuccess?: (id: string) => void;
+	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	t: (key: string) => string;
 }
 
@@ -42,10 +45,12 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		onError,
 		clearError,
 		onDeleteSuccess,
+		deleteAttachment,
 		t,
 		actions,
 		db,
 		entityType,
+		userId,
 	} = config;
 
 	const deps: TodoHandlerDeps = useMemo(
@@ -57,9 +62,11 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			fileStorage,
 			t,
 			onDeleteSuccess,
+			deleteAttachment,
 			actions,
 			db,
 			entityType,
+			userId,
 		}),
 		[
 			triggerSync,
@@ -69,9 +76,11 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			fileStorage,
 			t,
 			onDeleteSuccess,
+			deleteAttachment,
 			actions,
 			db,
 			entityType,
+			userId,
 		],
 	);
 

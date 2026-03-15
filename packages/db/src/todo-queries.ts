@@ -8,7 +8,6 @@ export interface TodoRow {
 	title: string;
 	completed: boolean;
 	deleted: boolean;
-	attachmentUrl: string | null;
 	updatedAt: Date;
 	userId: string;
 }
@@ -23,7 +22,6 @@ export async function insertTodo(values: {
 	title: string;
 	completed: boolean;
 	deleted: boolean;
-	attachmentUrl?: string | null;
 	updatedAt: Date;
 	userId: string;
 }): Promise<void> {
@@ -36,7 +34,6 @@ export async function updateTodo(
 		title: string;
 		completed: boolean;
 		deleted: boolean;
-		attachmentUrl: string | null;
 		updatedAt: Date;
 	}>,
 ): Promise<void> {

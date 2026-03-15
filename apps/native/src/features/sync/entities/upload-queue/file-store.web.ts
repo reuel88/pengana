@@ -6,14 +6,14 @@ import {
 
 import { appDb } from "@/features/todo/entities/todo/db.web";
 
-export function storeFileInIndexedDB(entityId: string, file: File) {
-	return storeFile(appDb, entityId, file);
+export function storeFileInIndexedDB(attachmentId: string, file: File) {
+	return storeFile(appDb, attachmentId, file);
 }
 
-export function getFileFromIndexedDB(entityId: string) {
-	return getFile(appDb, entityId);
+export function getFileFromIndexedDB(attachmentId: string) {
+	return getFile(appDb, attachmentId);
 }
 
-export function removeFileFromIndexedDB(entityId: string) {
-	return removeFile(appDb, entityId);
+export function removeFileFromIndexedDB(attachmentId: string) {
+	return removeFile(appDb, attachmentId);
 }

@@ -17,7 +17,8 @@ interface UploadRpc {
 		mimeType: AllowedMimeType;
 		data: string;
 		idempotencyKey: string;
-	}): Promise<{ data: { attachmentUrl: string } }>;
+		attachmentId: string;
+	}): Promise<{ data: { url: string; mediaId: string } }>;
 }
 
 interface UploadTransportOptions {
@@ -59,8 +60,8 @@ export function createUploadTransport(
 				mimeType: input.mimeType as AllowedMimeType,
 				data,
 				idempotencyKey: input.idempotencyKey,
+				attachmentId: input.idempotencyKey,
 			});
-
 			await options.onUploaded?.(
 				input.entityType,
 				input.entityId,

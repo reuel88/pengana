@@ -13,6 +13,8 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
+import { OrgDesignPresetPreviewProvider } from "@/features/theme/org-design-preset-preview";
+import { OrgDesignPresetSync } from "@/features/theme/org-design-preset-sync";
 import { ThemeProvider } from "@/features/theme/theme-provider";
 import type { orpc } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
@@ -100,11 +102,14 @@ function RootComponent() {
 				disableTransitionOnChange
 				storageKey="vite-ui-theme"
 			>
-				<div className={hideHeader ? "" : "grid h-svh grid-rows-[auto_1fr]"}>
-					{!hideHeader && <Header />}
-					<Outlet />
-				</div>
-				<Toaster richColors />
+				<OrgDesignPresetPreviewProvider>
+					<OrgDesignPresetSync />
+					<div className={hideHeader ? "" : "grid h-svh grid-rows-[auto_1fr]"}>
+						{!hideHeader && <Header />}
+						<Outlet />
+					</div>
+					<Toaster richColors />
+				</OrgDesignPresetPreviewProvider>
 			</ThemeProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 			<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />

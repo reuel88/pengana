@@ -21,13 +21,20 @@ export { useTodoHandlers } from "./hooks/use-todo-handlers";
 export type { UseTodoListWiringConfig } from "./hooks/use-todo-list-wiring";
 export { useTodoListWiring } from "./hooks/use-todo-list-wiring";
 export { useTodos } from "./hooks/use-todos";
-export type { WebOrgTodo, WebTodo } from "./lib/db";
+export type { WebMedia, WebOrgTodo, WebTodo } from "./lib/db";
 export { readFileAsBase64 } from "./lib/file-utils";
 export { filterTodos } from "./lib/filter-todos";
+export {
+	addMedia,
+	getMediaCountForEntity,
+	markMediaFailed,
+	reconcileMedia,
+	removeMedia,
+	updateMediaUploaded,
+} from "./lib/media-actions";
 export { createOrgSyncTransport } from "./lib/org-sync-transport";
 export {
 	addOrgTodo,
-	attachOrgFile,
 	deleteOrgTodo,
 	resolveOrgConflict,
 	toggleOrgTodo,
@@ -35,12 +42,15 @@ export {
 export { createPersonalSyncTransport } from "./lib/personal-sync-transport";
 export {
 	addTodo,
-	attachFile,
 	deleteTodo,
 	resolveConflict,
 	toggleTodo,
 } from "./lib/todo-actions";
-export { orgTodoEntity, todoEntity } from "./lib/todo-entity";
-export { createTodoUploadLifecycleCallbacks } from "./lib/upload-lifecycle-callbacks";
+export {
+	mediaEntity,
+	orgTodoEntity,
+	todoEntity,
+} from "./lib/todo-entity";
+export { createUploadLifecycleCallbacks } from "./lib/upload-lifecycle-callbacks";
 export type { FileDataRecord } from "./lib/upload-queue-stores";
 export { uploadRawStores } from "./lib/upload-queue-stores";

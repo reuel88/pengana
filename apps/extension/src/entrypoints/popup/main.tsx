@@ -4,6 +4,7 @@ import { LOCALE_STORAGE_KEY_EXTENSION } from "@pengana/i18n/persistence";
 import { getDirection } from "@pengana/i18n/rtl";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { ThemeProvider } from "@/features/theme/theme-provider";
 import App from "./App.tsx";
 import "./style.css";
 
@@ -25,7 +26,14 @@ async function main() {
 
 	ReactDOM.createRoot(root).render(
 		<React.StrictMode>
-			<App />
+			<ThemeProvider
+				attribute="class"
+				defaultTheme="dark"
+				disableTransitionOnChange
+				storageKey="vite-ui-theme"
+			>
+				<App />
+			</ThemeProvider>
 		</React.StrictMode>,
 	);
 }

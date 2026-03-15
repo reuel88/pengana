@@ -1,10 +1,8 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import type { UploadTransport } from "@pengana/sync-engine";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
 
-import {
-	getFileFromIndexedDB,
-	removeFileFromIndexedDB,
-} from "./dexie-file-store";
+import { getFileFromIndexedDB } from "./dexie-file-store";
 import { createUploadTransport } from "./upload-transport";
 
 interface UploadRpc {
@@ -15,7 +13,8 @@ interface UploadRpc {
 		mimeType: string;
 		data: string;
 		idempotencyKey: string;
-	}): Promise<{ data: { attachmentUrl: string } }>;
+		attachmentId: string;
+	}): Promise<{ data: { url: string; mediaId: string } }>;
 }
 
 interface IndexedDbUploadTransportOptions {
@@ -30,7 +29,8 @@ export function createIndexedDbUploadTransport({
 	return createUploadTransport({
 		rpc,
 		async getBase64(input) {
-			const fileData = await getFileFromIndexedDB(db, input.entityId);
+			const fileKey = input.fileUri.slice(INDEXEDDB_URI_PREFIX.length);
+			const fileData = await getFileFromIndexedDB(db, fileKey);
 			if (!fileData) {
 				throw new Error(
 					"File not found in storage. It may have been lost. Please re-attach the file.",
@@ -38,11 +38,11 @@ export function createIndexedDbUploadTransport({
 			}
 			return fileData.base64;
 		},
-		onUploaded(_entityType, entityId) {
-			void removeFileFromIndexedDB(db, entityId);
+		onUploaded(_entityType, _entityId, _fileUri) {
+			// File cleanup handled via lifecycle callbacks
 		},
-		onFailed(_entityType, entityId) {
-			void removeFileFromIndexedDB(db, entityId);
+		onFailed(_entityType, _entityId, _fileUri) {
+			// File cleanup handled via lifecycle callbacks
 		},
 	});
 }

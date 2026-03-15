@@ -37,7 +37,7 @@ function createMockUploadAdapter(): UploadAdapter {
 function createMockUploadTransport(): UploadTransport {
 	return {
 		upload: vi.fn().mockResolvedValue({
-			attachmentUrl: "https://cdn.example.com/file.jpg",
+			url: "https://cdn.example.com/file.jpg",
 		}),
 	};
 }
@@ -105,13 +105,13 @@ describe("UploadQueue", () => {
 		expect(adapter.updateStatus).toHaveBeenCalledWith("u1", "uploading");
 	});
 
-	it("successful upload calls markCompleted with attachment URL", async () => {
+	it("successful upload calls markCompleted with URL", async () => {
 		const item = makeUploadItem({ id: "u1" });
 		vi.mocked(adapter.getNextQueued)
 			.mockResolvedValueOnce(item)
 			.mockResolvedValueOnce(null);
 		vi.mocked(transport.upload).mockResolvedValue({
-			attachmentUrl: "https://cdn.example.com/result.jpg",
+			url: "https://cdn.example.com/result.jpg",
 		});
 
 		await queue.processQueue();
@@ -198,7 +198,7 @@ describe("UploadQueue", () => {
 	it("isProcessing reflects current state", async () => {
 		expect(queue.isProcessing).toBe(false);
 
-		let resolveUpload!: (value: { attachmentUrl: string }) => void;
+		let resolveUpload!: (value: { url: string }) => void;
 		vi.mocked(transport.upload).mockImplementation(
 			() =>
 				new Promise((resolve) => {
@@ -215,7 +215,7 @@ describe("UploadQueue", () => {
 		await vi.advanceTimersByTimeAsync(0);
 		expect(queue.isProcessing).toBe(true);
 
-		resolveUpload({ attachmentUrl: "https://cdn.example.com/f.jpg" });
+		resolveUpload({ url: "https://cdn.example.com/f.jpg" });
 		await processPromise;
 		expect(queue.isProcessing).toBe(false);
 	});

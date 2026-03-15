@@ -1,8 +1,14 @@
-import type { WebTodo } from "@pengana/todo-client";
+import type { WebMedia, WebTodo } from "@pengana/todo-client";
 import { useSync } from "@/features/sync/sync-context";
 import { TodoListConnected } from "./todo-list-connected";
 
-export function TodoList({ todos }: { todos: WebTodo[] }) {
+export function TodoList({
+	todos,
+	userId,
+}: {
+	todos: (WebTodo & { attachments: WebMedia[] })[];
+	userId: string;
+}) {
 	const { triggerSync, enqueueUpload } = useSync();
 
 	return (
@@ -10,6 +16,7 @@ export function TodoList({ todos }: { todos: WebTodo[] }) {
 			todos={todos}
 			triggerSync={triggerSync}
 			enqueueUpload={enqueueUpload}
+			userId={userId}
 		/>
 	);
 }

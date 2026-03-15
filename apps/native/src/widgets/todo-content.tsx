@@ -11,6 +11,7 @@ import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import { useOrgTodos, useTodos } from "@/features/todo/use-todos";
 import { useTheme } from "@/shared/lib/theme";
+import { themedText } from "@/shared/styles/shared";
 
 export type TodoTab = "personal" | "organization";
 
@@ -30,7 +31,7 @@ export function TodoShell({
 		<View style={styles.content} testID="todo-page">
 			<Text
 				accessibilityRole="header"
-				style={[styles.title, { color: theme.text }]}
+				style={[styles.title, themedText(theme)]}
 			>
 				{t("title")}
 			</Text>
@@ -60,9 +61,7 @@ export function TodoShell({
 								},
 							]}
 						>
-							<Text style={[styles.tabText, { color: theme.text }]}>
-								{label}
-							</Text>
+							<Text style={[styles.tabText, themedText(theme)]}>{label}</Text>
 						</TouchableOpacity>
 					))}
 				</View>
@@ -79,7 +78,7 @@ export function PersonalTodoContent({ userId }: { userId: string }) {
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />
-			<TodoList todos={todos} />
+			<TodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</View>
 	);
@@ -99,7 +98,7 @@ export function OrganizationTodoContent({
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList todos={todos} />
+			<OrgTodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</View>
 	);

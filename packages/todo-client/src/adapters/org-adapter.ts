@@ -8,18 +8,20 @@ import type { WebOrgTodo } from "../lib/db";
 
 function toBaseLocalTodo(
 	wire: Todo,
-	existing: WebOrgTodo | undefined,
 	syncStatus: "synced" | "conflict",
 ): WebOrgTodo {
 	return {
-		...wire,
+		id: wire.id,
+		title: wire.title,
+		completed: wire.completed,
+		updatedAt: wire.updatedAt,
+		userId: wire.userId,
 		organizationId:
 			(wire as Todo & { organizationId?: string }).organizationId ??
 			wire.userId,
 		createdBy: (wire as Todo & { createdBy?: string | null }).createdBy ?? null,
 		syncStatus,
-		attachmentLocalUri: existing?.attachmentLocalUri ?? null,
-		attachmentStatus: existing?.attachmentStatus ?? null,
+		deleted: wire.deleted,
 	};
 }
 
@@ -31,25 +33,21 @@ export function createDexieOrgSyncAdapter(
 		db,
 		tableName: "orgTodos",
 		syncKeyPrefix: "lastSyncedAt:org",
-		toWire: (local: WebOrgTodo): Todo => {
-			const {
-				attachmentLocalUri: _,
-				attachmentStatus: __,
-				organizationId: ___,
-				createdBy: ____,
-				...todo
-			} = local;
-			return {
-				...todo,
-				attachmentUrl: todo.attachmentUrl ?? null,
-			};
-		},
+		toWire: (local: WebOrgTodo): Todo => ({
+			id: local.id,
+			title: local.title,
+			completed: local.completed,
+			updatedAt: local.updatedAt,
+			userId: local.userId,
+			syncStatus: local.syncStatus,
+			deleted: local.deleted,
+		}),
 		toLocal: (
 			wire: Todo,
 			existing: WebOrgTodo | undefined,
 			syncStatus: "synced" | "conflict",
 		): WebOrgTodo => {
-			const base = toBaseLocalTodo(wire, existing, syncStatus);
+			const base = toBaseLocalTodo(wire, syncStatus);
 
 			if (syncStatus !== "conflict" || !existing) {
 				return base;
@@ -61,9 +59,6 @@ export function createDexieOrgSyncAdapter(
 				completed: existing.completed,
 				updatedAt: existing.updatedAt,
 				deleted: existing.deleted,
-				attachmentUrl: existing.attachmentUrl,
-				attachmentLocalUri: existing.attachmentLocalUri,
-				attachmentStatus: existing.attachmentStatus,
 			};
 		},
 	});

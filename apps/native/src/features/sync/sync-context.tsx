@@ -3,6 +3,7 @@ import { createPersonalSyncTransport } from "@pengana/todo-client";
 import { createSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
+import { reconcileNativeMedia } from "./reconcile-media";
 import { useSyncEngine } from "./use-sync-engine";
 
 export { useSync, useSyncDevtools } from "@pengana/sync-engine";
@@ -13,6 +14,7 @@ const personalDeps = createPlatformDeps(
 		createPersonalSyncTransport(
 			async (input) =>
 				(await client.todo.sync(input, { signal: input.signal })).data,
+			reconcileNativeMedia,
 		),
 );
 

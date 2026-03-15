@@ -30,6 +30,11 @@ import { normalizeSeatCount, resolveWebBaseUrl } from "./lib/web-url";
 
 const logger = getLogger(["app", "auth"]);
 const webUrl = resolveWebBaseUrl(env);
+const orgDesignPresetField = {
+	type: "json",
+	required: false,
+	input: true,
+} as const;
 
 let _notifyUser: (userId: string) => void = () => {};
 
@@ -209,6 +214,13 @@ export const auth = betterAuth({
 		}),
 		organization({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
+			schema: {
+				organization: {
+					additionalFields: {
+						designPreset: orgDesignPresetField,
+					},
+				},
+			},
 			sendInvitationEmail: async ({ invitation, organization, inviter }) => {
 				const inviterName = inviter.user.name ?? "Someone";
 				await sendEmail(db, {

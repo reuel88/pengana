@@ -1,22 +1,24 @@
 import { useTranslation } from "@pengana/i18n";
 import { ActivityIndicator, StyleSheet, Text } from "react-native";
 
-import { STATUS_COLORS } from "@/shared/lib/design-tokens";
+import { useTheme } from "@/shared/lib/theme";
+import { destructiveText, successText } from "@/shared/styles/shared";
 
-import type { TodoItemRow } from "./todo-item";
+import type { AttachmentRow } from "./todo-item";
 
 export function AttachmentIndicator({
 	status,
-	attachmentUrl,
+	url,
 }: {
-	status: TodoItemRow["attachmentStatus"];
-	attachmentUrl: string | null;
+	status: AttachmentRow["status"];
+	url: string | null;
 }) {
 	const { t } = useTranslation("todos");
+	const { theme } = useTheme();
 
-	if (attachmentUrl && (!status || status === "uploaded")) {
+	if (url && (!status || status === "uploaded")) {
 		return (
-			<Text style={styles.attachmentIcon} accessible>
+			<Text style={[styles.attachmentIcon, successText(theme)]} accessible>
 				{t("attachment.attached")}
 			</Text>
 		);
@@ -32,7 +34,7 @@ export function AttachmentIndicator({
 	if (status === "failed") {
 		return (
 			<Text
-				style={styles.attachmentFailed}
+				style={[styles.attachmentFailed, destructiveText(theme)]}
 				accessible
 				accessibilityRole="alert"
 			>
@@ -46,10 +48,8 @@ export function AttachmentIndicator({
 const styles = StyleSheet.create({
 	attachmentIcon: {
 		fontSize: 11,
-		color: STATUS_COLORS.success,
 	},
 	attachmentFailed: {
 		fontSize: 11,
-		color: STATUS_COLORS.error,
 	},
 });

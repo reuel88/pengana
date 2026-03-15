@@ -1,14 +1,16 @@
 import { useSync } from "@/features/sync/sync-context";
 
-import { attachFile } from "../todo-actions";
+import { addMedia, getMediaCountForEntity } from "../todo-actions";
 
 import { useFilePickerBase } from "./use-file-picker-base";
 
-export function useFilePicker() {
+export function useFilePicker(userId: string) {
 	const { enqueueUpload } = useSync();
 	return useFilePickerBase({
-		attachFile,
+		addMedia,
 		enqueueUpload,
+		getMediaCount: getMediaCountForEntity,
 		entityType: "todo",
+		userId,
 	});
 }

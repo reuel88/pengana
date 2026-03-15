@@ -1,10 +1,16 @@
 import { useTranslation } from "@pengana/i18n";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
-import type { TodoActions, WebOrgTodo, WebTodo } from "@pengana/todo-client";
+import type {
+	TodoActions,
+	WebMedia,
+	WebOrgTodo,
+	WebTodo,
+} from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
 import { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useState } from "react";
+import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
 const fileStorage = {
@@ -13,8 +19,12 @@ const fileStorage = {
 	createFileRef: (id: string) => ({ uri: `${INDEXEDDB_URI_PREFIX}${id}` }),
 };
 
+type TodoWithAttachments = (WebTodo | WebOrgTodo) & {
+	attachments: WebMedia[];
+};
+
 interface TodoListProps {
-	todos: WebTodo[] | WebOrgTodo[];
+	todos: TodoWithAttachments[];
 	syncHook: {
 		triggerSync: () => void;
 		enqueueUpload: (
@@ -22,10 +32,12 @@ interface TodoListProps {
 			entityId: string,
 			fileUri: string,
 			mimeType: string,
+			mediaId: string,
 		) => void;
 	};
 	actions?: TodoActions;
 	entityType?: string;
+	userId?: string;
 }
 
 export function TodoList({
@@ -33,6 +45,7 @@ export function TodoList({
 	syncHook,
 	actions,
 	entityType,
+	userId,
 }: TodoListProps) {
 	const { triggerSync, enqueueUpload } = syncHook;
 	const { t } = useTranslation();
@@ -47,18 +60,26 @@ export function TodoList({
 		setErrors(({ [id]: _, ...rest }) => rest);
 	}, []);
 
-	const { handleToggle, handleDelete, handleResolve, handleFileSelected } =
-		useTodoListWiring({
-			triggerSync,
-			enqueueUpload,
-			onError,
-			clearError,
-			fileStorage,
-			t,
-			onDeleteSuccess: clearError,
-			db: appDb,
-			...(actions ? { actions, entityType } : {}),
-		});
+	const {
+		handleToggle,
+		handleDelete,
+		handleResolve,
+		handleRemoveAttachment,
+		handleFilesSelected,
+	} = useTodoListWiring({
+		triggerSync,
+		enqueueUpload,
+		onError,
+		clearError,
+		fileStorage,
+		t,
+		onDeleteSuccess: clearError,
+		deleteAttachment: (attachmentId) =>
+			client.upload.deleteAttachment({ attachmentId }),
+		db: appDb,
+		userId,
+		...(actions ? { actions, entityType } : {}),
+	});
 
 	return (
 		<TodoListBase
@@ -66,7 +87,8 @@ export function TodoList({
 			onToggle={handleToggle}
 			onDelete={handleDelete}
 			onResolve={handleResolve}
-			onFileSelected={handleFileSelected}
+			onFilesSelected={handleFilesSelected}
+			onRemoveAttachment={handleRemoveAttachment}
 			onValidationError={onError}
 			errors={errors}
 		/>

@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import {
 	LOCALE_OPTIONS,
 	type SupportedLocale,
@@ -14,6 +13,7 @@ import {
 	View,
 } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
+import { AppIcon } from "@/shared/ui/app-icon";
 
 interface LanguageSwitcherProps {
 	currentLocale: SupportedLocale;
@@ -54,7 +54,7 @@ export function LanguageSwitcher({
 					accessibilityHint={t("common:language.changeHint")}
 					accessibilityState={{ expanded: isOpen }}
 				>
-					<Ionicons name="globe-outline" size={24} color={theme.text} />
+					<AppIcon name="globe" size={24} color={theme.text} />
 				</Pressable>
 			</View>
 			<Modal
@@ -87,11 +87,7 @@ export function LanguageSwitcher({
 										{item.label}
 									</Text>
 									{item.value === currentLocale ? (
-										<Ionicons
-											name="checkmark"
-											size={20}
-											color={theme.primary}
-										/>
+										<AppIcon name="check" size={20} color={theme.primary} />
 									) : null}
 								</Pressable>
 							)}
