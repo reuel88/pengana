@@ -80,6 +80,8 @@ export async function handleSync(
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
 			userId: t.userId,
+			organizationId: t.organizationId ?? "",
+			createdBy: t.createdBy ?? null,
 			syncStatus: "synced" as const,
 		})),
 		media: mediaRows.map((a) => ({

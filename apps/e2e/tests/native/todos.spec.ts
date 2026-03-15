@@ -2,15 +2,14 @@ import { TEST_PASSWORD, TEST_USER_NAME } from "../../constants.js";
 import { expect, test } from "../../fixtures/native.js";
 import { NativeAuthPage } from "../../page-objects/native/auth.page.js";
 import { NativeOrgPage } from "../../page-objects/native/org.page.js";
-import { NativeTodoPage } from "../../page-objects/native/todo.page.js";
 
 test.describe("Todos", () => {
 	test.use({ storageState: undefined }); // each test gets a fresh session via fixture
 
 	test("todos page loads for authenticated user with org", async ({
 		authenticatedWithOrgPage: { page },
+		nativeTodoPage: todoPage,
 	}) => {
-		const todoPage = new NativeTodoPage(page);
 		await todoPage.navigate();
 		await expect(
 			page.getByTestId("todo-page").getByRole("heading", { name: "Todos" }),
@@ -20,8 +19,10 @@ test.describe("Todos", () => {
 		).toBeVisible();
 	});
 
-	test("add a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new NativeTodoPage(page);
+	test("add a todo", async ({
+		authenticatedWithOrgPage: _setup,
+		nativeTodoPage: todoPage,
+	}) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Buy milk");
 		await expect(todoPage.todoRowLocator("Buy milk")).toBeVisible();
@@ -29,8 +30,8 @@ test.describe("Todos", () => {
 
 	test("add, complete, and delete an organization todo", async ({
 		authenticatedWithOrgPage: { page },
+		nativeTodoPage: todoPage,
 	}) => {
-		const todoPage = new NativeTodoPage(page);
 		const title = `Org Todo ${crypto.randomUUID()}`;
 
 		await todoPage.navigate();
@@ -51,8 +52,10 @@ test.describe("Todos", () => {
 		await expect(todoPage.todoRowLocator(title)).not.toBeVisible();
 	});
 
-	test("complete a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new NativeTodoPage(page);
+	test("complete a todo", async ({
+		authenticatedWithOrgPage: _setup,
+		nativeTodoPage: todoPage,
+	}) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Exercise");
 		await todoPage.toggleTodo("Exercise");
@@ -62,8 +65,10 @@ test.describe("Todos", () => {
 		);
 	});
 
-	test("delete a todo", async ({ authenticatedWithOrgPage: { page } }) => {
-		const todoPage = new NativeTodoPage(page);
+	test("delete a todo", async ({
+		authenticatedWithOrgPage: _setup,
+		nativeTodoPage: todoPage,
+	}) => {
 		await todoPage.navigate();
 		await todoPage.addTodo("Temporary task");
 		await todoPage.deleteTodo("Temporary task");
@@ -72,8 +77,8 @@ test.describe("Todos", () => {
 
 	test("todos persist after page reload", async ({
 		authenticatedWithOrgPage: { page },
+		nativeTodoPage: todoPage,
 	}) => {
-		const todoPage = new NativeTodoPage(page);
 		await todoPage.navigate();
 		const title = `Persist-${crypto.randomUUID()}`;
 		await todoPage.addTodo(title);
@@ -87,6 +92,9 @@ test.describe("Todos", () => {
 	}) => {
 		const authPage = new NativeAuthPage(page);
 		const orgPage = new NativeOrgPage(page);
+		const { NativeTodoPage } = await import(
+			"../../page-objects/native/todo.page.js"
+		);
 		const todoPage = new NativeTodoPage(page);
 		const userAEmail = `user-a-${crypto.randomUUID()}@e2e.test`;
 		const userBEmail = `user-b-${crypto.randomUUID()}@e2e.test`;

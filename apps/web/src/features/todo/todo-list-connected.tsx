@@ -1,13 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
-import type {
-	TodoActions,
-	WebMedia,
-	WebOrgTodo,
-	WebTodo,
-} from "@pengana/todo-client";
+import type { TodoActions, TodoConfig, WebTodo } from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
+import type { WebMedia } from "@pengana/upload-client";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";
@@ -21,8 +17,9 @@ export function TodoListConnected({
 	actions,
 	entityType,
 	userId,
+	config,
 }: {
-	todos: ((WebTodo | WebOrgTodo) & { attachments: WebMedia[] })[];
+	todos: (WebTodo & { attachments: WebMedia[] })[];
 	triggerSync: () => void;
 	enqueueUpload: (
 		entityType: string,
@@ -34,6 +31,7 @@ export function TodoListConnected({
 	actions?: TodoActions;
 	entityType?: string;
 	userId?: string;
+	config?: TodoConfig;
 }) {
 	const { t } = useTranslation();
 
@@ -70,6 +68,7 @@ export function TodoListConnected({
 		db: appDb,
 		entityType,
 		userId,
+		config,
 	});
 
 	return (

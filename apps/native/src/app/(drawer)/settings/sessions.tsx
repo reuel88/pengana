@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { orgQueryKeys } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { useTheme } from "@/shared/lib/theme";
 import {
@@ -30,7 +31,7 @@ export default function SessionsScreen() {
 	const { data: currentSession } = authClient.useSession();
 
 	const sessions = useQuery({
-		queryKey: ["native-sessions"],
+		queryKey: orgQueryKeys.sessions,
 		queryFn: async () => {
 			const { data } = await authClient.listSessions();
 			return Array.isArray(data) ? (data as Session[]) : [];
@@ -40,13 +41,13 @@ export default function SessionsScreen() {
 	const revoke = useMutation({
 		mutationFn: (token: string) => authClient.revokeSession({ token }),
 		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: ["native-sessions"] }),
+			queryClient.invalidateQueries({ queryKey: orgQueryKeys.sessions }),
 	});
 
 	const revokeAll = useMutation({
 		mutationFn: () => authClient.revokeSessions(),
 		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: ["native-sessions"] }),
+			queryClient.invalidateQueries({ queryKey: orgQueryKeys.sessions }),
 	});
 
 	return (

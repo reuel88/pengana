@@ -1,0 +1,19 @@
+{
+	"name": "@pengana/sync-client",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./lib/*": {
+			"default": "./src/lib/*.ts"
+		}
+	},
+	"dependencies": {
+		"@pengana/sync-engine": "workspace:*"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

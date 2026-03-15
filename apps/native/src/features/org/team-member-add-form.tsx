@@ -10,39 +10,22 @@ import {
 	View,
 } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 import { primaryButtonText } from "@/shared/styles/shared";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 type TeamMember = { userId: string; user: { email: string } };
 
-export function TeamMemberAddForm({
-	teamId,
-	members,
-}: {
-	teamId: string;
-	members: TeamMember[] | undefined;
-}) {
-	const { i18n, t } = useTranslation("organization");
-
-	return (
-		<TeamMemberAddFormContent
-			key={i18n.language}
-			teamId={teamId}
-			members={members}
-			t={t}
-		/>
-	);
-}
+export const TeamMemberAddForm = withLanguageKey(TeamMemberAddFormContent);
 
 function TeamMemberAddFormContent({
 	teamId,
 	members,
-	t,
 }: {
 	teamId: string;
 	members: TeamMember[] | undefined;
-	t: ReturnType<typeof useTranslation<"organization">>["t"];
 }) {
+	const { t } = useTranslation("organization");
 	const { theme } = useTheme();
 
 	const { handleAdd, loading } = useTeamMemberAdd({

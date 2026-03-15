@@ -15,6 +15,8 @@ export const todoSchema = z.object({
 	completed: z.boolean(),
 	updatedAt: z.string(),
 	userId: z.string(),
+	organizationId: z.string(),
+	createdBy: z.string().nullable(),
 	syncStatus: syncStatusSchema,
 	deleted: z.boolean(),
 });
@@ -53,36 +55,10 @@ export const syncOutputSchema = z.object({
 	syncedAt: z.string(),
 });
 
-export const orgTodoSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-	completed: z.boolean(),
-	updatedAt: z.string(),
-	organizationId: z.string(),
-	createdBy: z.string().nullable(),
-	syncStatus: syncStatusSchema,
-	deleted: z.boolean(),
-});
-
-export const orgSyncInputSchema = z.object({
-	changes: z.array(orgTodoSchema),
-	lastSyncedAt: z.string().nullable(),
-});
-
-export const orgSyncOutputSchema = z.object({
-	serverChanges: z.array(orgTodoSchema),
-	media: z.array(mediaSchema),
-	conflicts: z.array(z.string()),
-	syncedAt: z.string(),
-});
-
 export type SyncStatus = z.infer<typeof syncStatusSchema>;
 export type Todo = z.infer<typeof todoSchema>;
-export type OrgTodo = z.infer<typeof orgTodoSchema>;
 export type Media = z.infer<typeof mediaSchema>;
 export type UploadStatus = z.infer<typeof uploadStatusSchema>;
 export type UploadItem = z.infer<typeof uploadItemSchema>;
 export type SyncInput = z.infer<typeof syncInputSchema>;
 export type SyncOutput = z.infer<typeof syncOutputSchema>;
-export type OrgSyncInput = z.infer<typeof orgSyncInputSchema>;
-export type OrgSyncOutput = z.infer<typeof orgSyncOutputSchema>;

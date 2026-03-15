@@ -1,34 +1,39 @@
 import type { Todo } from "@pengana/sync-engine";
 import { describe, expect, it, vi } from "vitest";
 
-import type { WebOrgTodo } from "../lib/db";
+import type { WebTodo } from "../lib/db";
+import { orgTodoConfig } from "../lib/todo-config";
 
 const { createDexieSyncAdapterMock } = vi.hoisted(() => ({
 	createDexieSyncAdapterMock: vi.fn(),
 }));
 
-vi.mock("@pengana/entity-store", () => ({
-	createDexieSyncAdapter: createDexieSyncAdapterMock,
-}));
+vi.mock("@pengana/entity-store", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@pengana/entity-store")>();
+	return {
+		...actual,
+		createDexieSyncAdapter: createDexieSyncAdapterMock,
+	};
+});
 
-import { createDexieOrgSyncAdapter } from "./org-adapter";
+import { createTodoSyncAdapter } from "./adapter";
 
 function getToLocal() {
-	createDexieOrgSyncAdapter({} as never, "org-1");
+	createTodoSyncAdapter({} as never, "org-1", orgTodoConfig);
 	const [, config] = createDexieSyncAdapterMock.mock.lastCall as [
 		string,
 		{
 			toLocal: (
 				wire: Todo,
-				existing: WebOrgTodo | undefined,
+				existing: WebTodo | undefined,
 				syncStatus: "synced" | "conflict",
-			) => WebOrgTodo;
+			) => WebTodo;
 		},
 	];
 	return config.toLocal;
 }
 
-describe("createDexieOrgSyncAdapter", () => {
+describe("createTodoSyncAdapter (org config)", () => {
 	it("keeps normal wire mapping for synced rows", () => {
 		const toLocal = getToLocal();
 		const wire = {
@@ -52,7 +57,7 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "local-user",
 			syncStatus: "pending",
 			deleted: true,
-		} satisfies WebOrgTodo;
+		} satisfies WebTodo;
 
 		expect(toLocal(wire, existing, "synced")).toEqual({
 			id: "todo-1",
@@ -90,7 +95,7 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "local-user",
 			syncStatus: "pending",
 			deleted: true,
-		} satisfies WebOrgTodo;
+		} satisfies WebTodo;
 
 		expect(toLocal(wire, existing, "conflict")).toEqual({
 			id: "todo-1",
@@ -124,7 +129,7 @@ describe("createDexieOrgSyncAdapter", () => {
 			updatedAt: "2026-03-14T00:00:00.000Z",
 			userId: "org-fallback",
 			organizationId: "org-fallback",
-			createdBy: null,
+			createdBy: "",
 			syncStatus: "conflict",
 			deleted: false,
 		});

@@ -2,7 +2,7 @@ import {
 	getFileFromIndexedDB as getFile,
 	removeFileFromIndexedDB as removeFile,
 	storeFileInIndexedDB as storeFile,
-} from "@pengana/todo-client/adapters/dexie-file-store";
+} from "@pengana/upload-client/adapters/dexie-file-store";
 
 import { appDb } from "@/features/todo/entities/todo/db.web";
 

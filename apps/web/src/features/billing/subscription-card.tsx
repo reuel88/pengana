@@ -25,8 +25,7 @@ export function SubscriptionCard({ orgId }: { orgId: string }) {
 		setIsProcessing(true);
 		try {
 			await action();
-		} catch (err) {
-			console.error("[payment]", err);
+		} catch {
 			toast.error(t("errors:paymentError"));
 		} finally {
 			setIsProcessing(false);

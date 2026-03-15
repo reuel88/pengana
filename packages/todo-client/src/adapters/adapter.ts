@@ -5,31 +5,59 @@ import {
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 
 import type { WebTodo } from "../lib/db";
+import type { TodoConfig } from "../lib/todo-config";
 
-export function createDexieSyncAdapter(
+export function createTodoSyncAdapter(
 	db: EntityDatabase,
-	userId: string,
+	scopeId: string,
+	config: TodoConfig,
 ): SyncAdapter {
-	return createGenericAdapter<WebTodo>(userId, {
+	return createGenericAdapter<WebTodo>(scopeId, {
 		db,
-		tableName: "todos",
-		syncKeyPrefix: "lastSyncedAt",
+		tableName: config.entity.name,
+		syncKeyPrefix: config.syncKeyPrefix,
 		toWire: (local: WebTodo): Todo => ({
 			id: local.id,
 			title: local.title,
 			completed: local.completed,
 			updatedAt: local.updatedAt,
 			userId: local.userId,
+			organizationId: local.organizationId,
+			createdBy: local.createdBy || null,
 			syncStatus: local.syncStatus,
 			deleted: local.deleted,
 		}),
 		toLocal: (
 			wire: Todo,
-			_existing: WebTodo | undefined,
+			existing: WebTodo | undefined,
 			syncStatus: "synced" | "conflict",
-		): WebTodo => ({
-			...wire,
-			syncStatus,
-		}),
+		): WebTodo => {
+			const base: WebTodo = {
+				id: wire.id,
+				title: wire.title,
+				completed: wire.completed,
+				updatedAt: wire.updatedAt,
+				userId: wire.userId,
+				organizationId:
+					(wire as Todo & { organizationId?: string }).organizationId ??
+					wire.userId,
+				createdBy: (wire as Todo & { createdBy?: string }).createdBy ?? "",
+				syncStatus,
+				deleted: wire.deleted,
+			};
+
+			if (syncStatus !== "conflict" || !existing) {
+				return base;
+			}
+
+			// Preserve local dirty fields during conflicts
+			return {
+				...base,
+				title: existing.title,
+				completed: existing.completed,
+				updatedAt: existing.updatedAt,
+				deleted: existing.deleted,
+			};
+		},
 	});
 }

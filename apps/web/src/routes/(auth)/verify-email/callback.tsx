@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { VerifyEmailCallback } from "@/features/auth/verify-email-callback";
-import { AuthLayout } from "@/widgets/auth-layout";
 
 export const Route = createFileRoute("/(auth)/verify-email/callback")({
-	component: VerifyEmailCallbackPage,
+	component: VerifyEmailCallback,
 	validateSearch: z.object({
 		token: z.string().optional(),
 	}),
@@ -18,11 +17,3 @@ export const Route = createFileRoute("/(auth)/verify-email/callback")({
 		],
 	}),
 });
-
-function VerifyEmailCallbackPage() {
-	return (
-		<AuthLayout>
-			<VerifyEmailCallback />
-		</AuthLayout>
-	);
-}

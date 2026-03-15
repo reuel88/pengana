@@ -5,7 +5,7 @@ import { Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function PendingEmailPage({
+export function EmailSentNotice({
 	titleKey,
 	descriptionKey,
 	resendButtonKey,

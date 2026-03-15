@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@pengana/entity-store": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
-		"dexie": "^4.0.11",
+		"@pengana/upload-client": "workspace:*",
 		"dexie-react-hooks": "^4.2.0"
 	},
 	"peerDependencies": {

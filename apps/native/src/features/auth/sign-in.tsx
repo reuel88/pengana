@@ -7,6 +7,7 @@ import { useState } from "react";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
 import { getSafeRedirectPath } from "@/shared/lib/auth-flow";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 
 import {
 	AuthFormCard,
@@ -14,11 +15,7 @@ import {
 	AuthSubmitButton,
 } from "@/shared/ui/auth-form";
 
-function SignIn({ redirectTo }: { redirectTo?: string }) {
-	const { i18n } = useTranslation();
-
-	return <SignInForm key={i18n.language} redirectTo={redirectTo} />;
-}
+const SignIn = withLanguageKey(SignInForm);
 
 function SignInForm({ redirectTo }: { redirectTo?: string }) {
 	const [error, setError] = useState<string | null>(null);

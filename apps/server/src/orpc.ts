@@ -39,7 +39,7 @@ export interface NotificationHandlers {
 // instance, but this middleware is created before the server exists. We use a
 // mutable ref so that once the server starts and notifyUser is wired up, all
 // subsequent requests pick up the real implementation.
-const notifyRef: NotificationHandlers = {
+const notificationHandlers: NotificationHandlers = {
 	notifyUser: () => {
 		logger.warn`notifyUser called before WebSocket server initialized`;
 	},
@@ -52,8 +52,8 @@ export function wireNotifications(
 	notifyUser: (userId: string) => void,
 	notifyOrgMembers: (orgId: string) => void,
 ) {
-	notifyRef.notifyUser = notifyUser;
-	notifyRef.notifyOrgMembers = notifyOrgMembers;
+	notificationHandlers.notifyUser = notifyUser;
+	notificationHandlers.notifyOrgMembers = notifyOrgMembers;
 }
 
 const VALID_ERROR_CODES = new Set<string>(ERROR_CODES);
@@ -87,8 +87,8 @@ export async function handleOrpcRoutes(c: Context, next: Next) {
 	const appContext = await createContext({ context: c });
 	const orpcContext = {
 		...appContext,
-		notifyUser: notifyRef.notifyUser,
-		notifyOrgMembers: notifyRef.notifyOrgMembers,
+		notifyUser: notificationHandlers.notifyUser,
+		notifyOrgMembers: notificationHandlers.notifyOrgMembers,
 	};
 
 	const rpcResult = await rpcHandler.handle(c.req.raw, {

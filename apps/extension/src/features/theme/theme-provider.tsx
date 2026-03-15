@@ -38,7 +38,6 @@ type ThemeProviderProps = {
 	defaultTheme?: Theme;
 	storageKey?: string;
 	attribute?: "class";
-	disableTransitionOnChange?: boolean;
 };
 
 export function ThemeProvider({

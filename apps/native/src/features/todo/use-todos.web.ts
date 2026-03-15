@@ -1,6 +1,6 @@
-import type { Todo } from "@pengana/sync-engine";
-import type { WebMedia, WebOrgTodo } from "@pengana/todo-client";
+import type { WebTodo } from "@pengana/todo-client";
 import { filterTodos } from "@pengana/todo-client";
+import type { WebMedia } from "@pengana/upload-client";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo } from "react";
 
@@ -11,12 +11,9 @@ import type { TodoItemRow } from "./components/todo-item";
 function useTodosWithAttachments(tableName: string, scopeId: string) {
 	const todos = useLiveQuery(
 		() =>
-			appDb
-				.getTable<Todo | WebOrgTodo>(tableName)
-				.where({ userId: scopeId })
-				.toArray(),
+			appDb.getTable<WebTodo>(tableName).where({ userId: scopeId }).toArray(),
 		[tableName, scopeId],
-		[] as (Todo | WebOrgTodo)[],
+		[] as WebTodo[],
 	);
 
 	const todoIds = useMemo(() => todos.map((t) => t.id), [todos]);

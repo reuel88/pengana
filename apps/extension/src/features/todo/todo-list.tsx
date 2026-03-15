@@ -1,14 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
-import type {
-	TodoActions,
-	WebMedia,
-	WebOrgTodo,
-	WebTodo,
-} from "@pengana/todo-client";
+import type { TodoActions, TodoConfig, WebTodo } from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
-import { storeFileInIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
+import type { WebMedia } from "@pengana/upload-client";
+import { storeFileInIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
 import { useCallback, useState } from "react";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
@@ -19,7 +15,7 @@ const fileStorage = {
 	createFileRef: (id: string) => ({ uri: `${INDEXEDDB_URI_PREFIX}${id}` }),
 };
 
-type TodoWithAttachments = (WebTodo | WebOrgTodo) & {
+type TodoWithAttachments = WebTodo & {
 	attachments: WebMedia[];
 };
 
@@ -38,6 +34,7 @@ interface TodoListProps {
 	actions?: TodoActions;
 	entityType?: string;
 	userId?: string;
+	config?: TodoConfig;
 }
 
 export function TodoList({
@@ -46,6 +43,7 @@ export function TodoList({
 	actions,
 	entityType,
 	userId,
+	config,
 }: TodoListProps) {
 	const { triggerSync, enqueueUpload } = syncHook;
 	const { t } = useTranslation();
@@ -78,6 +76,7 @@ export function TodoList({
 			client.upload.deleteAttachment({ attachmentId }),
 		db: appDb,
 		userId,
+		config,
 		...(actions ? { actions, entityType } : {}),
 	});
 

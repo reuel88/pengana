@@ -41,10 +41,7 @@ test.describe("Authentication", () => {
 	});
 
 	test("sign in fails with wrong password", async ({ authPage, page }) => {
-		await authPage.navigateToSignIn();
-		await page.getByTestId("auth-email-input").fill("nonexistent@e2e.test");
-		await page.getByTestId("auth-password-input").fill("wrongpassword");
-		await page.getByRole("button", { name: "Sign in" }).click();
+		await authPage.signIn("nonexistent@e2e.test", "wrongpassword");
 		// User should remain on the sign-in page
 		await expect(page).toHaveURL(/login/);
 		await expect(page.getByTestId("auth-error")).toBeVisible();

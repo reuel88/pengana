@@ -6,12 +6,12 @@ import {
 	insertOrgTodo,
 	updateOrgTodo,
 } from "@pengana/db/org-todo-queries";
-import type { OrgSyncInput } from "@pengana/sync-engine";
+import type { SyncInput } from "@pengana/sync-engine";
 
 const logger = getLogger(["app", "org-sync"]);
 
 export async function handleOrgSync(
-	input: OrgSyncInput,
+	input: SyncInput,
 	organizationId: string,
 	createdBy: string,
 	notifyOrgMembers?: (orgId: string) => void,
@@ -23,6 +23,7 @@ export async function handleOrgSync(
 
 	for (const change of input.changes) {
 		if (change.organizationId !== organizationId) continue;
+		if (change.userId !== createdBy) continue;
 
 		const existing = await findOrgTodoById(change.id);
 
@@ -83,6 +84,7 @@ export async function handleOrgSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
+			userId: t.userId ?? "",
 			organizationId: t.organizationId,
 			createdBy: t.createdBy,
 			syncStatus: "synced" as const,

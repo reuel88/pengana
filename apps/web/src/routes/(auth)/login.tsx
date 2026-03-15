@@ -2,10 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { SignInForm } from "@/features/auth/sign-in-form";
 import { redirectIfAuthenticated } from "@/shared/lib/auth-client";
-import { AuthLayout } from "@/widgets/auth-layout";
 
 export const Route = createFileRoute("/(auth)/login")({
-	component: LoginPage,
+	component: SignInForm,
 	beforeLoad: redirectIfAuthenticated,
 	validateSearch: z.object({
 		invitationId: z.string().optional(),
@@ -20,11 +19,3 @@ export const Route = createFileRoute("/(auth)/login")({
 		],
 	}),
 });
-
-function LoginPage() {
-	return (
-		<AuthLayout>
-			<SignInForm />
-		</AuthLayout>
-	);
-}

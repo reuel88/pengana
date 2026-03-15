@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AccountSettingsForm } from "@/features/auth/account-settings-form";
 
 export const Route = createFileRoute("/settings/account")({
-	component: AccountSettingsPage,
+	component: AccountSettingsForm,
 	head: () => ({
 		meta: [
 			{ title: "Account Settings | pengana" },
@@ -13,7 +13,3 @@ export const Route = createFileRoute("/settings/account")({
 		],
 	}),
 });
-
-function AccountSettingsPage() {
-	return <AccountSettingsForm />;
-}

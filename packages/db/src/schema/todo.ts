@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-import { user } from "./auth";
+import { organization, user } from "./auth";
 
 export const todo = pgTable(
 	"todo",
@@ -14,6 +14,12 @@ export const todo = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
+		organizationId: text("organization_id").references(() => organization.id, {
+			onDelete: "set null",
+		}),
+		createdBy: text("created_by").references(() => user.id, {
+			onDelete: "set null",
+		}),
 	},
 	(table) => [
 		index("todo_userId_idx").on(table.userId),

@@ -29,7 +29,20 @@
 		"deleteConfirm": "Sigurado ka ba? Hindi na ito mababawi.",
 		"updateSuccess": "Na-update ang organisasyon",
 		"deleteSuccess": "Nabura ang organisasyon",
-		"error": "Nabigong i-update ang organisasyon"
+		"error": "Nabigong i-update ang organisasyon",
+		"appearance": {
+			"title": "Hitsura",
+			"description": "Preset ng disenyo para sa buong organisasyon. Ang light at dark mode ay nananatiling personal.",
+			"style": "Estilo",
+			"baseColor": "Pangunahing Kulay",
+			"accentTheme": "Accent na Tema",
+			"iconLibrary": "Library ng Icon",
+			"font": "Font",
+			"radius": "Radius",
+			"menu": "Menu",
+			"menuAccent": "Accent ng Menu",
+			"save": "I-save ang Hitsura"
+		}
 	},
 	"members": {
 		"title": "Mga Miyembro",

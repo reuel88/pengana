@@ -154,6 +154,9 @@ importers:
       '@pengana/org-client':
         specifier: workspace:*
         version: link:../../packages/org-client
+      '@pengana/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
@@ -163,6 +166,9 @@ importers:
       '@pengana/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@pengana/upload-client':
+        specifier: workspace:*
+        version: link:../../packages/upload-client
       better-auth:
         specifier: 'catalog:'
         version: 1.5.4(9a25b76d4b3d1ff3243764655f52f887)
@@ -245,12 +251,18 @@ importers:
       '@pengana/org-client':
         specifier: workspace:*
         version: link:../../packages/org-client
+      '@pengana/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
       '@pengana/todo-client':
         specifier: workspace:*
         version: link:../../packages/todo-client
+      '@pengana/upload-client':
+        specifier: workspace:*
+        version: link:../../packages/upload-client
       '@react-navigation/bottom-tabs':
         specifier: ^7.2.0
         version: 7.15.5(@react-navigation/native@7.1.33(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native-safe-area-context@5.6.2(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native-screens@4.23.0(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -499,6 +511,9 @@ importers:
       '@pengana/org-client':
         specifier: workspace:*
         version: link:../../packages/org-client
+      '@pengana/sync-client':
+        specifier: workspace:*
+        version: link:../../packages/sync-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
@@ -508,6 +523,9 @@ importers:
       '@pengana/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@pengana/upload-client':
+        specifier: workspace:*
+        version: link:../../packages/upload-client
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -883,6 +901,19 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
 
+  packages/sync-client:
+    dependencies:
+      '@pengana/sync-engine':
+        specifier: workspace:*
+        version: link:../sync-engine
+    devDependencies:
+      '@pengana/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/sync-engine:
     dependencies:
       react:
@@ -913,9 +944,9 @@ importers:
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../sync-engine
-      dexie:
-        specifier: ^4.0.11
-        version: 4.3.0
+      '@pengana/upload-client':
+        specifier: workspace:*
+        version: link:../upload-client
       dexie-react-hooks:
         specifier: ^4.2.0
         version: 4.2.0(@types/react@19.2.14)(dexie@4.3.0)(react@19.2.4)
@@ -1014,6 +1045,28 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+
+  packages/upload-client:
+    dependencies:
+      '@pengana/entity-store':
+        specifier: workspace:*
+        version: link:../entity-store
+      '@pengana/sync-engine':
+        specifier: workspace:*
+        version: link:../sync-engine
+      dexie:
+        specifier: ^4.0.11
+        version: 4.3.0
+    devDependencies:
+      '@pengana/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.18(@types/node@25.4.0)(jiti@2.6.1)(lightningcss@1.31.1)(msw@2.12.10(@types/node@25.4.0)(typescript@5.9.3))(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
 packages:
 

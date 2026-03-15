@@ -11,6 +11,7 @@ export interface OrgTodoRow {
 	updatedAt: Date;
 	organizationId: string;
 	createdBy: string | null;
+	userId: string | null;
 }
 
 export async function findOrgTodoById(
@@ -28,6 +29,7 @@ export async function insertOrgTodo(values: {
 	updatedAt: Date;
 	organizationId: string;
 	createdBy: string | null;
+	userId?: string | null;
 }): Promise<void> {
 	await db.insert(orgTodo).values(values);
 }

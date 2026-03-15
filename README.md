@@ -89,16 +89,20 @@ pengana/
 │   ├── extension/   # WXT browser extension client
 │   └── e2e/         # Playwright end-to-end tests
 ├── packages/
-│   ├── api/          # Shared oRPC routes, procedures, and server context
-│   ├── auth/         # Better Auth configuration and auth-related hooks
-│   ├── db/           # Drizzle schema, migrations, and query helpers
-│   ├── env/          # Typed environment validation per platform
-│   ├── config/       # Shared TypeScript and tooling config
-│   ├── i18n/         # Shared locales and i18n bootstrapping
-│   ├── org-client/   # Shared org/team/invitation client logic
-│   ├── sync-engine/  # Offline-first sync engine
-│   ├── todo-client/  # Shared local todo and upload queue logic
-│   └── ui/           # Shared UI components and styles
+│   ├── api/            # Shared oRPC routes, procedures, and server context
+│   ├── auth/           # Better Auth configuration and auth-related hooks
+│   ├── config/         # Shared TypeScript and tooling config
+│   ├── db/             # Drizzle schema, migrations, and query helpers
+│   ├── email-dev/      # Dev email templates and previews
+│   ├── entity-store/   # Dexie-based offline entity storage and reactive hooks
+│   ├── env/            # Typed environment validation per platform
+│   ├── i18n/           # Shared locales and i18n bootstrapping
+│   ├── org-client/     # Shared org/team/invitation client logic
+│   ├── sync-client/    # RPC sync transport factory
+│   ├── sync-engine/    # Offline-first sync engine, upload queue, and providers
+│   ├── todo-client/    # Todo entity adapters, actions, and hooks
+│   ├── ui/             # Shared UI components and styles
+│   └── upload-client/  # Media management and upload queue adapters
 ```
 
 ## Available Scripts

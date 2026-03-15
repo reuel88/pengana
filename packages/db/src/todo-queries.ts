@@ -10,6 +10,8 @@ export interface TodoRow {
 	deleted: boolean;
 	updatedAt: Date;
 	userId: string;
+	organizationId: string | null;
+	createdBy: string | null;
 }
 
 export async function findTodoById(id: string): Promise<TodoRow | undefined> {
@@ -24,6 +26,8 @@ export async function insertTodo(values: {
 	deleted: boolean;
 	updatedAt: Date;
 	userId: string;
+	organizationId?: string | null;
+	createdBy?: string | null;
 }): Promise<void> {
 	await db.insert(todo).values(values);
 }

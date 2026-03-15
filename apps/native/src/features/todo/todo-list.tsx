@@ -1,15 +1,12 @@
-import { useCallback } from "react";
-
 import { useSync } from "@/features/sync/sync-context";
-import { client } from "@/shared/api/orpc";
 
 import type { TodoItemRow } from "./components/todo-item";
+import { useAttachmentHandlers } from "./create-attachment-handlers";
 import { useFilePicker } from "./hooks/use-file-picker";
 import {
 	deleteTodo,
 	removeMedia,
 	resolveConflict,
-	retryMedia,
 	toggleTodo,
 } from "./todo-actions";
 import type { TodoListActions } from "./todo-list-base";
@@ -28,31 +25,8 @@ export function TodoList({
 }) {
 	const { triggerSync, enqueueUpload } = useSync();
 	const { showPickerForTodo } = useFilePicker(userId);
-
-	const handleRemoveAttachment = useCallback(
-		async (attachmentId: string) => {
-			await removeMedia(attachmentId);
-			client.upload.deleteAttachment({ attachmentId }).catch(() => {});
-			triggerSync();
-		},
-		[triggerSync],
-	);
-
-	const handleRetryAttachment = useCallback(
-		async (attachmentId: string) => {
-			const record = await retryMedia(attachmentId);
-			if (record?.localUri && record.entityType && record.entityId) {
-				enqueueUpload(
-					record.entityType,
-					record.entityId,
-					record.localUri,
-					record.mimeType,
-					record.id,
-				);
-			}
-		},
-		[enqueueUpload],
-	);
+	const { handleRemoveAttachment, handleRetryAttachment } =
+		useAttachmentHandlers(removeMedia, triggerSync, enqueueUpload);
 
 	return (
 		<TodoListBase

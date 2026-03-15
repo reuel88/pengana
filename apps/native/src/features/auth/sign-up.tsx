@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { queryClient } from "@/shared/api/orpc";
 import { authClient } from "@/shared/lib/auth-client";
+import { withLanguageKey } from "@/shared/lib/with-language-key";
 
 import {
 	AuthFormCard,
@@ -12,11 +13,7 @@ import {
 	AuthSubmitButton,
 } from "@/shared/ui/auth-form";
 
-function SignUp({ redirectTo }: { redirectTo?: string }) {
-	const { i18n } = useTranslation();
-
-	return <SignUpForm key={i18n.language} redirectTo={redirectTo} />;
-}
+const SignUp = withLanguageKey(SignUpForm);
 
 function SignUpForm({ redirectTo }: { redirectTo?: string }) {
 	const { t } = useTranslation();

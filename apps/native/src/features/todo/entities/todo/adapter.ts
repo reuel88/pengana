@@ -11,6 +11,8 @@ function rowToTodo(row: typeof todos.$inferSelect): Todo {
 		completed: row.completed,
 		updatedAt: row.updatedAt,
 		userId: row.userId,
+		organizationId: row.organizationId ?? row.userId,
+		createdBy: row.createdBy ?? null,
 		syncStatus: row.syncStatus,
 		deleted: row.deleted,
 	};
@@ -28,7 +30,7 @@ function todoToRow(todo: Todo, syncStatus: string) {
 		completed: todo.completed,
 		updatedAt: todo.updatedAt,
 		userId: todo.userId,
-		organizationId: orgTodo.organizationId ?? null,
+		organizationId: orgTodo.organizationId ?? todo.userId,
 		createdBy: orgTodo.createdBy ?? null,
 		syncStatus: syncStatus as "synced" | "pending" | "conflict",
 		deleted: todo.deleted,

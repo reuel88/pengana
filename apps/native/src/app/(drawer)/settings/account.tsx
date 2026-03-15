@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
 	Alert,
 	ScrollView,
@@ -15,9 +15,37 @@ import { primaryButtonText, themedSurface } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
+function SettingsCard({
+	title,
+	buttonLabel,
+	onPress,
+	children,
+}: {
+	title: string;
+	buttonLabel: string;
+	onPress: () => void;
+	children: ReactNode;
+}) {
+	const { theme } = useTheme();
+
+	return (
+		<View style={[styles.card, themedSurface(theme)]}>
+			<Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+			{children}
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: theme.primary }]}
+				onPress={onPress}
+			>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
+					{buttonLabel}
+				</Text>
+			</TouchableOpacity>
+		</View>
+	);
+}
+
 function ChangeNameCard() {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const { invalidateActiveOrg } = useInvalidateOrg();
 	const [name, setName] = useState(session?.user.name ?? "");
@@ -30,10 +58,22 @@ function ChangeNameCard() {
 	}, [session?.user.name, name]);
 
 	return (
-		<View style={[styles.card, themedSurface(theme)]}>
-			<Text style={[styles.title, { color: theme.text }]}>
-				{t("auth:settings.account.changeName")}
-			</Text>
+		<SettingsCard
+			title={t("auth:settings.account.changeName")}
+			buttonLabel={t("auth:settings.account.changeName")}
+			onPress={async () => {
+				const result = await authClient.updateUser({ name: name.trim() });
+				if (result.error) {
+					Alert.alert(
+						t("error:title"),
+						result.error.message || t("error:generic"),
+					);
+					return;
+				}
+				await invalidateActiveOrg();
+				Alert.alert("", t("auth:settings.account.updateSuccess"));
+			}}
+		>
 			<ThemedTextInput
 				label={t("auth:fields.name")}
 				value={name}
@@ -42,32 +82,12 @@ function ChangeNameCard() {
 					setName(value);
 				}}
 			/>
-			<TouchableOpacity
-				style={[styles.button, { backgroundColor: theme.primary }]}
-				onPress={async () => {
-					const result = await authClient.updateUser({ name: name.trim() });
-					if (result.error) {
-						Alert.alert(
-							t("error:title"),
-							result.error.message || t("error:generic"),
-						);
-						return;
-					}
-					await invalidateActiveOrg();
-					Alert.alert("", t("auth:settings.account.updateSuccess"));
-				}}
-			>
-				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
-					{t("auth:settings.account.changeName")}
-				</Text>
-			</TouchableOpacity>
-		</View>
+		</SettingsCard>
 	);
 }
 
 function ChangeEmailCard() {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const [email, setEmail] = useState(session?.user.email ?? "");
 	const hasEdited = useRef(false);
@@ -79,10 +99,23 @@ function ChangeEmailCard() {
 	}, [session?.user.email, email]);
 
 	return (
-		<View style={[styles.card, themedSurface(theme)]}>
-			<Text style={[styles.title, { color: theme.text }]}>
-				{t("auth:settings.account.changeEmail")}
-			</Text>
+		<SettingsCard
+			title={t("auth:settings.account.changeEmail")}
+			buttonLabel={t("auth:settings.account.changeEmail")}
+			onPress={async () => {
+				const result = await authClient.changeEmail({
+					newEmail: email.trim(),
+				});
+				if (result.error) {
+					Alert.alert(
+						t("error:title"),
+						result.error.message || t("error:generic"),
+					);
+					return;
+				}
+				Alert.alert("", t("auth:settings.account.updateSuccess"));
+			}}
+		>
 			<ThemedTextInput
 				label={t("auth:fields.email")}
 				value={email}
@@ -94,41 +127,41 @@ function ChangeEmailCard() {
 				keyboardType="email-address"
 				hint={t("auth:settings.account.changeEmailNote")}
 			/>
-			<TouchableOpacity
-				style={[styles.button, { backgroundColor: theme.primary }]}
-				onPress={async () => {
-					const result = await authClient.changeEmail({
-						newEmail: email.trim(),
-					});
-					if (result.error) {
-						Alert.alert(
-							t("error:title"),
-							result.error.message || t("error:generic"),
-						);
-						return;
-					}
-					Alert.alert("", t("auth:settings.account.updateSuccess"));
-				}}
-			>
-				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
-					{t("auth:settings.account.changeEmail")}
-				</Text>
-			</TouchableOpacity>
-		</View>
+		</SettingsCard>
 	);
 }
 
 function ChangePasswordCard() {
 	const { t } = useTranslation();
-	const { theme } = useTheme();
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 
 	return (
-		<View style={[styles.card, themedSurface(theme)]}>
-			<Text style={[styles.title, { color: theme.text }]}>
-				{t("auth:settings.account.changePassword")}
-			</Text>
+		<SettingsCard
+			title={t("auth:settings.account.changePassword")}
+			buttonLabel={t("auth:settings.account.changePassword")}
+			onPress={async () => {
+				await authClient.changePassword(
+					{
+						currentPassword,
+						newPassword,
+					},
+					{
+						onSuccess: () => {
+							setCurrentPassword("");
+							setNewPassword("");
+							Alert.alert("", t("auth:settings.account.passwordChanged"));
+						},
+						onError: (err) => {
+							Alert.alert(
+								t("error:title"),
+								err.error.message || t("error:generic"),
+							);
+						},
+					},
+				);
+			}}
+		>
 			<ThemedTextInput
 				label={t("auth:settings.account.currentPassword")}
 				value={currentPassword}
@@ -141,35 +174,7 @@ function ChangePasswordCard() {
 				onChangeText={setNewPassword}
 				secureTextEntry
 			/>
-			<TouchableOpacity
-				style={[styles.button, { backgroundColor: theme.primary }]}
-				onPress={async () => {
-					await authClient.changePassword(
-						{
-							currentPassword,
-							newPassword,
-						},
-						{
-							onSuccess: () => {
-								setCurrentPassword("");
-								setNewPassword("");
-								Alert.alert("", t("auth:settings.account.passwordChanged"));
-							},
-							onError: (err) => {
-								Alert.alert(
-									t("error:title"),
-									err.error.message || t("error:generic"),
-								);
-							},
-						},
-					);
-				}}
-			>
-				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
-					{t("auth:settings.account.changePassword")}
-				</Text>
-			</TouchableOpacity>
-		</View>
+		</SettingsCard>
 	);
 }
 

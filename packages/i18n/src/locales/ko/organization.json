@@ -29,7 +29,20 @@
 		"deleteConfirm": "정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
 		"updateSuccess": "조직이 업데이트되었습니다",
 		"deleteSuccess": "조직이 삭제되었습니다",
-		"error": "조직 업데이트에 실패했습니다"
+		"error": "조직 업데이트에 실패했습니다",
+		"appearance": {
+			"title": "외관",
+			"description": "조직 전체에 적용되는 디자인 프리셋입니다. 라이트 모드와 다크 모드는 개인 설정으로 유지됩니다.",
+			"style": "스타일",
+			"baseColor": "기본 색상",
+			"accentTheme": "강조 테마",
+			"iconLibrary": "아이콘 라이브러리",
+			"font": "폰트",
+			"radius": "모서리 반경",
+			"menu": "메뉴",
+			"menuAccent": "메뉴 강조 색상",
+			"save": "외관 저장"
+		}
 	},
 	"members": {
 		"title": "멤버",

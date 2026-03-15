@@ -29,7 +29,20 @@
 		"deleteConfirm": "Bạn có chắc không? Hành động này không thể hoàn tác.",
 		"updateSuccess": "Đã cập nhật tổ chức",
 		"deleteSuccess": "Đã xóa tổ chức",
-		"error": "Không thể cập nhật tổ chức"
+		"error": "Không thể cập nhật tổ chức",
+		"appearance": {
+			"title": "Giao diện",
+			"description": "Bộ thiết kế áp dụng cho toàn tổ chức. Chế độ sáng và tối vẫn là cài đặt cá nhân.",
+			"style": "Kiểu",
+			"baseColor": "Màu nền",
+			"accentTheme": "Chủ đề nhấn",
+			"iconLibrary": "Thư viện biểu tượng",
+			"font": "Phông chữ",
+			"radius": "Bán kính góc",
+			"menu": "Menu",
+			"menuAccent": "Màu nhấn menu",
+			"save": "Lưu giao diện"
+		}
 	},
 	"members": {
 		"title": "Thành viên",

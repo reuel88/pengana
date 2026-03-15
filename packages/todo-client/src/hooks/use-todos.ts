@@ -1,15 +1,25 @@
 import { type EntityDatabase, useDexieEntity } from "@pengana/entity-store";
+import type { WebMedia } from "@pengana/upload-client";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo, useRef } from "react";
 
-import type { WebMedia, WebTodo } from "../lib/db";
+import type { WebTodo } from "../lib/db";
+import type { TodoConfig } from "../lib/todo-config";
 
 export interface WebTodoWithAttachments extends WebTodo {
 	attachments: WebMedia[];
 }
 
-export function useTodos(db: EntityDatabase, userId: string) {
-	const { items, conflicts } = useDexieEntity<WebTodo>(db, "todos", userId);
+export function useTodos(
+	db: EntityDatabase,
+	config: TodoConfig,
+	scopeId: string,
+) {
+	const { items, conflicts } = useDexieEntity<WebTodo>(
+		db,
+		config.entity.name,
+		scopeId,
+	);
 
 	const todoIdsRef = useRef<string[]>([]);
 	const todoIds = useMemo(() => {

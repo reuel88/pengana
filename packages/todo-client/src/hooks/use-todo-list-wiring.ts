@@ -1,6 +1,7 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import { useMemo } from "react";
 
+import type { TodoConfig } from "../lib/todo-config";
 import type {
 	FileStorageStrategy,
 	TodoActions,
@@ -25,6 +26,7 @@ interface UseTodoListWiringConfigBase {
 	onDeleteSuccess?: (id: string) => void;
 	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	t: (key: string) => string;
+	config?: TodoConfig;
 }
 
 export type UseTodoListWiringConfig =
@@ -51,6 +53,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		db,
 		entityType,
 		userId,
+		config: todoConfig,
 	} = config;
 
 	const deps: TodoHandlerDeps = useMemo(
@@ -67,6 +70,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			db,
 			entityType,
 			userId,
+			config: todoConfig,
 		}),
 		[
 			triggerSync,
@@ -81,6 +85,7 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			db,
 			entityType,
 			userId,
+			todoConfig,
 		],
 	);
 

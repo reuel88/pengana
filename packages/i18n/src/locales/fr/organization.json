@@ -29,7 +29,20 @@
 		"deleteConfirm": "Êtes-vous sûr ? Cette action est irréversible.",
 		"updateSuccess": "Organisation mise à jour",
 		"deleteSuccess": "Organisation supprimée",
-		"error": "Échec de la mise à jour de l'organisation"
+		"error": "Échec de la mise à jour de l'organisation",
+		"appearance": {
+			"title": "Apparence",
+			"description": "Thème de conception à l'échelle de l'organisation. Les modes clair et sombre restent personnels.",
+			"style": "Style",
+			"baseColor": "Couleur de base",
+			"accentTheme": "Thème d'accentuation",
+			"iconLibrary": "Bibliothèque d'icônes",
+			"font": "Police",
+			"radius": "Rayon",
+			"menu": "Menu",
+			"menuAccent": "Accentuation du menu",
+			"save": "Enregistrer l'apparence"
+		}
 	},
 	"members": {
 		"title": "Membres",
