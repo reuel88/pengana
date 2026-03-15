@@ -20,7 +20,9 @@ function DashboardPage() {
 
 	const privateData = useQuery(orpc.privateData.queryOptions());
 
-	const activeOrg = useActiveOrg();
+	const activeOrg = useActiveOrg({
+		enabled: !!session.data.session.activeOrganizationId,
+	});
 	const orgId = activeOrg.data?.id ?? "";
 
 	return (

@@ -14,22 +14,22 @@ export function createDexieSyncAdapter(
 		db,
 		tableName: "todos",
 		syncKeyPrefix: "lastSyncedAt",
-		toWire: (local: WebTodo): Todo => {
-			const { attachmentLocalUri: _, attachmentStatus: __, ...todo } = local;
-			return {
-				...todo,
-				attachmentUrl: todo.attachmentUrl ?? null,
-			};
-		},
+		toWire: (local: WebTodo): Todo => ({
+			id: local.id,
+			title: local.title,
+			completed: local.completed,
+			updatedAt: local.updatedAt,
+			userId: local.userId,
+			syncStatus: local.syncStatus,
+			deleted: local.deleted,
+		}),
 		toLocal: (
 			wire: Todo,
-			existing: WebTodo | undefined,
+			_existing: WebTodo | undefined,
 			syncStatus: "synced" | "conflict",
 		): WebTodo => ({
 			...wire,
 			syncStatus,
-			attachmentLocalUri: existing?.attachmentLocalUri ?? null,
-			attachmentStatus: existing?.attachmentStatus ?? null,
 		}),
 	});
 }

@@ -10,8 +10,9 @@ import {
 	createDexieSyncAdapter,
 	createOrgSyncTransport,
 	createPersonalSyncTransport,
-	createTodoUploadLifecycleCallbacks,
+	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
+	reconcileMedia,
 } from "@pengana/todo-client";
 import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
@@ -90,20 +91,25 @@ function createEngine(scope: SyncScope): {
 			? createDexieOrgSyncAdapter(appDb, scope.scopeId)
 			: createDexieSyncAdapter(appDb, scope.scopeId);
 
+	const onMedia = (
+		media: import("@pengana/sync-engine").Media[],
+		entityIds: string[],
+	) => reconcileMedia(appDb, media, entityIds);
+
 	const transport =
 		scope.scopeType === "organization"
 			? createOrgSyncTransport(async (input) => {
 					return (await client.orgTodo.sync(input, { signal: input.signal }))
 						.data;
-				})
+				}, onMedia)
 			: createPersonalSyncTransport(async (input) => {
 					return (await client.todo.sync(input, { signal: input.signal })).data;
-				});
+				}, onMedia);
 
 	const engine = new SyncEngine(adapter, transport);
 	const uploadTransport = createIndexedDbUploadTransport();
 	const uploadQueue = new UploadQueue(uploadAdapter, uploadTransport, {
-		lifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
+		lifecycleCallbacks: createUploadLifecycleCallbacks(appDb),
 	});
 
 	uploadQueue.onEvent((event) => {

@@ -15,12 +15,19 @@ export function Header() {
 	] as const;
 
 	return (
-		<header>
+		<header
+			style={{
+				backgroundColor: "var(--menu-bg)",
+				borderBottomColor: "var(--menu-border)",
+				color: "var(--menu-foreground)",
+				backdropFilter: "var(--menu-backdrop-blur)",
+			}}
+		>
 			<div className="flex flex-row items-center justify-between px-2 py-1">
 				<nav className="flex items-center gap-4 text-lg">
 					{links.map(({ to, label }) => {
 						return (
-							<Link key={to} to={to}>
+							<Link key={to} to={to} style={{ color: "inherit" }}>
 								{label}
 							</Link>
 						);
@@ -34,7 +41,7 @@ export function Header() {
 					<UserMenu />
 				</div>
 			</div>
-			<hr role="presentation" />
+			<hr role="presentation" style={{ borderColor: "var(--menu-border)" }} />
 		</header>
 	);
 }

@@ -18,7 +18,7 @@ export function TodoPage({
 	const [activeTab, setActiveTab] = useState<TodoTab>("personal");
 
 	return (
-		<>
+		<div style={{ flex: 1, overflowY: "auto" }}>
 			<TodoShell
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
@@ -50,6 +50,6 @@ export function TodoPage({
 					</div>
 				</OrgSyncProvider>
 			) : null}
-		</>
+		</div>
 	);
 }

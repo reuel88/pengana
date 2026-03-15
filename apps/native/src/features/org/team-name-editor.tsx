@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { type TFunction, useTranslation } from "@pengana/i18n";
 import { makeTeamNameSchema } from "@pengana/i18n/zod";
 import { useTeamNameEditor, useZodForm } from "@pengana/org-client";
@@ -12,7 +11,8 @@ import {
 	View,
 } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
-import { sharedStyles } from "@/shared/styles/shared";
+import { outlineButton, smallPrimaryButtonText } from "@/shared/styles/shared";
+import { AppIcon } from "@/shared/ui/app-icon";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 export function TeamNameEditor({
@@ -98,17 +98,23 @@ function TeamNameEditorContent({
 							onPress={form.handleSubmit}
 							disabled={loading || isSubmitting || !name.trim()}
 						>
-							<Text style={sharedStyles.smallButtonText}>
+							<Text style={smallPrimaryButtonText(theme)}>
 								{t("teams.updateName")}
 							</Text>
 						</TouchableOpacity>
 					)}
 				</form.Subscribe>
 				<TouchableOpacity
-					style={[styles.cancelBtn, { borderColor: theme.border }]}
+					style={[styles.cancelBtn, outlineButton(theme)]}
 					onPress={() => setEditing(false)}
 				>
-					<Text style={{ color: theme.text, fontSize: 12 }}>
+					<Text
+						style={{
+							color: theme.text,
+							fontFamily: theme.fontFamily,
+							fontSize: 12,
+						}}
+					>
 						{t("common:confirm.cancel")}
 					</Text>
 				</TouchableOpacity>
@@ -130,7 +136,7 @@ function TeamNameEditorContent({
 					accessibilityRole="button"
 				>
 					<View style={{ opacity: 0.5 }}>
-						<Ionicons name="create-outline" size={20} color={theme.text} />
+						<AppIcon name="pencil" size={20} color={theme.text} />
 					</View>
 				</Pressable>
 			</View>

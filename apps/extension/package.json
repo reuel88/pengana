@@ -19,6 +19,7 @@
 		"@pengana/api": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/env": "workspace:*",
+		"@pengana/org-client": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
 		"@pengana/entity-store": "workspace:*",
 		"@pengana/todo-client": "workspace:*",

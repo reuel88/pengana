@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
-import { appDb, todos } from "@/features/todo/entities/todo";
+import { appDb, media, todos } from "@/features/todo/entities/todo";
 import { pendingUpdate } from "./lib/pending-update";
 
 export async function addTodo(userId: string, title: string): Promise<void> {
@@ -13,9 +13,6 @@ export async function addTodo(userId: string, title: string): Promise<void> {
 		userId,
 		syncStatus: "pending",
 		deleted: false,
-		attachmentUrl: null,
-		attachmentLocalUri: null,
-		attachmentStatus: null,
 	});
 }
 
@@ -51,15 +48,76 @@ export async function resolveConflict(
 	}
 }
 
-export async function attachFile(
-	todoId: string,
+export async function addMedia(
+	entityId: string,
+	entityType: string,
+	userId: string,
 	localUri: string,
+	mimeType: string,
+): Promise<string> {
+	const id = randomUUID();
+	const existing = await appDb
+		.select()
+		.from(media)
+		.where(eq(media.entityId, entityId));
+	const position = existing.length;
+
+	await appDb.insert(media).values({
+		id,
+		entityId,
+		entityType,
+		userId,
+		url: null,
+		localUri,
+		status: "queued",
+		mimeType,
+		position,
+		createdAt: new Date().toISOString(),
+	});
+
+	return id;
+}
+
+export async function removeMedia(mediaId: string): Promise<void> {
+	await appDb.delete(media).where(eq(media.id, mediaId));
+}
+
+export async function updateMediaUploaded(
+	mediaId: string,
+	url: string,
 ): Promise<void> {
 	await appDb
-		.update(todos)
-		.set({
-			attachmentLocalUri: localUri,
-			attachmentStatus: "queued",
-		})
-		.where(eq(todos.id, todoId));
+		.update(media)
+		.set({ url, status: "uploaded" })
+		.where(eq(media.id, mediaId));
+}
+
+export async function markMediaFailed(mediaId: string): Promise<void> {
+	await appDb
+		.update(media)
+		.set({ status: "failed" })
+		.where(eq(media.id, mediaId));
+}
+
+export async function retryMedia(mediaId: string) {
+	await appDb
+		.update(media)
+		.set({ status: "queued" })
+		.where(eq(media.id, mediaId));
+
+	const [record] = await appDb
+		.select()
+		.from(media)
+		.where(eq(media.id, mediaId));
+	return record ?? null;
+}
+
+export async function getMediaCountForEntity(
+	entityId: string,
+): Promise<number> {
+	const rows = await appDb
+		.select()
+		.from(media)
+		.where(eq(media.entityId, entityId));
+	return rows.length;
 }

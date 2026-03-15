@@ -3,14 +3,14 @@ import type { UploadStatus } from "@pengana/sync-engine";
 
 export function AttachmentIndicator({
 	status,
-	attachmentUrl,
+	url,
 }: {
 	status: UploadStatus | null;
-	attachmentUrl: string | null;
+	url: string | null;
 }) {
 	const { t } = useTranslation("todos");
 
-	if (attachmentUrl && (!status || status === "uploaded")) {
+	if (url && (!status || status === "uploaded")) {
 		return (
 			<span
 				className="text-green-500 text-xs"

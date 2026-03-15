@@ -1,0 +1,1 @@
+ALTER TABLE "organization" ADD COLUMN "design_preset" jsonb;

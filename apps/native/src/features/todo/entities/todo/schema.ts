@@ -7,11 +7,21 @@ export const todos = sqliteTable("todos", {
 	completed: integer("completed", { mode: "boolean" }).notNull().default(false),
 	organizationId: text("organization_id"),
 	createdBy: text("created_by"),
-	attachmentUrl: text("attachment_url"),
-	attachmentLocalUri: text("attachment_local_uri"),
-	attachmentStatus: text("attachment_status", {
+});
+
+export const media = sqliteTable("media", {
+	id: text("id").primaryKey(),
+	entityId: text("entity_id"),
+	entityType: text("entity_type"),
+	userId: text("user_id").notNull(),
+	url: text("url"),
+	localUri: text("local_uri"),
+	status: text("status", {
 		enum: ["queued", "uploading", "uploaded", "failed"],
 	}),
+	mimeType: text("mime_type").notNull(),
+	position: integer("position").notNull(),
+	createdAt: text("created_at").notNull(),
 });
 
 export const syncMeta = sqliteTable("sync_meta", {

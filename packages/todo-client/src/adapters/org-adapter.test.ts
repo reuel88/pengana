@@ -39,7 +39,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			userId: "org-1",
 			syncStatus: "synced",
 			deleted: false,
-			attachmentUrl: "https://cdn.example.com/server.png",
 			organizationId: "org-1",
 			createdBy: "server-user",
 		} as Todo & { organizationId: string; createdBy: string };
@@ -53,9 +52,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "local-user",
 			syncStatus: "pending",
 			deleted: true,
-			attachmentUrl: "https://cdn.example.com/local.png",
-			attachmentLocalUri: "file:///local.png",
-			attachmentStatus: "queued",
 		} satisfies WebOrgTodo;
 
 		expect(toLocal(wire, existing, "synced")).toEqual({
@@ -68,9 +64,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "server-user",
 			syncStatus: "synced",
 			deleted: false,
-			attachmentUrl: "https://cdn.example.com/server.png",
-			attachmentLocalUri: "file:///local.png",
-			attachmentStatus: "queued",
 		});
 	});
 
@@ -84,7 +77,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			userId: "org-1",
 			syncStatus: "synced",
 			deleted: false,
-			attachmentUrl: "https://cdn.example.com/server.png",
 			organizationId: "org-1",
 			createdBy: "server-user",
 		} as Todo & { organizationId: string; createdBy: string };
@@ -98,9 +90,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "local-user",
 			syncStatus: "pending",
 			deleted: true,
-			attachmentUrl: "https://cdn.example.com/local.png",
-			attachmentLocalUri: "file:///local.png",
-			attachmentStatus: "failed",
 		} satisfies WebOrgTodo;
 
 		expect(toLocal(wire, existing, "conflict")).toEqual({
@@ -113,9 +102,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: "server-user",
 			syncStatus: "conflict",
 			deleted: true,
-			attachmentUrl: "https://cdn.example.com/local.png",
-			attachmentLocalUri: "file:///local.png",
-			attachmentStatus: "failed",
 		});
 	});
 
@@ -129,7 +115,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			userId: "org-fallback",
 			syncStatus: "synced",
 			deleted: false,
-			attachmentUrl: null,
 		} satisfies Todo;
 
 		expect(toLocal(wire, undefined, "conflict")).toEqual({
@@ -142,9 +127,6 @@ describe("createDexieOrgSyncAdapter", () => {
 			createdBy: null,
 			syncStatus: "conflict",
 			deleted: false,
-			attachmentUrl: null,
-			attachmentLocalUri: null,
-			attachmentStatus: null,
 		});
 	});
 });

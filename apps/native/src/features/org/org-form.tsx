@@ -4,9 +4,12 @@ import { useZodForm } from "@pengana/org-client";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
-import { sharedStyles } from "@/shared/styles/shared";
+import {
+	primaryButton,
+	primaryButtonText,
+	sharedStyles,
+} from "@/shared/styles/shared";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 interface OrgFormValues {
@@ -151,10 +154,7 @@ function OrgFormContent({
 							testID={testIDs?.submit}
 							style={[
 								sharedStyles.button,
-								{
-									backgroundColor: theme.primary,
-									opacity: isDisabled ? 0.5 : 1,
-								},
+								primaryButton(theme, { disabled: isDisabled }),
 							]}
 							onPress={form.handleSubmit}
 							disabled={isDisabled}
@@ -162,9 +162,9 @@ function OrgFormContent({
 							accessibilityLabel={submitLabel}
 						>
 							{loading ? (
-								<ActivityIndicator color={TEXT_ON_PRIMARY} />
+								<ActivityIndicator color={theme.primaryForeground} />
 							) : (
-								<Text style={sharedStyles.buttonText}>{submitLabel}</Text>
+								<Text style={primaryButtonText(theme)}>{submitLabel}</Text>
 							)}
 						</TouchableOpacity>
 					);

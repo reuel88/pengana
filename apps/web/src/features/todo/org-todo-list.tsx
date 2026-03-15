@@ -1,6 +1,5 @@
-import type { TodoActions, WebOrgTodo } from "@pengana/todo-client";
+import type { TodoActions, WebMedia, WebOrgTodo } from "@pengana/todo-client";
 import {
-	attachOrgFile,
 	deleteOrgTodo,
 	resolveOrgConflict,
 	toggleOrgTodo,
@@ -14,10 +13,15 @@ const orgActions: TodoActions = {
 	deleteTodo: (id) => deleteOrgTodo(appDb, id),
 	resolveConflict: (id, resolution) =>
 		resolveOrgConflict(appDb, id, resolution),
-	attachFile: (id, localUri) => attachOrgFile(appDb, id, localUri),
 };
 
-export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
+export function OrgTodoList({
+	todos,
+	userId,
+}: {
+	todos: (WebOrgTodo & { attachments: WebMedia[] })[];
+	userId: string;
+}) {
 	const { triggerSync, enqueueUpload } = useOrgSync();
 
 	return (
@@ -27,6 +31,7 @@ export function OrgTodoList({ todos }: { todos: WebOrgTodo[] }) {
 			enqueueUpload={enqueueUpload}
 			actions={orgActions}
 			entityType="orgTodo"
+			userId={userId}
 		/>
 	);
 }

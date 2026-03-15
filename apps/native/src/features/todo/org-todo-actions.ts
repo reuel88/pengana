@@ -3,10 +3,14 @@ import { randomUUID } from "expo-crypto";
 import { appDb, todos } from "@/features/todo/entities/todo";
 
 export {
-	attachFile as attachOrgFile,
+	addMedia as addOrgMedia,
 	deleteTodo as deleteOrgTodo,
+	getMediaCountForEntity as getOrgMediaCountForEntity,
+	markMediaFailed as markOrgMediaFailed,
+	removeMedia as removeOrgMedia,
 	resolveConflict as resolveOrgConflict,
 	toggleTodo as toggleOrgTodo,
+	updateMediaUploaded as updateOrgMediaUploaded,
 } from "./todo-actions";
 
 export async function addOrgTodo(
@@ -24,8 +28,5 @@ export async function addOrgTodo(
 		createdBy: userId,
 		syncStatus: "pending",
 		deleted: false,
-		attachmentUrl: null,
-		attachmentLocalUri: null,
-		attachmentStatus: null,
 	});
 }

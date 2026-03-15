@@ -11,3 +11,9 @@ export const orgTodoEntity = defineEntity({
 	indexes: "id, userId, syncStatus, updatedAt",
 	scoping: "org",
 });
+
+export const mediaEntity = defineEntity({
+	name: "media",
+	indexes: "id, entityId, userId",
+	scoping: "both",
+});

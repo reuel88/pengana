@@ -151,6 +151,9 @@ importers:
       '@pengana/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@pengana/org-client':
+        specifier: workspace:*
+        version: link:../../packages/org-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../../packages/sync-engine
@@ -505,9 +508,18 @@ importers:
       '@pengana/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@phosphor-icons/react':
+        specifier: ^2.1.10
+        version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@polar-sh/better-auth':
         specifier: 'catalog:'
         version: 1.8.2(@polar-sh/sdk@0.46.3)(@stripe/react-stripe-js@4.0.2(@stripe/stripe-js@7.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@stripe/stripe-js@7.9.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(better-auth@1.5.4(2cc3a7f5b479b49cb0d3e9357a7cad86))(react-dom@19.2.4(react@19.2.4))(react-is@19.2.4)(react@19.2.4)(redux@5.0.1)(zod@4.3.6)
+      '@remixicon/react':
+        specifier: ^4.9.0
+        version: 4.9.0(react@19.2.4)
+      '@tabler/icons-react':
+        specifier: ^3.40.0
+        version: 3.40.0(react@19.2.4)
       '@tailwindcss/vite':
         specifier: ^4.0.15
         version: 4.2.1(vite@7.3.1(@types/node@25.4.0)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
@@ -932,6 +944,9 @@ importers:
       '@pengana/i18n':
         specifier: workspace:*
         version: link:../i18n
+      '@pengana/org-client':
+        specifier: workspace:*
+        version: link:../org-client
       '@pengana/sync-engine':
         specifier: workspace:*
         version: link:../sync-engine
@@ -3068,6 +3083,13 @@ packages:
   '@oxc-project/types@0.115.0':
     resolution: {integrity: sha512-4n91DKnebUS4yjUHl2g3/b2T+IUdCfmoZGhmwsovZCDaJSs+QkVAM+0AqqTxHSsHfeiMuueT75cZaZcT/m0pSw==}
 
+  '@phosphor-icons/react@2.1.10':
+    resolution: {integrity: sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>= 16.8'
+      react-dom: '>= 16.8'
+
   '@playwright/test@1.58.2':
     resolution: {integrity: sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==}
     engines: {node: '>=18'}
@@ -3879,6 +3901,11 @@ packages:
       react-redux:
         optional: true
 
+  '@remixicon/react@4.9.0':
+    resolution: {integrity: sha512-5/jLDD4DtKxH2B4QVXTobvV1C2uL8ab9D5yAYNtFt+w80O0Ys1xFOrspqROL3fjrZi+7ElFUWE37hBfaAl6U+Q==}
+    peerDependencies:
+      react: '>=18.2.0'
+
   '@rolldown/binding-android-arm64@1.0.0-rc.8':
     resolution: {integrity: sha512-5bcmMQDWEfWUq3m79Mcf/kbO6e5Jr6YjKSsA1RnpXR6k73hQ9z1B17+4h93jXpzHvS18p7bQHM1HN/fSd+9zog==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -4226,6 +4253,14 @@ packages:
   '@tabby_ai/hijri-converter@1.0.5':
     resolution: {integrity: sha512-r5bClKrcIusDoo049dSL8CawnHR6mRdDwhlQuIgZRNty68q0x8k3Lf1BtPAMxRf/GgnHBnIO4ujd3+GQdLWzxQ==}
     engines: {node: '>=16.0.0'}
+
+  '@tabler/icons-react@3.40.0':
+    resolution: {integrity: sha512-oO5+6QCnna4a//mYubx4euZfECtzQZFDGsDMIdzZUhbdyBCT+3bRVFBPueGIcemWld4Vb/0UQ39C/cmGfGylAg==}
+    peerDependencies:
+      react: '>= 16'
+
+  '@tabler/icons@3.40.0':
+    resolution: {integrity: sha512-V/Q4VgNPKubRTiLdmWjV/zscYcj5IIk+euicUtaVVqF6luSC9rDngYWgST5/yh3Mrg/mYUwRv1YVTk71Jp0twQ==}
 
   '@tailwindcss/node@4.2.1':
     resolution: {integrity: sha512-jlx6sLk4EOwO6hHe1oCGm1Q4AN/s0rSrTTPBGPM0/RQ6Uylwq17FuU8IeJJKEjtc6K6O07zsvP+gDO6MMWo7pg==}
@@ -12521,6 +12556,11 @@ snapshots:
 
   '@oxc-project/types@0.115.0': {}
 
+  '@phosphor-icons/react@2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
   '@playwright/test@1.58.2':
     dependencies:
       playwright: 1.58.2
@@ -13831,6 +13871,10 @@ snapshots:
       react: 19.2.4
       react-redux: 9.2.0(@types/react@19.2.14)(react@19.2.4)(redux@5.0.1)
 
+  '@remixicon/react@4.9.0(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
   '@rolldown/binding-android-arm64@1.0.0-rc.8':
     optional: true
 
@@ -14050,6 +14094,13 @@ snapshots:
       zod: 4.3.6
 
   '@tabby_ai/hijri-converter@1.0.5': {}
+
+  '@tabler/icons-react@3.40.0(react@19.2.4)':
+    dependencies:
+      '@tabler/icons': 3.40.0
+      react: 19.2.4
+
+  '@tabler/icons@3.40.0': {}
 
   '@tailwindcss/node@4.2.1':
     dependencies:

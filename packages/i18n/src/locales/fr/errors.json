@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Impossible de modifier l'état de la tâche",
 	"failedToDeleteTodo": "Impossible de supprimer la tâche",
+	"failedToDeleteAttachment": "Impossible de supprimer la pièce jointe",
 	"failedToResolveConflict": "Impossible de résoudre le conflit",
 	"invalidFileType": "Seules les images JPEG, PNG, HEIC et les fichiers PDF sont autorisés.",
 	"fileTooLarge": "Le fichier dépasse la taille maximale de 10 Mo.",

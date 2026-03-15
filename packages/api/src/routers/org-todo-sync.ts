@@ -1,4 +1,5 @@
 import { getLogger } from "@logtape/logtape";
+import { findMediaByEntityIds } from "@pengana/db/media-queries";
 import {
 	findOrgTodoById,
 	getOrgTodosUpdatedSince,
@@ -31,7 +32,6 @@ export async function handleOrgSync(
 				title: change.title,
 				completed: change.completed,
 				deleted: change.deleted,
-				attachmentUrl: change.attachmentUrl ?? null,
 				updatedAt: now,
 				organizationId,
 				createdBy,
@@ -45,7 +45,6 @@ export async function handleOrgSync(
 					title: change.title,
 					completed: change.completed,
 					deleted: change.deleted,
-					attachmentUrl: change.attachmentUrl ?? null,
 					updatedAt: now,
 				});
 			} else {
@@ -64,6 +63,9 @@ export async function handleOrgSync(
 		lastSyncedAt,
 	);
 
+	const todoIds = serverChanges.map((t) => t.id);
+	const mediaRows = await findMediaByEntityIds(todoIds);
+
 	if (conflicts.length > 0) {
 		logger.warn`Org sync conflicts for org ${organizationId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
 	}
@@ -80,11 +82,20 @@ export async function handleOrgSync(
 			title: t.title,
 			completed: t.completed,
 			deleted: t.deleted,
-			attachmentUrl: t.attachmentUrl ?? null,
 			updatedAt: t.updatedAt.toISOString(),
 			organizationId: t.organizationId,
 			createdBy: t.createdBy,
 			syncStatus: "synced" as const,
+		})),
+		media: mediaRows.map((a) => ({
+			id: a.id,
+			entityId: a.entityId,
+			entityType: a.entityType,
+			userId: a.userId,
+			url: a.url ?? null,
+			mimeType: a.mimeType,
+			position: a.position,
+			createdAt: a.createdAt.toISOString(),
 		})),
 		conflicts,
 		syncedAt: now.toISOString(),

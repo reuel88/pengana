@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Não foi possível alterar o status da tarefa",
 	"failedToDeleteTodo": "Falha ao excluir tarefa",
+	"failedToDeleteAttachment": "Falha ao excluir anexo",
 	"failedToResolveConflict": "Falha ao resolver conflito",
 	"invalidFileType": "Apenas imagens JPEG, PNG, HEIC e PDFs são permitidos.",
 	"fileTooLarge": "O arquivo excede o tamanho máximo de 10MB.",

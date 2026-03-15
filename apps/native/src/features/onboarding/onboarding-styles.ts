@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 
 export const onboardingStyles = StyleSheet.create({
 	card: {
@@ -33,7 +32,6 @@ export const onboardingStyles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	submitButtonText: {
-		color: TEXT_ON_PRIMARY,
 		fontSize: 16,
 		fontWeight: "500",
 	},

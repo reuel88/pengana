@@ -8,7 +8,24 @@ import {
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-const basePlugins = [organizationClient({ teams: { enabled: true } })];
+const orgDesignPresetField = {
+	type: "json",
+	required: false,
+	input: true,
+} as const;
+
+const basePlugins = [
+	organizationClient({
+		teams: { enabled: true },
+		schema: {
+			organization: {
+				additionalFields: {
+					designPreset: orgDesignPresetField,
+				},
+			},
+		},
+	}),
+];
 
 export const authClient = createAuthClient({
 	baseURL: env.VITE_SERVER_URL,

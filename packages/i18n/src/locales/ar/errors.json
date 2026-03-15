@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "فشل في تغيير المهمة",
 	"failedToDeleteTodo": "فشل في حذف المهمة",
+	"failedToDeleteAttachment": "فشل في حذف المرفق",
 	"failedToResolveConflict": "فشل في حل التعارض",
 	"invalidFileType": "يُسمح فقط بصور JPEG وPNG وHEIC وملفات PDF.",
 	"fileTooLarge": "الملف يتجاوز الحد الأقصى 10 ميغابايت.",

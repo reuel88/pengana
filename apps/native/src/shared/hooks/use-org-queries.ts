@@ -19,11 +19,12 @@ async function unwrapAuth<T>(
 	return data as T;
 }
 
-export function useActiveOrg() {
+export function useActiveOrg(options?: { enabled?: boolean }) {
 	const authClient = useAuthClient();
 	return useQuery({
 		queryKey: orgQueryKeys.activeOrg,
 		queryFn: () => unwrapAuth(authClient.organization.getFullOrganization()),
+		enabled: options?.enabled,
 		staleTime: STALE_TIME,
 	});
 }

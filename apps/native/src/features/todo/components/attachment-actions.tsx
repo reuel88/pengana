@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-import { STATUS_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { destructiveText, warningText } from "@/shared/styles/shared";
 
 export function AttachButton({ onPress }: { onPress: () => void }) {
 	const { theme } = useTheme();
@@ -23,6 +23,7 @@ export function AttachButton({ onPress }: { onPress: () => void }) {
 }
 
 export function RetryButton({ onPress }: { onPress: () => void }) {
+	const { theme } = useTheme();
 	const { t } = useTranslation("todos");
 
 	return (
@@ -32,7 +33,25 @@ export function RetryButton({ onPress }: { onPress: () => void }) {
 			accessibilityRole="button"
 			accessibilityLabel={t("actions.retry")}
 		>
-			<Text style={styles.retryText}>{t("actions.retry")}</Text>
+			<Text style={[styles.retryText, warningText(theme)]}>
+				{t("actions.retry")}
+			</Text>
+		</TouchableOpacity>
+	);
+}
+
+export function RemoveButton({ onPress }: { onPress: () => void }) {
+	const { theme } = useTheme();
+	const { t } = useTranslation("todos");
+
+	return (
+		<TouchableOpacity
+			onPress={onPress}
+			style={styles.removeButton}
+			accessibilityRole="button"
+			accessibilityLabel={t("actions.removeAttachment")}
+		>
+			<Text style={[styles.removeText, destructiveText(theme)]}>&times;</Text>
 		</TouchableOpacity>
 	);
 }
@@ -48,6 +67,13 @@ const styles = StyleSheet.create({
 	},
 	retryText: {
 		fontSize: 12,
-		color: STATUS_COLORS.warning,
+	},
+	removeButton: {
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		minHeight: 28,
+	},
+	removeText: {
+		fontSize: 14,
 	},
 });

@@ -4,15 +4,24 @@ import type { Context } from "../context";
 
 vi.mock("@pengana/db/todo-queries", () => ({
 	findTodoById: vi.fn(),
+	updateTodo: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@pengana/db/org-todo-queries", () => ({
 	findOrgTodoById: vi.fn(),
+	updateOrgTodo: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@pengana/db/seat-queries", () => ({
 	isMemberSeatedByUserId: vi.fn(),
 	autoSeatOwner: vi.fn(),
+}));
+
+vi.mock("@pengana/db/media-queries", () => ({
+	countMediaByEntityId: vi.fn().mockResolvedValue(0),
+	insertMedia: vi.fn().mockResolvedValue(undefined),
+	updateMediaUrl: vi.fn().mockResolvedValue(undefined),
+	deleteMedia: vi.fn().mockResolvedValue(undefined),
 }));
 
 const fsMocks = vi.hoisted(() => ({
@@ -60,6 +69,8 @@ function makeContext(overrides: Partial<Context> = {}): Context {
 		},
 		locale: "en-US",
 		t: (key: string) => key,
+		notifyUser: vi.fn(),
+		notifyOrgMembers: vi.fn(),
 		...overrides,
 	} as Context;
 }
@@ -72,6 +83,7 @@ function makeInput(overrides: Record<string, unknown> = {}) {
 		mimeType: "image/jpeg" as const,
 		data: Buffer.from("test").toString("base64"),
 		idempotencyKey: "550e8400-e29b-41d4-a716-446655440000",
+		attachmentId: "660e8400-e29b-41d4-a716-446655440000",
 		...overrides,
 	};
 }
@@ -94,18 +106,19 @@ describe("upload.upload", () => {
 			title: "Personal",
 			completed: false,
 			deleted: false,
-			attachmentUrl: null,
 			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
 			userId: "user-1",
 		});
 
+		const ctx = makeContext();
 		const result = await call(uploadRouter.upload, makeInput(), {
-			context: makeContext(),
+			context: ctx,
 		});
 
-		expect(result.data.attachmentUrl).toContain("/uploads/");
+		expect(result.data.url).toContain("/uploads/");
 		expect(fsMocks.writeFile).toHaveBeenCalledOnce();
 		expect(isMemberSeatedByUserId).not.toHaveBeenCalled();
+		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");
 	});
 
 	it("requires a seat when uploading attachments for org todos", async () => {
@@ -114,7 +127,6 @@ describe("upload.upload", () => {
 			title: "Org",
 			completed: false,
 			deleted: false,
-			attachmentUrl: null,
 			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
 			organizationId: "org-1",
 			createdBy: "user-1",
@@ -140,5 +152,41 @@ describe("upload.upload", () => {
 		expect(isMemberSeatedByUserId).toHaveBeenCalledWith("org-1", "user-1");
 		expect(fsMocks.mkdir).not.toHaveBeenCalled();
 		expect(fsMocks.writeFile).not.toHaveBeenCalled();
+	});
+
+	it("notifies org members after a successful org todo upload", async () => {
+		vi.mocked(findOrgTodoById).mockResolvedValue({
+			id: "todo-1",
+			title: "Org",
+			completed: false,
+			deleted: false,
+			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
+			organizationId: "org-1",
+			createdBy: "user-1",
+		});
+		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
+
+		const ctx = makeContext({
+			session: {
+				user: {
+					id: "user-1",
+					email: "user@example.com",
+					name: "Test User",
+				},
+				session: {
+					activeOrganizationId: "org-1",
+				},
+			},
+		});
+
+		const result = await call(
+			uploadRouter.upload,
+			makeInput({ entityType: "orgTodo" as const }),
+			{ context: ctx },
+		);
+
+		expect(result.data.url).toContain("/uploads/");
+		expect(ctx.notifyOrgMembers).toHaveBeenCalledWith("org-1");
+		expect(ctx.notifyUser).not.toHaveBeenCalled();
 	});
 });

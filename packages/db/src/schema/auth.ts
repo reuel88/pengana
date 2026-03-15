@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	index,
+	jsonb,
 	pgTable,
 	text,
 	timestamp,
@@ -94,6 +95,7 @@ export const organization = pgTable(
 		logo: text("logo"),
 		createdAt: timestamp("created_at").notNull(),
 		metadata: text("metadata"),
+		designPreset: jsonb("design_preset"),
 	},
 	(table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
 );

@@ -1,8 +1,22 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgSettings, useZodForm } from "@pengana/org-client";
+import {
+	isOrgDesignPresetEqual,
+	normalizeOrgDesignPreset,
+	ORG_ACCENT_THEME_OPTIONS,
+	ORG_BASE_COLOR_OPTIONS,
+	ORG_FONT_OPTIONS,
+	ORG_ICON_LIBRARY_OPTIONS,
+	ORG_MENU_ACCENT_OPTIONS,
+	ORG_MENU_OPTIONS,
+	ORG_RADIUS_OPTIONS,
+	ORG_STYLE_OPTIONS,
+	type OrgDesignPreset,
+	useOrgSettings,
+	useZodForm,
+} from "@pengana/org-client";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
@@ -10,6 +24,7 @@ import {
 	OrgNameField,
 	OrgSlugField,
 } from "@/features/org-management/org-form-fields";
+import { useOrgDesignPresetPreview } from "@/features/theme/org-design-preset-preview";
 import { useOrgRole } from "@/shared/hooks/use-org-queries";
 import { FormRoot } from "@/shared/ui/form-root";
 import { useOrgGuard } from "@/widgets/org-guard";
@@ -28,6 +43,8 @@ function OrgSettingsPage() {
 	const { t } = useTranslation("organization");
 	const { isOwner, isAdmin } = useOrgRole();
 	const guard = useOrgGuard();
+	const { setPreviewDesignPreset } = useOrgDesignPresetPreview();
+	const canEditAppearance = isOwner || isAdmin;
 
 	const { updateOrg, deleteOrg, loading } = useOrgSettings({
 		onUpdateSuccess: () => toast.success(t("settings.updateSuccess")),
@@ -48,6 +65,11 @@ function OrgSettingsPage() {
 	});
 
 	const orgId = guard.ready ? guard.activeOrg.id : undefined;
+	const [designPreset, setDesignPreset] = useState<OrgDesignPreset>(
+		normalizeOrgDesignPreset(
+			guard.ready ? guard.activeOrg.designPreset : undefined,
+		),
+	);
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
 		if (guard.ready) {
@@ -56,20 +78,82 @@ function OrgSettingsPage() {
 				slug: guard.activeOrg.slug,
 				logo: guard.activeOrg.logo ?? "",
 			});
+			setDesignPreset(normalizeOrgDesignPreset(guard.activeOrg.designPreset));
 		}
 	}, [orgId]);
+
+	useEffect(() => {
+		if (!guard.ready || !canEditAppearance) return;
+		setPreviewDesignPreset(designPreset);
+
+		return () => {
+			setPreviewDesignPreset(null);
+		};
+	}, [canEditAppearance, designPreset, guard.ready, setPreviewDesignPreset]);
 
 	if (!guard.ready) return guard.guardElement;
 
 	const { activeOrg } = guard;
+	const currentPreset = normalizeOrgDesignPreset(activeOrg.designPreset);
+	const designPresetChanged = !isOrgDesignPresetEqual(
+		currentPreset,
+		designPreset,
+	);
 
 	const onDelete = async () => {
 		if (!confirm(t("settings.deleteConfirm"))) return;
 		await deleteOrg(activeOrg.id);
 	};
 
+	const sections = useMemo(
+		() =>
+			[
+				{
+					key: "style",
+					label: "Style",
+					options: ORG_STYLE_OPTIONS,
+				},
+				{
+					key: "baseColor",
+					label: "Base Color",
+					options: ORG_BASE_COLOR_OPTIONS,
+				},
+				{
+					key: "accentTheme",
+					label: "Accent Theme",
+					options: ORG_ACCENT_THEME_OPTIONS,
+				},
+				{
+					key: "iconLibrary",
+					label: "Icon Library",
+					options: ORG_ICON_LIBRARY_OPTIONS,
+				},
+				{
+					key: "font",
+					label: "Font",
+					options: ORG_FONT_OPTIONS,
+				},
+				{
+					key: "radius",
+					label: "Radius",
+					options: ORG_RADIUS_OPTIONS,
+				},
+				{
+					key: "menu",
+					label: "Menu",
+					options: ORG_MENU_OPTIONS,
+				},
+				{
+					key: "menuAccent",
+					label: "Menu Accent",
+					options: ORG_MENU_ACCENT_OPTIONS,
+				},
+			] as const,
+		[],
+	);
+
 	return (
-		<div className="flex max-w-md flex-col gap-6">
+		<div className="flex max-w-4xl flex-col gap-6">
 			{isAdmin ? (
 				<FormRoot form={form} className="flex flex-col gap-3">
 					<h2 className="font-medium text-sm">{t("settings.update")}</h2>
@@ -95,6 +179,62 @@ function OrgSettingsPage() {
 			) : (
 				<p className="text-muted-foreground text-sm">{t("settings.title")}</p>
 			)}
+
+			<section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
+				<div className="space-y-1">
+					<h2 className="font-medium text-sm">Appearance</h2>
+					<p className="text-muted-foreground text-sm">
+						Organization-wide design preset. Light and dark mode stay personal.
+					</p>
+				</div>
+				<div className="grid gap-4 md:grid-cols-2">
+					{sections.map((section) => (
+						<div key={section.key} className="space-y-2">
+							<div className="font-medium text-sm">{section.label}</div>
+							<div className="grid gap-2">
+								{section.options.map((option) => {
+									const selected = designPreset[section.key] === option.id;
+									return (
+										<button
+											key={option.id}
+											type="button"
+											className={`rounded-xl border px-4 py-3 text-left transition ${
+												selected
+													? "border-primary bg-primary/10"
+													: "border-border bg-background"
+											} ${!canEditAppearance ? "cursor-default opacity-80" : ""}`}
+											onClick={() => {
+												if (!canEditAppearance) return;
+												setDesignPreset((current) => ({
+													...current,
+													[section.key]: option.id,
+												}));
+											}}
+											disabled={!canEditAppearance}
+										>
+											<div className="font-medium text-sm">{option.label}</div>
+											<div className="text-muted-foreground text-xs">
+												{option.description}
+											</div>
+										</button>
+									);
+								})}
+							</div>
+						</div>
+					))}
+				</div>
+				{canEditAppearance && (
+					<div className="flex justify-end">
+						<Button
+							type="button"
+							disabled={loading || !designPresetChanged}
+							onClick={() => void updateOrg({ designPreset })}
+						>
+							{loading ? t("common:submitting") : "Save Appearance"}
+						</Button>
+					</div>
+				)}
+			</section>
 
 			{isOwner && (
 				<div className="border-t pt-4">

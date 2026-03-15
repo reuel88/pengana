@@ -6,6 +6,7 @@
 		"paths": {
 			"@": ["./src"],
 			"@/*": ["./src/*"],
+			"@pengana/org-client": ["../../packages/org-client/src/index.ts"],
 			"@pengana/ui/*": ["../../packages/ui/src/*"]
 		}
 	}

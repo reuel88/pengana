@@ -50,6 +50,7 @@ describe("todo.sync", () => {
 		vi.clearAllMocks();
 		vi.mocked(handleSync).mockResolvedValue({
 			serverChanges: [],
+			media: [],
 			conflicts: [],
 			syncedAt: "2026-03-13T00:00:00.000Z",
 		});
@@ -69,6 +70,7 @@ describe("todo.sync", () => {
 		);
 		expect(result.data).toEqual({
 			serverChanges: [],
+			media: [],
 			conflicts: [],
 			syncedAt: "2026-03-13T00:00:00.000Z",
 		});

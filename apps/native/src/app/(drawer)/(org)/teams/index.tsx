@@ -16,9 +16,12 @@ import {
 } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { authMutation } from "@/shared/lib/auth-mutation";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, sharedStyles } from "@/shared/styles/shared";
+import {
+	mutedText,
+	primaryButtonText,
+	sharedStyles,
+} from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
@@ -80,7 +83,7 @@ export default function TeamsIndexScreen() {
 								onPress={handleCreate}
 								disabled={creating || !teamName.trim()}
 							>
-								<Text style={{ color: TEXT_ON_PRIMARY }}>
+								<Text style={primaryButtonText(theme)}>
 									{t("teams.create")}
 								</Text>
 							</TouchableOpacity>

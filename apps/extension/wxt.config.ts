@@ -1,3 +1,4 @@
+import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "wxt";
 
@@ -12,5 +13,13 @@ export default defineConfig({
 	},
 	vite: () => ({
 		plugins: [tailwindcss()],
+		resolve: {
+			alias: {
+				"@pengana/org-client": path.resolve(
+					__dirname,
+					"../../packages/org-client/src/index.ts",
+				),
+			},
+		},
 	}),
 });

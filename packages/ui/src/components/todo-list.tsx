@@ -6,7 +6,9 @@ interface TodoListProps {
 	onToggle: (id: string) => void;
 	onDelete: (id: string) => void;
 	onResolve: (id: string, resolution: "local" | "server") => void;
-	onFileSelected: (id: string, file: File) => void;
+	onFilesSelected: (id: string, files: File[]) => void;
+	onRemoveAttachment?: (id: string, attachmentId: string) => void;
+	onRetryAttachment?: (id: string, attachmentId: string) => void;
 	onValidationError?: (id: string, message: string) => void;
 	errors?: Record<string, string | null>;
 }
@@ -16,7 +18,9 @@ export function TodoList({
 	onToggle,
 	onDelete,
 	onResolve,
-	onFileSelected,
+	onFilesSelected,
+	onRemoveAttachment,
+	onRetryAttachment,
 	onValidationError,
 	errors,
 }: TodoListProps) {
@@ -31,7 +35,11 @@ export function TodoList({
 	}
 
 	return (
-		<div className="rounded-none border border-border" data-testid="todo-list">
+		<div
+			className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground"
+			data-slot="card"
+			data-testid="todo-list"
+		>
 			{todos.map((todo) => (
 				<TodoItem
 					key={todo.id}
@@ -39,7 +47,15 @@ export function TodoList({
 					onToggle={() => onToggle(todo.id)}
 					onDelete={() => onDelete(todo.id)}
 					onResolve={(resolution) => onResolve(todo.id, resolution)}
-					onFileSelected={(file) => onFileSelected(todo.id, file)}
+					onFilesSelected={(files) => onFilesSelected(todo.id, files)}
+					onRemoveAttachment={(attachmentId) =>
+						onRemoveAttachment?.(todo.id, attachmentId)
+					}
+					onRetryAttachment={
+						onRetryAttachment
+							? (attachmentId) => onRetryAttachment(todo.id, attachmentId)
+							: undefined
+					}
 					onValidationError={
 						onValidationError
 							? (msg) => onValidationError(todo.id, msg)

@@ -21,7 +21,7 @@ function PersonalTodoContent({ userId }: { userId: string }) {
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} />
-			<TodoList todos={todos} />
+			<TodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</div>
 	);
@@ -31,9 +31,13 @@ function OrgTodoContent({
 	organizationId,
 	userId,
 }: {
-	organizationId: string;
+	organizationId?: string;
 	userId: string;
 }) {
+	if (!organizationId) {
+		return null;
+	}
+
 	const { todos } = useOrgTodos(appDb, organizationId);
 	const { isOnline, isSyncing } = useOrgSync();
 
@@ -41,7 +45,7 @@ function OrgTodoContent({
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList todos={todos} />
+			<OrgTodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</div>
 	);
@@ -108,18 +112,18 @@ export function TodoPage({
 				)}
 			</SyncProvider>
 
-			{organizationId && (
-				<OrgSyncProvider organizationId={organizationId} userId={userId}>
-					<div
-						id="panel-organization"
-						role="tabpanel"
-						aria-labelledby="tab-organization"
-						className={activeTab !== "organization" ? "hidden" : undefined}
-					>
-						<OrgTodoContent organizationId={organizationId} userId={userId} />
-					</div>
-				</OrgSyncProvider>
-			)}
+			<OrgSyncProvider organizationId={organizationId} userId={userId}>
+				<div
+					id="panel-organization"
+					role="tabpanel"
+					aria-labelledby="tab-organization"
+					className={
+						!showTabs || activeTab !== "organization" ? "hidden" : undefined
+					}
+				>
+					<OrgTodoContent organizationId={organizationId} userId={userId} />
+				</div>
+			</OrgSyncProvider>
 		</div>
 	);
 }

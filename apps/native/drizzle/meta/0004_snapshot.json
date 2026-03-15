@@ -1,0 +1,267 @@
+{
+	"version": "6",
+	"dialect": "sqlite",
+	"id": "21726ce7-14d0-45b3-9c6c-aeb7ee7cf6fe",
+	"prevId": "7c555abd-8645-4fc5-8273-8a69c44ced2f",
+	"tables": {
+		"media": {
+			"name": "media",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"entity_id": {
+					"name": "entity_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"entity_type": {
+					"name": "entity_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"url": {
+					"name": "url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"local_uri": {
+					"name": "local_uri",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"sync_meta": {
+			"name": "sync_meta",
+			"columns": {
+				"key": {
+					"name": "key",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"value": {
+					"name": "value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"todos": {
+			"name": "todos",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"sync_status": {
+					"name": "sync_status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'pending'"
+				},
+				"deleted": {
+					"name": "deleted",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"completed": {
+					"name": "completed",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"organization_id": {
+					"name": "organization_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_by": {
+					"name": "created_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"upload_queue": {
+			"name": "upload_queue",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"entity_type": {
+					"name": "entity_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'todo'"
+				},
+				"entity_id": {
+					"name": "entity_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"file_uri": {
+					"name": "file_uri",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'queued'"
+				},
+				"retry_count": {
+					"name": "retry_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		}
+	},
+	"views": {},
+	"enums": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"indexes": {}
+	}
+}

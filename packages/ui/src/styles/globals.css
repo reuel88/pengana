@@ -40,6 +40,12 @@
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
+	--menu-bg: oklch(0.985 0 0);
+	--menu-foreground: oklch(0.145 0 0);
+	--menu-border: oklch(0.922 0 0);
+	--menu-accent: oklch(0.97 0 0);
+	--menu-accent-foreground: oklch(0.205 0 0);
+	--menu-backdrop-blur: none;
 }
 
 .dark {
@@ -74,6 +80,12 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
+	--menu-bg: oklch(0.205 0 0);
+	--menu-foreground: oklch(0.985 0 0);
+	--menu-border: oklch(1 0 0 / 10%);
+	--menu-accent: oklch(0.269 0 0);
+	--menu-accent-foreground: oklch(0.985 0 0);
+	--menu-backdrop-blur: none;
 }
 
 @theme inline {
@@ -124,8 +136,52 @@
 	}
 	body {
 		@apply font-sans bg-background text-foreground;
+		font-family: var(--font-sans);
 	}
 	html {
 		@apply font-sans;
+		font-family: var(--font-sans);
+	}
+	html[data-org-style="vega"] [data-slot] {
+		box-shadow: none;
+	}
+	html[data-org-style="nova"] [data-slot] {
+		box-shadow: 0 1px 0 0 color-mix(in oklab, var(--border) 82%, transparent);
+	}
+	html[data-org-style="maia"] [data-slot] {
+		box-shadow: 0 0 0 1px color-mix(in oklab, var(--border) 86%, transparent);
+	}
+	html[data-org-style="lyra"] [data-slot] {
+		box-shadow: 0 12px 30px -24px
+			color-mix(in oklab, var(--foreground) 28%, transparent);
+	}
+	html[data-org-style="mira"] [data-slot] {
+		box-shadow:
+			0 1px 0 0 color-mix(in oklab, var(--border) 65%, transparent),
+			0 16px 48px -36px color-mix(in oklab, var(--foreground) 22%, transparent);
+	}
+	html[data-org-icon-library="phosphor"] svg {
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.85;
+	}
+	html[data-org-icon-library="tabler"] svg {
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.65;
+	}
+	html[data-org-icon-library="hugeicons"] svg {
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
+	}
+	html[data-org-icon-library="remixicon"] svg {
+		stroke-linecap: square;
+		stroke-linejoin: miter;
+		stroke-width: 1.6;
+	}
+	html[data-org-menu="default-translucent"] header,
+	html[data-org-menu="inverted-translucent"] header {
+		backdrop-filter: var(--menu-backdrop-blur);
 	}
 }

@@ -8,9 +8,6 @@ export interface WebTodo {
 	userId: string;
 	syncStatus: "synced" | "pending" | "conflict";
 	deleted: boolean;
-	attachmentUrl: string | null;
-	attachmentLocalUri: string | null;
-	attachmentStatus: UploadStatus | null;
 }
 
 export interface WebOrgTodo {
@@ -23,7 +20,17 @@ export interface WebOrgTodo {
 	createdBy: string | null;
 	syncStatus: "synced" | "pending" | "conflict";
 	deleted: boolean;
-	attachmentUrl: string | null;
-	attachmentLocalUri: string | null;
-	attachmentStatus: UploadStatus | null;
+}
+
+export interface WebMedia {
+	id: string;
+	entityId: string | null;
+	entityType: string | null;
+	userId: string;
+	url: string | null;
+	localUri: string | null;
+	status: UploadStatus | null;
+	mimeType: string;
+	position: number;
+	createdAt: string;
 }

@@ -1,7 +1,10 @@
 import { env } from "@pengana/env/web";
 import { useTranslation } from "@pengana/i18n";
 import { Button } from "@pengana/ui/components/button";
+import type { ReactNode } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
+import { ModeToggle } from "@/features/theme/mode-toggle";
+import { OrgDesignPresetSync } from "@/features/theme/org-design-preset-sync";
 import { authClient } from "@/shared/lib/auth-client";
 import { TodoPage } from "@/widgets/todo-page";
 
@@ -30,7 +33,10 @@ function ActionPrompt({
 	return (
 		<>
 			<header className="flex w-full justify-end p-2">
-				<LanguageSwitcher />
+				<div className="flex items-center gap-2">
+					<ModeToggle />
+					<LanguageSwitcher />
+				</div>
 			</header>
 			<div className="flex flex-col items-center justify-center gap-4 p-8">
 				<p className="text-muted-foreground text-sm">{t(messageKey)}</p>
@@ -49,45 +55,50 @@ function App() {
 		refetch: refetchOrgs,
 	} = authClient.useListOrganizations();
 
-	if (isPending) return <LoadingState />;
+	let content: ReactNode;
 
-	if (!session) {
-		return (
+	if (isPending) {
+		content = <LoadingState />;
+	} else if (!session) {
+		content = (
 			<ActionPrompt
 				messageKey="loginPrompt"
 				buttonKey="loginButton"
 				url={`${env.VITE_WEB_URL}/login`}
 			/>
 		);
-	}
-
-	if (isOrgsPending) return <LoadingState />;
-
-	if (orgsError) {
-		return (
+	} else if (isOrgsPending) {
+		content = <LoadingState />;
+	} else if (orgsError) {
+		content = (
 			<ActionPrompt
 				messageKey="common:error.generic"
 				buttonKey="common:error.retry"
 				onAction={() => refetchOrgs()}
 			/>
 		);
-	}
-
-	if (!Array.isArray(orgs) || orgs.length === 0) {
-		return (
+	} else if (!Array.isArray(orgs) || orgs.length === 0) {
+		content = (
 			<ActionPrompt
 				messageKey="onboardingPrompt"
 				buttonKey="onboardingButton"
 				url={`${env.VITE_WEB_URL}/onboarding`}
 			/>
 		);
+	} else {
+		content = (
+			<TodoPage
+				userId={session.user.id}
+				organizationId={session.session.activeOrganizationId ?? undefined}
+			/>
+		);
 	}
 
 	return (
-		<TodoPage
-			userId={session.user.id}
-			organizationId={session.session.activeOrganizationId ?? undefined}
-		/>
+		<>
+			<OrgDesignPresetSync />
+			{content}
+		</>
 	);
 }
 

@@ -15,7 +15,9 @@ export default function SettingsLayout() {
 				name="index"
 				options={{
 					headerTitle: t("auth:settings.account.title"),
-					headerLeft: () => <DrawerToggleButton tintColor={theme.text} />,
+					headerLeft: () => (
+						<DrawerToggleButton tintColor={theme.menuForeground} />
+					),
 				}}
 			/>
 			<Stack.Screen

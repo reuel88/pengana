@@ -1,8 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, View } from "react-native";
 
-import { BANNER_COLORS } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { themedText } from "@/shared/styles/shared";
 
 export function ConnectivityBanner({
 	isOnline,
@@ -11,27 +11,23 @@ export function ConnectivityBanner({
 	isOnline: boolean;
 	isSyncing: boolean;
 }) {
-	const { colorScheme } = useTheme();
+	const { theme } = useTheme();
 	const { t } = useTranslation("sync");
-
-	const isDark = colorScheme === "dark";
 	const bannerColors = isOnline
 		? {
-				bg: BANNER_COLORS.onlineBg,
-				text: isDark
-					? BANNER_COLORS.onlineTextDark
-					: BANNER_COLORS.onlineTextLight,
+				bg: theme.successSurface,
+				text: theme.success,
 			}
 		: {
-				bg: BANNER_COLORS.offlineBg,
-				text: isDark
-					? BANNER_COLORS.offlineTextDark
-					: BANNER_COLORS.offlineTextLight,
+				bg: theme.dangerSurface,
+				text: theme.danger,
 			};
 
 	return (
 		<View style={[styles.banner, { backgroundColor: bannerColors.bg }]}>
-			<Text style={[styles.text, { color: bannerColors.text }]}>
+			<Text
+				style={[styles.text, themedText(theme), { color: bannerColors.text }]}
+			>
 				{isOnline ? (isSyncing ? t("syncing") : t("online")) : t("offline")}
 			</Text>
 		</View>

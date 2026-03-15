@@ -1,13 +1,14 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import { isQuotaError } from "@pengana/sync-engine";
 import { useCallback, useMemo } from "react";
-
 import {
-	attachFile,
-	deleteTodo,
-	resolveConflict,
-	toggleTodo,
-} from "../lib/todo-actions";
+	addMedia,
+	getMediaCountForEntity,
+	removeMedia,
+} from "../lib/media-actions";
+import { deleteTodo, resolveConflict, toggleTodo } from "../lib/todo-actions";
+
+const MAX_ATTACHMENTS = 10;
 
 export interface FileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
@@ -24,7 +25,6 @@ export interface TodoActions {
 		id: string,
 		resolution: "local" | "server",
 	) => Promise<void>;
-	attachFile: (id: string, localUri: string) => Promise<void>;
 }
 
 function createDefaultActions(db: EntityDatabase): TodoActions {
@@ -32,7 +32,6 @@ function createDefaultActions(db: EntityDatabase): TodoActions {
 		toggleTodo: (id) => toggleTodo(db, id),
 		deleteTodo: (id) => deleteTodo(db, id),
 		resolveConflict: (id, resolution) => resolveConflict(db, id, resolution),
-		attachFile: (id, localUri) => attachFile(db, id, localUri),
 	};
 }
 
@@ -58,16 +57,17 @@ export interface TodoHandlerDeps {
 		entityId: string,
 		fileUri: string,
 		mimeType: string,
+		mediaId: string,
 	) => void;
 	entityType?: string;
+	userId?: string;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
 	fileStorage: FileStorageStrategy;
 	t: (key: string) => string;
 	onDeleteSuccess?: (id: string) => void;
-	/** Pre-bound actions. When omitted, `db` must be provided to construct defaults. */
+	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	actions?: TodoActions;
-	/** EntityDatabase instance, required when `actions` is not provided. */
 	db?: EntityDatabase;
 }
 
@@ -81,6 +81,8 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		t,
 		onDeleteSuccess,
 		entityType = "todo",
+		userId = "",
+		db,
 	} = deps;
 	const actions = resolveActions(deps);
 
@@ -139,21 +141,55 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		[clearError, actions, triggerSync, onError, t],
 	);
 
-	const handleFileSelected = useCallback(
-		async (id: string, file: File) => {
-			let fileRef: ReturnType<typeof createFileRef> | null = null;
+	const handleRemoveAttachment = useCallback(
+		async (todoId: string, attachmentId: string) => {
+			if (!db) return;
 			try {
-				clearError(id);
-				await storeFile(id, file);
-				fileRef = createFileRef(id, file);
-				await actions.attachFile(id, fileRef.uri);
-				enqueueUpload(entityType, id, fileRef.uri, file.type);
-				fileRef = null;
+				clearError(todoId);
+				await removeMedia(db, attachmentId);
+				await deps.deleteAttachment?.(attachmentId);
+				triggerSync();
+			} catch {
+				onError(todoId, t("errors:failedToDeleteAttachment"));
+			}
+		},
+		[db, clearError, deps.deleteAttachment, triggerSync, onError, t],
+	);
+
+	const handleFilesSelected = useCallback(
+		async (todoId: string, files: File[]) => {
+			if (!db) return;
+			const refs: Array<{ revoke?: () => void }> = [];
+			try {
+				clearError(todoId);
+				const currentCount = await getMediaCountForEntity(db, todoId);
+				const available = MAX_ATTACHMENTS - currentCount;
+				const filesToProcess = files.slice(0, available);
+
+				for (const file of filesToProcess) {
+					const mediaId = await addMedia(
+						db,
+						todoId,
+						entityType,
+						userId,
+						"",
+						file.type,
+					);
+					await storeFile(mediaId, file);
+					const fileRef = createFileRef(mediaId, file);
+					refs.push(fileRef);
+
+					await db
+						.getTable("media")
+						.update(mediaId, { localUri: fileRef.uri } as never);
+
+					enqueueUpload(entityType, todoId, fileRef.uri, file.type, mediaId);
+				}
 				triggerSync();
 			} catch (e) {
-				fileRef?.revoke?.();
+				for (const ref of refs) ref.revoke?.();
 				onError(
-					id,
+					todoId,
 					isQuotaError(e)
 						? t("errors:storageFull")
 						: t("errors:failedToStoreFile"),
@@ -161,11 +197,12 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			}
 		},
 		[
+			db,
 			clearError,
 			storeFile,
 			createFileRef,
-			actions,
 			entityType,
+			userId,
 			enqueueUpload,
 			triggerSync,
 			onError,
@@ -174,7 +211,19 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 	);
 
 	return useMemo(
-		() => ({ handleToggle, handleDelete, handleResolve, handleFileSelected }),
-		[handleToggle, handleDelete, handleResolve, handleFileSelected],
+		() => ({
+			handleToggle,
+			handleDelete,
+			handleResolve,
+			handleRemoveAttachment,
+			handleFilesSelected,
+		}),
+		[
+			handleToggle,
+			handleDelete,
+			handleResolve,
+			handleRemoveAttachment,
+			handleFilesSelected,
+		],
 	);
 }

@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { useSignOut } from "@/shared/hooks/use-sign-out";
 import { authClient } from "@/shared/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { primaryButtonText, themedSurface } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 
 export default function Home() {
@@ -22,12 +22,7 @@ export default function Home() {
 		<Container>
 			<ScrollView style={styles.scrollView}>
 				<View style={styles.content}>
-					<View
-						style={[
-							styles.welcomeCard,
-							{ backgroundColor: theme.card, borderColor: theme.border },
-						]}
-					>
+					<View style={[styles.welcomeCard, themedSurface(theme)]}>
 						<Text style={[styles.welcomeText, { color: theme.text }]}>
 							{t("dashboard:welcome", { name: session?.user?.name || "" })}
 						</Text>
@@ -45,7 +40,9 @@ export default function Home() {
 						]}
 						onPress={handleSignOut}
 					>
-						<Text style={styles.signOutText}>{t("user.signOut")}</Text>
+						<Text style={[styles.signOutText, primaryButtonText(theme)]}>
+							{t("user.signOut")}
+						</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
@@ -80,7 +77,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	signOutText: {
-		color: TEXT_ON_PRIMARY,
 		fontWeight: "bold",
 	},
 });

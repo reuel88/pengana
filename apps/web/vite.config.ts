@@ -19,7 +19,7 @@ export default defineConfig({
 				theme_color: "#0c0c0c",
 			},
 			pwaAssets: { disabled: false, config: true },
-			devOptions: { enabled: true },
+			devOptions: { enabled: false },
 		}),
 	],
 	build: {
@@ -45,9 +45,19 @@ export default defineConfig({
 		},
 	},
 	resolve: {
-		alias: {
-			"@": path.resolve(__dirname, "./src"),
-		},
+		alias: [
+			{
+				find: /^lucide-react$/,
+				replacement: path.resolve(
+					__dirname,
+					"./src/shared/lib/lucide-react-adapter.tsx",
+				),
+			},
+			{
+				find: "@",
+				replacement: path.resolve(__dirname, "./src"),
+			},
+		],
 	},
 	server: {
 		port: 3001,

@@ -13,7 +13,6 @@ function rowToTodo(row: typeof todos.$inferSelect): Todo {
 		userId: row.userId,
 		syncStatus: row.syncStatus,
 		deleted: row.deleted,
-		attachmentUrl: row.attachmentUrl ?? null,
 	};
 }
 
@@ -33,7 +32,6 @@ function todoToRow(todo: Todo, syncStatus: string) {
 		createdBy: orgTodo.createdBy ?? null,
 		syncStatus: syncStatus as "synced" | "pending" | "conflict",
 		deleted: todo.deleted,
-		attachmentUrl: todo.attachmentUrl ?? null,
 	};
 }
 

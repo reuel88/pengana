@@ -3,7 +3,7 @@ import type {
 	SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
 import {
-	createTodoUploadLifecycleCallbacks,
+	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
 } from "@pengana/todo-client";
 import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
@@ -47,6 +47,6 @@ export function createExtensionPlatformDeps(
 		},
 		storageHealth: createWebStorageHealthProvider(),
 		removeFile: (entityId: string) => removeFileFromIndexedDB(appDb, entityId),
-		uploadLifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
+		uploadLifecycleCallbacks: createUploadLifecycleCallbacks(appDb),
 	};
 }

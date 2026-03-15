@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "切换待办事项状态失败",
 	"failedToDeleteTodo": "删除待办事项失败",
+	"failedToDeleteAttachment": "删除附件失败",
 	"failedToResolveConflict": "解决冲突失败",
 	"invalidFileType": "仅允许 JPEG、PNG、HEIC 图片和 PDF 文件。",
 	"fileTooLarge": "文件超过最大限制 10MB。",

@@ -3,22 +3,22 @@ import {
 	isAllowedMimeType,
 	MAX_FILE_SIZE_BYTES,
 	type SyncStatus,
-	type UploadStatus,
 } from "@pengana/sync-engine";
 import { useRef } from "react";
 import { cn } from "../lib/utils";
-import { AttachmentIndicator } from "./attachment-indicator";
+import { type AttachmentItem, AttachmentList } from "./attachment-list";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
 import { SyncDot } from "./sync-dot";
+
+const MAX_ATTACHMENTS = 10;
 
 export interface TodoItemData {
 	id: string;
 	title: string;
 	completed: boolean;
 	syncStatus: SyncStatus;
-	attachmentUrl: string | null;
-	attachmentStatus: UploadStatus | null;
+	attachments: AttachmentItem[];
 }
 
 interface TodoItemProps {
@@ -26,7 +26,9 @@ interface TodoItemProps {
 	onToggle: () => void;
 	onDelete: () => void;
 	onResolve: (resolution: "local" | "server") => void;
-	onFileSelected: (file: File) => void;
+	onFilesSelected: (files: File[]) => void;
+	onRemoveAttachment: (attachmentId: string) => void;
+	onRetryAttachment?: (attachmentId: string) => void;
 	onValidationError?: (message: string) => void;
 	error?: string | null;
 }
@@ -36,7 +38,9 @@ export function TodoItem({
 	onToggle,
 	onDelete,
 	onResolve,
-	onFileSelected,
+	onFilesSelected,
+	onRemoveAttachment,
+	onRetryAttachment,
 	onValidationError,
 	error,
 }: TodoItemProps) {
@@ -48,27 +52,35 @@ export function TodoItem({
 	};
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
+		const fileList = e.target.files;
+		if (!fileList || fileList.length === 0) return;
 
+		const files = Array.from(fileList);
 		e.target.value = "";
 
-		if (!isAllowedMimeType(file.type)) {
-			onValidationError?.(t("errors:invalidFileType"));
-			return;
+		const valid: File[] = [];
+		for (const file of files) {
+			if (!isAllowedMimeType(file.type)) {
+				onValidationError?.(t("errors:invalidFileType"));
+				continue;
+			}
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				onValidationError?.(t("errors:fileTooLarge"));
+				continue;
+			}
+			valid.push(file);
 		}
 
-		if (file.size > MAX_FILE_SIZE_BYTES) {
-			onValidationError?.(t("errors:fileTooLarge"));
-			return;
+		if (valid.length > 0) {
+			onFilesSelected(valid);
 		}
-
-		onFileSelected(file);
 	};
+
+	const canAttach = todo.attachments.length < MAX_ATTACHMENTS;
 
 	return (
 		<div
-			className="flex flex-col border-border border-b"
+			className="flex flex-col border-border border-b last:border-b-0"
 			data-testid="todo-row"
 			data-completed={todo.completed}
 		>
@@ -77,6 +89,7 @@ export function TodoItem({
 					ref={fileInputRef}
 					type="file"
 					accept="image/jpeg,image/png,image/heic,application/pdf"
+					multiple
 					className="hidden"
 					onChange={handleFileChange}
 				/>
@@ -94,10 +107,6 @@ export function TodoItem({
 				>
 					{todo.title}
 				</span>
-				<AttachmentIndicator
-					status={todo.attachmentStatus}
-					attachmentUrl={todo.attachmentUrl}
-				/>
 				{todo.syncStatus === "conflict" && (
 					<div className="flex gap-1">
 						<Button
@@ -116,14 +125,9 @@ export function TodoItem({
 						</Button>
 					</div>
 				)}
-				{!todo.attachmentUrl && !todo.attachmentStatus && (
+				{canAttach && (
 					<Button size="xs" variant="outline" onClick={handleAttach}>
 						{t("actions.attach")}
-					</Button>
-				)}
-				{todo.attachmentStatus === "failed" && (
-					<Button size="xs" variant="outline" onClick={handleAttach}>
-						{t("actions.retry")}
 					</Button>
 				)}
 				<Button
@@ -135,6 +139,11 @@ export function TodoItem({
 					{t("actions.delete")}
 				</Button>
 			</div>
+			<AttachmentList
+				attachments={todo.attachments}
+				onRemove={onRemoveAttachment}
+				onRetry={onRetryAttachment}
+			/>
 			{error && <p className="px-3 pb-2 text-red-500 text-xs">{error}</p>}
 		</div>
 	);

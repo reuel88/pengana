@@ -8,9 +8,11 @@ import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file
 
 import { useOrgSync } from "@/features/sync/org-sync-context";
 
-import { attachOrgFile } from "../org-todo-actions";
+import { addOrgMedia, getOrgMediaCountForEntity } from "../org-todo-actions";
 
-export function useOrgFilePicker() {
+const MAX_ATTACHMENTS = 10;
+
+export function useOrgFilePicker(userId: string) {
 	const { enqueueUpload } = useOrgSync();
 	const { t } = useTranslation();
 
@@ -18,28 +20,47 @@ export function useOrgFilePicker() {
 		const input = document.createElement("input");
 		input.type = "file";
 		input.accept = "image/jpeg,image/png,image/heic,application/pdf";
+		input.multiple = true;
 
 		input.onchange = async () => {
-			const file = input.files?.[0];
-			if (!file) return;
+			const files = input.files;
+			if (!files || files.length === 0) return;
 
-			if (!isAllowedMimeType(file.type)) {
-				window.alert(t("errors:invalidFileType"));
-				return;
-			}
+			const currentCount = await getOrgMediaCountForEntity(todoId);
+			const available = MAX_ATTACHMENTS - currentCount;
 
-			if (file.size > MAX_FILE_SIZE_BYTES) {
-				window.alert(t("errors:fileTooLarge"));
-				return;
-			}
+			for (let i = 0; i < Math.min(files.length, available); i++) {
+				const file = files[i];
 
-			const localUri = `${INDEXEDDB_URI_PREFIX}${todoId}`;
-			try {
-				await storeFileInIndexedDB(todoId, file);
-				await attachOrgFile(todoId, localUri);
-				enqueueUpload("orgTodo", todoId, localUri, file.type);
-			} catch {
-				window.alert(t("errors:failedToAttachFile"));
+				if (!isAllowedMimeType(file.type)) {
+					window.alert(t("errors:invalidFileType"));
+					continue;
+				}
+
+				if (file.size > MAX_FILE_SIZE_BYTES) {
+					window.alert(t("errors:fileTooLarge"));
+					continue;
+				}
+
+				try {
+					const mediaId = await addOrgMedia(
+						todoId,
+						"orgTodo",
+						userId,
+						`${INDEXEDDB_URI_PREFIX}${todoId}`,
+						file.type,
+					);
+					await storeFileInIndexedDB(mediaId, file);
+					enqueueUpload(
+						"orgTodo",
+						todoId,
+						`${INDEXEDDB_URI_PREFIX}${mediaId}`,
+						file.type,
+						mediaId,
+					);
+				} catch {
+					window.alert(t("errors:failedToAttachFile"));
+				}
 			}
 		};
 

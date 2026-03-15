@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { useInvalidateOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { primaryButtonText, themedSurface } from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
@@ -30,12 +30,7 @@ function ChangeNameCard() {
 	}, [session?.user.name, name]);
 
 	return (
-		<View
-			style={[
-				styles.card,
-				{ backgroundColor: theme.card, borderColor: theme.border },
-			]}
-		>
+		<View style={[styles.card, themedSurface(theme)]}>
 			<Text style={[styles.title, { color: theme.text }]}>
 				{t("auth:settings.account.changeName")}
 			</Text>
@@ -62,7 +57,7 @@ function ChangeNameCard() {
 					Alert.alert("", t("auth:settings.account.updateSuccess"));
 				}}
 			>
-				<Text style={styles.buttonText}>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
 					{t("auth:settings.account.changeName")}
 				</Text>
 			</TouchableOpacity>
@@ -84,12 +79,7 @@ function ChangeEmailCard() {
 	}, [session?.user.email, email]);
 
 	return (
-		<View
-			style={[
-				styles.card,
-				{ backgroundColor: theme.card, borderColor: theme.border },
-			]}
-		>
+		<View style={[styles.card, themedSurface(theme)]}>
 			<Text style={[styles.title, { color: theme.text }]}>
 				{t("auth:settings.account.changeEmail")}
 			</Text>
@@ -120,7 +110,7 @@ function ChangeEmailCard() {
 					Alert.alert("", t("auth:settings.account.updateSuccess"));
 				}}
 			>
-				<Text style={styles.buttonText}>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
 					{t("auth:settings.account.changeEmail")}
 				</Text>
 			</TouchableOpacity>
@@ -135,12 +125,7 @@ function ChangePasswordCard() {
 	const [newPassword, setNewPassword] = useState("");
 
 	return (
-		<View
-			style={[
-				styles.card,
-				{ backgroundColor: theme.card, borderColor: theme.border },
-			]}
-		>
+		<View style={[styles.card, themedSurface(theme)]}>
 			<Text style={[styles.title, { color: theme.text }]}>
 				{t("auth:settings.account.changePassword")}
 			</Text>
@@ -180,7 +165,7 @@ function ChangePasswordCard() {
 					);
 				}}
 			>
-				<Text style={styles.buttonText}>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
 					{t("auth:settings.account.changePassword")}
 				</Text>
 			</TouchableOpacity>
@@ -219,7 +204,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	buttonText: {
-		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 	},
 });

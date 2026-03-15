@@ -19,9 +19,6 @@ export async function addOrgTodo(
 		createdBy: userId,
 		syncStatus: "pending",
 		deleted: false,
-		attachmentUrl: null,
-		attachmentLocalUri: null,
-		attachmentStatus: null,
 	});
 }
 
@@ -42,17 +39,6 @@ export async function deleteOrgTodo(
 ): Promise<void> {
 	const actions = createDexieActions<WebOrgTodo>(db, "orgTodos");
 	await actions.softDelete(id);
-}
-
-export async function attachOrgFile(
-	db: EntityDatabase,
-	todoId: string,
-	localUri: string,
-): Promise<void> {
-	await db.getTable<WebOrgTodo>("orgTodos").update(todoId, {
-		attachmentLocalUri: localUri,
-		attachmentStatus: "queued",
-	} as never);
 }
 
 export async function resolveOrgConflict(

@@ -10,9 +10,8 @@ import {
 } from "react-native";
 
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText } from "@/shared/styles/shared";
+import { mutedText, primaryButtonText } from "@/shared/styles/shared";
 
 import { onboardingStyles } from "./onboarding-styles";
 
@@ -73,9 +72,9 @@ export function OnboardingInvitations({
 						disabled={actingId !== null}
 					>
 						{actingId === invitation.id ? (
-							<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
+							<ActivityIndicator size="small" color={theme.primaryForeground} />
 						) : (
-							<Text style={styles.acceptButtonText}>
+							<Text style={[styles.acceptButtonText, primaryButtonText(theme)]}>
 								{t("invitations.accept")}
 							</Text>
 						)}
@@ -123,7 +122,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 	},
 	acceptButtonText: {
-		color: TEXT_ON_PRIMARY,
 		fontSize: 14,
 		fontWeight: "500",
 	},

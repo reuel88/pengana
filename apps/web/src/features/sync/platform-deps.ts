@@ -5,7 +5,7 @@ import {
 	createWebSocketRealtimeTransport,
 	type SyncEnginePlatformDeps,
 } from "@pengana/sync-engine";
-import { createTodoUploadLifecycleCallbacks } from "@pengana/todo-client";
+import { createUploadLifecycleCallbacks } from "@pengana/todo-client";
 import { removeFileFromIndexedDB } from "@pengana/todo-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/todo-client/lib/storage-health";
 import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
@@ -67,6 +67,6 @@ export function createWebPlatformDeps(
 		},
 		storageHealth: createWebStorageHealthProvider(),
 		removeFile: (entityId: string) => removeFileFromIndexedDB(appDb, entityId),
-		uploadLifecycleCallbacks: createTodoUploadLifecycleCallbacks(appDb),
+		uploadLifecycleCallbacks: createUploadLifecycleCallbacks(appDb),
 	};
 }

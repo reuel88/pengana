@@ -26,6 +26,7 @@ export interface OrganizationBase {
 	logo?: string | null;
 	createdAt: Date;
 	metadata?: unknown;
+	designPreset?: Record<string, unknown> | null;
 }
 
 export interface Organization extends OrganizationBase {
@@ -121,7 +122,12 @@ export interface AuthClientOrg {
 			error?: { message?: string } | null;
 		}>;
 		update: (opts: {
-			data: { name: string; slug: string; logo?: string };
+			data: {
+				name?: string;
+				slug?: string;
+				logo?: string;
+				designPreset?: Record<string, unknown>;
+			};
 		}) => Promise<{
 			data?: unknown;
 			error?: { message?: string } | null;

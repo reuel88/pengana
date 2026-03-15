@@ -9,12 +9,15 @@ import {
 	View,
 } from "react-native";
 
-import {
-	BANNER_COLORS,
-	STATUS_COLORS,
-	TEXT_ON_PRIMARY,
-} from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import {
+	inputThemed,
+	placeholderColor,
+	primaryButton,
+	primaryButtonText,
+	themedSurface,
+	themedText,
+} from "@/shared/styles/shared";
 
 export function AuthFormCard({
 	title,
@@ -27,33 +30,23 @@ export function AuthFormCard({
 	children: ReactNode;
 	testID?: string;
 }) {
-	const { theme, colorScheme } = useTheme();
-	const errorTextColor =
-		colorScheme === "dark"
-			? BANNER_COLORS.offlineTextDark
-			: BANNER_COLORS.offlineTextLight;
+	const { theme } = useTheme();
 
 	return (
-		<View
-			testID={testID}
-			style={[
-				styles.card,
-				{ backgroundColor: theme.card, borderColor: theme.border },
-			]}
-		>
-			<Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+		<View testID={testID} style={[styles.card, themedSurface(theme)]}>
+			<Text style={[styles.title, themedText(theme)]}>{title}</Text>
 			{error ? (
 				<View
 					testID="auth-error"
 					style={[
 						styles.errorContainer,
 						{
-							backgroundColor: BANNER_COLORS.offlineBg,
-							borderColor: STATUS_COLORS.error,
+							backgroundColor: theme.dangerSurface,
+							borderColor: theme.danger,
 						},
 					]}
 				>
-					<Text style={[styles.errorText, { color: errorTextColor }]}>
+					<Text style={[styles.errorText, { color: theme.danger }]}>
 						{error}
 					</Text>
 				</View>
@@ -85,18 +78,14 @@ export function AuthFormField({
 	const hasErrors = errors != null && errors.length > 0;
 	return (
 		<View style={styles.fieldContainer}>
-			<Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+			<Text style={[styles.label, themedText(theme)]}>{label}</Text>
 			<TextInput
 				testID={testID}
 				style={[
 					styles.input,
-					{
-						color: theme.text,
-						borderColor: hasErrors ? theme.notification : theme.border,
-						backgroundColor: theme.background,
-					},
+					inputThemed(theme, { isError: hasErrors, danger: theme.danger }),
 				]}
-				placeholderTextColor={theme.text}
+				placeholderTextColor={placeholderColor(theme)}
 				value={value}
 				onBlur={onBlur}
 				{...rest}
@@ -111,13 +100,15 @@ export function AuthFormField({
 				}}
 			/>
 			{hint ? (
-				<Text style={[styles.hintText, { color: theme.text }]}>{hint}</Text>
+				<Text style={[styles.hintText, { color: theme.mutedText }]}>
+					{hint}
+				</Text>
 			) : null}
 			{hasErrors
 				? errors.map((err, index) => (
 						<Text
 							key={`${err.message}-${String(index)}`}
-							style={[styles.fieldErrorText, { color: theme.notification }]}
+							style={[styles.fieldErrorText, { color: theme.danger }]}
 							accessibilityLiveRegion="polite"
 						>
 							{err.message}
@@ -151,18 +142,14 @@ export function AuthSubmitButton({
 			accessibilityRole="button"
 			accessibilityLabel={label}
 			accessibilityState={{ disabled: isDisabled, busy: isSubmitting }}
-			style={[
-				styles.button,
-				{
-					backgroundColor: theme.primary,
-					opacity: isDisabled ? 0.5 : 1,
-				},
-			]}
+			style={[styles.button, primaryButton(theme, { disabled: isDisabled })]}
 		>
 			{isSubmitting ? (
-				<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
+				<ActivityIndicator size="small" color={theme.primaryForeground} />
 			) : (
-				<Text style={styles.buttonText}>{label}</Text>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
+					{label}
+				</Text>
 			)}
 		</TouchableOpacity>
 	);
@@ -216,7 +203,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	buttonText: {
-		color: TEXT_ON_PRIMARY,
 		fontSize: 16,
 	},
 });

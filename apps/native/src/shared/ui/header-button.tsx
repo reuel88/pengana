@@ -1,8 +1,7 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { forwardRef } from "react";
 import { Pressable, StyleSheet, type View } from "react-native";
-
 import { useTheme } from "@/shared/lib/theme";
+import { AppIcon } from "@/shared/ui/app-icon";
 
 export const HeaderButton = forwardRef<
 	View,
@@ -27,8 +26,8 @@ export const HeaderButton = forwardRef<
 			}
 		>
 			{({ pressed }) => (
-				<FontAwesome
-					name="info-circle"
+				<AppIcon
+					name="info"
 					size={20}
 					color={theme.text}
 					style={{

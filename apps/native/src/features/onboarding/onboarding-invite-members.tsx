@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { useBatchInvite } from "@/shared/hooks/use-batch-invite";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { primaryButtonText } from "@/shared/styles/shared";
 import { RoleToggle } from "@/shared/ui/role-toggle";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
@@ -194,9 +194,14 @@ function OnboardingInviteMembersContent({
 						accessibilityLabel={t("invite.send")}
 					>
 						{loading ? (
-							<ActivityIndicator size="small" color={TEXT_ON_PRIMARY} />
+							<ActivityIndicator size="small" color={theme.primaryForeground} />
 						) : (
-							<Text style={onboardingStyles.submitButtonText}>
+							<Text
+								style={[
+									onboardingStyles.submitButtonText,
+									primaryButtonText(theme),
+								]}
+							>
 								{t("invite.send")}
 							</Text>
 						)}

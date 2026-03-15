@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
-import { secondaryText, sharedStyles } from "@/shared/styles/shared";
+import { secondaryText, smallPrimaryButtonText } from "@/shared/styles/shared";
 
 export function TeamMemberRow({
 	name,
@@ -37,7 +37,7 @@ export function TeamMemberRow({
 					onPress={onRemove}
 					style={[styles.removeButton, { backgroundColor: theme.notification }]}
 				>
-					<Text style={sharedStyles.smallButtonText}>
+					<Text style={smallPrimaryButtonText(theme)}>
 						{t("teams.removeMember")}
 					</Text>
 				</TouchableOpacity>

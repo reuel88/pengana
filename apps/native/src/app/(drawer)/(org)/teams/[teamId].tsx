@@ -20,7 +20,11 @@ import {
 	useTeams,
 } from "@/shared/hooks/use-org-queries";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, sharedStyles } from "@/shared/styles/shared";
+import {
+	mutedText,
+	sharedStyles,
+	smallPrimaryButtonText,
+} from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
@@ -116,7 +120,7 @@ export default function TeamDetailScreen() {
 									]}
 									onPress={onDelete}
 								>
-									<Text style={sharedStyles.smallButtonText}>
+									<Text style={smallPrimaryButtonText(theme)}>
 										{t("teams.delete")}
 									</Text>
 								</TouchableOpacity>

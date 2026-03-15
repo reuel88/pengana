@@ -8,6 +8,10 @@ vi.mock("@pengana/db/todo-queries", () => ({
 	updateTodo: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@pengana/db/media-queries", () => ({
+	findMediaByEntityIds: vi.fn().mockResolvedValue([]),
+}));
+
 import {
 	findTodoById,
 	getTodosUpdatedSince,
@@ -22,7 +26,6 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		title: "Test",
 		completed: false,
 		deleted: false,
-		attachmentUrl: null,
 		updatedAt: "2025-06-01T00:00:10.000Z",
 		userId: "test-user",
 		syncStatus: "pending" as const,
@@ -36,7 +39,6 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 		title: "Server Todo",
 		completed: false,
 		deleted: false,
-		attachmentUrl: null,
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
 		userId: "test-user",
 		...overrides,
@@ -139,7 +141,6 @@ describe("handleSync", () => {
 		const serverRow = makeServerRow({
 			id: "s1",
 			title: "From Server",
-			attachmentUrl: "https://cdn.example.com/f.jpg",
 			updatedAt: new Date("2025-06-01T12:00:00.000Z"),
 		});
 		vi.mocked(getTodosUpdatedSince).mockResolvedValue([serverRow]);
@@ -154,7 +155,6 @@ describe("handleSync", () => {
 			title: "From Server",
 			completed: false,
 			deleted: false,
-			attachmentUrl: "https://cdn.example.com/f.jpg",
 			updatedAt: "2025-06-01T12:00:00.000Z",
 			userId: "test-user",
 			syncStatus: "synced",

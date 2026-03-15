@@ -26,7 +26,9 @@ export default function OrgLayout() {
 				name="index"
 				options={{
 					headerTitle: t("title"),
-					headerLeft: () => <DrawerToggleButton tintColor={theme.text} />,
+					headerLeft: () => (
+						<DrawerToggleButton tintColor={theme.menuForeground} />
+					),
 				}}
 			/>
 			<Stack.Screen

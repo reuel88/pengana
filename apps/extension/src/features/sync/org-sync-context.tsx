@@ -2,6 +2,7 @@ import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
 import {
 	createDexieOrgSyncAdapter,
 	createOrgSyncTransport,
+	reconcileMedia,
 } from "@pengana/todo-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
@@ -16,9 +17,13 @@ export {
 const orgDeps = createExtensionPlatformDeps(
 	(organizationId) => createDexieOrgSyncAdapter(appDb, organizationId),
 	() =>
-		createOrgSyncTransport(async (input) => {
-			return (await client.orgTodo.sync(input, { signal: input.signal })).data;
-		}),
+		createOrgSyncTransport(
+			async (input) => {
+				return (await client.orgTodo.sync(input, { signal: input.signal }))
+					.data;
+			},
+			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
+		),
 );
 
 export function OrgSyncProvider({

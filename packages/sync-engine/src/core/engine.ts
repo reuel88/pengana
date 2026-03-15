@@ -154,9 +154,10 @@ export class SyncEngine<T extends { id: string } = Todo> {
 }
 
 function isAbortError(error: unknown): boolean {
-	return error instanceof DOMException
-		? error.name === "AbortError"
-		: error instanceof Error && error.name === "AbortError";
+	if (typeof DOMException !== "undefined" && error instanceof DOMException) {
+		return error.name === "AbortError";
+	}
+	return error instanceof Error && error.name === "AbortError";
 }
 
 function createAbortError(): Error {

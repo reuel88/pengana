@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getFileFromIndexedDB, removeFileFromIndexedDB } = vi.hoisted(() => ({
+const { getFileFromIndexedDB } = vi.hoisted(() => ({
 	getFileFromIndexedDB: vi.fn(),
-	removeFileFromIndexedDB: vi.fn(),
 }));
 
 vi.mock("./dexie-file-store", () => ({
 	getFileFromIndexedDB,
-	removeFileFromIndexedDB,
 }));
 
 import { createIndexedDbUploadTransport } from "./indexeddb-upload-transport";
@@ -17,13 +15,12 @@ const fakeDb = {} as Parameters<typeof createIndexedDbUploadTransport>[0]["db"];
 describe("createIndexedDbUploadTransport", () => {
 	beforeEach(() => {
 		getFileFromIndexedDB.mockReset();
-		removeFileFromIndexedDB.mockReset();
 	});
 
 	it("reads from IndexedDB and uploads the stored base64", async () => {
 		const rpc = {
 			upload: vi.fn().mockResolvedValue({
-				data: { attachmentUrl: "https://cdn.example.com/file.png" },
+				data: { url: "https://cdn.example.com/file.png" },
 			}),
 		};
 		getFileFromIndexedDB.mockResolvedValue({ base64: "YWJj" });
@@ -33,12 +30,12 @@ describe("createIndexedDbUploadTransport", () => {
 		await transport.upload({
 			entityType: "todo",
 			entityId: "todo-1",
-			fileUri: "blob:file",
+			fileUri: "indexeddb://media-123",
 			mimeType: "image/png",
 			idempotencyKey: "idem-1",
 		});
 
-		expect(getFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
+		expect(getFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "media-123");
 		expect(rpc.upload).toHaveBeenCalledWith({
 			entityType: "todo",
 			entityId: "todo-1",
@@ -46,8 +43,8 @@ describe("createIndexedDbUploadTransport", () => {
 			mimeType: "image/png",
 			data: "YWJj",
 			idempotencyKey: "idem-1",
+			attachmentId: "idem-1",
 		});
-		expect(removeFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
 	});
 
 	it("throws the storage-specific missing file error", async () => {
@@ -61,7 +58,7 @@ describe("createIndexedDbUploadTransport", () => {
 			transport.upload({
 				entityType: "todo",
 				entityId: "todo-1",
-				fileUri: "blob:file",
+				fileUri: "indexeddb://media-456",
 				mimeType: "image/png",
 				idempotencyKey: "idem-1",
 			}),
@@ -70,14 +67,14 @@ describe("createIndexedDbUploadTransport", () => {
 		);
 	});
 
-	it("removes the stored file when upload fails permanently", async () => {
+	it("does not throw when onFailed is called", async () => {
 		const transport = createIndexedDbUploadTransport({
 			rpc: { upload: vi.fn() },
 			db: fakeDb,
 		});
 
-		await transport.onFailed?.("todo", "todo-1", "blob:file");
-
-		expect(removeFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "todo-1");
+		await expect(
+			transport.onFailed?.("todo", "todo-1", "blob:file"),
+		).resolves.toBeUndefined();
 	});
 });

@@ -8,6 +8,10 @@ vi.mock("@pengana/db/org-todo-queries", () => ({
 	updateOrgTodo: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@pengana/db/media-queries", () => ({
+	findMediaByEntityIds: vi.fn().mockResolvedValue([]),
+}));
+
 import {
 	findOrgTodoById,
 	getOrgTodosUpdatedSince,
@@ -22,7 +26,6 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		title: "Org Test",
 		completed: false,
 		deleted: false,
-		attachmentUrl: null,
 		updatedAt: "2025-06-01T00:00:10.000Z",
 		organizationId: "org-1",
 		createdBy: "user-1",
@@ -37,7 +40,6 @@ function makeServerRow(overrides: Partial<OrgTodoRow> = {}): OrgTodoRow {
 		title: "Server Org Todo",
 		completed: false,
 		deleted: false,
-		attachmentUrl: null,
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
 		organizationId: "org-1",
 		createdBy: "user-1",
@@ -115,7 +117,6 @@ describe("handleOrgSync", () => {
 		const serverRow = makeServerRow({
 			id: "server-org-1",
 			title: "From Server",
-			attachmentUrl: "https://cdn.example.com/f.jpg",
 			updatedAt: new Date("2025-06-01T12:00:00.000Z"),
 		});
 		vi.mocked(getOrgTodosUpdatedSince).mockResolvedValue([serverRow]);
@@ -131,7 +132,6 @@ describe("handleOrgSync", () => {
 			title: "From Server",
 			completed: false,
 			deleted: false,
-			attachmentUrl: "https://cdn.example.com/f.jpg",
 			updatedAt: "2025-06-01T12:00:00.000Z",
 			organizationId: "org-1",
 			createdBy: "user-1",

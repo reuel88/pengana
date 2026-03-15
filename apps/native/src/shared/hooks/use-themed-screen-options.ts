@@ -4,8 +4,11 @@ export function useThemedScreenOptions() {
 	const { theme } = useTheme();
 
 	return {
-		headerStyle: { backgroundColor: theme.background },
-		headerTitleStyle: { color: theme.text },
-		headerTintColor: theme.text,
+		headerStyle: { backgroundColor: theme.menuBackground },
+		headerTitleStyle: {
+			color: theme.menuForeground,
+			fontFamily: theme.fontFamily,
+		},
+		headerTintColor: theme.menuForeground,
 	} as const;
 }

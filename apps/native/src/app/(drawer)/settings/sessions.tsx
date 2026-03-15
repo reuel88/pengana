@@ -8,8 +8,13 @@ import {
 	View,
 } from "react-native";
 import { authClient } from "@/shared/lib/auth-client";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import {
+	outlineButton,
+	primaryButtonText,
+	themedSurface,
+	themedText,
+} from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 
 type Session = {
@@ -52,7 +57,7 @@ export default function SessionsScreen() {
 						style={[styles.button, { backgroundColor: theme.primary }]}
 						onPress={() => revokeAll.mutate()}
 					>
-						<Text style={styles.buttonText}>
+						<Text style={[styles.buttonText, primaryButtonText(theme)]}>
 							{t("auth:settings.sessions.revokeAll")}
 						</Text>
 					</TouchableOpacity>
@@ -64,12 +69,9 @@ export default function SessionsScreen() {
 					return (
 						<View
 							key={session.token}
-							style={[
-								styles.card,
-								{ backgroundColor: theme.card, borderColor: theme.border },
-							]}
+							style={[styles.card, themedSurface(theme)]}
 						>
-							<Text style={[styles.deviceText, { color: theme.text }]}>
+							<Text style={[styles.deviceText, themedText(theme)]}>
 								{session.userAgent || t("auth:settings.sessions.device")}
 							</Text>
 							<Text style={[styles.lastActiveText, { color: theme.text }]}>
@@ -82,13 +84,10 @@ export default function SessionsScreen() {
 								</Text>
 							) : (
 								<TouchableOpacity
-									style={[
-										styles.secondaryButton,
-										{ borderColor: theme.border },
-									]}
+									style={[styles.secondaryButton, outlineButton(theme)]}
 									onPress={() => revoke.mutate(session.token)}
 								>
-									<Text style={{ color: theme.text }}>
+									<Text style={themedText(theme)}>
 										{t("auth:settings.sessions.revoke")}
 									</Text>
 								</TouchableOpacity>
@@ -116,7 +115,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	buttonText: {
-		color: TEXT_ON_PRIMARY,
 		fontWeight: "600",
 	},
 	deviceText: {

@@ -9,8 +9,8 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { TEXT_ON_PRIMARY } from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import { primaryButtonText } from "@/shared/styles/shared";
 import { ThemedTextInput } from "@/shared/ui/themed-text-input";
 
 type TeamMember = { userId: string; user: { email: string } };
@@ -89,9 +89,9 @@ function TeamMemberAddFormContent({
 						disabled={loading || isSubmitting || !email.trim() || !members}
 					>
 						{loading ? (
-							<ActivityIndicator color={TEXT_ON_PRIMARY} size="small" />
+							<ActivityIndicator color={theme.primaryForeground} size="small" />
 						) : (
-							<Text style={{ color: TEXT_ON_PRIMARY }}>
+							<Text style={primaryButtonText(theme)}>
 								{t("teams.addMember")}
 							</Text>
 						)}

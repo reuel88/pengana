@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Không thể chuyển trạng thái công việc",
 	"failedToDeleteTodo": "Không thể xóa công việc",
+	"failedToDeleteAttachment": "Không thể xóa tệp đính kèm",
 	"failedToResolveConflict": "Không thể giải quyết xung đột",
 	"invalidFileType": "Chỉ chấp nhận ảnh JPEG, PNG, HEIC và tệp PDF.",
 	"fileTooLarge": "Tệp vượt quá kích thước tối đa 10MB.",

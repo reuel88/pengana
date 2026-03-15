@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Не удалось переключить задачу",
 	"failedToDeleteTodo": "Не удалось удалить задачу",
+	"failedToDeleteAttachment": "Не удалось удалить вложение",
 	"failedToResolveConflict": "Не удалось разрешить конфликт",
 	"invalidFileType": "Допускаются только изображения JPEG, PNG, HEIC и файлы PDF.",
 	"fileTooLarge": "Файл превышает максимальный размер 10 МБ.",

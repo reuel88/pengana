@@ -8,11 +8,13 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import {
-	PLACEHOLDER_COLORS,
-	TEXT_ON_PRIMARY,
-} from "@/shared/lib/design-tokens";
 import { useTheme } from "@/shared/lib/theme";
+import {
+	inputThemed,
+	placeholderColor,
+	primaryButtonText,
+	themedControl,
+} from "@/shared/styles/shared";
 
 export function TodoInputBase({
 	onAdd,
@@ -23,7 +25,7 @@ export function TodoInputBase({
 }) {
 	const [title, setTitle] = useState("");
 	const [submitting, setSubmitting] = useState(false);
-	const { theme, colorScheme } = useTheme();
+	const { theme } = useTheme();
 	const { t } = useTranslation();
 
 	const handleSubmit = async () => {
@@ -51,21 +53,10 @@ export function TodoInputBase({
 				placeholder={t("todos:addPlaceholder")}
 				accessibilityLabel={t("todos:addPlaceholder")}
 				accessibilityHint={t("todos:addInputHint")}
-				placeholderTextColor={
-					colorScheme === "dark"
-						? PLACEHOLDER_COLORS.dark
-						: PLACEHOLDER_COLORS.light
-				}
+				placeholderTextColor={placeholderColor(theme)}
 				onSubmitEditing={handleSubmit}
 				returnKeyType="done"
-				style={[
-					styles.input,
-					{
-						color: theme.text,
-						borderColor: theme.border,
-						backgroundColor: theme.background,
-					},
-				]}
+				style={[styles.input, themedControl(theme), inputThemed(theme)]}
 			/>
 			<TouchableOpacity
 				testID="todo-submit"
@@ -75,13 +66,16 @@ export function TodoInputBase({
 				accessibilityLabel={t("todos:addButton")}
 				style={[
 					styles.button,
+					{ borderRadius: theme.radius },
 					{
 						backgroundColor:
 							title.trim() && !submitting ? theme.primary : theme.border,
 					},
 				]}
 			>
-				<Text style={styles.buttonText}>{t("todos:addButton")}</Text>
+				<Text style={[styles.buttonText, primaryButtonText(theme)]}>
+					{t("todos:addButton")}
+				</Text>
 			</TouchableOpacity>
 		</View>
 	);
@@ -107,8 +101,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	buttonText: {
-		color: TEXT_ON_PRIMARY,
-		fontWeight: "600",
 		fontSize: 14,
 	},
 });

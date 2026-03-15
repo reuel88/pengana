@@ -59,6 +59,7 @@ export type {
 } from "./realtime/types";
 export { createWebSocketRealtimeTransport } from "./realtime/websocket-realtime-transport";
 export {
+	mediaSchema,
 	orgSyncInputSchema,
 	orgSyncOutputSchema,
 	orgTodoSchema,
@@ -70,6 +71,7 @@ export {
 	uploadStatusSchema,
 } from "./schemas";
 export type {
+	Media,
 	OrgSyncInput,
 	OrgSyncOutput,
 	OrgTodo,

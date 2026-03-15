@@ -12,7 +12,13 @@ import {
 import { useActiveOrg, useOrgRole } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
 import { useTheme } from "@/shared/lib/theme";
-import { mutedText, secondaryText, sharedStyles } from "@/shared/styles/shared";
+import {
+	mutedText,
+	primaryButtonText,
+	secondaryText,
+	sharedStyles,
+	smallPrimaryButtonText,
+} from "@/shared/styles/shared";
 import { Container } from "@/shared/ui/container";
 import { EmptyOrgScreen } from "@/shared/ui/empty-org-screen";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
@@ -57,7 +63,7 @@ function MemberRow({
 					onPress={() => onRemove(member.id)}
 					style={[styles.removeButton, { backgroundColor: theme.notification }]}
 				>
-					<Text style={sharedStyles.smallButtonText}>
+					<Text style={smallPrimaryButtonText(theme)}>
 						{t("members.remove")}
 					</Text>
 				</TouchableOpacity>
@@ -131,7 +137,7 @@ export default function MembersScreen() {
 						]}
 						onPress={onLeave}
 					>
-						<Text style={sharedStyles.buttonText}>{t("members.leave")}</Text>
+						<Text style={primaryButtonText(theme)}>{t("members.leave")}</Text>
 					</TouchableOpacity>
 				}
 				ListEmptyComponent={

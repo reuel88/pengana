@@ -1,6 +1,7 @@
 {
 	"failedToToggleTodo": "Failed to toggle todo",
 	"failedToDeleteTodo": "Failed to delete todo",
+	"failedToDeleteAttachment": "Failed to delete attachment",
 	"failedToResolveConflict": "Failed to resolve conflict",
 	"invalidFileType": "Only JPEG, PNG, HEIC images and PDFs are allowed.",
 	"fileTooLarge": "File exceeds maximum size of 10MB.",

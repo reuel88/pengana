@@ -2,34 +2,36 @@ import type { UploadLifecycleCallbacks } from "@pengana/sync-engine";
 import { eq } from "drizzle-orm";
 
 import { appDb } from "@/features/todo/entities/todo/db";
-import { todos } from "@/features/todo/entities/todo/schema";
+import { media } from "@/features/todo/entities/todo/schema";
 
 export function createNativeUploadLifecycleCallbacks(): UploadLifecycleCallbacks {
 	return {
 		async onCompleted(
 			_entityType: string,
-			entityId: string,
-			attachmentUrl: string,
+			_entityId: string,
+			url: string,
+			uploadItemId: string,
 		): Promise<void> {
 			await appDb
-				.update(todos)
+				.update(media)
 				.set({
-					attachmentUrl,
-					attachmentStatus: "uploaded",
-					updatedAt: new Date().toISOString(),
-					syncStatus: "pending",
+					url,
+					status: "uploaded",
 				})
-				.where(eq(todos.id, entityId));
+				.where(eq(media.id, uploadItemId));
 		},
 
-		async onFailed(_entityType: string, entityId: string): Promise<void> {
+		async onFailed(
+			_entityType: string,
+			_entityId: string,
+			uploadItemId: string,
+		): Promise<void> {
 			await appDb
-				.update(todos)
+				.update(media)
 				.set({
-					attachmentStatus: "failed",
-					updatedAt: new Date().toISOString(),
+					status: "failed",
 				})
-				.where(eq(todos.id, entityId));
+				.where(eq(media.id, uploadItemId));
 		},
 	};
 }

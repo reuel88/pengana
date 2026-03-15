@@ -8,6 +8,8 @@ import m0001 from "./0001_add_upload_queue.sql";
 import m0002 from "./0002_add_org_todos.sql";
 // @ts-expect-error - inline-import babel plugin handles .sql imports
 import m0003 from "./0003_hot_clea.sql";
+// @ts-expect-error - inline-import babel plugin handles .sql imports
+import m0004 from "./0004_sparkling_nuke.sql";
 import journal from "./meta/_journal.json";
 
 export default {
@@ -17,5 +19,6 @@ export default {
 		m0001: m0001,
 		m0002: m0002,
 		m0003: m0003,
+		m0004: m0004,
 	},
 };
