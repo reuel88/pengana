@@ -19,7 +19,10 @@
 		"fileAttached": "文件已附加",
 		"invalidFile": "无效文件",
 		"cameraUnavailable": "相机不可用",
-		"cameraNotAvailable": "此设备上无法使用相机。"
+		"cameraNotAvailable": "此设备上无法使用相机。",
+		"error": "错误",
+		"libraryError": "无法从您的相册加载照片。",
+		"pdfError": "无法加载所选文档。"
 	},
 	"actions": {
 		"keepLocal": "保留本地",

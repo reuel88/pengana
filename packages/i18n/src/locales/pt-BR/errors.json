@@ -17,6 +17,8 @@
 	"unauthorized": "Não autorizado",
 	"paymentError": "Algo deu errado com o pagamento. Por favor, tente novamente.",
 	"migrationError": "Erro de migração: {{message}}. Tente reiniciar o aplicativo.",
-	"noActiveOrganization": "No active organization",
-	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
+	"noActiveOrganization": "Nenhuma organização ativa",
+	"seatRequiredForWrite": "Um assento é necessário para operações de escrita. Entre em contato com o proprietário da sua organização.",
+	"failedToRetryAttachment": "Falha ao reenviar anexo",
+	"attachmentBelongsToAnotherUser": "O anexo pertence a outro usuário"
 }

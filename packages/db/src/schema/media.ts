@@ -32,5 +32,8 @@ export const media = pgTable(
 			table.scopeId,
 			table.updatedAt,
 		),
+		index("media_user_id_idx").on(table.userId),
+		index("media_organization_id_idx").on(table.organizationId),
+		index("media_created_by_idx").on(table.createdBy),
 	],
 );

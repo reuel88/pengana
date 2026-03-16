@@ -10,7 +10,7 @@ export interface TodoConfig {
 	buildNewTodo: (params: {
 		scopeId: string;
 		actorId: string;
-		organizationId: string;
+		organizationId: string | null;
 		title: string;
 	}) => Omit<WebTodo, "id">;
 }

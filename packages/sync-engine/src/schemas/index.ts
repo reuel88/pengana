@@ -15,7 +15,7 @@ export const todoSchema = z.object({
 	completed: z.boolean(),
 	updatedAt: z.string(),
 	userId: z.string(),
-	organizationId: z.string(),
+	organizationId: z.string().nullable(),
 	createdBy: z.string().nullable(),
 	syncStatus: syncStatusSchema,
 	deleted: z.boolean(),

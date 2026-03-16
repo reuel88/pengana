@@ -50,7 +50,10 @@ export async function insertMedia(values: {
 }
 
 export async function updateMediaUrl(id: string, url: string): Promise<void> {
-	await db.update(media).set({ url }).where(eq(media.id, id));
+	await db
+		.update(media)
+		.set({ url, updatedAt: new Date() })
+		.where(eq(media.id, id));
 }
 
 export async function findMediaById(id: string): Promise<MediaRow | undefined> {

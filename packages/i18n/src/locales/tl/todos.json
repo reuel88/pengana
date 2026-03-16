@@ -19,7 +19,10 @@
 		"fileAttached": "Nakalakip ang file",
 		"invalidFile": "Hindi wastong file",
 		"cameraUnavailable": "Hindi magamit ang camera",
-		"cameraNotAvailable": "Hindi available ang camera sa device na ito."
+		"cameraNotAvailable": "Hindi available ang camera sa device na ito.",
+		"error": "Error",
+		"libraryError": "Hindi ma-load ang mga larawan mula sa iyong library.",
+		"pdfError": "Hindi ma-load ang napiling dokumento."
 	},
 	"actions": {
 		"keepLocal": "Panatilihin ang Lokal",

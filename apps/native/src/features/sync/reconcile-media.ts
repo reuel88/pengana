@@ -1,5 +1,5 @@
 import type { Media } from "@pengana/sync-engine";
-import { and, eq, notInArray } from "drizzle-orm";
+import { and, eq, inArray, notInArray } from "drizzle-orm";
 
 import { appDb } from "@/features/todo/entities/todo/db";
 import { media } from "@/features/todo/entities/todo/schema";
@@ -9,24 +9,26 @@ export async function reconcileNativeMedia(
 	entityIds?: string[],
 ): Promise<void> {
 	await appDb.transaction(async (tx) => {
+		// Batch-fetch all existing local media for the incoming server IDs
+		const serverIds = serverMedia.map((m) => m.id);
+		const existingRows =
+			serverIds.length > 0
+				? await tx.select().from(media).where(inArray(media.id, serverIds))
+				: [];
+		const existingMap = new Map(existingRows.map((r) => [r.id, r]));
+
+		const toInsert: (typeof media.$inferInsert)[] = [];
+		const toUpdate: { id: string; url: string }[] = [];
+
 		for (const sa of serverMedia) {
-			const [existing] = await tx
-				.select()
-				.from(media)
-				.where(eq(media.id, sa.id));
+			const existing = existingMap.get(sa.id);
 
 			if (existing) {
 				if (sa.url && existing.url !== sa.url) {
-					await tx
-						.update(media)
-						.set({
-							url: sa.url,
-							status: "uploaded",
-						})
-						.where(eq(media.id, sa.id));
+					toUpdate.push({ id: sa.id, url: sa.url });
 				}
 			} else {
-				await tx.insert(media).values({
+				toInsert.push({
 					id: sa.id,
 					entityId: sa.entityId,
 					entityType: sa.entityType,
@@ -44,6 +46,17 @@ export async function reconcileNativeMedia(
 					createdBy: sa.createdBy,
 				});
 			}
+		}
+
+		if (toInsert.length > 0) {
+			await tx.insert(media).values(toInsert);
+		}
+
+		for (const item of toUpdate) {
+			await tx
+				.update(media)
+				.set({ url: item.url, status: "uploaded" })
+				.where(eq(media.id, item.id));
 		}
 
 		// Remove local media that the server no longer has for the synced entities

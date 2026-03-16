@@ -31,7 +31,8 @@ function PersonalTodoContent({
 	const orgFilter = useMemo(
 		() =>
 			organizationId
-				? (t: { organizationId: string }) => t.organizationId === organizationId
+				? (t: { organizationId: string | null }) =>
+						t.organizationId === organizationId
 				: undefined,
 		[organizationId],
 	);

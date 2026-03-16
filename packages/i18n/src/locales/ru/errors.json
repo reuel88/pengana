@@ -17,6 +17,8 @@
 	"unauthorized": "Не авторизован",
 	"paymentError": "Произошла ошибка при оплате. Пожалуйста, попробуйте снова.",
 	"migrationError": "Ошибка миграции: {{message}}. Попробуйте перезапустить приложение.",
-	"noActiveOrganization": "No active organization",
-	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
+	"noActiveOrganization": "Нет активной организации",
+	"seatRequiredForWrite": "Для операций записи необходимо место. Обратитесь к владельцу организации.",
+	"failedToRetryAttachment": "Не удалось повторить отправку вложения",
+	"attachmentBelongsToAnotherUser": "Вложение принадлежит другому пользователю"
 }

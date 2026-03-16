@@ -21,7 +21,7 @@ export const addTodo = (
 	userId: string,
 	title: string,
 	organizationId?: string,
-) => actions.addTodo(userId, userId, organizationId ?? "", title);
+) => actions.addTodo(userId, userId, organizationId ?? null, title);
 export const toggleTodo = (id: string) => actions.toggleTodo(id);
 export const deleteTodo = (id: string) => actions.deleteTodo(id);
 export const resolveConflict = (id: string, resolution: "local" | "server") =>

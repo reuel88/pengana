@@ -19,7 +19,10 @@
 		"fileAttached": "Fichier joint",
 		"invalidFile": "Fichier invalide",
 		"cameraUnavailable": "Caméra indisponible",
-		"cameraNotAvailable": "La caméra n'est pas disponible sur cet appareil."
+		"cameraNotAvailable": "La caméra n'est pas disponible sur cet appareil.",
+		"error": "Erreur",
+		"libraryError": "Impossible de charger les photos depuis votre bibliothèque.",
+		"pdfError": "Impossible de charger le document sélectionné."
 	},
 	"actions": {
 		"keepLocal": "Garder la version locale",

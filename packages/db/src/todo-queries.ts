@@ -1,4 +1,4 @@
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, inArray } from "drizzle-orm";
 
 import { db } from "./index";
 import { todo } from "./schema/todo";
@@ -21,6 +21,14 @@ export interface TodoRow {
 export async function findTodoById(id: string): Promise<TodoRow | undefined> {
 	const rows = await db.select().from(todo).where(eq(todo.id, id));
 	return rows[0];
+}
+
+export async function findTodosByIds(
+	ids: string[],
+): Promise<Map<string, TodoRow>> {
+	if (ids.length === 0) return new Map();
+	const rows = await db.select().from(todo).where(inArray(todo.id, ids));
+	return new Map(rows.map((r) => [r.id, r]));
 }
 
 export async function insertTodo(values: {

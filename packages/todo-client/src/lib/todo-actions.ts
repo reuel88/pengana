@@ -10,7 +10,7 @@ export function createTodoActions(db: EntityDatabase, config: TodoConfig) {
 		async addTodo(
 			scopeId: string,
 			actorId: string,
-			organizationId: string,
+			organizationId: string | null,
 			title: string,
 		): Promise<void> {
 			const actions = createDexieActions<WebTodo>(db, tableName);

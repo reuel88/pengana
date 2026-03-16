@@ -1,4 +1,6 @@
+import { useTranslation } from "@pengana/i18n";
 import { useCallback } from "react";
+import { Alert } from "react-native";
 
 import { client } from "@/shared/api/orpc";
 
@@ -15,29 +17,39 @@ export function useAttachmentHandlers(
 		id: string,
 	) => void,
 ) {
+	const { t } = useTranslation("todos");
+
 	const handleRemoveAttachment = useCallback(
 		async (attachmentId: string) => {
-			await removeMediaFn(attachmentId);
-			client.upload.deleteAttachment({ attachmentId }).catch(() => {});
-			triggerSync();
+			try {
+				await removeMediaFn(attachmentId);
+				client.upload.deleteAttachment({ attachmentId }).catch(() => {});
+				triggerSync();
+			} catch {
+				Alert.alert(t("error.title"), t("errors:failedToDeleteAttachment"));
+			}
 		},
-		[removeMediaFn, triggerSync],
+		[removeMediaFn, triggerSync, t],
 	);
 
 	const handleRetryAttachment = useCallback(
 		async (attachmentId: string) => {
-			const record = await retryMedia(attachmentId);
-			if (record?.localUri && record.entityType && record.entityId) {
-				enqueueUpload(
-					record.entityType,
-					record.entityId,
-					record.localUri,
-					record.mimeType,
-					record.id,
-				);
+			try {
+				const record = await retryMedia(attachmentId);
+				if (record?.localUri && record.entityType && record.entityId) {
+					enqueueUpload(
+						record.entityType,
+						record.entityId,
+						record.localUri,
+						record.mimeType,
+						record.id,
+					);
+				}
+			} catch {
+				Alert.alert(t("error.title"), t("errors:failedToRetryAttachment"));
 			}
 		},
-		[enqueueUpload],
+		[enqueueUpload, t],
 	);
 
 	return { handleRemoveAttachment, handleRetryAttachment };

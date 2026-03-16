@@ -9,6 +9,8 @@ function makeTodo(overrides: Partial<Todo> = {}): Todo {
 		completed: false,
 		updatedAt: new Date().toISOString(),
 		userId: "user-1",
+		organizationId: null,
+		createdBy: null,
 		syncStatus: "pending",
 		deleted: false,
 		...overrides,

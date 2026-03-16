@@ -19,7 +19,10 @@
 		"fileAttached": "File attached",
 		"invalidFile": "Invalid file",
 		"cameraUnavailable": "Camera unavailable",
-		"cameraNotAvailable": "Camera is not available on this device."
+		"cameraNotAvailable": "Camera is not available on this device.",
+		"error": "Error",
+		"libraryError": "Could not load photos from your library.",
+		"pdfError": "Could not load the selected document."
 	},
 	"actions": {
 		"keepLocal": "Keep Local",

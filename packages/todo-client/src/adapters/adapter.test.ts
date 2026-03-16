@@ -55,6 +55,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "local-user",
+			scopeType: "org",
 			syncStatus: "pending",
 			deleted: true,
 		} satisfies WebTodo;
@@ -94,6 +95,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "local-user",
+			scopeType: "org",
 			syncStatus: "pending",
 			deleted: true,
 		} satisfies WebTodo;
@@ -120,6 +122,8 @@ describe("createTodoSyncAdapter (org config)", () => {
 			completed: true,
 			updatedAt: "2026-03-14T00:00:00.000Z",
 			userId: "org-fallback",
+			organizationId: "org-fallback",
+			createdBy: "",
 			syncStatus: "synced",
 			deleted: false,
 		} satisfies Todo;

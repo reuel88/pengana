@@ -19,7 +19,10 @@
 		"fileAttached": "파일 첨부됨",
 		"invalidFile": "잘못된 파일",
 		"cameraUnavailable": "카메라 사용 불가",
-		"cameraNotAvailable": "이 기기에서는 카메라를 사용할 수 없습니다."
+		"cameraNotAvailable": "이 기기에서는 카메라를 사용할 수 없습니다.",
+		"error": "오류",
+		"libraryError": "사진 보관함에서 사진을 불러올 수 없습니다.",
+		"pdfError": "선택한 문서를 불러올 수 없습니다."
 	},
 	"actions": {
 		"keepLocal": "로컬 유지",

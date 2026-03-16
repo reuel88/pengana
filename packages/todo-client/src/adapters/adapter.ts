@@ -41,10 +41,8 @@ export function createTodoSyncAdapter(
 				completed: wire.completed,
 				updatedAt: wire.updatedAt,
 				userId: wire.userId,
-				organizationId:
-					(wire as Todo & { organizationId?: string }).organizationId ??
-					wire.userId,
-				createdBy: (wire as Todo & { createdBy?: string }).createdBy ?? "",
+				organizationId: wire.organizationId,
+				createdBy: wire.createdBy ?? "",
 				syncStatus,
 				deleted: wire.deleted,
 				scopeType: config.scopeType,
