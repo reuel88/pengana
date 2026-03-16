@@ -107,6 +107,8 @@ export const uploadRouter = {
 				await writeFile(filepath, buffer);
 			}
 
+			const now = new Date();
+
 			await insertMedia({
 				id: input.attachmentId,
 				entityId: input.entityId,
@@ -115,9 +117,13 @@ export const uploadRouter = {
 				url,
 				mimeType: input.mimeType,
 				position: count,
+				scopeType: todoRow.scopeType,
+				scopeId: todoRow.scopeId,
+				organizationId: todoRow.organizationId,
+				createdBy: userId,
+				updatedAt: now,
 			});
 
-			const now = new Date();
 			await updateTodo(input.entityId, { updatedAt: now });
 
 			if (todoRow.scopeType === "org" && activeOrgId) {
@@ -152,7 +158,20 @@ export const uploadRouter = {
 				throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
 			}
 
-			if (mediaRecord.userId !== userId) {
+			if (mediaRecord.scopeType === "org") {
+				const activeOrgId = context.session.session.activeOrganizationId;
+				if (!activeOrgId || mediaRecord.organizationId !== activeOrgId) {
+					throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
+				}
+
+				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
+				if (!seated) {
+					seated = await autoSeatOwner(activeOrgId, userId);
+				}
+				if (!seated) {
+					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
+				}
+			} else if (mediaRecord.userId !== userId) {
 				throw apiError("FORBIDDEN", context.t("notAttachmentOwner"));
 			}
 

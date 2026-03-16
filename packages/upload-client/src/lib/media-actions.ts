@@ -10,6 +10,10 @@ export async function addMedia(
 	userId: string,
 	localUri: string,
 	mimeType: string,
+	scopeType: "personal" | "org",
+	scopeId: string,
+	organizationId: string | null,
+	createdBy: string | null,
 ): Promise<string> {
 	const id = crypto.randomUUID();
 	const table = db.getTable<WebMedia>("media");
@@ -28,6 +32,11 @@ export async function addMedia(
 		mimeType,
 		position,
 		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy,
 	});
 
 	return id;
@@ -116,6 +125,11 @@ export async function reconcileMedia(
 				mimeType: sa.mimeType,
 				position: sa.position,
 				createdAt: sa.createdAt,
+				updatedAt: sa.updatedAt,
+				scopeType: sa.scopeType,
+				scopeId: sa.scopeId,
+				organizationId: sa.organizationId,
+				createdBy: sa.createdBy,
 			});
 		}
 	}

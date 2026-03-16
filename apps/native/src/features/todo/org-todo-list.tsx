@@ -21,12 +21,14 @@ const actions: TodoListActions = {
 export function OrgTodoList({
 	todos,
 	userId,
+	organizationId,
 }: {
 	todos: TodoItemRow[];
 	userId: string;
+	organizationId: string;
 }) {
 	const { triggerSync, enqueueUpload } = useOrgSync();
-	const { showPickerForTodo } = useOrgFilePicker(userId);
+	const { showPickerForTodo } = useOrgFilePicker(userId, organizationId);
 	const { handleRemoveAttachment, handleRetryAttachment } =
 		useAttachmentHandlers(removeMedia, triggerSync, enqueueUpload);
 

@@ -23,7 +23,11 @@ export class TodoPage extends BaseTodoPage {
 	}
 
 	async deleteTodo(title: string) {
-		await this.todoRow(title).getByRole("button", { name: "Delete" }).click();
+		const deleteBtn = this.todoRow(title).getByRole("button", {
+			name: "Delete",
+		});
+		await deleteBtn.waitFor({ state: "attached" });
+		await deleteBtn.click();
 	}
 
 	async toggleTodo(title: string) {
@@ -38,5 +42,34 @@ export class TodoPage extends BaseTodoPage {
 
 	todoRowLocator(title: string) {
 		return this.todoRow(title);
+	}
+
+	async attachFileToTodo(
+		title: string,
+		filePayload: { name: string; mimeType: string; buffer: Buffer },
+	) {
+		const row = this.todoRow(title);
+		const fileInput = row.locator('input[type="file"]');
+		await fileInput.setInputFiles({
+			name: filePayload.name,
+			mimeType: filePayload.mimeType,
+			buffer: filePayload.buffer,
+		});
+	}
+
+	attachmentLocator(todoTitle: string) {
+		const row = this.todoRow(todoTitle);
+		return row.locator('[data-testid="attachment-badge"]');
+	}
+
+	uploadedAttachmentLocator(todoTitle: string) {
+		const row = this.todoRow(todoTitle);
+		return row.locator(
+			'[data-testid="attachment-badge"][data-upload-status="uploaded"]',
+		);
+	}
+
+	async attachmentCountForTodo(todoTitle: string) {
+		return this.attachmentLocator(todoTitle).count();
 	}
 }

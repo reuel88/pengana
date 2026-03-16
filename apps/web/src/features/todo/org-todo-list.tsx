@@ -10,9 +10,11 @@ const orgActions = createTodoActions(appDb, orgTodoConfig);
 export function OrgTodoList({
 	todos,
 	userId,
+	organizationId,
 }: {
 	todos: (WebTodo & { attachments: WebMedia[] })[];
 	userId: string;
+	organizationId: string;
 }) {
 	const { triggerSync, enqueueUpload } = useOrgSync();
 
@@ -24,6 +26,9 @@ export function OrgTodoList({
 			actions={orgActions}
 			entityType="todo"
 			userId={userId}
+			scopeType="org"
+			scopeId={organizationId}
+			organizationId={organizationId}
 		/>
 	);
 }

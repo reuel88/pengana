@@ -71,6 +71,10 @@ export function useFilePickerBase(deps: {
 		userId: string,
 		uri: string,
 		mimeType: string,
+		scopeType: "personal" | "org",
+		scopeId: string,
+		organizationId: string | null,
+		createdBy: string | null,
 	) => Promise<string>;
 	// Native files are available from the picker URI directly; web must store in
 	// IndexedDB first, then update the URI — hence this is optional on native.
@@ -85,6 +89,10 @@ export function useFilePickerBase(deps: {
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
 	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
 }) {
 	const { t } = useTranslation();
 
@@ -100,6 +108,10 @@ export function useFilePickerBase(deps: {
 				deps.userId,
 				asset.uri,
 				asset.mimeType,
+				deps.scopeType,
+				deps.scopeId,
+				deps.organizationId,
+				deps.createdBy,
 			);
 			deps.enqueueUpload(
 				deps.entityType,

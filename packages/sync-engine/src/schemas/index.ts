@@ -30,6 +30,11 @@ export const mediaSchema = z.object({
 	mimeType: z.string(),
 	position: z.number(),
 	createdAt: z.string(),
+	updatedAt: z.string(),
+	scopeType: z.enum(["personal", "org"]),
+	scopeId: z.string(),
+	organizationId: z.string().nullable(),
+	createdBy: z.string().nullable(),
 });
 
 export const uploadItemSchema = z.object({

@@ -9,4 +9,12 @@ export abstract class BaseTodoPage {
 	abstract toggleTodo(title: string): Promise<void>;
 	abstract completedTodoLocator(title: string): Locator;
 	abstract todoRowLocator(title: string): Locator;
+	abstract attachFileToTodo(
+		title: string,
+		filePayload: {
+			name: string;
+			mimeType: string;
+			buffer: Buffer;
+		},
+	): Promise<void>;
 }

@@ -12,6 +12,11 @@ export interface MediaRow {
 	mimeType: string;
 	position: number;
 	createdAt: Date;
+	updatedAt: Date;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
 }
 
 export async function findMediaByEntityIds(
@@ -29,13 +34,18 @@ export async function insertMedia(values: {
 	url?: string | null;
 	mimeType: string;
 	position: number;
+	updatedAt?: Date;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId?: string | null;
+	createdBy?: string | null;
 }): Promise<void> {
 	await db
 		.insert(media)
 		.values(values)
 		.onConflictDoUpdate({
 			target: media.id,
-			set: { url: values.url },
+			set: { url: values.url, updatedAt: values.updatedAt ?? new Date() },
 		});
 }
 

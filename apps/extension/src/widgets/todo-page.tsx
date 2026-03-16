@@ -52,7 +52,14 @@ function TodoContent({
 				}
 				triggerSync={sync.triggerSync}
 			/>
-			<TodoList todos={todos} syncHook={sync} userId={userId} />
+			<TodoList
+				todos={todos}
+				syncHook={sync}
+				userId={userId}
+				scopeType="personal"
+				scopeId={userId}
+				organizationId={organizationId ?? null}
+			/>
 		</div>
 	);
 }
@@ -82,6 +89,9 @@ function OrgTodoContent({
 				actions={orgActions}
 				entityType="todo"
 				userId={userId}
+				scopeType="org"
+				scopeId={organizationId}
+				organizationId={organizationId}
 			/>
 		</div>
 	);

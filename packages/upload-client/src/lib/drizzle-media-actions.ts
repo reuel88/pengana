@@ -19,6 +19,11 @@ type MediaTable = SQLiteTable & {
 	mimeType: SQLiteColumn;
 	position: SQLiteColumn;
 	createdAt: SQLiteColumn;
+	updatedAt: SQLiteColumn;
+	scopeType: SQLiteColumn;
+	scopeId: SQLiteColumn;
+	organizationId: SQLiteColumn;
+	createdBy: SQLiteColumn;
 };
 
 export async function addMedia(
@@ -30,6 +35,10 @@ export async function addMedia(
 	userId: string,
 	localUri: string,
 	mimeType: string,
+	scopeType: "personal" | "org",
+	scopeId: string,
+	organizationId: string | null,
+	createdBy: string | null,
 ): Promise<string> {
 	const id = generateId();
 	const [row] = await db
@@ -49,6 +58,11 @@ export async function addMedia(
 		mimeType,
 		position,
 		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy,
 	});
 
 	return id;

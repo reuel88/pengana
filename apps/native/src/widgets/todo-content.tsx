@@ -104,7 +104,11 @@ export function OrganizationTodoContent({
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList todos={todos} userId={userId} />
+			<OrgTodoList
+				todos={todos}
+				userId={userId}
+				organizationId={organizationId}
+			/>
 			<SyncDevtools />
 		</View>
 	);

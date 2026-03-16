@@ -42,6 +42,7 @@ process.env.POLAR_SUCCESS_URL ??= "http://localhost:3001/success";
 process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
+import { insertMedia } from "@pengana/db/media-queries";
 import {
 	autoSeatOwner,
 	isMemberSeatedByUserId,
@@ -116,6 +117,15 @@ describe("upload.upload", () => {
 		expect(fsMocks.writeFile).toHaveBeenCalledOnce();
 		expect(isMemberSeatedByUserId).not.toHaveBeenCalled();
 		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");
+
+		expect(insertMedia).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "personal",
+				scopeId: "user-1",
+				organizationId: null,
+				createdBy: "user-1",
+			}),
+		);
 	});
 
 	it("requires a seat when uploading attachments for org todos", async () => {
@@ -189,5 +199,14 @@ describe("upload.upload", () => {
 		expect(result.data.url).toContain("/uploads/");
 		expect(ctx.notifyOrgMembers).toHaveBeenCalledWith("org-1");
 		expect(ctx.notifyUser).not.toHaveBeenCalled();
+
+		expect(insertMedia).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "org",
+				scopeId: "org-1",
+				organizationId: "org-1",
+				createdBy: "user-1",
+			}),
+		);
 	});
 });

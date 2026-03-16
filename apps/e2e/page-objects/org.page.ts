@@ -28,9 +28,7 @@ export class OrgPage {
 	}
 
 	private orgSwitcherTrigger() {
-		return this.page
-			.locator('header [data-slot="dropdown-menu-trigger"]')
-			.first();
+		return this.page.getByTestId("org-switcher-trigger");
 	}
 
 	async switchOrg(orgName: string) {
