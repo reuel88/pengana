@@ -2,16 +2,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "../context";
 
 vi.mock("@pengana/db/todo-queries", () => ({
-	updateTodoForUser: vi.fn(),
+	updateTodoForScope: vi.fn(),
+}));
+
+vi.mock("@pengana/db/seat-queries", () => ({
+	isMemberSeatedByUserId: vi.fn().mockResolvedValue(true),
+	autoSeatOwner: vi.fn().mockResolvedValue(false),
 }));
 
 vi.mock("./todo-sync", () => ({
-	handleSync: vi.fn(),
+	handleTodoSync: vi.fn(),
 }));
 
 import { call } from "@orpc/server";
 
-let handleSync: typeof import("./todo-sync").handleSync;
+let handleTodoSync: typeof import("./todo-sync").handleTodoSync;
 let todoRouter: typeof import("./todo").todoRouter;
 
 process.env.DATABASE_URL ??= "postgres://test:test@localhost:5432/test";
@@ -32,7 +37,7 @@ function makeContext(overrides: Partial<Context> = {}): Context {
 				name: "Test User",
 			},
 			session: {
-				activeOrganizationId: null,
+				activeOrganizationId: "org-1",
 			},
 		},
 		locale: "en-US",
@@ -45,10 +50,10 @@ function makeContext(overrides: Partial<Context> = {}): Context {
 
 describe("todo.sync", () => {
 	beforeEach(async () => {
-		({ handleSync } = await import("./todo-sync"));
+		({ handleTodoSync } = await import("./todo-sync"));
 		({ todoRouter } = await import("./todo"));
 		vi.clearAllMocks();
-		vi.mocked(handleSync).mockResolvedValue({
+		vi.mocked(handleTodoSync).mockResolvedValue({
 			serverChanges: [],
 			media: [],
 			conflicts: [],
@@ -56,17 +61,21 @@ describe("todo.sync", () => {
 		});
 	});
 
-	it("allows personal todo sync without an active organization", async () => {
+	it("passes active organization to personal todo sync", async () => {
 		const input = { changes: [], lastSyncedAt: null };
 
 		const result = await call(todoRouter.sync, input, {
 			context: makeContext(),
 		});
 
-		expect(handleSync).toHaveBeenCalledWith(
+		expect(handleTodoSync).toHaveBeenCalledWith(
 			input,
+			"personal",
+			"user-1",
 			"user-1",
 			expect.any(Function),
+			false,
+			"org-1",
 		);
 		expect(result.data).toEqual({
 			serverChanges: [],

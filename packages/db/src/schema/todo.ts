@@ -11,6 +11,8 @@ export const todo = pgTable(
 		completed: boolean("completed").default(false).notNull(),
 		deleted: boolean("deleted").default(false).notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+		scopeType: text("scope_type", { enum: ["personal", "org"] }).notNull(),
+		scopeId: text("scope_id").notNull(),
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
@@ -22,8 +24,11 @@ export const todo = pgTable(
 		}),
 	},
 	(table) => [
-		index("todo_userId_idx").on(table.userId),
-		index("todo_userId_updatedAt_idx").on(table.userId, table.updatedAt),
+		index("todo_scope_updatedAt_idx").on(
+			table.scopeType,
+			table.scopeId,
+			table.updatedAt,
+		),
 	],
 );
 

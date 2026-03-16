@@ -45,16 +45,27 @@ export async function updateMediaUploaded(
 	mediaId: string,
 	url: string,
 ): Promise<void> {
+	// Dexie .update() doesn't type partial updates
 	await db.getTable<WebMedia>("media").update(mediaId, {
 		url,
 		status: "uploaded",
 	} as never);
 }
 
+export async function updateMediaLocalUri(
+	db: EntityDatabase,
+	mediaId: string,
+	localUri: string,
+): Promise<void> {
+	// Dexie .update() doesn't type partial updates
+	await db.getTable<WebMedia>("media").update(mediaId, { localUri } as never);
+}
+
 export async function markMediaFailed(
 	db: EntityDatabase,
 	mediaId: string,
 ): Promise<void> {
+	// Dexie .update() doesn't type partial updates
 	await db.getTable<WebMedia>("media").update(mediaId, {
 		status: "failed",
 	} as never);
@@ -74,18 +85,27 @@ export async function reconcileMedia(
 ): Promise<void> {
 	const table = db.getTable<WebMedia>("media");
 
-	// Upsert server media
+	// Bulk-fetch existing records for all server media IDs in one query
+	const serverIds = serverMedia.map((m) => m.id);
+	const existingRecords =
+		serverIds.length > 0 ? await table.bulkGet(serverIds) : [];
+	const existingById = new Map<string, WebMedia>();
+	for (let i = 0; i < serverIds.length; i++) {
+		const id = serverIds[i];
+		const rec = existingRecords[i];
+		if (id && rec) existingById.set(id, rec);
+	}
+
+	// Upsert server media — collect puts and updates, then apply in bulk
+	const toPut: WebMedia[] = [];
 	for (const sa of serverMedia) {
-		const existing = await table.get(sa.id);
+		const existing = existingById.get(sa.id);
 		if (existing) {
 			if (sa.url && existing.url !== sa.url) {
-				await table.update(sa.id, {
-					url: sa.url,
-					status: "uploaded",
-				} as never);
+				toPut.push({ ...existing, url: sa.url, status: "uploaded" });
 			}
 		} else {
-			await table.put({
+			toPut.push({
 				id: sa.id,
 				entityId: sa.entityId,
 				entityType: sa.entityType,
@@ -99,17 +119,19 @@ export async function reconcileMedia(
 			});
 		}
 	}
+	if (toPut.length > 0) {
+		await table.bulkPut(toPut);
+	}
 
 	// Remove local media that the server no longer has for the synced entities
 	if (entityIds && entityIds.length > 0) {
 		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
-		for (const entityId of entityIds) {
-			const localMedia = await table.where({ entityId }).toArray();
-			for (const local of localMedia) {
-				if (!serverMediaIds.has(local.id)) {
-					await table.delete(local.id);
-				}
-			}
+		const localMedia = await table.where("entityId").anyOf(entityIds).toArray();
+		const toDelete = localMedia
+			.filter((local) => !serverMediaIds.has(local.id))
+			.map((local) => local.id);
+		if (toDelete.length > 0) {
+			await table.bulkDelete(toDelete);
 		}
 	}
 }

@@ -8,4 +8,5 @@ export interface WebTodo {
 	createdBy: string; // always present — who created the 2do
 	syncStatus: "synced" | "pending" | "conflict";
 	deleted: boolean;
+	scopeType: "personal" | "org";
 }

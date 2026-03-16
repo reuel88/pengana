@@ -1,5 +1,5 @@
 import { filterTodos } from "@pengana/todo-client";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
 
@@ -7,9 +7,20 @@ import { appDb, media, todos } from "@/features/todo/entities/todo";
 
 import type { TodoItemRow } from "./components/todo-item";
 
-function useTodosWithAttachments(scopeId: string) {
+function useTodosWithAttachments(scopeId: string, organizationId?: string) {
 	const { data: allTodos } = useLiveQuery(
-		appDb.select().from(todos).where(eq(todos.userId, scopeId)),
+		organizationId
+			? appDb
+					.select()
+					.from(todos)
+					.where(
+						and(
+							eq(todos.userId, scopeId),
+							eq(todos.organizationId, organizationId),
+						),
+					)
+			: appDb.select().from(todos).where(eq(todos.userId, scopeId)),
+		[scopeId, organizationId],
 	);
 
 	const todoIds = useMemo(() => (allTodos ?? []).map((t) => t.id), [allTodos]);
@@ -48,8 +59,8 @@ function useTodosWithAttachments(scopeId: string) {
 	return { todos: activeTodos, conflictTodos };
 }
 
-export function useTodos(userId: string) {
-	return useTodosWithAttachments(userId);
+export function useTodos(userId: string, organizationId?: string) {
+	return useTodosWithAttachments(userId, organizationId);
 }
 
 export function useOrgTodos(organizationId: string) {

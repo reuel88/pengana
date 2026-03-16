@@ -3,14 +3,9 @@ import { randomUUID } from "expo-crypto";
 import { appDb, todos } from "@/features/todo/entities/todo";
 
 export {
-	addMedia as addOrgMedia,
 	deleteTodo as deleteOrgTodo,
-	getMediaCountForEntity as getOrgMediaCountForEntity,
-	markMediaFailed as markOrgMediaFailed,
-	removeMedia as removeOrgMedia,
 	resolveConflict as resolveOrgConflict,
 	toggleTodo as toggleOrgTodo,
-	updateMediaUploaded as updateOrgMediaUploaded,
 } from "./todo-actions";
 
 export async function addOrgTodo(
@@ -26,6 +21,7 @@ export async function addOrgTodo(
 		userId: organizationId,
 		organizationId,
 		createdBy: userId,
+		scopeType: "org",
 		syncStatus: "pending",
 		deleted: false,
 	});

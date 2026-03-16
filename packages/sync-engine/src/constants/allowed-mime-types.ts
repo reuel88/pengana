@@ -23,3 +23,9 @@ export const MIME_TO_EXT: Record<string, string> = {
 };
 
 export const INDEXEDDB_URI_PREFIX = "indexeddb://";
+
+/** Canonical entity type string used in media/upload paths */
+export const ENTITY_TYPE_TODO = "todo" as const;
+
+/** Maximum number of file attachments per 2do item */
+export const MAX_ATTACHMENTS = 10;

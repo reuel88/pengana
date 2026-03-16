@@ -7,14 +7,20 @@ import { appDb } from "@/shared/db";
 
 const todoActions = createTodoActions(appDb, personalTodoConfig);
 
-export function TodoInput({ userId }: { userId: string }) {
+export function TodoInput({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
 	const { triggerSync } = useSync();
 	const { t } = useTranslation();
 
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await todoActions.addTodo(userId, userId, "", title);
+				await todoActions.addTodo(userId, userId, organizationId ?? "", title);
 				triggerSync();
 			}}
 			onError={() => toast.error(t("errors:failedToAddTodo"))}

@@ -14,10 +14,15 @@ export function useDexieEntity<TLocal extends SyncableBase>(
 	db: EntityDatabase,
 	tableName: string,
 	scopeId: string,
+	filter?: (item: TLocal) => boolean,
 ) {
 	const allItems = useLiveQuery(
-		() => db.getTable<TLocal>(tableName).where({ userId: scopeId }).toArray(),
-		[db, tableName, scopeId],
+		() => {
+			const query = db.getTable<TLocal>(tableName).where({ userId: scopeId });
+			if (filter) return query.filter(filter).toArray();
+			return query.toArray();
+		},
+		[db, tableName, scopeId, filter],
 		[],
 	);
 

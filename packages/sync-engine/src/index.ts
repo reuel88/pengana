@@ -1,8 +1,10 @@
 export type { AllowedMimeType } from "./constants/allowed-mime-types";
 export {
 	ALLOWED_MIME_TYPES,
+	ENTITY_TYPE_TODO,
 	INDEXEDDB_URI_PREFIX,
 	isAllowedMimeType,
+	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 	MIME_TO_EXT,
 } from "./constants/allowed-mime-types";

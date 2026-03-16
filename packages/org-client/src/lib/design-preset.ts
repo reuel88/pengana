@@ -309,60 +309,57 @@ export const ORG_MENU_OPTIONS: RegistryItem<OrgMenuId>[] = ORG_MENU_IDS.map(
 export const ORG_MENU_ACCENT_OPTIONS: RegistryItem<OrgMenuAccentId>[] =
 	ORG_MENU_ACCENT_IDS.map((id) => ({ id, ...MENU_ACCENT_DETAILS[id] }));
 
-function includes<T extends string>(
-	values: readonly T[],
-	value: unknown,
-): value is T {
-	return typeof value === "string" && values.includes(value as T);
+function createNormalizer<T extends string>(
+	validValues: readonly T[],
+	fallback: T,
+	aliases?: Record<string, T>,
+): (value: unknown) => T {
+	return (value: unknown): T => {
+		if (typeof value === "string") {
+			const aliased = aliases?.[value];
+			if (aliased !== undefined) return aliased;
+			if ((validValues as readonly string[]).includes(value)) return value as T;
+		}
+		return fallback;
+	};
 }
 
-function normalizeStyle(value: unknown): OrgStyleId {
-	if (value === "default") return "vega";
-	return includes(ORG_STYLE_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.style;
-}
-
-function normalizeBaseColor(value: unknown): OrgBaseColorId {
-	return includes(ORG_BASE_COLOR_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.baseColor;
-}
-
-function normalizeAccentTheme(value: unknown): OrgAccentThemeId {
-	return includes(ORG_ACCENT_THEME_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.accentTheme;
-}
-
-function normalizeIconLibrary(value: unknown): OrgIconLibraryId {
-	return includes(ORG_ICON_LIBRARY_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.iconLibrary;
-}
-
-function normalizeFont(value: unknown): OrgFontId {
-	if (value === "geistMono") return "geist-mono";
-	return includes(ORG_FONT_IDS, value) ? value : DEFAULT_ORG_DESIGN_PRESET.font;
-}
-
-function normalizeRadius(value: unknown): OrgRadiusId {
-	return includes(ORG_RADIUS_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.radius;
-}
-
-function normalizeMenu(value: unknown): OrgMenuId {
-	if (value === "translucent") return "default-translucent";
-	return includes(ORG_MENU_IDS, value) ? value : DEFAULT_ORG_DESIGN_PRESET.menu;
-}
-
-function normalizeMenuAccent(value: unknown): OrgMenuAccentId {
-	if (value === "contrast") return "bold";
-	return includes(ORG_MENU_ACCENT_IDS, value)
-		? value
-		: DEFAULT_ORG_DESIGN_PRESET.menuAccent;
-}
+const normalizeStyle = createNormalizer(
+	ORG_STYLE_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.style,
+	{ default: "vega" },
+);
+const normalizeBaseColor = createNormalizer(
+	ORG_BASE_COLOR_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.baseColor,
+);
+const normalizeAccentTheme = createNormalizer(
+	ORG_ACCENT_THEME_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.accentTheme,
+);
+const normalizeIconLibrary = createNormalizer(
+	ORG_ICON_LIBRARY_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.iconLibrary,
+);
+const normalizeFont = createNormalizer(
+	ORG_FONT_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.font,
+	{ geistMono: "geist-mono" },
+);
+const normalizeRadius = createNormalizer(
+	ORG_RADIUS_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.radius,
+);
+const normalizeMenu = createNormalizer(
+	ORG_MENU_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.menu,
+	{ translucent: "default-translucent" },
+);
+const normalizeMenuAccent = createNormalizer(
+	ORG_MENU_ACCENT_IDS,
+	DEFAULT_ORG_DESIGN_PRESET.menuAccent,
+	{ contrast: "bold" },
+);
 
 export function normalizeOrgDesignPreset(value: unknown): OrgDesignPreset {
 	if (!value || typeof value !== "object") return DEFAULT_ORG_DESIGN_PRESET;

@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, count as sqlCount } from "drizzle-orm";
 
 import { db } from "./index";
 import { media } from "./schema/media";
@@ -30,7 +30,13 @@ export async function insertMedia(values: {
 	mimeType: string;
 	position: number;
 }): Promise<void> {
-	await db.insert(media).values(values);
+	await db
+		.insert(media)
+		.values(values)
+		.onConflictDoUpdate({
+			target: media.id,
+			set: { url: values.url },
+		});
 }
 
 export async function updateMediaUrl(id: string, url: string): Promise<void> {
@@ -47,9 +53,9 @@ export async function deleteMedia(id: string): Promise<void> {
 }
 
 export async function countMediaByEntityId(entityId: string): Promise<number> {
-	const rows = await db
-		.select({ id: media.id })
+	const [row] = await db
+		.select({ count: sqlCount() })
 		.from(media)
 		.where(eq(media.entityId, entityId));
-	return rows.length;
+	return row?.count ?? 0;
 }

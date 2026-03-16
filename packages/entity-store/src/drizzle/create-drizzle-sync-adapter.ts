@@ -25,6 +25,11 @@ export interface DrizzleSyncAdapterConfig {
 	toWire: (row: any) => Todo;
 	// biome-ignore lint/suspicious/noExplicitAny: Insert shape varies per entity
 	toRow: (wire: Todo, syncStatus: string) => any;
+	/** Optional post-query filter applied in getPendingChanges. */
+	// biome-ignore lint/suspicious/noExplicitAny: Row shape varies per entity
+	filter?: (item: any) => boolean;
+	/** Appended to sync meta key: `${syncKeyPrefix}:${scopeId}:${suffix}`. */
+	syncKeySuffix?: string;
 }
 
 /**
@@ -46,17 +51,19 @@ export function createDrizzleSyncAdapter(
 		toWire,
 		toRow,
 	} = config;
-	const lastSyncedAtKey = `${syncKeyPrefix}:${scopeId}`;
+	const lastSyncedAtKey = config.syncKeySuffix
+		? `${syncKeyPrefix}:${scopeId}:${config.syncKeySuffix}`
+		: `${syncKeyPrefix}:${scopeId}`;
 
 	return {
 		async getPendingChanges(): Promise<Todo[]> {
-			const rows = await db
+			let rows = await db
 				.select()
 				.from(table)
 				.where(
 					and(eq(columns.userId, scopeId), eq(columns.syncStatus, "pending")),
 				);
-
+			if (config.filter) rows = rows.filter(config.filter);
 			return rows.map(toWire);
 		},
 

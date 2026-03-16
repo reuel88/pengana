@@ -1,5 +1,6 @@
 import { createSyncTransport } from "@pengana/sync-client";
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
+import { useMemo } from "react";
 import { createSyncAdapter } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
@@ -8,24 +9,34 @@ import { useSyncEngine } from "./use-sync-engine";
 
 export { useSync, useSyncDevtools } from "@pengana/sync-engine";
 
-const personalDeps = createPlatformDeps(
-	(userId) => createSyncAdapter(userId),
-	() =>
-		createSyncTransport(
-			async (input) =>
-				(await client.todo.sync(input, { signal: input.signal })).data,
-			reconcileNativeMedia,
-		),
-);
-
 export function SyncProvider({
 	userId,
+	organizationId,
 	children,
 }: {
 	userId: string;
+	organizationId?: string;
 	children: React.ReactNode;
 }) {
-	const { core, devtools } = useSyncEngine(userId, personalDeps);
+	const deps = useMemo(
+		() =>
+			createPlatformDeps(
+				(uid) =>
+					createSyncAdapter(
+						uid,
+						organizationId ? { syncKeySuffix: organizationId } : undefined,
+					),
+				() =>
+					createSyncTransport(
+						async (input) =>
+							(await client.todo.sync(input, { signal: input.signal })).data,
+						reconcileNativeMedia,
+					),
+			),
+		[organizationId],
+	);
+
+	const { core, devtools } = useSyncEngine(userId, deps);
 
 	return (
 		<SyncContext value={core}>

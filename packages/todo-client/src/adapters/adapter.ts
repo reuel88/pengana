@@ -11,11 +11,14 @@ export function createTodoSyncAdapter(
 	db: EntityDatabase,
 	scopeId: string,
 	config: TodoConfig,
+	options?: { filter?: (item: WebTodo) => boolean; syncKeySuffix?: string },
 ): SyncAdapter {
 	return createGenericAdapter<WebTodo>(scopeId, {
 		db,
 		tableName: config.entity.name,
 		syncKeyPrefix: config.syncKeyPrefix,
+		filter: options?.filter,
+		syncKeySuffix: options?.syncKeySuffix,
 		toWire: (local: WebTodo): Todo => ({
 			id: local.id,
 			title: local.title,
@@ -44,6 +47,7 @@ export function createTodoSyncAdapter(
 				createdBy: (wire as Todo & { createdBy?: string }).createdBy ?? "",
 				syncStatus,
 				deleted: wire.deleted,
+				scopeType: config.scopeType,
 			};
 
 			if (syncStatus !== "conflict" || !existing) {

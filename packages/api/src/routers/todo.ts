@@ -1,23 +1,29 @@
-import { updateTodoForUser } from "@pengana/db/todo-queries";
+import { updateTodoForScope } from "@pengana/db/todo-queries";
 import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
-import {
-	envelope,
-	envelopeOutput,
-	protectedProcedure,
-	seatedProcedure,
-} from "../index";
-import { handleSync } from "./todo-sync";
+import { envelope, envelopeOutput, seatedProcedure } from "../index";
+import { handleTodoSync } from "./todo-sync";
 
 export const todoRouter = {
-	sync: protectedProcedure
+	sync: seatedProcedure
 		.route({ method: "POST", path: "/todo/sync", summary: "Sync todos" })
 		.input(syncInputSchema)
 		.output(envelopeOutput(syncOutputSchema))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
-			return envelope(await handleSync(input, userId, context.notifyUser));
+			const orgId = context.session.session.activeOrganizationId;
+			return envelope(
+				await handleTodoSync(
+					input,
+					"personal",
+					userId,
+					userId,
+					context.notifyUser,
+					false,
+					orgId ?? undefined,
+				),
+			);
 		}),
 
 	forceConflict: seatedProcedure
@@ -31,7 +37,7 @@ export const todoRouter = {
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
 
-			await updateTodoForUser(input.todoId, userId, {
+			await updateTodoForScope(input.todoId, "personal", userId, {
 				title: `[Server Edit] ${Date.now()}`,
 				updatedAt: new Date(),
 			});

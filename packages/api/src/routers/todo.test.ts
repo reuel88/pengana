@@ -18,7 +18,7 @@ import {
 	insertTodo,
 	updateTodo,
 } from "@pengana/db/todo-queries";
-import { handleSync } from "./todo-sync";
+import { handleTodoSync } from "./todo-sync";
 
 function makeChange(overrides: Record<string, unknown> = {}) {
 	return {
@@ -42,6 +42,8 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 		completed: false,
 		deleted: false,
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
+		scopeType: "personal",
+		scopeId: "test-user",
 		userId: "test-user",
 		organizationId: null,
 		createdBy: null,
@@ -49,7 +51,7 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 	};
 }
 
-describe("handleSync", () => {
+describe("handleTodoSync", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		vi.mocked(getTodosUpdatedSince).mockResolvedValue([]);
@@ -58,8 +60,10 @@ describe("handleSync", () => {
 	it("inserts new todo when not on server", async () => {
 		vi.mocked(findTodoById).mockResolvedValue(undefined);
 
-		await handleSync(
+		await handleTodoSync(
 			{ changes: [makeChange()], lastSyncedAt: null },
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -68,6 +72,8 @@ describe("handleSync", () => {
 				id: "todo-1",
 				title: "Test",
 				userId: "test-user",
+				scopeType: "personal",
+				scopeId: "test-user",
 			}),
 		);
 	});
@@ -77,11 +83,13 @@ describe("handleSync", () => {
 			makeServerRow({ updatedAt: new Date("2025-06-01T00:00:05.000Z") }),
 		);
 
-		await handleSync(
+		await handleTodoSync(
 			{
 				changes: [makeChange({ updatedAt: "2025-06-01T00:00:10.000Z" })],
 				lastSyncedAt: null,
 			},
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -96,11 +104,13 @@ describe("handleSync", () => {
 			makeServerRow({ updatedAt: new Date("2025-06-01T00:00:20.000Z") }),
 		);
 
-		const result = await handleSync(
+		const result = await handleTodoSync(
 			{
 				changes: [makeChange({ updatedAt: "2025-06-01T00:00:10.000Z" })],
 				lastSyncedAt: null,
 			},
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -109,11 +119,13 @@ describe("handleSync", () => {
 	});
 
 	it("skips changes with mismatched userId", async () => {
-		await handleSync(
+		await handleTodoSync(
 			{
 				changes: [makeChange({ userId: "other-user" })],
 				lastSyncedAt: null,
 			},
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -123,21 +135,28 @@ describe("handleSync", () => {
 	});
 
 	it("returns server changes since lastSyncedAt minus 5s overlap", async () => {
-		await handleSync(
+		await handleTodoSync(
 			{ changes: [], lastSyncedAt: "2025-06-01T00:00:10.000Z" },
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
-		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[1];
+		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
 		expect(calledDate.getTime()).toBe(
 			new Date("2025-06-01T00:00:10.000Z").getTime() - 5000,
 		);
 	});
 
 	it("returns all changes when lastSyncedAt is null", async () => {
-		await handleSync({ changes: [], lastSyncedAt: null }, "test-user");
+		await handleTodoSync(
+			{ changes: [], lastSyncedAt: null },
+			"personal",
+			"test-user",
+			"test-user",
+		);
 
-		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[1];
+		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
 		expect(calledDate.getTime()).toBe(0);
 	});
 
@@ -149,8 +168,10 @@ describe("handleSync", () => {
 		});
 		vi.mocked(getTodosUpdatedSince).mockResolvedValue([serverRow]);
 
-		const result = await handleSync(
+		const result = await handleTodoSync(
 			{ changes: [], lastSyncedAt: null },
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -168,17 +189,14 @@ describe("handleSync", () => {
 	});
 
 	it("handles mixed insert/update/conflict in single sync", async () => {
-		// insert - not found
 		vi.mocked(findTodoById)
 			.mockResolvedValueOnce(undefined)
-			// update - client wins
 			.mockResolvedValueOnce(
 				makeServerRow({
 					id: "todo-2",
 					updatedAt: new Date("2025-01-01T00:00:00.000Z"),
 				}),
 			)
-			// conflict - server wins
 			.mockResolvedValueOnce(
 				makeServerRow({
 					id: "todo-3",
@@ -186,7 +204,7 @@ describe("handleSync", () => {
 				}),
 			);
 
-		const result = await handleSync(
+		const result = await handleTodoSync(
 			{
 				changes: [
 					makeChange({ id: "todo-1" }),
@@ -195,6 +213,8 @@ describe("handleSync", () => {
 				],
 				lastSyncedAt: null,
 			},
+			"personal",
+			"test-user",
 			"test-user",
 		);
 
@@ -203,11 +223,13 @@ describe("handleSync", () => {
 		expect(result.conflicts).toEqual(["todo-3"]);
 	});
 
-	it("calls notifyUser when changes exist", async () => {
+	it("calls notify when changes exist", async () => {
 		const notifyUser = vi.fn();
 
-		await handleSync(
+		await handleTodoSync(
 			{ changes: [makeChange()], lastSyncedAt: null },
+			"personal",
+			"test-user",
 			"test-user",
 			notifyUser,
 		);
@@ -215,15 +237,142 @@ describe("handleSync", () => {
 		expect(notifyUser).toHaveBeenCalledWith("test-user");
 	});
 
-	it("does not call notifyUser when changes empty", async () => {
+	it("does not call notify when changes empty", async () => {
 		const notifyUser = vi.fn();
 
-		await handleSync(
+		await handleTodoSync(
 			{ changes: [], lastSyncedAt: null },
+			"personal",
+			"test-user",
 			"test-user",
 			notifyUser,
 		);
 
 		expect(notifyUser).not.toHaveBeenCalled();
+	});
+
+	// Org sync tests
+	it("inserts new org todo when not on server", async () => {
+		vi.mocked(findTodoById).mockResolvedValue(undefined);
+
+		await handleTodoSync(
+			{
+				changes: [
+					makeChange({
+						organizationId: "org-1",
+						createdBy: "user-1",
+						userId: "org-1",
+					}),
+				],
+				lastSyncedAt: null,
+			},
+			"org",
+			"org-1",
+			"user-1",
+		);
+
+		expect(insertTodo).toHaveBeenCalledWith(
+			expect.objectContaining({
+				id: "todo-1",
+				title: "Test",
+				scopeType: "org",
+				scopeId: "org-1",
+				organizationId: "org-1",
+				createdBy: "user-1",
+			}),
+		);
+	});
+
+	it("skips org changes for another organization", async () => {
+		await handleTodoSync(
+			{
+				changes: [
+					makeChange({
+						organizationId: "other-org",
+						createdBy: "user-1",
+					}),
+				],
+				lastSyncedAt: null,
+			},
+			"org",
+			"org-1",
+			"user-1",
+		);
+
+		expect(findTodoById).not.toHaveBeenCalled();
+		expect(insertTodo).not.toHaveBeenCalled();
+	});
+
+	it("skips org changes from a different user", async () => {
+		await handleTodoSync(
+			{
+				changes: [
+					makeChange({
+						organizationId: "org-1",
+						createdBy: "other-user",
+					}),
+				],
+				lastSyncedAt: null,
+			},
+			"org",
+			"org-1",
+			"user-1",
+		);
+
+		expect(findTodoById).not.toHaveBeenCalled();
+	});
+
+	it("calls notify with the org id when org changes exist", async () => {
+		const notifyOrgMembers = vi.fn();
+
+		await handleTodoSync(
+			{
+				changes: [
+					makeChange({
+						organizationId: "org-1",
+						createdBy: "user-1",
+					}),
+				],
+				lastSyncedAt: null,
+			},
+			"org",
+			"org-1",
+			"user-1",
+			notifyOrgMembers,
+		);
+
+		expect(notifyOrgMembers).toHaveBeenCalledWith("org-1");
+	});
+
+	it("maps org server rows to output shape with syncStatus synced", async () => {
+		const serverRow = makeServerRow({
+			id: "server-org-1",
+			title: "From Server",
+			updatedAt: new Date("2025-06-01T12:00:00.000Z"),
+			scopeType: "org",
+			scopeId: "org-1",
+			organizationId: "org-1",
+			createdBy: "user-1",
+		});
+		vi.mocked(getTodosUpdatedSince).mockResolvedValue([serverRow]);
+
+		const result = await handleTodoSync(
+			{ changes: [], lastSyncedAt: null },
+			"org",
+			"org-1",
+			"user-1",
+		);
+
+		expect(result.serverChanges[0]).toEqual({
+			id: "server-org-1",
+			title: "From Server",
+			completed: false,
+			deleted: false,
+			updatedAt: "2025-06-01T12:00:00.000Z",
+			userId: "org-1",
+			organizationId: "org-1",
+			createdBy: "user-1",
+			syncStatus: "synced",
+		});
 	});
 });

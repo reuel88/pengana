@@ -5,7 +5,7 @@ import {
 	useTodos,
 } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
 	OrgSyncProvider,
 	SyncProvider,
@@ -21,14 +21,27 @@ import { appDb } from "@/shared/db";
 
 type Tab = "personal" | "organization";
 
-function PersonalTodoContent({ userId }: { userId: string }) {
-	const { todos } = useTodos(appDb, personalTodoConfig, userId);
+function PersonalTodoContent({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
+	const orgFilter = useMemo(
+		() =>
+			organizationId
+				? (t: { organizationId: string }) => t.organizationId === organizationId
+				: undefined,
+		[organizationId],
+	);
+	const { todos } = useTodos(appDb, personalTodoConfig, userId, orgFilter);
 	const { isOnline, isSyncing } = useSync();
 
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<TodoInput userId={userId} />
+			<TodoInput userId={userId} organizationId={organizationId} />
 			<TodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</div>
@@ -99,7 +112,7 @@ export function TodoPage({
 				</div>
 			)}
 
-			<SyncProvider userId={userId}>
+			<SyncProvider userId={userId} organizationId={organizationId}>
 				{showTabs ? (
 					<div
 						id="panel-personal"
@@ -107,11 +120,17 @@ export function TodoPage({
 						aria-labelledby="tab-personal"
 						className={activeTab !== "personal" ? "hidden" : undefined}
 					>
-						<PersonalTodoContent userId={userId} />
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
 					</div>
 				) : (
 					<div>
-						<PersonalTodoContent userId={userId} />
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
 					</div>
 				)}
 			</SyncProvider>

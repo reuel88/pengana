@@ -5,6 +5,7 @@ import {
 } from "./design-preset";
 import {
 	type OrgDesignPresetMode,
+	type ResolvedAppThemeTokens,
 	resolveOrgDesignTokens,
 } from "./design-theme";
 
@@ -36,9 +37,45 @@ const radiusValues = {
 	large: "1.125rem",
 } as const;
 
-function setCssVariable(doc: Document, name: string, value: string) {
-	doc.documentElement.style.setProperty(name, value);
-}
+type CssVariableMapping = [
+	cssVar: string,
+	tokenKey: keyof ResolvedAppThemeTokens,
+];
+
+const TOKEN_TO_CSS_VARS: CssVariableMapping[] = [
+	["--background", "background"],
+	["--foreground", "text"],
+	["--card", "card"],
+	["--card-foreground", "cardForeground"],
+	["--popover", "popover"],
+	["--popover-foreground", "popoverForeground"],
+	["--secondary", "secondary"],
+	["--secondary-foreground", "secondaryForeground"],
+	["--muted", "muted"],
+	["--muted-foreground", "mutedText"],
+	["--accent", "secondary"],
+	["--accent-foreground", "secondaryForeground"],
+	["--border", "border"],
+	["--input", "input"],
+	["--primary", "primary"],
+	["--primary-foreground", "primaryForeground"],
+	["--ring", "ring"],
+	["--destructive", "danger"],
+	["--sidebar", "menuBackground"],
+	["--sidebar-foreground", "menuForeground"],
+	["--sidebar-border", "menuBorder"],
+	["--sidebar-ring", "ring"],
+	["--sidebar-primary", "primary"],
+	["--sidebar-primary-foreground", "primaryForeground"],
+	["--sidebar-accent", "menuAccentBackground"],
+	["--sidebar-accent-foreground", "menuAccentForeground"],
+	["--menu-bg", "menuBackground"],
+	["--menu-foreground", "menuForeground"],
+	["--menu-border", "menuBorder"],
+	["--menu-accent", "menuAccentBackground"],
+	["--menu-accent-foreground", "menuAccentForeground"],
+	["--menu-backdrop-blur", "menuBackdropBlur"],
+];
 
 export function applyOrgDesignPresetToDocument(
 	presetInput: OrgDesignPreset | Record<string, unknown> | null | undefined,
@@ -55,42 +92,10 @@ export function applyOrgDesignPresetToDocument(
 	doc.documentElement.dataset.orgMenu = preset.menu;
 	doc.documentElement.dataset.orgMenuAccent = preset.menuAccent;
 
-	setCssVariable(doc, "--background", tokens.background);
-	setCssVariable(doc, "--foreground", tokens.text);
-	setCssVariable(doc, "--card", tokens.card);
-	setCssVariable(doc, "--card-foreground", tokens.cardForeground);
-	setCssVariable(doc, "--popover", tokens.popover);
-	setCssVariable(doc, "--popover-foreground", tokens.popoverForeground);
-	setCssVariable(doc, "--secondary", tokens.secondary);
-	setCssVariable(doc, "--secondary-foreground", tokens.secondaryForeground);
-	setCssVariable(doc, "--muted", tokens.muted);
-	setCssVariable(doc, "--muted-foreground", tokens.mutedText);
-	setCssVariable(doc, "--accent", tokens.secondary);
-	setCssVariable(doc, "--accent-foreground", tokens.secondaryForeground);
-	setCssVariable(doc, "--border", tokens.border);
-	setCssVariable(doc, "--input", tokens.input);
-	setCssVariable(doc, "--primary", tokens.primary);
-	setCssVariable(doc, "--primary-foreground", tokens.primaryForeground);
-	setCssVariable(doc, "--ring", tokens.ring);
-	setCssVariable(doc, "--destructive", tokens.danger);
-	setCssVariable(doc, "--sidebar", tokens.menuBackground);
-	setCssVariable(doc, "--sidebar-foreground", tokens.menuForeground);
-	setCssVariable(doc, "--sidebar-border", tokens.menuBorder);
-	setCssVariable(doc, "--sidebar-ring", tokens.ring);
-	setCssVariable(doc, "--sidebar-primary", tokens.primary);
-	setCssVariable(doc, "--sidebar-primary-foreground", tokens.primaryForeground);
-	setCssVariable(doc, "--sidebar-accent", tokens.menuAccentBackground);
-	setCssVariable(
-		doc,
-		"--sidebar-accent-foreground",
-		tokens.menuAccentForeground,
-	);
-	setCssVariable(doc, "--menu-bg", tokens.menuBackground);
-	setCssVariable(doc, "--menu-foreground", tokens.menuForeground);
-	setCssVariable(doc, "--menu-border", tokens.menuBorder);
-	setCssVariable(doc, "--menu-accent", tokens.menuAccentBackground);
-	setCssVariable(doc, "--menu-accent-foreground", tokens.menuAccentForeground);
-	setCssVariable(doc, "--menu-backdrop-blur", tokens.menuBackdropBlur);
-	setCssVariable(doc, "--radius", radiusValues[preset.radius]);
-	setCssVariable(doc, "--font-sans", fontStacks[preset.font]);
+	const style = doc.documentElement.style;
+	for (const [cssVar, tokenKey] of TOKEN_TO_CSS_VARS) {
+		style.setProperty(cssVar, tokens[tokenKey]);
+	}
+	style.setProperty("--radius", radiusValues[preset.radius]);
+	style.setProperty("--font-sans", fontStacks[preset.font]);
 }

@@ -1,6 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import {
 	isAllowedMimeType,
+	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 	type SyncStatus,
 } from "@pengana/sync-engine";
@@ -10,8 +11,6 @@ import { type AttachmentItem, AttachmentList } from "./attachment-list";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
 import { SyncDot } from "./sync-dot";
-
-const MAX_ATTACHMENTS = 10;
 
 export interface TodoItemData {
 	id: string;

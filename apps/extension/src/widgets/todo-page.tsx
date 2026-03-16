@@ -1,5 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import type { TodoActions } from "@pengana/todo-client";
 import {
 	createTodoActions,
 	orgTodoConfig,
@@ -23,26 +22,34 @@ import type { SyncScope } from "@/shared/api/background-messages";
 import { appDb } from "@/shared/db";
 
 const personalActions = createTodoActions(appDb, personalTodoConfig);
-const orgActions_ = createTodoActions(appDb, orgTodoConfig);
-
-const orgActions: TodoActions = {
-	toggleTodo: (id) => orgActions_.toggleTodo(id),
-	deleteTodo: (id) => orgActions_.deleteTodo(id),
-	resolveConflict: (id, resolution) =>
-		orgActions_.resolveConflict(id, resolution),
-};
+const orgActions = createTodoActions(appDb, orgTodoConfig);
 
 type Tab = "personal" | "organization";
 
-function TodoContent({ userId }: { userId: string }) {
-	const { todos } = useTodos(appDb, personalTodoConfig, userId);
+function TodoContent({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
+	const orgFilter = useMemo(
+		() =>
+			organizationId
+				? (t: { organizationId: string }) => t.organizationId === organizationId
+				: undefined,
+		[organizationId],
+	);
+	const { todos } = useTodos(appDb, personalTodoConfig, userId, orgFilter);
 	const sync = useSync();
 
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
-				onAdd={(title) => personalActions.addTodo(userId, userId, "", title)}
+				onAdd={(title) =>
+					personalActions.addTodo(userId, userId, organizationId ?? "", title)
+				}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList todos={todos} syncHook={sync} userId={userId} />
@@ -65,7 +72,7 @@ function OrgTodoContent({
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
 				onAdd={(title) =>
-					orgActions_.addTodo(organizationId, userId, organizationId, title)
+					orgActions.addTodo(organizationId, userId, organizationId, title)
 				}
 				triggerSync={sync.triggerSync}
 			/>
@@ -73,7 +80,7 @@ function OrgTodoContent({
 				todos={todos}
 				syncHook={sync}
 				actions={orgActions}
-				entityType="orgTodo"
+				entityType="todo"
 				userId={userId}
 			/>
 		</div>
@@ -134,7 +141,7 @@ export function TodoPage({
 					))}
 				</div>
 			) : null}
-			<SyncProvider userId={userId}>
+			<SyncProvider userId={userId} organizationId={organizationId}>
 				{organizationId ? (
 					<div
 						id="panel-personal"
@@ -142,11 +149,11 @@ export function TodoPage({
 						aria-labelledby="tab-personal"
 						className={activeTab !== "personal" ? "hidden" : undefined}
 					>
-						<TodoContent userId={userId} />
+						<TodoContent userId={userId} organizationId={organizationId} />
 					</div>
 				) : (
 					<div>
-						<TodoContent userId={userId} />
+						<TodoContent userId={userId} organizationId={organizationId} />
 					</div>
 				)}
 			</SyncProvider>

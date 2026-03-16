@@ -1,5 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
-import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
+import {
+	isAllowedMimeType,
+	MAX_ATTACHMENTS,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -22,14 +26,16 @@ type PickerResult = {
 		| null;
 };
 
-const MAX_ATTACHMENTS = 10;
+type PickerMessages = {
+	invalidTitle: string;
+	invalidMessage: string;
+	fileTooLargeMessage: string;
+};
 
 async function pickAssets(
 	picker: () => Promise<PickerResult>,
 	defaultMimeType: string,
-	invalidTitle: string,
-	invalidMessage: string,
-	fileTooLargeMessage: string,
+	messages: PickerMessages,
 ): Promise<AssetResult[]> {
 	const result = await picker();
 	if (result.canceled || !result.assets || result.assets.length === 0)
@@ -39,7 +45,7 @@ async function pickAssets(
 	for (const asset of result.assets) {
 		const mimeType = asset.mimeType ?? defaultMimeType;
 		if (!isAllowedMimeType(mimeType)) {
-			Alert.alert(invalidTitle, invalidMessage);
+			Alert.alert(messages.invalidTitle, messages.invalidMessage);
 			continue;
 		}
 		let fileSize = asset.fileSize ?? asset.size;
@@ -50,7 +56,7 @@ async function pickAssets(
 			}
 		}
 		if (fileSize != null && fileSize > MAX_FILE_SIZE_BYTES) {
-			Alert.alert(invalidTitle, fileTooLargeMessage);
+			Alert.alert(messages.invalidTitle, messages.fileTooLargeMessage);
 			continue;
 		}
 		valid.push({ uri: asset.uri, mimeType });
@@ -66,6 +72,9 @@ export function useFilePickerBase(deps: {
 		uri: string,
 		mimeType: string,
 	) => Promise<string>;
+	// Native files are available from the picker URI directly; web must store in
+	// IndexedDB first, then update the URI — hence this is optional on native.
+	updateMediaLocalUri?: (mediaId: string, localUri: string) => Promise<void>;
 	enqueueUpload: (
 		entity: string,
 		entityId: string,
@@ -102,28 +111,24 @@ export function useFilePickerBase(deps: {
 		}
 	};
 
-	const invalidFileTitle = t("todos:attachment.invalidFile");
-	const invalidFileMessage = t("errors:invalidFileType");
-	const fileTooLargeMessage = t("errors:fileTooLarge");
+	const messages: PickerMessages = {
+		invalidTitle: t("todos:attachment.invalidFile"),
+		invalidMessage: t("errors:invalidFileType"),
+		fileTooLargeMessage: t("errors:fileTooLarge"),
+	};
 
 	const pick = (picker: () => Promise<PickerResult>, defaultMimeType: string) =>
-		pickAssets(
-			picker,
-			defaultMimeType,
-			invalidFileTitle,
-			invalidFileMessage,
-			fileTooLargeMessage,
-		);
+		pickAssets(picker, defaultMimeType, messages);
 
 	const pickFromCamera = async (todoId: string) => {
 		const permission = await ImagePicker.requestCameraPermissionsAsync();
 		if (!permission.granted) return;
 
-		const currentCount = await deps.getMediaCount(todoId);
-		let remaining = MAX_ATTACHMENTS - currentCount;
-
 		try {
-			while (remaining > 0) {
+			while (true) {
+				const currentCount = await deps.getMediaCount(todoId);
+				if (currentCount >= MAX_ATTACHMENTS) break;
+
 				const assets = await pick(
 					() =>
 						ImagePicker.launchCameraAsync({
@@ -134,24 +139,7 @@ export function useFilePickerBase(deps: {
 				);
 				if (assets.length === 0) break;
 
-				for (const asset of assets) {
-					if (remaining <= 0) break;
-					const mediaId = await deps.addMedia(
-						todoId,
-						deps.entityType,
-						deps.userId,
-						asset.uri,
-						asset.mimeType,
-					);
-					deps.enqueueUpload(
-						deps.entityType,
-						todoId,
-						asset.uri,
-						asset.mimeType,
-						mediaId,
-					);
-					remaining--;
-				}
+				await attachAssets(todoId, assets);
 			}
 		} catch {
 			Alert.alert(

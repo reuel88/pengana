@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { Todo } from "@pengana/sync-engine";
+import { MAX_ATTACHMENTS, type Todo } from "@pengana/sync-engine";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/shared/lib/theme";
@@ -8,8 +8,6 @@ import { destructiveText, themedText } from "@/shared/styles/shared";
 import { AttachButton, RemoveButton, RetryButton } from "./attachment-actions";
 import { ConflictActions } from "./conflict-actions";
 import { SyncDot } from "./sync-dot";
-
-const MAX_ATTACHMENTS = 10;
 
 export interface AttachmentRow {
 	id: string;
@@ -36,6 +34,52 @@ function mimeLabel(mimeType: string): string {
 	if (mimeType.startsWith("image/")) return "IMG";
 	if (mimeType === "application/pdf") return "PDF";
 	return "FILE";
+}
+
+function AttachmentStatus({
+	attachment,
+	onRetry,
+	theme,
+}: {
+	attachment: AttachmentRow;
+	onRetry?: (id: string) => void;
+	theme: ReturnType<typeof useTheme>["theme"];
+}) {
+	const { t } = useTranslation();
+
+	if (attachment.status === "queued" || attachment.status === "uploading") {
+		return (
+			<Text
+				style={[
+					styles.uploadingText,
+					{ color: theme.text, fontFamily: theme.fontFamily },
+				]}
+			>
+				{t("todos:attachment.uploading")}
+			</Text>
+		);
+	}
+
+	if (attachment.status === "failed") {
+		return (
+			<>
+				<Text style={[styles.failedText, { fontFamily: theme.fontFamily }]}>
+					{t("todos:attachment.failed")}
+				</Text>
+				{onRetry && <RetryButton onPress={() => onRetry(attachment.id)} />}
+			</>
+		);
+	}
+
+	if (attachment.url) {
+		return (
+			<Text style={[styles.uploadedText, { fontFamily: theme.fontFamily }]}>
+				{t("todos:attachment.attached")}
+			</Text>
+		);
+	}
+
+	return null;
 }
 
 export function TodoItem({
@@ -115,39 +159,11 @@ export function TodoItem({
 							>
 								{mimeLabel(a.mimeType)}
 							</Text>
-							{a.status === "queued" || a.status === "uploading" ? (
-								<Text
-									style={[
-										styles.uploadingText,
-										{ color: theme.text, fontFamily: theme.fontFamily },
-									]}
-								>
-									{t("todos:attachment.uploading")}
-								</Text>
-							) : a.status === "failed" ? (
-								<>
-									<Text
-										style={[
-											styles.failedText,
-											{ fontFamily: theme.fontFamily },
-										]}
-									>
-										{t("todos:attachment.failed")}
-									</Text>
-									{onRetryAttachment && (
-										<RetryButton onPress={() => onRetryAttachment(a.id)} />
-									)}
-								</>
-							) : a.url ? (
-								<Text
-									style={[
-										styles.uploadedText,
-										{ fontFamily: theme.fontFamily },
-									]}
-								>
-									{t("todos:attachment.attached")}
-								</Text>
-							) : null}
+							<AttachmentStatus
+								attachment={a}
+								onRetry={onRetryAttachment}
+								theme={theme}
+							/>
 							{onRemoveAttachment && (
 								<RemoveButton onPress={() => onRemoveAttachment(a.id)} />
 							)}

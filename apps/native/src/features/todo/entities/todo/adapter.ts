@@ -37,6 +37,20 @@ function todoToRow(todo: Todo, syncStatus: string) {
 	};
 }
 
+function personalToRow(todo: Todo, syncStatus: string) {
+	return {
+		...todoToRow(todo, syncStatus),
+		scopeType: "personal" as const,
+	};
+}
+
+function orgToRow(todo: Todo, syncStatus: string) {
+	return {
+		...todoToRow(todo, syncStatus),
+		scopeType: "org" as const,
+	};
+}
+
 const drizzleAdapterConfig = {
 	db: appDb,
 	table: todos,
@@ -51,13 +65,21 @@ const drizzleAdapterConfig = {
 		key: syncMeta.key,
 	},
 	toWire: rowToTodo,
-	toRow: todoToRow,
 };
 
-export function createDrizzleSyncAdapter(userId: string): SyncAdapter {
+export function createDrizzleSyncAdapter(
+	userId: string,
+	options?: {
+		filter?: (item: typeof todos.$inferSelect) => boolean;
+		syncKeySuffix?: string;
+	},
+): SyncAdapter {
 	return createGenericAdapter(userId, {
 		...drizzleAdapterConfig,
+		toRow: personalToRow,
 		syncKeyPrefix: "lastSyncedAt",
+		filter: options?.filter,
+		syncKeySuffix: options?.syncKeySuffix,
 	});
 }
 
@@ -66,6 +88,7 @@ export function createDrizzleOrgSyncAdapter(
 ): SyncAdapter {
 	return createGenericAdapter(organizationId, {
 		...drizzleAdapterConfig,
+		toRow: orgToRow,
 		syncKeyPrefix: "lastSyncedAt:org",
 	});
 }
