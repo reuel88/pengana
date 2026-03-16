@@ -47,7 +47,13 @@ export function useFilePickerBase(deps: {
 			const files = input.files;
 			if (!files || files.length === 0) return;
 
-			const currentCount = await deps.getMediaCount(todoId);
+			let currentCount: number;
+			try {
+				currentCount = await deps.getMediaCount(todoId);
+			} catch {
+				window.alert(t("errors:failedToAttachFile"));
+				return;
+			}
 			const available = Math.max(0, MAX_ATTACHMENTS - currentCount);
 
 			for (let i = 0; i < Math.min(files.length, available); i++) {

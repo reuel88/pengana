@@ -55,7 +55,7 @@ async function pickAssets(
 				fileSize = info.size;
 			}
 		}
-		if (fileSize != null && fileSize > MAX_FILE_SIZE_BYTES) {
+		if (fileSize == null || fileSize > MAX_FILE_SIZE_BYTES) {
 			Alert.alert(messages.invalidTitle, messages.fileTooLargeMessage);
 			continue;
 		}
@@ -102,24 +102,28 @@ export function useFilePickerBase(deps: {
 		const toProcess = assets.slice(0, available);
 
 		for (const asset of toProcess) {
-			const mediaId = await deps.addMedia(
-				todoId,
-				deps.entityType,
-				deps.userId,
-				asset.uri,
-				asset.mimeType,
-				deps.scopeType,
-				deps.scopeId,
-				deps.organizationId,
-				deps.createdBy,
-			);
-			deps.enqueueUpload(
-				deps.entityType,
-				todoId,
-				asset.uri,
-				asset.mimeType,
-				mediaId,
-			);
+			try {
+				const mediaId = await deps.addMedia(
+					todoId,
+					deps.entityType,
+					deps.userId,
+					asset.uri,
+					asset.mimeType,
+					deps.scopeType,
+					deps.scopeId,
+					deps.organizationId,
+					deps.createdBy,
+				);
+				deps.enqueueUpload(
+					deps.entityType,
+					todoId,
+					asset.uri,
+					asset.mimeType,
+					mediaId,
+				);
+			} catch {
+				Alert.alert(t("errors:failedToAttachFile"));
+			}
 		}
 	};
 

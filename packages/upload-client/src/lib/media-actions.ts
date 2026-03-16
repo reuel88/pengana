@@ -142,7 +142,9 @@ export async function reconcileMedia(
 		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
 		const localMedia = await table.where("entityId").anyOf(entityIds).toArray();
 		const toDelete = localMedia
-			.filter((local) => !serverMediaIds.has(local.id))
+			.filter(
+				(local) => !serverMediaIds.has(local.id) && local.status === "uploaded",
+			)
 			.map((local) => local.id);
 		if (toDelete.length > 0) {
 			await table.bulkDelete(toDelete);

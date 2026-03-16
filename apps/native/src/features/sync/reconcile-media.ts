@@ -70,10 +70,15 @@ export async function reconcileNativeMedia(
 							and(
 								eq(media.entityId, entityId),
 								notInArray(media.id, serverMediaIds),
+								eq(media.status, "uploaded"),
 							),
 						);
 				} else {
-					await tx.delete(media).where(eq(media.entityId, entityId));
+					await tx
+						.delete(media)
+						.where(
+							and(eq(media.entityId, entityId), eq(media.status, "uploaded")),
+						);
 				}
 			}
 		}

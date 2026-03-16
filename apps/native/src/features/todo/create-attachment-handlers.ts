@@ -23,7 +23,14 @@ export function useAttachmentHandlers(
 		async (attachmentId: string) => {
 			try {
 				await removeMediaFn(attachmentId);
-				client.upload.deleteAttachment({ attachmentId }).catch(() => {});
+				client.upload.deleteAttachment({ attachmentId }).catch((err) => {
+					if (__DEV__)
+						console.warn(
+							"Failed to delete attachment on server:",
+							attachmentId,
+							err,
+						);
+				});
 				triggerSync();
 			} catch {
 				Alert.alert(t("error.title"), t("errors:failedToDeleteAttachment"));
