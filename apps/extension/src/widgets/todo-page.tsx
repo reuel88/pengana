@@ -49,7 +49,7 @@ function TodoContent({
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
 				onAdd={(title) =>
-					personalActions.addTodo(userId, userId, organizationId ?? "", title)
+					personalActions.addTodo(userId, userId, organizationId ?? null, title)
 				}
 				triggerSync={sync.triggerSync}
 			/>
