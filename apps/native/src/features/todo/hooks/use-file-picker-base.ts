@@ -98,7 +98,7 @@ export function useFilePickerBase(deps: {
 
 	const attachAssets = async (todoId: string, assets: AssetResult[]) => {
 		const currentCount = await deps.getMediaCount(todoId);
-		const available = MAX_ATTACHMENTS - currentCount;
+		const available = Math.max(0, MAX_ATTACHMENTS - currentCount);
 		const toProcess = assets.slice(0, available);
 
 		for (const asset of toProcess) {
@@ -162,34 +162,45 @@ export function useFilePickerBase(deps: {
 	};
 
 	const pickFromLibrary = async (todoId: string) => {
-		const currentCount = await deps.getMediaCount(todoId);
-		const selectionLimit = MAX_ATTACHMENTS - currentCount;
-		if (selectionLimit <= 0) return;
+		try {
+			const currentCount = await deps.getMediaCount(todoId);
+			const selectionLimit = MAX_ATTACHMENTS - currentCount;
+			if (selectionLimit <= 0) return;
 
-		const assets = await pick(
-			() =>
-				ImagePicker.launchImageLibraryAsync({
-					mediaTypes: ["images"],
-					quality: 0.8,
-					allowsMultipleSelection: true,
-					selectionLimit,
-				}),
-			"image/jpeg",
-		);
-		if (assets.length > 0) await attachAssets(todoId, assets);
+			const assets = await pick(
+				() =>
+					ImagePicker.launchImageLibraryAsync({
+						mediaTypes: ["images"],
+						quality: 0.8,
+						allowsMultipleSelection: true,
+						selectionLimit,
+					}),
+				"image/jpeg",
+			);
+			if (assets.length > 0) await attachAssets(todoId, assets);
+		} catch {
+			Alert.alert(
+				t("todos:attachment.error"),
+				t("todos:attachment.libraryError"),
+			);
+		}
 	};
 
 	const pickPdf = async (todoId: string) => {
-		const assets = await pick(
-			() =>
-				DocumentPicker.getDocumentAsync({
-					type: ["application/pdf"],
-					copyToCacheDirectory: true,
-					multiple: true,
-				}),
-			"application/pdf",
-		);
-		if (assets.length > 0) await attachAssets(todoId, assets);
+		try {
+			const assets = await pick(
+				() =>
+					DocumentPicker.getDocumentAsync({
+						type: ["application/pdf"],
+						copyToCacheDirectory: true,
+						multiple: true,
+					}),
+				"application/pdf",
+			);
+			if (assets.length > 0) await attachAssets(todoId, assets);
+		} catch {
+			Alert.alert(t("todos:attachment.error"), t("todos:attachment.pdfError"));
+		}
 	};
 
 	const showPickerForTodo = (todoId: string) => {

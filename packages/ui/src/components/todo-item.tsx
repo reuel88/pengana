@@ -99,6 +99,7 @@ export function TodoItem({
 					data-testid="todo-toggle"
 				/>
 				<span
+					data-testid="todo-title"
 					className={cn(
 						"flex-1 text-sm",
 						todo.completed && "text-muted-foreground line-through",

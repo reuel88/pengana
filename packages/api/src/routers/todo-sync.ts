@@ -2,7 +2,7 @@ import { getLogger } from "@logtape/logtape";
 import { findMediaByEntityIds } from "@pengana/db/media-queries";
 import type { ScopeType } from "@pengana/db/todo-queries";
 import {
-	findTodoById,
+	findTodosByIds,
 	getTodosUpdatedSince,
 	insertTodo,
 	updateTodo,
@@ -25,7 +25,13 @@ export async function handleTodoSync(
 
 	logger.debug`Sync started for scope ${scopeType}:${scopeId} by ${createdBy} with ${String(input.changes.length)} change(s)`;
 
-	for (const change of skipChanges ? [] : input.changes) {
+	let appliedCount = 0;
+
+	const changesToProcess = skipChanges ? [] : input.changes;
+	const changeIds = changesToProcess.map((c) => c.id);
+	const existingTodos = await findTodosByIds(changeIds);
+
+	for (const change of changesToProcess) {
 		if (scopeType === "personal") {
 			if (change.userId !== scopeId) continue;
 		} else {
@@ -33,7 +39,7 @@ export async function handleTodoSync(
 			if (change.createdBy !== createdBy) continue;
 		}
 
-		const existing = await findTodoById(change.id);
+		const existing = existingTodos.get(change.id);
 
 		if (!existing) {
 			await insertTodo({
@@ -44,14 +50,20 @@ export async function handleTodoSync(
 				updatedAt: now,
 				scopeType,
 				scopeId,
-				userId: createdBy,
+				userId: scopeType === "org" ? scopeId : createdBy,
 				organizationId:
 					scopeType === "org"
 						? scopeId
 						: (organizationId ?? (change.organizationId || null)),
 				createdBy,
 			});
+			appliedCount++;
 		} else {
+			if (existing.scopeType !== scopeType || existing.scopeId !== scopeId) {
+				conflicts.push(change.id);
+				continue;
+			}
+
 			const clientTime = new Date(change.updatedAt).getTime();
 			const serverTime = existing.updatedAt.getTime();
 
@@ -62,6 +74,7 @@ export async function handleTodoSync(
 					deleted: change.deleted,
 					updatedAt: now,
 				});
+				appliedCount++;
 			} else {
 				conflicts.push(change.id);
 			}
@@ -87,7 +100,7 @@ export async function handleTodoSync(
 		logger.warn`Sync conflicts for ${scopeType}:${scopeId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
 	}
 
-	if (input.changes.length > 0) {
+	if (appliedCount > 0) {
 		notify?.(scopeId);
 	}
 
@@ -100,9 +113,9 @@ export async function handleTodoSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
-			userId: scopeType === "personal" ? t.scopeId : t.scopeId,
+			userId: t.userId,
 			organizationId:
-				scopeType === "org" ? t.scopeId : (t.organizationId ?? ""),
+				scopeType === "org" ? t.scopeId : (t.organizationId ?? null),
 			createdBy: t.createdBy ?? null,
 			syncStatus: "synced" as const,
 		})),

@@ -17,6 +17,8 @@
 	"unauthorized": "غير مصرح",
 	"paymentError": "حدث خطأ في الدفع. يرجى المحاولة مرة أخرى.",
 	"migrationError": "خطأ في الترحيل: {{message}}. حاول إعادة تشغيل التطبيق.",
-	"noActiveOrganization": "No active organization",
-	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
+	"noActiveOrganization": "لا توجد مؤسسة نشطة",
+	"seatRequiredForWrite": "مقعد مطلوب لإجراء عمليات الكتابة. تواصل مع مالك المؤسسة.",
+	"failedToRetryAttachment": "فشل في إعادة محاولة المرفق",
+	"attachmentBelongsToAnotherUser": "المرفق يخص مستخدمًا آخر"
 }

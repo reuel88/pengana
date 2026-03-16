@@ -17,6 +17,8 @@
 	"unauthorized": "未授权",
 	"paymentError": "支付出现问题，请重试。",
 	"migrationError": "迁移错误：{{message}}。请尝试重新启动应用。",
-	"noActiveOrganization": "No active organization",
-	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
+	"noActiveOrganization": "没有活跃的组织",
+	"seatRequiredForWrite": "写入操作需要席位。请联系您的组织所有者。",
+	"failedToRetryAttachment": "重试附件失败",
+	"attachmentBelongsToAnotherUser": "附件属于其他用户"
 }

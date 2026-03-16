@@ -17,9 +17,11 @@ export class TodoPage extends BaseTodoPage {
 	}
 
 	private todoRow(title: string) {
-		return this.page
-			.locator('[data-testid="todo-row"]')
-			.filter({ has: this.page.locator("span", { hasText: title }) });
+		return this.page.locator('[data-testid="todo-row"]').filter({
+			has: this.page.locator('[data-testid="todo-title"]', {
+				hasText: title,
+			}),
+		});
 	}
 
 	async deleteTodo(title: string) {
@@ -37,7 +39,11 @@ export class TodoPage extends BaseTodoPage {
 	completedTodoLocator(title: string) {
 		return this.page
 			.locator('[data-testid="todo-row"][data-completed="true"]')
-			.filter({ has: this.page.locator("span", { hasText: title }) });
+			.filter({
+				has: this.page.locator('[data-testid="todo-title"]', {
+					hasText: title,
+				}),
+			});
 	}
 
 	todoRowLocator(title: string) {

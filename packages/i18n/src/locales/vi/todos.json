@@ -19,7 +19,10 @@
 		"fileAttached": "Đã đính kèm tệp",
 		"invalidFile": "Tệp không hợp lệ",
 		"cameraUnavailable": "Camera không khả dụng",
-		"cameraNotAvailable": "Camera không khả dụng trên thiết bị này."
+		"cameraNotAvailable": "Camera không khả dụng trên thiết bị này.",
+		"error": "Lỗi",
+		"libraryError": "Không thể tải ảnh từ thư viện của bạn.",
+		"pdfError": "Không thể tải tài liệu đã chọn."
 	},
 	"actions": {
 		"keepLocal": "Giữ bản cục bộ",

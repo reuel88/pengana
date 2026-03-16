@@ -2,7 +2,7 @@ import type { TodoRow } from "@pengana/db/todo-queries";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@pengana/db/todo-queries", () => ({
-	findTodoById: vi.fn(),
+	findTodosByIds: vi.fn().mockResolvedValue(new Map()),
 	getTodosUpdatedSince: vi.fn().mockResolvedValue([]),
 	insertTodo: vi.fn().mockResolvedValue(undefined),
 	updateTodo: vi.fn().mockResolvedValue(undefined),
@@ -13,7 +13,7 @@ vi.mock("@pengana/db/media-queries", () => ({
 }));
 
 import {
-	findTodoById,
+	findTodosByIds,
 	getTodosUpdatedSince,
 	insertTodo,
 	updateTodo,
@@ -28,7 +28,7 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		deleted: false,
 		updatedAt: "2025-06-01T00:00:10.000Z",
 		userId: "test-user",
-		organizationId: "",
+		organizationId: null,
 		createdBy: null as string | null,
 		syncStatus: "pending" as const,
 		...overrides,
@@ -58,7 +58,7 @@ describe("handleTodoSync", () => {
 	});
 
 	it("inserts new todo when not on server", async () => {
-		vi.mocked(findTodoById).mockResolvedValue(undefined);
+		vi.mocked(findTodosByIds).mockResolvedValue(new Map());
 
 		await handleTodoSync(
 			{ changes: [makeChange()], lastSyncedAt: null },
@@ -79,9 +79,10 @@ describe("handleTodoSync", () => {
 	});
 
 	it("updates when client timestamp >= server (LWW wins)", async () => {
-		vi.mocked(findTodoById).mockResolvedValue(
-			makeServerRow({ updatedAt: new Date("2025-06-01T00:00:05.000Z") }),
-		);
+		const row = makeServerRow({
+			updatedAt: new Date("2025-06-01T00:00:05.000Z"),
+		});
+		vi.mocked(findTodosByIds).mockResolvedValue(new Map([["todo-1", row]]));
 
 		await handleTodoSync(
 			{
@@ -100,9 +101,10 @@ describe("handleTodoSync", () => {
 	});
 
 	it("reports conflict when client timestamp < server (LWW loses)", async () => {
-		vi.mocked(findTodoById).mockResolvedValue(
-			makeServerRow({ updatedAt: new Date("2025-06-01T00:00:20.000Z") }),
-		);
+		const row = makeServerRow({
+			updatedAt: new Date("2025-06-01T00:00:20.000Z"),
+		});
+		vi.mocked(findTodosByIds).mockResolvedValue(new Map([["todo-1", row]]));
 
 		const result = await handleTodoSync(
 			{
@@ -129,7 +131,6 @@ describe("handleTodoSync", () => {
 			"test-user",
 		);
 
-		expect(findTodoById).not.toHaveBeenCalled();
 		expect(insertTodo).not.toHaveBeenCalled();
 		expect(updateTodo).not.toHaveBeenCalled();
 	});
@@ -182,27 +183,27 @@ describe("handleTodoSync", () => {
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
 			userId: "test-user",
-			organizationId: "",
+			organizationId: null,
 			createdBy: null,
 			syncStatus: "synced",
 		});
 	});
 
 	it("handles mixed insert/update/conflict in single sync", async () => {
-		vi.mocked(findTodoById)
-			.mockResolvedValueOnce(undefined)
-			.mockResolvedValueOnce(
-				makeServerRow({
-					id: "todo-2",
-					updatedAt: new Date("2025-01-01T00:00:00.000Z"),
-				}),
-			)
-			.mockResolvedValueOnce(
-				makeServerRow({
-					id: "todo-3",
-					updatedAt: new Date("2025-12-01T00:00:00.000Z"),
-				}),
-			);
+		const row2 = makeServerRow({
+			id: "todo-2",
+			updatedAt: new Date("2025-01-01T00:00:00.000Z"),
+		});
+		const row3 = makeServerRow({
+			id: "todo-3",
+			updatedAt: new Date("2025-12-01T00:00:00.000Z"),
+		});
+		vi.mocked(findTodosByIds).mockResolvedValue(
+			new Map([
+				["todo-2", row2],
+				["todo-3", row3],
+			]),
+		);
 
 		const result = await handleTodoSync(
 			{
@@ -225,6 +226,7 @@ describe("handleTodoSync", () => {
 
 	it("calls notify when changes exist", async () => {
 		const notifyUser = vi.fn();
+		vi.mocked(findTodosByIds).mockResolvedValue(new Map());
 
 		await handleTodoSync(
 			{ changes: [makeChange()], lastSyncedAt: null },
@@ -253,7 +255,7 @@ describe("handleTodoSync", () => {
 
 	// Org sync tests
 	it("inserts new org todo when not on server", async () => {
-		vi.mocked(findTodoById).mockResolvedValue(undefined);
+		vi.mocked(findTodosByIds).mockResolvedValue(new Map());
 
 		await handleTodoSync(
 			{
@@ -299,7 +301,6 @@ describe("handleTodoSync", () => {
 			"user-1",
 		);
 
-		expect(findTodoById).not.toHaveBeenCalled();
 		expect(insertTodo).not.toHaveBeenCalled();
 	});
 
@@ -319,7 +320,7 @@ describe("handleTodoSync", () => {
 			"user-1",
 		);
 
-		expect(findTodoById).not.toHaveBeenCalled();
+		expect(insertTodo).not.toHaveBeenCalled();
 	});
 
 	it("calls notify with the org id when org changes exist", async () => {
@@ -369,7 +370,7 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
-			userId: "org-1",
+			userId: "test-user",
 			organizationId: "org-1",
 			createdBy: "user-1",
 			syncStatus: "synced",

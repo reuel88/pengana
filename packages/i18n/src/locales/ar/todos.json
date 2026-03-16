@@ -19,7 +19,10 @@
 		"fileAttached": "ملف مرفق",
 		"invalidFile": "ملف غير صالح",
 		"cameraUnavailable": "الكاميرا غير متاحة",
-		"cameraNotAvailable": "الكاميرا غير متاحة على هذا الجهاز."
+		"cameraNotAvailable": "الكاميرا غير متاحة على هذا الجهاز.",
+		"error": "خطأ",
+		"libraryError": "تعذّر تحميل الصور من مكتبتك.",
+		"pdfError": "تعذّر تحميل المستند المحدد."
 	},
 	"actions": {
 		"keepLocal": "احتفظ بالمحلي",

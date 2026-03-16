@@ -17,6 +17,8 @@
 	"unauthorized": "Không được phép",
 	"paymentError": "Đã xảy ra lỗi thanh toán. Vui lòng thử lại.",
 	"migrationError": "Lỗi di chuyển: {{message}}. Hãy thử khởi động lại ứng dụng.",
-	"noActiveOrganization": "No active organization",
-	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner."
+	"noActiveOrganization": "Không có tổ chức nào đang hoạt động",
+	"seatRequiredForWrite": "Cần có chỗ ngồi để thực hiện thao tác ghi. Liên hệ với chủ sở hữu tổ chức của bạn.",
+	"failedToRetryAttachment": "Không thể thử lại tệp đính kèm",
+	"attachmentBelongsToAnotherUser": "Tệp đính kèm thuộc về người dùng khác"
 }

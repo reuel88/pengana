@@ -20,7 +20,12 @@ export function TodoInput({
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
-				await todoActions.addTodo(userId, userId, organizationId ?? "", title);
+				await todoActions.addTodo(
+					userId,
+					userId,
+					organizationId ?? null,
+					title,
+				);
 				triggerSync();
 			}}
 			onError={() => toast.error(t("errors:failedToAddTodo"))}

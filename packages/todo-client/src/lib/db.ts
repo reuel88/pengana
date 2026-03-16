@@ -4,7 +4,7 @@ export interface WebTodo {
 	completed: boolean;
 	updatedAt: string;
 	userId: string; // sync engine scope key (userId for personal, organizationId for org)
-	organizationId: string; // always present — all todos belong to an org
+	organizationId: string | null; // null when user has no org
 	createdBy: string; // always present — who created the 2do
 	syncStatus: "synced" | "pending" | "conflict";
 	deleted: boolean;

@@ -93,6 +93,14 @@ export const uploadRouter = {
 				throw apiError("BAD_REQUEST", context.t("fileTooLarge"));
 			}
 
+			const existingMedia = await findMediaById(input.attachmentId);
+			if (existingMedia && existingMedia.userId !== userId) {
+				throw apiError(
+					"FORBIDDEN",
+					context.t("attachmentBelongsToAnotherUser"),
+				);
+			}
+
 			await mkdir(UPLOADS_DIR, { recursive: true });
 
 			const ext = MIME_TO_EXT[input.mimeType] ?? "bin";
@@ -180,6 +188,12 @@ export const uploadRouter = {
 			if (mediaRecord.entityId) {
 				const now = new Date();
 				await updateTodo(mediaRecord.entityId, { updatedAt: now });
+			}
+
+			if (mediaRecord.scopeType === "org" && mediaRecord.organizationId) {
+				context.notifyOrgMembers(mediaRecord.organizationId);
+			} else {
+				context.notifyUser(userId);
 			}
 
 			return envelope({ deleted: true });

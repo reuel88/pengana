@@ -14,7 +14,7 @@ export type {
 	StorageLevel,
 } from "./storage-health";
 
-import type { Todo, UploadItem, UploadStatus } from "../schemas";
+import type { Media, Todo, UploadItem, UploadStatus } from "../schemas";
 
 export interface UploadAdapter {
 	addToQueue(item: UploadItem): Promise<void>;
@@ -58,6 +58,7 @@ export interface SyncTransport<T extends { id: string } = Todo> {
 		signal?: AbortSignal;
 	}): Promise<{
 		serverChanges: T[];
+		media?: Media[];
 		conflicts: string[];
 		syncedAt: string;
 	}>;
