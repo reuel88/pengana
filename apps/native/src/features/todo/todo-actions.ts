@@ -2,7 +2,12 @@ import { drizzleMedia } from "@pengana/upload-client";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
-import { appDb, media, todos } from "@/features/todo/entities/todo";
+import {
+	appDb,
+	media,
+	mediaAttachments,
+	todos,
+} from "@/features/todo/entities/todo";
 import { pendingUpdate } from "./lib/pending-update";
 
 export async function addTodo(
@@ -56,8 +61,6 @@ export async function resolveConflict(
 }
 
 export const addMedia = (
-	entityId: string,
-	entityType: string,
 	userId: string,
 	localUri: string,
 	mimeType: string,
@@ -70,8 +73,6 @@ export const addMedia = (
 		appDb,
 		media,
 		randomUUID,
-		entityId,
-		entityType,
 		userId,
 		localUri,
 		mimeType,
@@ -81,8 +82,24 @@ export const addMedia = (
 		createdBy,
 	);
 
-export const removeMedia = (mediaId: string): Promise<void> =>
-	drizzleMedia.removeMedia(appDb, media, mediaId);
+export const attachMedia = (
+	mediaId: string,
+	entityType: string,
+	entityId: string,
+): Promise<string> =>
+	drizzleMedia.attachMediaToEntity(
+		appDb,
+		mediaAttachments,
+		randomUUID,
+		mediaId,
+		entityType,
+		entityId,
+	);
+
+export const removeMedia = async (mediaId: string): Promise<void> => {
+	await drizzleMedia.removeMediaAttachments(appDb, mediaAttachments, mediaId);
+	await drizzleMedia.removeMedia(appDb, media, mediaId);
+};
 
 export const updateMediaUploaded = (
 	mediaId: string,
@@ -103,4 +120,13 @@ export const retryMedia = (mediaId: string) =>
 	drizzleMedia.retryMedia(appDb, media, mediaId);
 
 export const getMediaCountForEntity = (entityId: string): Promise<number> =>
-	drizzleMedia.getMediaCountForEntity(appDb, media, entityId);
+	drizzleMedia.getMediaCountForEntity(appDb, mediaAttachments, entityId);
+
+export async function getAttachmentForMedia(mediaId: string) {
+	const [row] = await appDb
+		.select()
+		.from(mediaAttachments)
+		.where(eq(mediaAttachments.mediaId, mediaId))
+		.limit(1);
+	return row ?? null;
+}

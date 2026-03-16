@@ -9,8 +9,6 @@ import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file
 
 export function useFilePickerBase(deps: {
 	addMedia: (
-		entityId: string,
-		entityType: string,
 		userId: string,
 		uri: string,
 		mimeType: string,
@@ -19,13 +17,18 @@ export function useFilePickerBase(deps: {
 		organizationId: string | null,
 		createdBy: string | null,
 	) => Promise<string>;
+	attachMedia: (
+		mediaId: string,
+		entityType: string,
+		entityId: string,
+	) => Promise<string>;
 	updateMediaLocalUri: (mediaId: string, localUri: string) => Promise<void>;
 	enqueueUpload: (
-		entity: string,
-		entityId: string,
 		uri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
@@ -71,8 +74,6 @@ export function useFilePickerBase(deps: {
 
 				try {
 					const mediaId = await deps.addMedia(
-						todoId,
-						deps.entityType,
 						deps.userId,
 						"",
 						file.type,
@@ -81,15 +82,16 @@ export function useFilePickerBase(deps: {
 						deps.organizationId,
 						deps.createdBy,
 					);
+					await deps.attachMedia(mediaId, deps.entityType, todoId);
 					await storeFileInIndexedDB(mediaId, file);
 					const localUri = `${INDEXEDDB_URI_PREFIX}${mediaId}`;
 					await deps.updateMediaLocalUri(mediaId, localUri);
 					deps.enqueueUpload(
-						deps.entityType,
-						todoId,
 						localUri,
 						file.type,
 						mediaId,
+						deps.entityType,
+						todoId,
 					);
 				} catch {
 					window.alert(t("errors:failedToAttachFile"));

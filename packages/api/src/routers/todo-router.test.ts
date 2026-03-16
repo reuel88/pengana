@@ -56,6 +56,7 @@ describe("todo.sync", () => {
 		vi.mocked(handleTodoSync).mockResolvedValue({
 			serverChanges: [],
 			media: [],
+			mediaAttachments: [],
 			conflicts: [],
 			syncedAt: "2026-03-13T00:00:00.000Z",
 		});
@@ -80,6 +81,7 @@ describe("todo.sync", () => {
 		expect(result.data).toEqual({
 			serverChanges: [],
 			media: [],
+			mediaAttachments: [],
 			conflicts: [],
 			syncedAt: "2026-03-13T00:00:00.000Z",
 		});

@@ -10,6 +10,7 @@ vi.mock("@pengana/db/todo-queries", () => ({
 
 vi.mock("@pengana/db/media-queries", () => ({
 	findMediaByEntityIds: vi.fn().mockResolvedValue([]),
+	findMediaAttachmentsByEntityIds: vi.fn().mockResolvedValue([]),
 }));
 
 import {
@@ -370,7 +371,7 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
-			userId: "test-user",
+			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 			syncStatus: "synced",

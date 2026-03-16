@@ -1,16 +1,13 @@
-import { eq, inArray, count as sqlCount } from "drizzle-orm";
+import { and, eq, inArray, count as sqlCount } from "drizzle-orm";
 
 import { db } from "./index";
-import { media } from "./schema/media";
+import { media, mediaAttachments } from "./schema/media";
 
 export interface MediaRow {
 	id: string;
-	entityId: string | null;
-	entityType: string | null;
 	userId: string;
 	url: string | null;
 	mimeType: string;
-	position: number;
 	createdAt: Date;
 	updatedAt: Date;
 	scopeType: "personal" | "org";
@@ -19,21 +16,48 @@ export interface MediaRow {
 	createdBy: string | null;
 }
 
+export interface MediaAttachmentRow {
+	id: string;
+	mediaId: string;
+	entityType: string;
+	entityId: string;
+	position: number;
+	createdAt: Date;
+}
+
 export async function findMediaByEntityIds(
 	entityIds: string[],
-): Promise<MediaRow[]> {
+): Promise<
+	(MediaRow & { entityId: string; entityType: string; position: number })[]
+> {
 	if (entityIds.length === 0) return [];
-	return db.select().from(media).where(inArray(media.entityId, entityIds));
+	const rows = await db
+		.select({
+			id: media.id,
+			userId: media.userId,
+			url: media.url,
+			mimeType: media.mimeType,
+			createdAt: media.createdAt,
+			updatedAt: media.updatedAt,
+			scopeType: media.scopeType,
+			scopeId: media.scopeId,
+			organizationId: media.organizationId,
+			createdBy: media.createdBy,
+			entityId: mediaAttachments.entityId,
+			entityType: mediaAttachments.entityType,
+			position: mediaAttachments.position,
+		})
+		.from(mediaAttachments)
+		.innerJoin(media, eq(media.id, mediaAttachments.mediaId))
+		.where(inArray(mediaAttachments.entityId, entityIds));
+	return rows;
 }
 
 export async function insertMedia(values: {
 	id: string;
-	entityId?: string | null;
-	entityType?: string | null;
 	userId: string;
 	url?: string | null;
 	mimeType: string;
-	position: number;
 	updatedAt?: Date;
 	scopeType: "personal" | "org";
 	scopeId: string;
@@ -65,10 +89,65 @@ export async function deleteMedia(id: string): Promise<void> {
 	await db.delete(media).where(eq(media.id, id));
 }
 
+export async function attachMedia(
+	mediaId: string,
+	entityType: string,
+	entityId: string,
+	position: number,
+): Promise<MediaAttachmentRow> {
+	const [row] = await db
+		.insert(mediaAttachments)
+		.values({
+			id: crypto.randomUUID(),
+			mediaId,
+			entityType,
+			entityId,
+			position,
+		})
+		.returning();
+	if (!row) throw new Error("Failed to create media attachment");
+	return row;
+}
+
+export async function detachMedia(
+	mediaId: string,
+	entityType: string,
+	entityId: string,
+): Promise<void> {
+	await db
+		.delete(mediaAttachments)
+		.where(
+			and(
+				eq(mediaAttachments.mediaId, mediaId),
+				eq(mediaAttachments.entityType, entityType),
+				eq(mediaAttachments.entityId, entityId),
+			),
+		);
+}
+
+export async function findAttachmentsByMedia(
+	mediaId: string,
+): Promise<MediaAttachmentRow[]> {
+	return db
+		.select()
+		.from(mediaAttachments)
+		.where(eq(mediaAttachments.mediaId, mediaId));
+}
+
 export async function countMediaByEntityId(entityId: string): Promise<number> {
 	const [row] = await db
 		.select({ count: sqlCount() })
-		.from(media)
-		.where(eq(media.entityId, entityId));
+		.from(mediaAttachments)
+		.where(eq(mediaAttachments.entityId, entityId));
 	return row?.count ?? 0;
+}
+
+export async function findMediaAttachmentsByEntityIds(
+	entityIds: string[],
+): Promise<MediaAttachmentRow[]> {
+	if (entityIds.length === 0) return [];
+	return db
+		.select()
+		.from(mediaAttachments)
+		.where(inArray(mediaAttachments.entityId, entityIds));
 }

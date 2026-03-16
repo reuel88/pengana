@@ -8,19 +8,13 @@ export function createUploadLifecycleCallbacks(
 ): UploadLifecycleCallbacks {
 	return {
 		async onCompleted(
-			_entityType: string,
-			_entityId: string,
 			attachmentUrl: string,
 			uploadItemId: string,
 		): Promise<void> {
 			await updateMediaUploaded(db, uploadItemId, attachmentUrl);
 		},
 
-		async onFailed(
-			_entityType: string,
-			_entityId: string,
-			uploadItemId: string,
-		): Promise<void> {
+		async onFailed(uploadItemId: string): Promise<void> {
 			await markMediaFailed(db, uploadItemId);
 		},
 	};

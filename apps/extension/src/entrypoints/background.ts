@@ -94,8 +94,9 @@ function createEngine(scope: SyncScope): {
 
 	const onMedia = (
 		media: import("@pengana/sync-engine").Media[],
+		attachments: import("@pengana/sync-engine").MediaAttachment[],
 		entityIds: string[],
-	) => reconcileMedia(appDb, media, entityIds);
+	) => reconcileMedia(appDb, media, attachments, entityIds);
 
 	const transport = isOrg
 		? createSyncTransport(async (input) => {

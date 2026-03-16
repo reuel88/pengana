@@ -25,11 +25,11 @@ export function TodoListConnected({
 	todos: (WebTodo & { attachments: WebMedia[] })[];
 	triggerSync: () => void;
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		fileUri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	actions?: TodoActions;
 	entityType?: string;
@@ -70,7 +70,7 @@ export function TodoListConnected({
 		t,
 		actions,
 		deleteAttachment: (attachmentId) =>
-			client.upload.deleteAttachment({ attachmentId }),
+			client.upload.deleteMedia({ mediaId: attachmentId }),
 		db: appDb,
 		entityType,
 		userId,

@@ -24,11 +24,11 @@ interface TodoListProps {
 	syncHook: {
 		triggerSync: () => void;
 		enqueueUpload: (
-			entityType: string,
-			entityId: string,
 			fileUri: string,
 			mimeType: string,
 			mediaId: string,
+			entityType?: string,
+			entityId?: string,
 		) => void;
 	};
 	actions?: TodoActions;
@@ -79,7 +79,7 @@ export function TodoList({
 		t,
 		onDeleteSuccess: clearError,
 		deleteAttachment: (attachmentId) =>
-			client.upload.deleteAttachment({ attachmentId }),
+			client.upload.deleteMedia({ mediaId: attachmentId }),
 		db: appDb,
 		userId,
 		config,

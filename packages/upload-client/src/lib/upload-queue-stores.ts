@@ -9,7 +9,7 @@ export interface FileDataRecord {
 
 export const uploadQueueStore: RawStoreDefinition = {
 	name: "uploadQueue",
-	indexes: "id, entityType, entityId, status, createdAt",
+	indexes: "id, status, createdAt, entityType, entityId",
 };
 
 export const fileDataStore: RawStoreDefinition = {

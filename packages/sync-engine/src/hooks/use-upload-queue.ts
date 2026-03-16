@@ -81,18 +81,18 @@ export function useUploadQueue(
 
 	const enqueueUpload = useCallback(
 		(
-			entityType: string,
-			entityId: string,
 			fileUri: string,
 			mimeType: string,
 			mediaId: string,
+			entityType?: string,
+			entityId?: string,
 		) => {
 			uploadQueueRef.current?.enqueue({
 				id: mediaId,
-				entityType,
-				entityId,
 				fileUri,
 				mimeType,
+				entityType,
+				entityId,
 			});
 		},
 		[],

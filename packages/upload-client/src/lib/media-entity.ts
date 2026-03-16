@@ -2,6 +2,12 @@ import { defineEntity } from "@pengana/entity-store";
 
 export const mediaEntity = defineEntity({
 	name: "media",
-	indexes: "id, entityId, userId, scopeType, scopeId, organizationId",
+	indexes: "id, userId, scopeType, scopeId, organizationId",
+	scoping: "both",
+});
+
+export const mediaAttachmentEntity = defineEntity({
+	name: "mediaAttachments",
+	indexes: "id, mediaId, entityType, entityId, [entityType+entityId]",
 	scoping: "both",
 });
