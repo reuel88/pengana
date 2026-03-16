@@ -8,11 +8,20 @@ import { appDb } from "@/features/todo/entities/todo";
 
 import type { TodoItemRow } from "./components/todo-item";
 
-function useTodosWithAttachments(tableName: string, scopeId: string) {
+function useTodosWithAttachments(
+	tableName: string,
+	scopeId: string,
+	filter?: (item: WebTodo) => boolean,
+) {
 	const todos = useLiveQuery(
-		() =>
-			appDb.getTable<WebTodo>(tableName).where({ userId: scopeId }).toArray(),
-		[tableName, scopeId],
+		() => {
+			const query = appDb
+				.getTable<WebTodo>(tableName)
+				.where({ userId: scopeId });
+			if (filter) return query.filter(filter).toArray();
+			return query.toArray();
+		},
+		[tableName, scopeId, filter],
 		[] as WebTodo[],
 	);
 
@@ -56,10 +65,17 @@ function useTodosWithAttachments(tableName: string, scopeId: string) {
 	return { todos: activeTodos, conflictTodos };
 }
 
-export function useTodos(userId: string) {
-	return useTodosWithAttachments("todos", userId);
+export function useTodos(userId: string, organizationId?: string) {
+	const filter = useMemo(
+		() =>
+			organizationId
+				? (t: WebTodo) => t.organizationId === organizationId
+				: undefined,
+		[organizationId],
+	);
+	return useTodosWithAttachments("todos", userId, filter);
 }
 
 export function useOrgTodos(organizationId: string) {
-	return useTodosWithAttachments("orgTodos", organizationId);
+	return useTodosWithAttachments("todos", organizationId);
 }

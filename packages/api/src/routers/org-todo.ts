@@ -1,10 +1,10 @@
-import { updateOrgTodoForOrg } from "@pengana/db/org-todo-queries";
+import { updateTodoForScope } from "@pengana/db/todo-queries";
 import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { apiError } from "../errors";
 import { envelope, envelopeOutput, seatedProcedure } from "../index";
-import { handleOrgSync } from "./org-todo-sync";
+import { handleTodoSync } from "./todo-sync";
 
 export const orgTodoRouter = {
 	sync: seatedProcedure
@@ -20,7 +20,13 @@ export const orgTodoRouter = {
 			const orgId = context.session.session.activeOrganizationId;
 			if (!orgId) throw apiError("BAD_REQUEST", "No active organization");
 			return envelope(
-				await handleOrgSync(input, orgId, userId, context.notifyOrgMembers),
+				await handleTodoSync(
+					input,
+					"org",
+					orgId,
+					userId,
+					context.notifyOrgMembers,
+				),
 			);
 		}),
 
@@ -36,7 +42,7 @@ export const orgTodoRouter = {
 			const orgId = context.session.session.activeOrganizationId;
 			if (!orgId) throw apiError("BAD_REQUEST", "No active organization");
 
-			await updateOrgTodoForOrg(input.todoId, orgId, {
+			await updateTodoForScope(input.todoId, "org", orgId, {
 				title: `[Server Edit] ${Date.now()}`,
 				updatedAt: new Date(),
 			});

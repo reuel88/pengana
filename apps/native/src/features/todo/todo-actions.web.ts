@@ -9,6 +9,7 @@ import {
 	getMediaCountForEntity as _getMediaCount,
 	markMediaFailed as _markMediaFailed,
 	removeMedia as _removeMedia,
+	updateMediaLocalUri as _updateMediaLocalUri,
 	updateMediaUploaded as _updateMediaUploaded,
 } from "@pengana/upload-client";
 
@@ -16,8 +17,11 @@ import { appDb } from "@/features/todo/entities/todo";
 
 const actions = createTodoActions(appDb, personalTodoConfig);
 
-export const addTodo = (userId: string, title: string) =>
-	actions.addTodo(userId, userId, "", title);
+export const addTodo = (
+	userId: string,
+	title: string,
+	organizationId?: string,
+) => actions.addTodo(userId, userId, organizationId ?? "", title);
 export const toggleTodo = (id: string) => actions.toggleTodo(id);
 export const deleteTodo = (id: string) => actions.deleteTodo(id);
 export const resolveConflict = (id: string, resolution: "local" | "server") =>
@@ -34,6 +38,8 @@ export const updateMediaUploaded = (mediaId: string, url: string) =>
 	_updateMediaUploaded(appDb, mediaId, url);
 export const markMediaFailed = (mediaId: string) =>
 	_markMediaFailed(appDb, mediaId);
+export const updateMediaLocalUri = (mediaId: string, localUri: string) =>
+	_updateMediaLocalUri(appDb, mediaId, localUri);
 export const getMediaCountForEntity = (entityId: string) =>
 	_getMediaCount(appDb, entityId);
 
@@ -45,5 +51,6 @@ export async function updateTodoTitle(
 		title,
 		updatedAt: new Date().toISOString(),
 		syncStatus: "pending",
+		// Dexie .update() doesn't type partial updates
 	} as never);
 }

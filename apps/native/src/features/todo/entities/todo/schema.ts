@@ -5,6 +5,7 @@ export const todos = sqliteTable("todos", {
 	...syncableColumns,
 	title: text("title").notNull(),
 	completed: integer("completed", { mode: "boolean" }).notNull().default(false),
+	scopeType: text("scope_type").notNull().default("personal"),
 	organizationId: text("organization_id"),
 	createdBy: text("created_by"),
 });

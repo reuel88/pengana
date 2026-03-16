@@ -61,7 +61,7 @@ export function TodoPage({
 					onTabChange={setActiveTab}
 					showTabs={Boolean(organizationId)}
 				/>
-				<SyncProvider userId={userId}>
+				<SyncProvider userId={userId} organizationId={organizationId}>
 					<View
 						testID="personal-todo-panel"
 						style={
@@ -70,7 +70,10 @@ export function TodoPage({
 								: undefined
 						}
 					>
-						<PersonalTodoContent userId={userId} />
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
 					</View>
 				</SyncProvider>
 				{organizationId ? (

@@ -98,7 +98,6 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 		scopeId,
 		effectiveOnline,
 		engineRef,
-		deps.generateUUID,
 		deps.createUploadAdapter,
 		deps.createUploadTransport,
 		deps.uploadLifecycleCallbacks,

@@ -1,5 +1,6 @@
 import { getLogger } from "@logtape/logtape";
 import { findMediaByEntityIds } from "@pengana/db/media-queries";
+import type { ScopeType } from "@pengana/db/todo-queries";
 import {
 	findTodoById,
 	getTodosUpdatedSince,
@@ -10,19 +11,27 @@ import type { SyncInput } from "@pengana/sync-engine";
 
 const logger = getLogger(["app", "sync"]);
 
-export async function handleSync(
+export async function handleTodoSync(
 	input: SyncInput,
-	userId: string,
-	notifyUser?: (userId: string) => void,
-	isSeated = true,
+	scopeType: ScopeType,
+	scopeId: string,
+	createdBy: string,
+	notify?: (id: string) => void,
+	skipChanges = false,
+	organizationId?: string,
 ) {
 	const conflicts: string[] = [];
 	const now = new Date();
 
-	logger.debug`Sync started for user ${userId} with ${String(input.changes.length)} change(s), seated=${String(isSeated)}`;
+	logger.debug`Sync started for scope ${scopeType}:${scopeId} by ${createdBy} with ${String(input.changes.length)} change(s)`;
 
-	for (const change of isSeated ? input.changes : []) {
-		if (change.userId !== userId) continue;
+	for (const change of skipChanges ? [] : input.changes) {
+		if (scopeType === "personal") {
+			if (change.userId !== scopeId) continue;
+		} else {
+			if (change.organizationId !== scopeId) continue;
+			if (change.createdBy !== createdBy) continue;
+		}
 
 		const existing = await findTodoById(change.id);
 
@@ -33,7 +42,14 @@ export async function handleSync(
 				completed: change.completed,
 				deleted: change.deleted,
 				updatedAt: now,
-				userId,
+				scopeType,
+				scopeId,
+				userId: createdBy,
+				organizationId:
+					scopeType === "org"
+						? scopeId
+						: (organizationId ?? (change.organizationId || null)),
+				createdBy,
 			});
 		} else {
 			const clientTime = new Date(change.updatedAt).getTime();
@@ -57,20 +73,25 @@ export async function handleSync(
 		? new Date(new Date(input.lastSyncedAt).getTime() - OVERLAP_MS)
 		: new Date(0);
 
-	const serverChanges = await getTodosUpdatedSince(userId, lastSyncedAt);
+	const serverChanges = await getTodosUpdatedSince(
+		scopeType,
+		scopeId,
+		lastSyncedAt,
+		organizationId,
+	);
 
 	const todoIds = serverChanges.map((t) => t.id);
 	const mediaRows = await findMediaByEntityIds(todoIds);
 
 	if (conflicts.length > 0) {
-		logger.warn`Sync conflicts for user ${userId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
+		logger.warn`Sync conflicts for ${scopeType}:${scopeId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
 	}
 
 	if (input.changes.length > 0) {
-		notifyUser?.(userId);
+		notify?.(scopeId);
 	}
 
-	logger.debug`Sync completed for user ${userId}: ${String(serverChanges.length)} server change(s), ${String(conflicts.length)} conflict(s)`;
+	logger.debug`Sync completed for ${scopeType}:${scopeId}: ${String(serverChanges.length)} server change(s), ${String(conflicts.length)} conflict(s)`;
 
 	return {
 		serverChanges: serverChanges.map((t) => ({
@@ -79,8 +100,9 @@ export async function handleSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
-			userId: t.userId,
-			organizationId: t.organizationId ?? "",
+			userId: scopeType === "personal" ? t.scopeId : t.scopeId,
+			organizationId:
+				scopeType === "org" ? t.scopeId : (t.organizationId ?? ""),
 			createdBy: t.createdBy ?? null,
 			syncStatus: "synced" as const,
 		})),

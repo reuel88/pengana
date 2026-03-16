@@ -7,11 +7,6 @@ vi.mock("@pengana/db/todo-queries", () => ({
 	updateTodo: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("@pengana/db/org-todo-queries", () => ({
-	findOrgTodoById: vi.fn(),
-	updateOrgTodo: vi.fn().mockResolvedValue(undefined),
-}));
-
 vi.mock("@pengana/db/seat-queries", () => ({
 	isMemberSeatedByUserId: vi.fn(),
 	autoSeatOwner: vi.fn(),
@@ -20,7 +15,7 @@ vi.mock("@pengana/db/seat-queries", () => ({
 vi.mock("@pengana/db/media-queries", () => ({
 	countMediaByEntityId: vi.fn().mockResolvedValue(0),
 	insertMedia: vi.fn().mockResolvedValue(undefined),
-	updateMediaUrl: vi.fn().mockResolvedValue(undefined),
+	findMediaById: vi.fn().mockResolvedValue(undefined),
 	deleteMedia: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -47,7 +42,6 @@ process.env.POLAR_SUCCESS_URL ??= "http://localhost:3001/success";
 process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
-import { findOrgTodoById } from "@pengana/db/org-todo-queries";
 import {
 	autoSeatOwner,
 	isMemberSeatedByUserId,
@@ -95,7 +89,6 @@ describe("upload.upload", () => {
 			Object.assign(new Error("missing"), { code: "ENOENT" }),
 		);
 		vi.mocked(findTodoById).mockResolvedValue(undefined);
-		vi.mocked(findOrgTodoById).mockResolvedValue(undefined);
 		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(false);
 		vi.mocked(autoSeatOwner).mockResolvedValue(false);
 	});
@@ -107,7 +100,11 @@ describe("upload.upload", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
+			scopeType: "personal",
+			scopeId: "user-1",
 			userId: "user-1",
+			organizationId: null,
+			createdBy: "user-1",
 		});
 
 		const ctx = makeContext();
@@ -122,18 +119,21 @@ describe("upload.upload", () => {
 	});
 
 	it("requires a seat when uploading attachments for org todos", async () => {
-		vi.mocked(findOrgTodoById).mockResolvedValue({
+		vi.mocked(findTodoById).mockResolvedValue({
 			id: "todo-1",
 			title: "Org",
 			completed: false,
 			deleted: false,
 			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
+			scopeType: "org",
+			scopeId: "org-1",
+			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 		});
 
 		await expect(
-			call(uploadRouter.upload, makeInput({ entityType: "orgTodo" as const }), {
+			call(uploadRouter.upload, makeInput(), {
 				context: makeContext({
 					session: {
 						user: {
@@ -155,12 +155,15 @@ describe("upload.upload", () => {
 	});
 
 	it("notifies org members after a successful org todo upload", async () => {
-		vi.mocked(findOrgTodoById).mockResolvedValue({
+		vi.mocked(findTodoById).mockResolvedValue({
 			id: "todo-1",
 			title: "Org",
 			completed: false,
 			deleted: false,
 			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
+			scopeType: "org",
+			scopeId: "org-1",
+			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 		});
@@ -179,11 +182,9 @@ describe("upload.upload", () => {
 			},
 		});
 
-		const result = await call(
-			uploadRouter.upload,
-			makeInput({ entityType: "orgTodo" as const }),
-			{ context: ctx },
-		);
+		const result = await call(uploadRouter.upload, makeInput(), {
+			context: ctx,
+		});
 
 		expect(result.data.url).toContain("/uploads/");
 		expect(ctx.notifyOrgMembers).toHaveBeenCalledWith("org-1");

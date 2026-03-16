@@ -2,18 +2,31 @@ import { useTranslation } from "@pengana/i18n";
 import {
 	INDEXEDDB_URI_PREFIX,
 	isAllowedMimeType,
+	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/sync-engine";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file-store.web";
 
-import { useOrgSync } from "@/features/sync/org-sync-context";
-
-import { addOrgMedia, getOrgMediaCountForEntity } from "../org-todo-actions";
-
-const MAX_ATTACHMENTS = 10;
-
-export function useOrgFilePicker(userId: string) {
-	const { enqueueUpload } = useOrgSync();
+export function useFilePickerBase(deps: {
+	addMedia: (
+		entityId: string,
+		entityType: string,
+		userId: string,
+		uri: string,
+		mimeType: string,
+	) => Promise<string>;
+	updateMediaLocalUri: (mediaId: string, localUri: string) => Promise<void>;
+	enqueueUpload: (
+		entity: string,
+		entityId: string,
+		uri: string,
+		mimeType: string,
+		mediaId: string,
+	) => void;
+	getMediaCount: (entityId: string) => Promise<number>;
+	entityType: string;
+	userId: string;
+}) {
 	const { t } = useTranslation();
 
 	const showPickerForTodo = (todoId: string) => {
@@ -26,7 +39,7 @@ export function useOrgFilePicker(userId: string) {
 			const files = input.files;
 			if (!files || files.length === 0) return;
 
-			const currentCount = await getOrgMediaCountForEntity(todoId);
+			const currentCount = await deps.getMediaCount(todoId);
 			const available = MAX_ATTACHMENTS - currentCount;
 
 			for (let i = 0; i < Math.min(files.length, available); i++) {
@@ -43,18 +56,20 @@ export function useOrgFilePicker(userId: string) {
 				}
 
 				try {
-					const mediaId = await addOrgMedia(
+					const mediaId = await deps.addMedia(
 						todoId,
-						"orgTodo",
-						userId,
-						`${INDEXEDDB_URI_PREFIX}${todoId}`,
+						deps.entityType,
+						deps.userId,
+						"",
 						file.type,
 					);
 					await storeFileInIndexedDB(mediaId, file);
-					enqueueUpload(
-						"orgTodo",
+					const localUri = `${INDEXEDDB_URI_PREFIX}${mediaId}`;
+					await deps.updateMediaLocalUri(mediaId, localUri);
+					deps.enqueueUpload(
+						deps.entityType,
 						todoId,
-						`${INDEXEDDB_URI_PREFIX}${mediaId}`,
+						localUri,
 						file.type,
 						mediaId,
 					);

@@ -1,16 +1,23 @@
+import { drizzleMedia } from "@pengana/upload-client";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
 import { appDb, media, todos } from "@/features/todo/entities/todo";
 import { pendingUpdate } from "./lib/pending-update";
 
-export async function addTodo(userId: string, title: string): Promise<void> {
+export async function addTodo(
+	userId: string,
+	title: string,
+	organizationId?: string,
+): Promise<void> {
 	await appDb.insert(todos).values({
 		id: randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
 		userId,
+		organizationId: organizationId ?? null,
+		scopeType: "personal",
 		syncStatus: "pending",
 		deleted: false,
 	});
@@ -48,76 +55,44 @@ export async function resolveConflict(
 	}
 }
 
-export async function addMedia(
+export const addMedia = (
 	entityId: string,
 	entityType: string,
 	userId: string,
 	localUri: string,
 	mimeType: string,
-): Promise<string> {
-	const id = randomUUID();
-	const existing = await appDb
-		.select()
-		.from(media)
-		.where(eq(media.entityId, entityId));
-	const position = existing.length;
-
-	await appDb.insert(media).values({
-		id,
+): Promise<string> =>
+	drizzleMedia.addMedia(
+		appDb,
+		media,
+		randomUUID,
 		entityId,
 		entityType,
 		userId,
-		url: null,
 		localUri,
-		status: "queued",
 		mimeType,
-		position,
-		createdAt: new Date().toISOString(),
-	});
+	);
 
-	return id;
-}
+export const removeMedia = (mediaId: string): Promise<void> =>
+	drizzleMedia.removeMedia(appDb, media, mediaId);
 
-export async function removeMedia(mediaId: string): Promise<void> {
-	await appDb.delete(media).where(eq(media.id, mediaId));
-}
-
-export async function updateMediaUploaded(
+export const updateMediaUploaded = (
 	mediaId: string,
 	url: string,
-): Promise<void> {
-	await appDb
-		.update(media)
-		.set({ url, status: "uploaded" })
-		.where(eq(media.id, mediaId));
-}
+): Promise<void> =>
+	drizzleMedia.updateMediaUploaded(appDb, media, mediaId, url);
 
-export async function markMediaFailed(mediaId: string): Promise<void> {
-	await appDb
-		.update(media)
-		.set({ status: "failed" })
-		.where(eq(media.id, mediaId));
-}
+export const markMediaFailed = (mediaId: string): Promise<void> =>
+	drizzleMedia.markMediaFailed(appDb, media, mediaId);
 
-export async function retryMedia(mediaId: string) {
-	await appDb
-		.update(media)
-		.set({ status: "queued" })
-		.where(eq(media.id, mediaId));
+export const updateMediaLocalUri = (
+	mediaId: string,
+	localUri: string,
+): Promise<void> =>
+	drizzleMedia.updateMediaLocalUri(appDb, media, mediaId, localUri);
 
-	const [record] = await appDb
-		.select()
-		.from(media)
-		.where(eq(media.id, mediaId));
-	return record ?? null;
-}
+export const retryMedia = (mediaId: string) =>
+	drizzleMedia.retryMedia(appDb, media, mediaId);
 
-export async function getMediaCountForEntity(
-	entityId: string,
-): Promise<number> {
-	const rows = await appDb
-		.select()
-		.from(media)
-		.where(eq(media.entityId, entityId));
-	return rows.length;
-}
+export const getMediaCountForEntity = (entityId: string): Promise<number> =>
+	drizzleMedia.getMediaCountForEntity(appDb, media, entityId);

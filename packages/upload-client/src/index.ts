@@ -10,6 +10,7 @@ export {
 	type UploadTransportInput,
 } from "./adapters/upload-transport";
 export type { WebMedia } from "./lib/db";
+export * as drizzleMedia from "./lib/drizzle-media-actions";
 export { readFileAsBase64 } from "./lib/file-utils";
 export {
 	addMedia,
@@ -17,6 +18,7 @@ export {
 	markMediaFailed,
 	reconcileMedia,
 	removeMedia,
+	updateMediaLocalUri,
 	updateMediaUploaded,
 } from "./lib/media-actions";
 export { mediaEntity } from "./lib/media-entity";

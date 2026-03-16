@@ -18,7 +18,6 @@ export function useUploadQueue(
 	userId: string | undefined,
 	isOnline: boolean,
 	engineRef: React.RefObject<Syncable | null>,
-	_generateUUID: () => string,
 	createUploadAdapter: () => UploadAdapter,
 	createUploadTransport: () => UploadTransport,
 	lifecycleCallbacks?: UploadLifecycleCallbacks,

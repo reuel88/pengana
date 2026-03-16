@@ -5,9 +5,7 @@ import {
 	deleteMedia,
 	findMediaById,
 	insertMedia,
-	updateMediaUrl,
 } from "@pengana/db/media-queries";
-import { findOrgTodoById, updateOrgTodo } from "@pengana/db/org-todo-queries";
 import {
 	autoSeatOwner,
 	isMemberSeatedByUserId,
@@ -15,6 +13,8 @@ import {
 import { findTodoById, updateTodo } from "@pengana/db/todo-queries";
 import {
 	ALLOWED_MIME_TYPES,
+	ENTITY_TYPE_TODO,
+	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 	MIME_TO_EXT,
 } from "@pengana/sync-engine";
@@ -24,7 +24,6 @@ import { apiError } from "../errors";
 import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
-const MAX_ATTACHMENTS = 10;
 
 export const uploadRouter = {
 	upload: protectedProcedure
@@ -56,28 +55,29 @@ export const uploadRouter = {
 			const userId = context.session.user.id;
 			const activeOrgId = context.session.session.activeOrganizationId;
 
-			if (input.entityType === "orgTodo") {
+			const todoRow = await findTodoById(input.entityId);
+			if (!todoRow) {
+				throw apiError("NOT_FOUND", context.t("todoNotFound"));
+			}
+
+			if (todoRow.scopeType === "org") {
 				if (!activeOrgId) {
 					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
 				}
-				const orgId = activeOrgId;
-
-				const orgTodo = await findOrgTodoById(input.entityId);
-				if (!orgTodo || orgTodo.organizationId !== orgId) {
+				if (todoRow.scopeId !== activeOrgId) {
 					throw apiError("NOT_FOUND", context.t("todoNotFound"));
 				}
 
-				let seated = await isMemberSeatedByUserId(orgId, userId);
+				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
 				if (!seated) {
-					seated = await autoSeatOwner(orgId, userId);
+					seated = await autoSeatOwner(activeOrgId, userId);
 				}
 
 				if (!seated) {
 					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
 				}
 			} else {
-				const todo = await findTodoById(input.entityId);
-				if (!todo || todo.userId !== userId) {
+				if (todoRow.userId !== userId) {
 					throw apiError("NOT_FOUND", context.t("todoNotFound"));
 				}
 			}
@@ -110,24 +110,19 @@ export const uploadRouter = {
 			await insertMedia({
 				id: input.attachmentId,
 				entityId: input.entityId,
-				entityType: input.entityType,
+				entityType: ENTITY_TYPE_TODO,
 				userId,
 				url,
 				mimeType: input.mimeType,
 				position: count,
-			}).catch(async () => {
-				await updateMediaUrl(input.attachmentId, url);
 			});
 
 			const now = new Date();
-			if (input.entityType === "orgTodo") {
-				await updateOrgTodo(input.entityId, { updatedAt: now });
-				if (!activeOrgId) {
-					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
-				}
+			await updateTodo(input.entityId, { updatedAt: now });
+
+			if (todoRow.scopeType === "org" && activeOrgId) {
 				context.notifyOrgMembers(activeOrgId);
 			} else {
-				await updateTodo(input.entityId, { updatedAt: now });
 				context.notifyUser(userId);
 			}
 
@@ -149,18 +144,23 @@ export const uploadRouter = {
 			}),
 		)
 		.output(envelopeOutput(z.object({ deleted: z.boolean() })))
-		.handler(async ({ input }) => {
+		.handler(async ({ input, context }) => {
+			const userId = context.session.user.id;
 			const mediaRecord = await findMediaById(input.attachmentId);
+
+			if (!mediaRecord) {
+				throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
+			}
+
+			if (mediaRecord.userId !== userId) {
+				throw apiError("FORBIDDEN", context.t("notAttachmentOwner"));
+			}
+
 			await deleteMedia(input.attachmentId);
 
-			// Bump the parent entity's updatedAt so other clients pick up the change on sync
-			if (mediaRecord?.entityId) {
+			if (mediaRecord.entityId) {
 				const now = new Date();
-				if (mediaRecord.entityType === "org-todo") {
-					await updateOrgTodo(mediaRecord.entityId, { updatedAt: now });
-				} else {
-					await updateTodo(mediaRecord.entityId, { updatedAt: now });
-				}
+				await updateTodo(mediaRecord.entityId, { updatedAt: now });
 			}
 
 			return envelope({ deleted: true });

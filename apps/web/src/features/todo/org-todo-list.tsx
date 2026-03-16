@@ -1,17 +1,11 @@
-import type { TodoActions, WebTodo } from "@pengana/todo-client";
+import type { WebTodo } from "@pengana/todo-client";
 import { createTodoActions, orgTodoConfig } from "@pengana/todo-client";
 import type { WebMedia } from "@pengana/upload-client";
 import { useOrgSync } from "@/features/sync/sync-context";
 import { appDb } from "@/shared/db";
 import { TodoListConnected } from "./todo-list-connected";
 
-const todoActions = createTodoActions(appDb, orgTodoConfig);
-const orgActions: TodoActions = {
-	toggleTodo: (id) => todoActions.toggleTodo(id),
-	deleteTodo: (id) => todoActions.deleteTodo(id),
-	resolveConflict: (id, resolution) =>
-		todoActions.resolveConflict(id, resolution),
-};
+const orgActions = createTodoActions(appDb, orgTodoConfig);
 
 export function OrgTodoList({
 	todos,
@@ -28,7 +22,7 @@ export function OrgTodoList({
 			triggerSync={triggerSync}
 			enqueueUpload={enqueueUpload}
 			actions={orgActions}
-			entityType="orgTodo"
+			entityType="todo"
 			userId={userId}
 		/>
 	);

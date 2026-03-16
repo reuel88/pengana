@@ -18,6 +18,10 @@ export interface DexieSyncAdapterConfig<TLocal> {
 		existing: TLocal | undefined,
 		syncStatus: "synced" | "conflict",
 	) => TLocal;
+	/** Optional post-query filter applied in getPendingChanges. */
+	filter?: (item: TLocal) => boolean;
+	/** Appended to sync meta key: `${syncKeyPrefix}:${scopeId}:${suffix}`. */
+	syncKeySuffix?: string;
 }
 
 /**
@@ -38,9 +42,10 @@ export function createDexieSyncAdapter<TLocal>(
 
 	return {
 		async getPendingChanges(): Promise<Todo[]> {
-			const rows = await table
+			let rows = await table
 				.where({ userId: scopeId, syncStatus: "pending" })
 				.toArray();
+			if (config.filter) rows = rows.filter(config.filter);
 			return rows.map(config.toWire);
 		},
 
@@ -95,15 +100,19 @@ export function createDexieSyncAdapter<TLocal>(
 		},
 
 		async getLastSyncedAt(): Promise<string | null> {
-			const meta = await config.db.syncMeta.get(
-				`${config.syncKeyPrefix}:${scopeId}`,
-			);
+			const syncKey = config.syncKeySuffix
+				? `${config.syncKeyPrefix}:${scopeId}:${config.syncKeySuffix}`
+				: `${config.syncKeyPrefix}:${scopeId}`;
+			const meta = await config.db.syncMeta.get(syncKey);
 			return meta?.value ?? null;
 		},
 
 		async setLastSyncedAt(timestamp: string): Promise<void> {
+			const syncKey = config.syncKeySuffix
+				? `${config.syncKeyPrefix}:${scopeId}:${config.syncKeySuffix}`
+				: `${config.syncKeyPrefix}:${scopeId}`;
 			await config.db.syncMeta.put({
-				key: `${config.syncKeyPrefix}:${scopeId}`,
+				key: syncKey,
 				value: timestamp,
 			});
 		},

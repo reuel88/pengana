@@ -14,11 +14,13 @@ export function useTodos(
 	db: EntityDatabase,
 	config: TodoConfig,
 	scopeId: string,
+	filter?: (item: WebTodo) => boolean,
 ) {
 	const { items, conflicts } = useDexieEntity<WebTodo>(
 		db,
 		config.entity.name,
 		scopeId,
+		filter,
 	);
 
 	const todoIdsRef = useRef<string[]>([]);

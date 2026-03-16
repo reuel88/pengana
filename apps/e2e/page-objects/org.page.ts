@@ -26,4 +26,26 @@ export class OrgPage {
 		await this.page.locator("#invite-role").selectOption(role);
 		await this.page.getByRole("button", { name: "Send Invitation" }).click();
 	}
+
+	private orgSwitcherTrigger() {
+		return this.page
+			.locator('header [data-slot="dropdown-menu-trigger"]')
+			.first();
+	}
+
+	async switchOrg(orgName: string) {
+		await this.orgSwitcherTrigger().click();
+		await this.page.getByRole("menuitem", { name: orgName }).click();
+		await this.page.waitForURL(/\/org/);
+	}
+
+	async createOrgFromSwitcher(orgName: string) {
+		await this.orgSwitcherTrigger().click();
+		await this.page
+			.getByRole("menuitem", { name: "Create Organization" })
+			.click();
+		await this.page.getByTestId("org-name-input").fill(orgName);
+		await this.page.getByTestId("org-submit").click();
+		await this.page.waitForURL(/\/org/);
+	}
 }

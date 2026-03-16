@@ -3,12 +3,16 @@ import { and, eq, gte } from "drizzle-orm";
 import { db } from "./index";
 import { todo } from "./schema/todo";
 
+export type ScopeType = "personal" | "org";
+
 export interface TodoRow {
 	id: string;
 	title: string;
 	completed: boolean;
 	deleted: boolean;
 	updatedAt: Date;
+	scopeType: ScopeType;
+	scopeId: string;
 	userId: string;
 	organizationId: string | null;
 	createdBy: string | null;
@@ -25,6 +29,8 @@ export async function insertTodo(values: {
 	completed: boolean;
 	deleted: boolean;
 	updatedAt: Date;
+	scopeType: ScopeType;
+	scopeId: string;
 	userId: string;
 	organizationId?: string | null;
 	createdBy?: string | null;
@@ -44,9 +50,10 @@ export async function updateTodo(
 	await db.update(todo).set(values).where(eq(todo.id, id));
 }
 
-export async function updateTodoForUser(
+export async function updateTodoForScope(
 	id: string,
-	userId: string,
+	scopeType: ScopeType,
+	scopeId: string,
 	values: Partial<{
 		title: string;
 		completed: boolean;
@@ -57,15 +64,31 @@ export async function updateTodoForUser(
 	await db
 		.update(todo)
 		.set(values)
-		.where(and(eq(todo.id, id), eq(todo.userId, userId)));
+		.where(
+			and(
+				eq(todo.id, id),
+				eq(todo.scopeType, scopeType),
+				eq(todo.scopeId, scopeId),
+			),
+		);
 }
 
 export async function getTodosUpdatedSince(
-	userId: string,
+	scopeType: ScopeType,
+	scopeId: string,
 	since: Date,
+	organizationId?: string,
 ): Promise<TodoRow[]> {
+	const conditions = [
+		eq(todo.scopeType, scopeType),
+		eq(todo.scopeId, scopeId),
+		gte(todo.updatedAt, since),
+	];
+	if (organizationId) {
+		conditions.push(eq(todo.organizationId, organizationId));
+	}
 	return db
 		.select()
 		.from(todo)
-		.where(and(eq(todo.userId, userId), gte(todo.updatedAt, since)));
+		.where(and(...conditions));
 }

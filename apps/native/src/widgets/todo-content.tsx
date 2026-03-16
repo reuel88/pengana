@@ -70,14 +70,20 @@ export function TodoShell({
 	);
 }
 
-export function PersonalTodoContent({ userId }: { userId: string }) {
-	const { todos } = useTodos(userId);
+export function PersonalTodoContent({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId?: string;
+}) {
+	const { todos } = useTodos(userId, organizationId);
 	const { isOnline, isSyncing } = useSync();
 
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<TodoInput userId={userId} />
+			<TodoInput userId={userId} organizationId={organizationId} />
 			<TodoList todos={todos} userId={userId} />
 			<SyncDevtools />
 		</View>

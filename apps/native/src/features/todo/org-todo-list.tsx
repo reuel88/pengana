@@ -5,10 +5,10 @@ import { useAttachmentHandlers } from "./create-attachment-handlers";
 import { useOrgFilePicker } from "./hooks/use-org-file-picker";
 import {
 	deleteOrgTodo,
-	removeOrgMedia,
 	resolveOrgConflict,
 	toggleOrgTodo,
 } from "./org-todo-actions";
+import { removeMedia } from "./todo-actions";
 import type { TodoListActions } from "./todo-list-base";
 import { TodoListBase } from "./todo-list-base";
 
@@ -28,7 +28,7 @@ export function OrgTodoList({
 	const { triggerSync, enqueueUpload } = useOrgSync();
 	const { showPickerForTodo } = useOrgFilePicker(userId);
 	const { handleRemoveAttachment, handleRetryAttachment } =
-		useAttachmentHandlers(removeOrgMedia, triggerSync, enqueueUpload);
+		useAttachmentHandlers(removeMedia, triggerSync, enqueueUpload);
 
 	return (
 		<TodoListBase

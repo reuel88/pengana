@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import { isQuotaError } from "@pengana/sync-engine";
+import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync-engine";
 import {
 	addMedia,
 	getMediaCountForEntity,
@@ -9,8 +9,6 @@ import { useCallback, useMemo } from "react";
 import { createTodoActions } from "../lib/todo-actions";
 import type { TodoConfig } from "../lib/todo-config";
 import { personalTodoConfig } from "../lib/todo-config";
-
-const MAX_ATTACHMENTS = 10;
 
 export interface FileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
@@ -29,19 +27,6 @@ export interface TodoActions {
 	) => Promise<void>;
 }
 
-function createDefaultActions(
-	db: EntityDatabase,
-	config: TodoConfig,
-): TodoActions {
-	const actions = createTodoActions(db, config);
-	return {
-		toggleTodo: (id) => actions.toggleTodo(id),
-		deleteTodo: (id) => actions.deleteTodo(id),
-		resolveConflict: (id, resolution) =>
-			actions.resolveConflict(id, resolution),
-	};
-}
-
 function resolveActions({
 	actions,
 	db,
@@ -55,7 +40,7 @@ function resolveActions({
 		throw new Error("useTodoHandlers requires either actions or db");
 	}
 
-	return createDefaultActions(db, config ?? personalTodoConfig);
+	return createTodoActions(db, config ?? personalTodoConfig);
 }
 
 export interface TodoHandlerDeps {
