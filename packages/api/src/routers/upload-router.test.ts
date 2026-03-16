@@ -144,7 +144,7 @@ describe("upload.upload", () => {
 						session: {
 							activeOrganizationId: "org-1",
 						},
-					},
+					} as Context["session"],
 				}),
 			}),
 		).rejects.toThrow("seatRequiredForWrite");
@@ -179,7 +179,7 @@ describe("upload.upload", () => {
 				session: {
 					activeOrganizationId: "org-1",
 				},
-			},
+			} as Context["session"],
 		});
 
 		const result = await call(uploadRouter.upload, makeInput(), {

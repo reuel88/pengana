@@ -67,6 +67,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "server-user",
+			scopeType: "org",
 			syncStatus: "synced",
 			deleted: false,
 		});
@@ -105,6 +106,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "server-user",
+			scopeType: "org",
 			syncStatus: "conflict",
 			deleted: true,
 		});
@@ -130,6 +132,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			userId: "org-fallback",
 			organizationId: "org-fallback",
 			createdBy: "",
+			scopeType: "org",
 			syncStatus: "conflict",
 			deleted: false,
 		});
