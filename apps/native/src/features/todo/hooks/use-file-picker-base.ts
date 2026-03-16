@@ -5,7 +5,7 @@ import {
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/sync-engine";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { ActionSheetIOS, Alert, Platform } from "react-native";
 
@@ -50,9 +50,13 @@ async function pickAssets(
 		}
 		let fileSize = asset.fileSize ?? asset.size;
 		if (fileSize == null) {
-			const info = await FileSystem.getInfoAsync(asset.uri);
-			if (info.exists && "size" in info) {
-				fileSize = info.size;
+			try {
+				const info = new File(asset.uri).info();
+				if (info.exists && info.size != null) {
+					fileSize = info.size;
+				}
+			} catch {
+				// fileSize stays null → handled by the guard below
 			}
 		}
 		if (fileSize == null || fileSize > MAX_FILE_SIZE_BYTES) {
