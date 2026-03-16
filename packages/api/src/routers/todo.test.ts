@@ -143,7 +143,7 @@ describe("handleTodoSync", () => {
 		);
 
 		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
-		expect(calledDate.getTime()).toBe(
+		expect(calledDate?.getTime()).toBe(
 			new Date("2025-06-01T00:00:10.000Z").getTime() - 5000,
 		);
 	});
@@ -157,7 +157,7 @@ describe("handleTodoSync", () => {
 		);
 
 		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
-		expect(calledDate.getTime()).toBe(0);
+		expect(calledDate?.getTime()).toBe(0);
 	});
 
 	it("maps server rows to output shape with syncStatus synced", async () => {
