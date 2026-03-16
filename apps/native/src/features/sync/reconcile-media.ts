@@ -37,6 +37,11 @@ export async function reconcileNativeMedia(
 					mimeType: sa.mimeType,
 					position: sa.position,
 					createdAt: sa.createdAt,
+					updatedAt: sa.updatedAt,
+					scopeType: sa.scopeType,
+					scopeId: sa.scopeId,
+					organizationId: sa.organizationId,
+					createdBy: sa.createdBy,
 				});
 			}
 		}

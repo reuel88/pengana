@@ -47,7 +47,10 @@ export function OrgSwitcher() {
 	return (
 		<>
 			<DropdownMenu>
-				<DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+				<DropdownMenuTrigger
+					data-testid="org-switcher-trigger"
+					render={<Button variant="outline" size="sm" />}
+				>
 					{activeOrg?.name || t("switcher.label")}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="bg-card" align="start">

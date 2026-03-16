@@ -113,6 +113,13 @@
 			"when": 1773634317787,
 			"tag": "0015_small_stryfe",
 			"breakpoints": true
+		},
+		{
+			"idx": 16,
+			"version": "7",
+			"when": 1773643759494,
+			"tag": "0016_clumsy_victor_mancha",
+			"breakpoints": true
 		}
 	]
 }

@@ -18,6 +18,9 @@ export function TodoListConnected({
 	entityType,
 	userId,
 	config,
+	scopeType,
+	scopeId,
+	organizationId,
 }: {
 	todos: (WebTodo & { attachments: WebMedia[] })[];
 	triggerSync: () => void;
@@ -32,6 +35,9 @@ export function TodoListConnected({
 	entityType?: string;
 	userId?: string;
 	config?: TodoConfig;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
 }) {
 	const { t } = useTranslation();
 
@@ -69,6 +75,9 @@ export function TodoListConnected({
 		entityType,
 		userId,
 		config,
+		scopeType,
+		scopeId,
+		organizationId,
 	});
 
 	return (

@@ -54,6 +54,9 @@ export interface TodoHandlerDeps {
 	) => void;
 	entityType?: string;
 	userId?: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
 	fileStorage: FileStorageStrategy;
@@ -76,6 +79,9 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		onDeleteSuccess,
 		entityType = "todo",
 		userId = "",
+		scopeType,
+		scopeId,
+		organizationId,
 		db,
 	} = deps;
 	const actions = resolveActions(deps);
@@ -168,6 +174,10 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 						userId,
 						"",
 						file.type,
+						scopeType,
+						scopeId,
+						organizationId,
+						userId,
 					);
 					await storeFile(mediaId, file);
 					const fileRef = createFileRef(mediaId, file);
@@ -197,6 +207,9 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			createFileRef,
 			entityType,
 			userId,
+			scopeType,
+			scopeId,
+			organizationId,
 			enqueueUpload,
 			triggerSync,
 			onError,

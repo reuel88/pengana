@@ -20,6 +20,9 @@ interface UseTodoListWiringConfigBase {
 	) => void;
 	entityType?: string;
 	userId?: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
 	fileStorage: FileStorageStrategy;
 	onError: (id: string, message: string) => void;
 	clearError: (id: string) => void;
@@ -53,6 +56,9 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 		db,
 		entityType,
 		userId,
+		scopeType,
+		scopeId,
+		organizationId,
 		config: todoConfig,
 	} = config;
 
@@ -70,6 +76,9 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			db,
 			entityType,
 			userId,
+			scopeType,
+			scopeId,
+			organizationId,
 			config: todoConfig,
 		}),
 		[
@@ -85,6 +94,9 @@ export function useTodoListWiring(config: UseTodoListWiringConfig) {
 			db,
 			entityType,
 			userId,
+			scopeType,
+			scopeId,
+			organizationId,
 			todoConfig,
 		],
 	);

@@ -35,6 +35,9 @@ interface TodoListProps {
 	entityType?: string;
 	userId?: string;
 	config?: TodoConfig;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
 }
 
 export function TodoList({
@@ -44,6 +47,9 @@ export function TodoList({
 	entityType,
 	userId,
 	config,
+	scopeType,
+	scopeId,
+	organizationId,
 }: TodoListProps) {
 	const { triggerSync, enqueueUpload } = syncHook;
 	const { t } = useTranslation();
@@ -77,6 +83,9 @@ export function TodoList({
 		db: appDb,
 		userId,
 		config,
+		scopeType,
+		scopeId,
+		organizationId,
 		...(actions ? { actions, entityType } : {}),
 	});
 

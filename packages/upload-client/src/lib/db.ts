@@ -11,4 +11,9 @@ export interface WebMedia {
 	mimeType: string;
 	position: number;
 	createdAt: string;
+	updatedAt: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
 }

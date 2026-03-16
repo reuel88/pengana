@@ -45,6 +45,8 @@ export function AttachmentList({
 			{attachments.map((a) => (
 				<span
 					key={a.id}
+					data-testid="attachment-badge"
+					data-upload-status={a.status ?? "uploaded"}
 					className={cn(
 						"inline-flex items-center gap-1 rounded-sm border border-border px-2 py-0.5 text-xs",
 						statusColor(a.status, !!a.url),

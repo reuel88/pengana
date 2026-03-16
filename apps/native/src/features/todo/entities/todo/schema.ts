@@ -23,6 +23,11 @@ export const media = sqliteTable("media", {
 	mimeType: text("mime_type").notNull(),
 	position: integer("position").notNull(),
 	createdAt: text("created_at").notNull(),
+	updatedAt: text("updated_at").notNull(),
+	scopeType: text("scope_type").notNull().default("personal"),
+	scopeId: text("scope_id").notNull().default(""),
+	organizationId: text("organization_id"),
+	createdBy: text("created_by"),
 });
 
 export const syncMeta = sqliteTable("sync_meta", {

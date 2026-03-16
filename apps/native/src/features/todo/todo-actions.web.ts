@@ -32,7 +32,23 @@ export const addMedia = (
 	userId: string,
 	localUri: string,
 	mimeType: string,
-) => _addMedia(appDb, entityId, entityType, userId, localUri, mimeType);
+	scopeType: "personal" | "org",
+	scopeId: string,
+	organizationId: string | null,
+	createdBy: string | null,
+) =>
+	_addMedia(
+		appDb,
+		entityId,
+		entityType,
+		userId,
+		localUri,
+		mimeType,
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy,
+	);
 export const removeMedia = (mediaId: string) => _removeMedia(appDb, mediaId);
 export const updateMediaUploaded = (mediaId: string, url: string) =>
 	_updateMediaUploaded(appDb, mediaId, url);

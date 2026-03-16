@@ -14,6 +14,10 @@ export function useFilePickerBase(deps: {
 		userId: string,
 		uri: string,
 		mimeType: string,
+		scopeType: "personal" | "org",
+		scopeId: string,
+		organizationId: string | null,
+		createdBy: string | null,
 	) => Promise<string>;
 	updateMediaLocalUri: (mediaId: string, localUri: string) => Promise<void>;
 	enqueueUpload: (
@@ -26,6 +30,10 @@ export function useFilePickerBase(deps: {
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
 	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
 }) {
 	const { t } = useTranslation();
 
@@ -62,6 +70,10 @@ export function useFilePickerBase(deps: {
 						deps.userId,
 						"",
 						file.type,
+						deps.scopeType,
+						deps.scopeId,
+						deps.organizationId,
+						deps.createdBy,
 					);
 					await storeFileInIndexedDB(mediaId, file);
 					const localUri = `${INDEXEDDB_URI_PREFIX}${mediaId}`;

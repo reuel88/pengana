@@ -7,9 +7,11 @@ import { TodoListConnected } from "./todo-list-connected";
 export function TodoList({
 	todos,
 	userId,
+	organizationId,
 }: {
 	todos: (WebTodo & { attachments: WebMedia[] })[];
 	userId: string;
+	organizationId?: string;
 }) {
 	const { triggerSync, enqueueUpload } = useSync();
 
@@ -20,6 +22,9 @@ export function TodoList({
 			enqueueUpload={enqueueUpload}
 			userId={userId}
 			config={personalTodoConfig}
+			scopeType="personal"
+			scopeId={userId}
+			organizationId={organizationId ?? null}
 		/>
 	);
 }

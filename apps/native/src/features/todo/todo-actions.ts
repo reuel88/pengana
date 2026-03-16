@@ -61,6 +61,10 @@ export const addMedia = (
 	userId: string,
 	localUri: string,
 	mimeType: string,
+	scopeType: "personal" | "org",
+	scopeId: string,
+	organizationId: string | null,
+	createdBy: string | null,
 ): Promise<string> =>
 	drizzleMedia.addMedia(
 		appDb,
@@ -71,6 +75,10 @@ export const addMedia = (
 		userId,
 		localUri,
 		mimeType,
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy,
 	);
 
 export const removeMedia = (mediaId: string): Promise<void> =>

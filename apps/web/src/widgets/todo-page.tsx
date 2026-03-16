@@ -42,7 +42,7 @@ function PersonalTodoContent({
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<TodoInput userId={userId} organizationId={organizationId} />
-			<TodoList todos={todos} userId={userId} />
+			<TodoList todos={todos} userId={userId} organizationId={organizationId} />
 			<SyncDevtools />
 		</div>
 	);
@@ -62,7 +62,11 @@ function OrgTodoContent({
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList todos={todos} userId={userId} />
+			<OrgTodoList
+				todos={todos}
+				userId={userId}
+				organizationId={organizationId}
+			/>
 			<SyncDevtools />
 		</div>
 	);
