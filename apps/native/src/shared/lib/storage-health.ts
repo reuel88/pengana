@@ -25,4 +25,4 @@ export function createNativeStorageHealthProvider(): StorageHealthProvider {
 	};
 }
 
-export { WARNING_FREE_BYTES, CRITICAL_FREE_BYTES };
+export { CRITICAL_FREE_BYTES, WARNING_FREE_BYTES };
