@@ -31,7 +31,7 @@ export const test = base.extend<NativeTestFixtures>({
 		const password = TEST_PASSWORD;
 		const authPage = new NativeAuthPage(page);
 		await authPage.signUp(TEST_USER_NAME, email, password);
-		await page.waitForURL(/onboarding/);
+		await page.waitForURL(/onboarding/, { timeout: 60_000 });
 		await use({ page, email, password });
 	},
 

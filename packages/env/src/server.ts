@@ -6,7 +6,9 @@ export const env = createEnv({
 	server: {
 		DATABASE_URL: z.string().min(1),
 		BETTER_AUTH_SECRET: z.string().min(32),
-		BETTER_AUTH_URL: z.url(),
+		BETTER_AUTH_SECRETS: z.string().optional(),
+		BETTER_AUTH_URL: z.url().optional(),
+		BETTER_AUTH_ALLOWED_HOSTS: z.string().optional(),
 		POLAR_ACCESS_TOKEN: z.string().min(1),
 		POLAR_SERVER: z.enum(["sandbox", "production"]).default("sandbox"),
 		POLAR_PRO_PRODUCT_ID: z.string().min(1),

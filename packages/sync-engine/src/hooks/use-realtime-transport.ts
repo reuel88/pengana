@@ -34,8 +34,11 @@ export function useRealtimeTransport(
 			notifyKey,
 			createNotifyTransport,
 			enabled: enabledRef.current,
-			onNotify: () => {
-				engineRef.current?.sync();
+			onNotify: (kind) => {
+				if (kind === "sync") {
+					engineRef.current?.sync();
+					return;
+				}
 				onSyncNotifyRef.current?.();
 			},
 			onOpen: () => {

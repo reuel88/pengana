@@ -55,14 +55,19 @@ function getWsUrl() {
 
 function createRealtimeTransport(
 	_id: string,
-	callbacks: { onNotify: () => void; onOpen?: () => void },
+	callbacks: {
+		onNotify: (kind: "sync" | "refresh") => void;
+		onOpen?: () => void;
+	},
 ) {
 	return createWebSocketRealtimeTransport({
 		getUrl: getWsUrl,
 		decodeMessage: (data) => {
 			const message = parseWsMessage(data);
 			if (!message) return null;
-			return message.type === "sync-notify" ? "notify" : "heartbeat";
+			if (message.type === "sync-notify") return "sync";
+			if (message.type === "refresh-notify") return "refresh";
+			return "heartbeat";
 		},
 		onNotify: callbacks.onNotify,
 		onOpen: callbacks.onOpen,

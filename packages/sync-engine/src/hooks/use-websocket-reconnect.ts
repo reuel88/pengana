@@ -16,7 +16,10 @@ export function useWebSocketReconnect(
 		() =>
 			(
 				_notifyKey: string,
-				callbacks: { onNotify: () => void; onOpen?: () => void },
+				callbacks: {
+					onNotify: (kind: "sync" | "refresh") => void;
+					onOpen?: () => void;
+				},
 			) =>
 				createWebSocketRealtimeTransport({
 					getUrl: getWsUrl,
@@ -31,7 +34,9 @@ export function useWebSocketReconnect(
 							) {
 								return "heartbeat";
 							}
-							return message.type === "sync-notify" ? "notify" : null;
+							if (message.type === "sync-notify") return "sync";
+							if (message.type === "refresh-notify") return "refresh";
+							return null;
 						} catch {
 							return null;
 						}

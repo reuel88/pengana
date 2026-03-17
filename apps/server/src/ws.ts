@@ -8,6 +8,7 @@ import { redeemWsTicket } from "./ws-tickets";
 
 const PING_INTERVAL_MS = 30_000;
 const MAX_CONNECTIONS_PER_USER = 5;
+type NotifyKind = "sync" | "refresh";
 
 function redactId(id: string): string {
 	if (id.length <= 8) return "***";
@@ -138,19 +139,21 @@ export function setupWebSocket(server: ServerType) {
 		clearInterval(pingInterval);
 	});
 
-	function notifyUser(userId: string) {
+	function notifyUser(userId: string, kind: NotifyKind = "sync") {
 		const sockets = connections.get(userId);
 		if (!sockets) {
 			wsLogger.debug`notifyUser(${redactId(userId)}): no connections found`;
 			return;
 		}
 
-		const payload: WsMessage = { type: "sync-notify" };
+		const payload: WsMessage = {
+			type: kind === "refresh" ? "refresh-notify" : "sync-notify",
+		};
 		let sentCount = 0;
 		for (const ws of sockets) {
 			if (sendMessage(ws, payload)) sentCount++;
 		}
-		wsLogger.debug`notifyUser(${redactId(userId)}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
+		wsLogger.debug`notifyUser(${redactId(userId)}, ${kind}): sent to ${String(sentCount)}/${String(sockets.size)} sockets`;
 	}
 
 	// Cached dynamic import avoids a circular dependency: db -> auth -> ws -> db
@@ -158,13 +161,13 @@ export function setupWebSocket(server: ServerType) {
 		typeof import("@pengana/db/seat-queries")
 	> | null = null;
 
-	async function notifyOrgMembers(orgId: string) {
+	async function notifyOrgMembers(orgId: string, kind: NotifyKind = "sync") {
 		try {
 			seatQueriesPromise ??= import("@pengana/db/seat-queries");
 			const { getSeatedMemberUserIds } = await seatQueriesPromise;
 			const memberUserIds = await getSeatedMemberUserIds(orgId);
 			for (const uid of memberUserIds) {
-				notifyUser(uid);
+				notifyUser(uid, kind);
 			}
 		} catch (error) {
 			wsLogger.error`notifyOrgMembers failed for org ${redactId(orgId)}: ${error}`;

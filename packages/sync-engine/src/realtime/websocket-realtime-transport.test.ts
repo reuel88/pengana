@@ -47,7 +47,8 @@ describe("createWebSocketRealtimeTransport", () => {
 			createSocket: () => socket,
 			decodeMessage: (data) => {
 				const parsed = JSON.parse(String(data)) as { type?: string };
-				if (parsed.type === "sync-notify") return "notify";
+				if (parsed.type === "sync-notify") return "sync";
+				if (parsed.type === "refresh-notify") return "refresh";
 				if (parsed.type === "connected" || parsed.type === "keepalive") {
 					return "heartbeat";
 				}
@@ -68,8 +69,36 @@ describe("createWebSocketRealtimeTransport", () => {
 
 		expect(statuses).toEqual(["connecting", "open"]);
 		expect(onOpen).toHaveBeenCalledTimes(1);
-		expect(onNotify).toHaveBeenCalledTimes(1);
+		expect(onNotify).toHaveBeenCalledWith("sync");
 		expect(transport.getStatus()).toBe("open");
+	});
+
+	it("forwards refresh notifications without treating them as sync", async () => {
+		const socket = new FakeSocket();
+		const onNotify = vi.fn();
+
+		const transport = createWebSocketRealtimeTransport({
+			getUrl: () => "wss://example.test/ws",
+			createSocket: () => socket,
+			decodeMessage: (data) => {
+				const parsed = JSON.parse(String(data)) as { type?: string };
+				if (parsed.type === "sync-notify") return "sync";
+				if (parsed.type === "refresh-notify") return "refresh";
+				if (parsed.type === "connected" || parsed.type === "keepalive") {
+					return "heartbeat";
+				}
+				return null;
+			},
+			onNotify,
+			random: () => 0,
+		});
+
+		transport.start();
+		await vi.runAllTimersAsync();
+		socket.emitOpen();
+		socket.emitMessage(JSON.stringify({ type: "refresh-notify" }));
+
+		expect(onNotify).toHaveBeenCalledWith("refresh");
 	});
 
 	it("enters degraded mode after repeated failures and polls while reconnecting", async () => {
@@ -106,7 +135,7 @@ describe("createWebSocketRealtimeTransport", () => {
 		expect(statuses).toContain("degraded");
 
 		await vi.advanceTimersByTimeAsync(1_000);
-		expect(onNotify).toHaveBeenCalled();
+		expect(onNotify).toHaveBeenCalledWith("sync");
 	});
 
 	it("recycles stale sockets that stop receiving keepalives", async () => {

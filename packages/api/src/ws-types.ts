@@ -3,7 +3,8 @@ export const WS_PATH = "/ws";
 export type WsMessage =
 	| { type: "connected" }
 	| { type: "keepalive" }
-	| { type: "sync-notify" };
+	| { type: "sync-notify" }
+	| { type: "refresh-notify" };
 
 function decodeWsMessageData(data: unknown): string | null {
 	if (typeof data === "string") {
@@ -41,7 +42,8 @@ export function parseWsMessage(data: unknown): WsMessage | null {
 		if (
 			parsed.type === "connected" ||
 			parsed.type === "keepalive" ||
-			parsed.type === "sync-notify"
+			parsed.type === "sync-notify" ||
+			parsed.type === "refresh-notify"
 		) {
 			return { type: parsed.type };
 		}

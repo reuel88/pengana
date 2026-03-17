@@ -23,6 +23,11 @@ import type { SyncScope } from "@/shared/api/background-messages";
 import { client } from "@/shared/api/orpc";
 import { sessionResponseSchema } from "@/shared/api/session-schema";
 import { appDb } from "@/shared/db";
+import {
+	isSyncScope,
+	mergeScopes,
+	scopeKey,
+} from "@/shared/lib/sync-scope-helpers";
 
 // --- Constants ---
 
@@ -42,33 +47,6 @@ let teardownPromise: Promise<void> | null = null;
 
 const storageHealthProvider = createWebStorageHealthProvider();
 const uploadAdapter = createWebUploadAdapter(appDb);
-
-// --- Helpers ---
-
-function scopeKey(scope: SyncScope): string {
-	return `${scope.scopeType}:${scope.scopeId}`;
-}
-
-function isSyncScope(value: unknown): value is SyncScope {
-	if (!value || typeof value !== "object") return false;
-
-	const scope = value as Partial<SyncScope>;
-	return (
-		(scope.scopeType === "personal" || scope.scopeType === "organization") &&
-		typeof scope.scopeId === "string" &&
-		scope.scopeId.length > 0
-	);
-}
-
-function mergeScopes(...groups: SyncScope[][]): SyncScope[] {
-	const merged = new Map<string, SyncScope>();
-	for (const scopes of groups) {
-		for (const scope of scopes) {
-			merged.set(scopeKey(scope), scope);
-		}
-	}
-	return [...merged.values()];
-}
 
 async function fetchUserId(): Promise<string | null> {
 	try {
