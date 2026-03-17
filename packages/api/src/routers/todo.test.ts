@@ -305,25 +305,6 @@ describe("handleTodoSync", () => {
 		expect(insertTodo).not.toHaveBeenCalled();
 	});
 
-	it("skips org changes from a different user", async () => {
-		await handleTodoSync(
-			{
-				changes: [
-					makeChange({
-						organizationId: "org-1",
-						createdBy: "other-user",
-					}),
-				],
-				lastSyncedAt: null,
-			},
-			"org",
-			"org-1",
-			"user-1",
-		);
-
-		expect(insertTodo).not.toHaveBeenCalled();
-	});
-
 	it("calls notify with the org id when org changes exist", async () => {
 		const notifyOrgMembers = vi.fn();
 

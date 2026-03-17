@@ -235,7 +235,11 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
-			teams: { enabled: true, defaultTeam: { enabled: false } },
+			teams: {
+				enabled: true,
+				defaultTeam: { enabled: false },
+				allowRemovingAllTeams: true,
+			},
 			membershipLimit: Number.MAX_SAFE_INTEGER,
 			schema: {
 				organization: {

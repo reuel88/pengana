@@ -39,7 +39,6 @@ export async function handleTodoSync(
 			if (change.userId !== scopeId) continue;
 		} else {
 			if (change.organizationId !== scopeId) continue;
-			if (change.createdBy !== createdBy) continue;
 		}
 
 		const existing = existingTodos.get(change.id);
