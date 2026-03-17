@@ -177,11 +177,21 @@ export async function reconcileMedia(
 	let uploadedMediaNotOnServer: { id: string; attachmentCount: number }[] = [];
 	if (entityIds && entityIds.length > 0) {
 		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
+
+		// Get media IDs scoped to the synced entities
+		const scopedAtts = await attTable
+			.where("entityId")
+			.anyOf(entityIds)
+			.toArray();
+		const scopedMediaIds = new Set(scopedAtts.map((a) => a.mediaId));
+
 		const localUploaded = await mediaTable
 			.where("status")
 			.equals("uploaded")
 			.toArray();
-		const candidates = localUploaded.filter((m) => !serverMediaIds.has(m.id));
+		const candidates = localUploaded.filter(
+			(m) => scopedMediaIds.has(m.id) && !serverMediaIds.has(m.id),
+		);
 		uploadedMediaNotOnServer = await Promise.all(
 			candidates.map(async (m) => ({
 				id: m.id,

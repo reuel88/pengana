@@ -9,7 +9,7 @@ export const env = createEnv({
 		BETTER_AUTH_SECRETS: z
 			.string()
 			.regex(
-				/^\s*\d+\s*:.+(\s*,\s*\d+\s*:.+)*$/,
+				/^\s*\d+\s*:[^,]+(\s*,\s*\d+\s*:[^,]+)*$/,
 				'BETTER_AUTH_SECRETS must be comma-separated "version:secret" pairs (e.g. "2:base64secret,1:base64secret")',
 			)
 			.optional(),

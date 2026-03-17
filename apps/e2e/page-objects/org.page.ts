@@ -64,13 +64,13 @@ export class OrgPage {
 	// --- Members ---
 
 	async leaveOrganization() {
-		this.page.on("dialog", (d) => d.accept());
+		this.page.once("dialog", (d) => d.accept());
 		await this.page.getByRole("button", { name: "Leave Organization" }).click();
 	}
 
 	async removeMember(email: string) {
 		const row = this.page.locator("tr", { hasText: email });
-		this.page.on("dialog", (d) => d.accept());
+		this.page.once("dialog", (d) => d.accept());
 		await row.getByRole("button", { name: "Remove" }).click();
 	}
 
@@ -98,7 +98,7 @@ export class OrgPage {
 	}
 
 	async deleteTeam() {
-		this.page.on("dialog", (d) => d.accept());
+		this.page.once("dialog", (d) => d.accept());
 		await this.page
 			.getByRole("button", { name: "Delete Team" })
 			.dispatchEvent("click");
@@ -131,7 +131,7 @@ export class OrgPage {
 	}
 
 	async deleteOrganization() {
-		this.page.on("dialog", (d) => d.accept());
+		this.page.once("dialog", (d) => d.accept());
 		const btn = this.page.getByRole("button", {
 			name: "Delete Organization",
 		});

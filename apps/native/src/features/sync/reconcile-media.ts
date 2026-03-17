@@ -61,21 +61,37 @@ export async function reconcileNativeMedia(
 		}[] = [];
 		if (entityIds && entityIds.length > 0) {
 			const serverMediaIds = serverMedia.map((m) => m.id);
+
+			// Get media IDs scoped to the synced entities
+			const scopedAtts = await tx
+				.select({ mediaId: mediaAttachments.mediaId })
+				.from(mediaAttachments)
+				.where(inArray(mediaAttachments.entityId, entityIds));
+			const scopedMediaIds = [...new Set(scopedAtts.map((a) => a.mediaId))];
+
 			const orphanCandidates =
-				serverMediaIds.length > 0
-					? await tx
-							.select({ id: media.id })
-							.from(media)
-							.where(
-								and(
-									eq(media.status, "uploaded"),
-									notInArray(media.id, serverMediaIds),
-								),
-							)
-					: await tx
-							.select({ id: media.id })
-							.from(media)
-							.where(eq(media.status, "uploaded"));
+				scopedMediaIds.length === 0
+					? []
+					: serverMediaIds.length > 0
+						? await tx
+								.select({ id: media.id })
+								.from(media)
+								.where(
+									and(
+										eq(media.status, "uploaded"),
+										inArray(media.id, scopedMediaIds),
+										notInArray(media.id, serverMediaIds),
+									),
+								)
+						: await tx
+								.select({ id: media.id })
+								.from(media)
+								.where(
+									and(
+										eq(media.status, "uploaded"),
+										inArray(media.id, scopedMediaIds),
+									),
+								);
 
 			uploadedMediaNotOnServer = await Promise.all(
 				orphanCandidates.map(async (c) => {

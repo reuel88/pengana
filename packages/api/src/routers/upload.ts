@@ -1,4 +1,4 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
 	attachMedia,
@@ -330,6 +330,16 @@ export const uploadRouter = {
 			}
 
 			const attachments = await findAttachmentsByMedia(input.mediaId);
+
+			if (mediaRecord.url) {
+				const filename = mediaRecord.url.replace(/^\/uploads\//, "");
+				const filepath = join(UPLOADS_DIR, filename);
+				try {
+					await unlink(filepath);
+				} catch {
+					// File may already be gone — not critical
+				}
+			}
 
 			await deleteMedia(input.mediaId);
 

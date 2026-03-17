@@ -76,7 +76,7 @@ export function useTeamMembers(
 	const authClient = useAuthClient();
 	const { organizationId, isAdmin, adminFetchFn } = opts ?? {};
 	return useQuery({
-		queryKey: orgQueryKeys.teamMembers(teamId),
+		queryKey: orgQueryKeys.teamMembers(teamId, isAdmin),
 		queryFn: async () => {
 			if (isAdmin && organizationId && adminFetchFn) {
 				return adminFetchFn(teamId as string, organizationId);
@@ -149,7 +149,7 @@ export function useInvalidateOrg() {
 	const invalidateTeamMembers = useCallback(
 		(teamId: string) =>
 			queryClient.invalidateQueries({
-				queryKey: orgQueryKeys.teamMembers(teamId),
+				queryKey: ["auth", "team-members", teamId],
 			}),
 		[queryClient],
 	);
