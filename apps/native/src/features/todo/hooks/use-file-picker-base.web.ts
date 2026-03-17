@@ -8,15 +8,15 @@ import {
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file-store.web";
 
 export function useFilePickerBase(deps: {
-	addMedia: (
-		userId: string,
-		uri: string,
-		mimeType: string,
-		scopeType: "personal" | "org",
-		scopeId: string,
-		organizationId: string | null,
-		createdBy: string | null,
-	) => Promise<string>;
+	addMedia: (options: {
+		userId: string;
+		localUri: string;
+		mimeType: string;
+		scopeType: "personal" | "org";
+		scopeId: string;
+		organizationId: string | null;
+		createdBy: string | null;
+	}) => Promise<string>;
 	attachMedia: (
 		mediaId: string,
 		entityType: string,
@@ -73,15 +73,15 @@ export function useFilePickerBase(deps: {
 				}
 
 				try {
-					const mediaId = await deps.addMedia(
-						deps.userId,
-						"",
-						file.type,
-						deps.scopeType,
-						deps.scopeId,
-						deps.organizationId,
-						deps.createdBy,
-					);
+					const mediaId = await deps.addMedia({
+						userId: deps.userId,
+						localUri: "",
+						mimeType: file.type,
+						scopeType: deps.scopeType,
+						scopeId: deps.scopeId,
+						organizationId: deps.organizationId,
+						createdBy: deps.createdBy,
+					});
 					await deps.attachMedia(mediaId, deps.entityType, todoId);
 					await storeFileInIndexedDB(mediaId, file);
 					const localUri = `${INDEXEDDB_URI_PREFIX}${mediaId}`;

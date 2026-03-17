@@ -20,7 +20,8 @@ import {
 import { useOrgDesignPresetPreview } from "@/features/theme/org-design-preset-preview";
 import { useOrgRole } from "@/shared/hooks/use-org-queries";
 import { FormRoot } from "@/shared/ui/form-root";
-import { useOrgGuard } from "@/widgets/org-guard";
+import type { ActiveOrg } from "@/widgets/org-guard";
+import { OrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/settings")({
 	component: OrgSettingsPage,
@@ -35,8 +36,36 @@ const updateOrgSchema = z.object({
 function OrgSettingsPage() {
 	const { t } = useTranslation("organization");
 	const { isOwner, isAdmin } = useOrgRole();
-	const guard = useOrgGuard();
 	const { setPreviewDesignPreset } = useOrgDesignPresetPreview();
+
+	return (
+		<OrgGuard>
+			{(activeOrg) => (
+				<OrgSettingsContent
+					activeOrg={activeOrg}
+					t={t}
+					isOwner={isOwner}
+					isAdmin={isAdmin}
+					setPreviewDesignPreset={setPreviewDesignPreset}
+				/>
+			)}
+		</OrgGuard>
+	);
+}
+
+function OrgSettingsContent({
+	activeOrg,
+	t,
+	isOwner,
+	isAdmin,
+	setPreviewDesignPreset,
+}: {
+	activeOrg: ActiveOrg;
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+	isOwner: boolean;
+	isAdmin: boolean;
+	setPreviewDesignPreset: (preset: OrgDesignPreset | null) => void;
+}) {
 	const canEditAppearance = isOwner || isAdmin;
 
 	const { updateOrg, deleteOrg, loading } = useOrgSettings({
@@ -48,45 +77,39 @@ function OrgSettingsPage() {
 	const form = useZodForm({
 		schema: updateOrgSchema,
 		defaultValues: {
-			name: guard.ready ? guard.activeOrg.name : "",
-			slug: guard.ready ? guard.activeOrg.slug : "",
-			logo: guard.ready ? (guard.activeOrg.logo ?? "") : "",
+			name: activeOrg.name,
+			slug: activeOrg.slug,
+			logo: activeOrg.logo ?? "",
 		},
 		onSubmit: async ({ value }) => {
 			await updateOrg(value);
 		},
 	});
 
-	const orgId = guard.ready ? guard.activeOrg.id : undefined;
+	const orgId = activeOrg.id;
 	const [designPreset, setDesignPreset] = useState<OrgDesignPreset>(
-		normalizeOrgDesignPreset(
-			guard.ready ? guard.activeOrg.designPreset : undefined,
-		),
+		normalizeOrgDesignPreset(activeOrg.designPreset),
 	);
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: only re-initialize form when switching orgs, not on every field change
 	useEffect(() => {
-		if (guard.ready) {
-			form.reset({
-				name: guard.activeOrg.name,
-				slug: guard.activeOrg.slug,
-				logo: guard.activeOrg.logo ?? "",
-			});
-			setDesignPreset(normalizeOrgDesignPreset(guard.activeOrg.designPreset));
-		}
+		form.reset({
+			name: activeOrg.name,
+			slug: activeOrg.slug,
+			logo: activeOrg.logo ?? "",
+		});
+		setDesignPreset(normalizeOrgDesignPreset(activeOrg.designPreset));
 	}, [orgId]);
 
 	useEffect(() => {
-		if (!guard.ready || !canEditAppearance) return;
+		if (!canEditAppearance) return;
 		setPreviewDesignPreset(designPreset);
 
 		return () => {
 			setPreviewDesignPreset(null);
 		};
-	}, [canEditAppearance, designPreset, guard.ready, setPreviewDesignPreset]);
+	}, [canEditAppearance, designPreset, setPreviewDesignPreset]);
 
-	if (!guard.ready) return guard.guardElement;
-
-	const { activeOrg } = guard;
 	const currentPreset = normalizeOrgDesignPreset(activeOrg.designPreset);
 	const designPresetChanged = !isOrgDesignPresetEqual(
 		currentPreset,

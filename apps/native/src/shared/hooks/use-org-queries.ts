@@ -62,16 +62,33 @@ export function useTeams(orgId: string | undefined) {
 	});
 }
 
-export function useTeamMembers(teamId: string | undefined) {
+export function useTeamMembers(
+	teamId: string | undefined,
+	opts?: {
+		organizationId?: string;
+		isAdmin?: boolean;
+		adminFetchFn?: (
+			teamId: string,
+			organizationId: string,
+		) => Promise<{ id: string; userId: string }[]>;
+	},
+) {
 	const authClient = useAuthClient();
+	const { organizationId, isAdmin, adminFetchFn } = opts ?? {};
 	return useQuery({
 		queryKey: orgQueryKeys.teamMembers(teamId),
-		queryFn: async () =>
-			(await unwrapAuth(
-				authClient.organization.listTeamMembers({
-					query: { teamId: teamId as string },
-				}),
-			)) ?? [],
+		queryFn: async () => {
+			if (isAdmin && organizationId && adminFetchFn) {
+				return adminFetchFn(teamId as string, organizationId);
+			}
+			return (
+				(await unwrapAuth(
+					authClient.organization.listTeamMembers({
+						query: { teamId: teamId as string },
+					}),
+				)) ?? []
+			);
+		},
 		enabled: !!teamId,
 		staleTime: STALE_TIME,
 	});

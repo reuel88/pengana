@@ -27,6 +27,41 @@ import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
 
+type EntityScope = {
+	scopeType: "org" | "personal";
+	scopeId: string;
+	organizationId: string | null;
+};
+
+async function validateEntityAccess(
+	entityType: string,
+	entityId: string,
+	userId: string,
+	activeOrgId: string | null,
+	t: (key: string) => string,
+): Promise<EntityScope> {
+	if (entityType === "todo") {
+		const todoRow = await findTodoById(entityId);
+		if (!todoRow) throw apiError("NOT_FOUND", t("todoNotFound"));
+		if (todoRow.scopeType === "org") {
+			if (!activeOrgId || todoRow.scopeId !== activeOrgId) {
+				throw apiError("NOT_FOUND", t("todoNotFound"));
+			}
+			let seated = await isMemberSeatedByUserId(activeOrgId, userId);
+			if (!seated) seated = await autoSeatOwner(activeOrgId, userId);
+			if (!seated) throw apiError("FORBIDDEN", t("seatRequiredForWrite"));
+		} else if (todoRow.userId !== userId) {
+			throw apiError("NOT_FOUND", t("todoNotFound"));
+		}
+		return {
+			scopeType: todoRow.scopeType as "org" | "personal",
+			scopeId: todoRow.scopeId,
+			organizationId: todoRow.organizationId,
+		};
+	}
+	return { scopeType: "personal", scopeId: userId, organizationId: null };
+}
+
 export const uploadRouter = {
 	upload: protectedProcedure
 		.route({
@@ -71,6 +106,24 @@ export const uploadRouter = {
 				throw apiError("BAD_REQUEST", context.t("fileTooLarge"));
 			}
 
+			let entityScope: EntityScope | undefined;
+			if (input.entityType && input.entityId) {
+				entityScope = await validateEntityAccess(
+					input.entityType,
+					input.entityId,
+					userId,
+					activeOrgId ?? null,
+					context.t,
+				);
+
+				const entityAttachmentCount = await countMediaByEntityId(
+					input.entityId,
+				);
+				if (entityAttachmentCount >= MAX_ATTACHMENTS) {
+					throw apiError("BAD_REQUEST", context.t("tooManyAttachments"));
+				}
+			}
+
 			await mkdir(UPLOADS_DIR, { recursive: true });
 
 			const ext = MIME_TO_EXT[input.mimeType] ?? "bin";
@@ -85,8 +138,17 @@ export const uploadRouter = {
 				await writeFile(filepath, buffer);
 			}
 
-			const scopeType = activeOrgId ? "org" : "personal";
-			const scopeId = activeOrgId ?? userId;
+			const scopeType = entityScope
+				? entityScope.scopeType
+				: activeOrgId
+					? "org"
+					: "personal";
+			const scopeId = entityScope
+				? entityScope.scopeId
+				: (activeOrgId ?? userId);
+			const organizationId = entityScope
+				? entityScope.organizationId
+				: (activeOrgId ?? null);
 
 			await insertMedia({
 				id: input.attachmentId,
@@ -95,28 +157,20 @@ export const uploadRouter = {
 				mimeType: input.mimeType,
 				scopeType,
 				scopeId,
-				organizationId: activeOrgId ?? null,
+				organizationId,
 				createdBy: userId,
 				updatedAt: new Date(),
 			});
 
-			if (input.entityType && input.entityId) {
-				const count = await countMediaByEntityId(input.entityId);
-				if (count < MAX_ATTACHMENTS) {
-					await attachMedia(
-						input.attachmentId,
-						input.entityType,
-						input.entityId,
-						count,
-					);
-					if (input.entityType === "todo") {
-						await updateTodo(input.entityId, { updatedAt: new Date() });
-					}
+			if (input.entityType && input.entityId && entityScope) {
+				await attachMedia(input.attachmentId, input.entityType, input.entityId);
+				if (input.entityType === "todo") {
+					await updateTodo(input.entityId, { updatedAt: new Date() });
 				}
 			}
 
-			if (activeOrgId) {
-				context.notifyOrgMembers(activeOrgId);
+			if (scopeType === "org" && organizationId) {
+				context.notifyOrgMembers(organizationId);
 			} else {
 				context.notifyUser(userId);
 			}
@@ -156,27 +210,13 @@ export const uploadRouter = {
 				);
 			}
 
-			if (input.entityType === "todo") {
-				const todoRow = await findTodoById(input.entityId);
-				if (!todoRow) {
-					throw apiError("NOT_FOUND", context.t("todoNotFound"));
-				}
-
-				if (todoRow.scopeType === "org") {
-					if (!activeOrgId || todoRow.scopeId !== activeOrgId) {
-						throw apiError("NOT_FOUND", context.t("todoNotFound"));
-					}
-					let seated = await isMemberSeatedByUserId(activeOrgId, userId);
-					if (!seated) {
-						seated = await autoSeatOwner(activeOrgId, userId);
-					}
-					if (!seated) {
-						throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
-					}
-				} else if (todoRow.userId !== userId) {
-					throw apiError("NOT_FOUND", context.t("todoNotFound"));
-				}
-			}
+			const entityScope = await validateEntityAccess(
+				input.entityType,
+				input.entityId,
+				userId,
+				activeOrgId ?? null,
+				context.t,
+			);
 
 			const count = await countMediaByEntityId(input.entityId);
 			if (count >= MAX_ATTACHMENTS) {
@@ -187,7 +227,6 @@ export const uploadRouter = {
 				input.mediaId,
 				input.entityType,
 				input.entityId,
-				count,
 			);
 
 			const now = new Date();
@@ -195,8 +234,8 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (activeOrgId) {
-				context.notifyOrgMembers(activeOrgId);
+			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
 			}
@@ -230,6 +269,14 @@ export const uploadRouter = {
 				throw apiError("FORBIDDEN", context.t("notAttachmentOwner"));
 			}
 
+			const entityScope = await validateEntityAccess(
+				input.entityType,
+				input.entityId,
+				userId,
+				activeOrgId ?? null,
+				context.t,
+			);
+
 			await detachMedia(input.mediaId, input.entityType, input.entityId);
 
 			const now = new Date();
@@ -237,8 +284,8 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (activeOrgId) {
-				context.notifyOrgMembers(activeOrgId);
+			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
 			}

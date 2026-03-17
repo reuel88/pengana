@@ -1,4 +1,4 @@
-import { and, eq, inArray, count as sqlCount } from "drizzle-orm";
+import { and, eq, inArray, sql, count as sqlCount } from "drizzle-orm";
 
 import { db } from "./index";
 import { media, mediaAttachments } from "./schema/media";
@@ -93,7 +93,6 @@ export async function attachMedia(
 	mediaId: string,
 	entityType: string,
 	entityId: string,
-	position: number,
 ): Promise<MediaAttachmentRow> {
 	const [row] = await db
 		.insert(mediaAttachments)
@@ -102,7 +101,7 @@ export async function attachMedia(
 			mediaId,
 			entityType,
 			entityId,
-			position,
+			position: sql`(SELECT COALESCE(MAX(${mediaAttachments.position}), -1) + 1 FROM ${mediaAttachments} WHERE ${mediaAttachments.entityType} = ${entityType} AND ${mediaAttachments.entityId} = ${entityId})`,
 		})
 		.returning();
 	if (!row) throw new Error("Failed to create media attachment");

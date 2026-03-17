@@ -1,6 +1,6 @@
 import type { WebTodo } from "@pengana/todo-client";
 import { personalTodoConfig } from "@pengana/todo-client";
-import type { WebMedia } from "@pengana/upload-client";
+import type { LocalMedia } from "@pengana/upload-client";
 import { useSync } from "@/features/sync/sync-context";
 import { TodoListConnected } from "./todo-list-connected";
 
@@ -9,7 +9,7 @@ export function TodoList({
 	userId,
 	organizationId,
 }: {
-	todos: (WebTodo & { attachments: WebMedia[] })[];
+	todos: (WebTodo & { attachments: LocalMedia[] })[];
 	userId: string;
 	organizationId?: string;
 }) {

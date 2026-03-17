@@ -4,10 +4,7 @@ import { getLogger } from "@logtape/logtape";
 import { db } from "@pengana/db";
 import { findUserByEmail } from "@pengana/db/notification-queries";
 import * as schema from "@pengana/db/schema/auth";
-import {
-	assignSeatIfAvailable,
-	getEffectiveSeatLimit,
-} from "@pengana/db/seat-queries";
+import { assignSeatIfAvailable } from "@pengana/db/seat-queries";
 import {
 	countOrgMembers,
 	getOrgSubscription,
@@ -239,9 +236,7 @@ export const auth = betterAuth({
 		}),
 		organization({
 			teams: { enabled: true, defaultTeam: { enabled: false } },
-			membershipLimit: async (_user, org) => {
-				return await getEffectiveSeatLimit(org.id);
-			},
+			membershipLimit: Number.MAX_SAFE_INTEGER,
 			schema: {
 				organization: {
 					additionalFields: {
@@ -263,6 +258,19 @@ export const auth = betterAuth({
 				});
 			},
 			organizationHooks: {
+				afterCreateTeam: async (data) => {
+					if (!data.user) return;
+					try {
+						await db.insert(schema.teamMember).values({
+							id: crypto.randomUUID(),
+							teamId: data.team.id,
+							userId: data.user.id,
+							createdAt: new Date(),
+						});
+					} catch (error) {
+						logger.error`Failed to auto-add creator to team: ${error}`;
+					}
+				},
 				afterCreateInvitation: async (data) => {
 					try {
 						const user = await findUserByEmail(data.invitation.email);

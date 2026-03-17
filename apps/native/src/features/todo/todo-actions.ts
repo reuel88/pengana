@@ -60,27 +60,15 @@ export async function resolveConflict(
 	}
 }
 
-export const addMedia = (
-	userId: string,
-	localUri: string,
-	mimeType: string,
-	scopeType: "personal" | "org",
-	scopeId: string,
-	organizationId: string | null,
-	createdBy: string | null,
-): Promise<string> =>
-	drizzleMedia.addMedia(
-		appDb,
-		media,
-		randomUUID,
-		userId,
-		localUri,
-		mimeType,
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy,
-	);
+export const addMedia = (options: {
+	userId: string;
+	localUri: string;
+	mimeType: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
+}): Promise<string> => drizzleMedia.addMedia(appDb, media, randomUUID, options);
 
 export const attachMedia = (
 	mediaId: string,

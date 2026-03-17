@@ -51,7 +51,7 @@ export function createWebPlatformDeps(
 	return {
 		createNotifyTransport: createRealtimeTransport,
 		generateUUID: () => crypto.randomUUID(),
-		onSyncNotify: () => {
+		onRefreshNotify: () => {
 			queryClient.invalidateQueries({
 				queryKey: notificationQueryKeys.list,
 			});

@@ -1,34 +1,29 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import type { Media, MediaAttachment } from "@pengana/sync-engine";
 
-import type { WebMedia, WebMediaAttachment } from "./db";
+import type { AddMediaOptions, LocalMedia, LocalMediaAttachment } from "./db";
+import { buildReconcilePlan } from "./reconcile-plan";
 
 export async function addMedia(
 	db: EntityDatabase,
-	userId: string,
-	localUri: string,
-	mimeType: string,
-	scopeType: "personal" | "org",
-	scopeId: string,
-	organizationId: string | null,
-	createdBy: string | null,
+	options: AddMediaOptions,
 ): Promise<string> {
 	const id = crypto.randomUUID();
-	const table = db.getTable<WebMedia>("media");
+	const table = db.getTable<LocalMedia>("media");
 
 	await table.put({
 		id,
-		userId,
+		userId: options.userId,
 		url: null,
-		localUri,
+		localUri: options.localUri,
 		status: "queued",
-		mimeType,
+		mimeType: options.mimeType,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy,
+		scopeType: options.scopeType,
+		scopeId: options.scopeId,
+		organizationId: options.organizationId,
+		createdBy: options.createdBy,
 	});
 
 	return id;
@@ -40,9 +35,10 @@ export async function attachMediaToEntity(
 	entityType: string,
 	entityId: string,
 ): Promise<string> {
-	const table = db.getTable<WebMediaAttachment>("mediaAttachments");
+	const table = db.getTable<LocalMediaAttachment>("mediaAttachments");
 	const existing = await table.where({ entityType, entityId }).toArray();
-	const position = existing.length;
+	const position =
+		existing.length > 0 ? Math.max(...existing.map((e) => e.position)) + 1 : 0;
 
 	const id = crypto.randomUUID();
 	await table.put({
@@ -63,7 +59,7 @@ export async function detachMediaFromEntity(
 	entityType: string,
 	entityId: string,
 ): Promise<void> {
-	const table = db.getTable<WebMediaAttachment>("mediaAttachments");
+	const table = db.getTable<LocalMediaAttachment>("mediaAttachments");
 	const records = await table
 		.where({ mediaId })
 		.filter((r) => r.entityType === entityType && r.entityId === entityId)
@@ -77,9 +73,9 @@ export async function removeMedia(
 	db: EntityDatabase,
 	mediaId: string,
 ): Promise<void> {
-	await db.getTable<WebMedia>("media").delete(mediaId);
+	await db.getTable<LocalMedia>("media").delete(mediaId);
 	// Also remove all attachment records for this media
-	const attTable = db.getTable<WebMediaAttachment>("mediaAttachments");
+	const attTable = db.getTable<LocalMediaAttachment>("mediaAttachments");
 	const attachments = await attTable.where({ mediaId }).toArray();
 	if (attachments.length > 0) {
 		await attTable.bulkDelete(attachments.map((a) => a.id));
@@ -91,7 +87,7 @@ export async function updateMediaUploaded(
 	mediaId: string,
 	url: string,
 ): Promise<void> {
-	await db.getTable<WebMedia>("media").update(mediaId, {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
 		url,
 		status: "uploaded",
 	} as never);
@@ -102,14 +98,14 @@ export async function updateMediaLocalUri(
 	mediaId: string,
 	localUri: string,
 ): Promise<void> {
-	await db.getTable<WebMedia>("media").update(mediaId, { localUri } as never);
+	await db.getTable<LocalMedia>("media").update(mediaId, { localUri } as never);
 }
 
 export async function markMediaFailed(
 	db: EntityDatabase,
 	mediaId: string,
 ): Promise<void> {
-	await db.getTable<WebMedia>("media").update(mediaId, {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
 		status: "failed",
 	} as never);
 }
@@ -119,7 +115,7 @@ export async function getMediaCountForEntity(
 	entityId: string,
 ): Promise<number> {
 	return db
-		.getTable<WebMediaAttachment>("mediaAttachments")
+		.getTable<LocalMediaAttachment>("mediaAttachments")
 		.where({ entityId })
 		.count();
 }
@@ -130,87 +126,98 @@ export async function reconcileMedia(
 	serverAttachments: MediaAttachment[],
 	entityIds?: string[],
 ): Promise<void> {
-	const mediaTable = db.getTable<WebMedia>("media");
-	const attTable = db.getTable<WebMediaAttachment>("mediaAttachments");
+	const mediaTable = db.getTable<LocalMedia>("media");
+	const attTable = db.getTable<LocalMediaAttachment>("mediaAttachments");
 
-	// --- Reconcile media records ---
+	// --- Query local state ---
 	const serverIds = serverMedia.map((m) => m.id);
 	const existingRecords =
 		serverIds.length > 0 ? await mediaTable.bulkGet(serverIds) : [];
-	const existingById = new Map<string, WebMedia>();
+	const existingMediaById = new Map<
+		string,
+		{ id: string; url: string | null }
+	>();
 	for (let i = 0; i < serverIds.length; i++) {
 		const id = serverIds[i];
 		const rec = existingRecords[i];
-		if (id && rec) existingById.set(id, rec);
+		if (id && rec) existingMediaById.set(id, rec);
 	}
 
-	const toPut: WebMedia[] = [];
-	for (const sa of serverMedia) {
-		const existing = existingById.get(sa.id);
-		if (existing) {
-			if (sa.url && existing.url !== sa.url) {
-				toPut.push({ ...existing, url: sa.url, status: "uploaded" });
-			}
-		} else {
-			toPut.push({
-				id: sa.id,
-				userId: sa.userId,
-				url: sa.url,
-				localUri: null,
-				status: sa.url ? "uploaded" : null,
-				mimeType: sa.mimeType,
-				createdAt: sa.createdAt,
-				updatedAt: sa.updatedAt,
-				scopeType: sa.scopeType,
-				scopeId: sa.scopeId,
-				organizationId: sa.organizationId,
-				createdBy: sa.createdBy,
-			});
-		}
-	}
-	if (toPut.length > 0) {
-		await mediaTable.bulkPut(toPut);
-	}
+	const existingAttachmentsByEntityId = new Map<
+		string,
+		{ id: string; mediaId: string }[]
+	>();
+	const existingAttachmentIds = new Set<string>();
 
-	// --- Reconcile media_attachments ---
-	const attToPut: WebMediaAttachment[] = serverAttachments.map((sa) => ({
-		id: sa.id,
-		mediaId: sa.mediaId,
-		entityType: sa.entityType,
-		entityId: sa.entityId,
-		position: sa.position,
-		createdAt: sa.createdAt,
-	}));
-	if (attToPut.length > 0) {
-		await attTable.bulkPut(attToPut);
-	}
-
-	// Remove local attachment records that the server no longer has for the synced entities
 	if (entityIds && entityIds.length > 0) {
-		const serverAttIds = new Set(serverAttachments.map((a) => a.id));
 		const localAtts = await attTable
 			.where("entityId")
 			.anyOf(entityIds)
 			.toArray();
-		const toDelete = localAtts
-			.filter((local) => !serverAttIds.has(local.id))
-			.map((local) => local.id);
-		if (toDelete.length > 0) {
-			await attTable.bulkDelete(toDelete);
+		for (const att of localAtts) {
+			existingAttachmentIds.add(att.id);
+			const list = existingAttachmentsByEntityId.get(att.entityId) ?? [];
+			list.push({ id: att.id, mediaId: att.mediaId });
+			existingAttachmentsByEntityId.set(att.entityId, list);
 		}
+	}
 
-		// Remove uploaded media that are no longer attached to any synced entity
-		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
-		const localMedia = await mediaTable.toArray();
-		const mediaToDelete = localMedia
-			.filter((m) => !serverMediaIds.has(m.id) && m.status === "uploaded")
-			.map((m) => m.id);
-		// Only delete media that have no remaining attachment records
-		for (const mId of mediaToDelete) {
-			const remaining = await attTable.where({ mediaId: mId }).count();
-			if (remaining === 0) {
-				await mediaTable.delete(mId);
-			}
+	// For attachment inserts, also check existing attachments by server IDs
+	const serverAttIds = serverAttachments.map((a) => a.id);
+	if (serverAttIds.length > 0) {
+		const existingAtts = await attTable
+			.where("id")
+			.anyOf(serverAttIds)
+			.toArray();
+		for (const att of existingAtts) {
+			existingAttachmentIds.add(att.id);
 		}
+	}
+
+	let uploadedMediaNotOnServer: { id: string; attachmentCount: number }[] = [];
+	if (entityIds && entityIds.length > 0) {
+		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
+		const localUploaded = await mediaTable
+			.where("status")
+			.equals("uploaded")
+			.toArray();
+		const candidates = localUploaded.filter((m) => !serverMediaIds.has(m.id));
+		uploadedMediaNotOnServer = await Promise.all(
+			candidates.map(async (m) => ({
+				id: m.id,
+				attachmentCount: await attTable.where({ mediaId: m.id }).count(),
+			})),
+		);
+	}
+
+	// --- Build plan ---
+	const plan = buildReconcilePlan({
+		serverMedia,
+		serverAttachments,
+		existingMediaById,
+		existingAttachmentsByEntityId,
+		existingAttachmentIds,
+		uploadedMediaNotOnServer,
+		entityIds,
+	});
+
+	// --- Execute plan ---
+	if (plan.mediaToInsert.length > 0) {
+		await mediaTable.bulkPut(plan.mediaToInsert);
+	}
+	for (const update of plan.mediaToUpdate) {
+		await mediaTable.update(update.id, {
+			url: update.url,
+			status: "uploaded",
+		} as never);
+	}
+	if (plan.attachmentsToInsert.length > 0) {
+		await attTable.bulkPut(plan.attachmentsToInsert);
+	}
+	if (plan.attachmentIdsToDelete.length > 0) {
+		await attTable.bulkDelete(plan.attachmentIdsToDelete);
+	}
+	for (const mId of plan.mediaIdsToDelete) {
+		await mediaTable.delete(mId);
 	}
 }

@@ -1,6 +1,16 @@
 import type { UploadStatus } from "@pengana/sync-engine";
 
-export interface WebMedia {
+export interface AddMediaOptions {
+	userId: string;
+	localUri: string;
+	mimeType: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
+}
+
+export interface LocalMedia {
 	id: string;
 	userId: string;
 	url: string | null;
@@ -15,7 +25,7 @@ export interface WebMedia {
 	createdBy: string | null;
 }
 
-export interface WebMediaAttachment {
+export interface LocalMediaAttachment {
 	id: string;
 	mediaId: string;
 	entityType: string;

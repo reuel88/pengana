@@ -3,7 +3,7 @@ import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
 import type { TodoActions, TodoConfig, WebTodo } from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
-import type { WebMedia } from "@pengana/upload-client";
+import type { LocalMedia } from "@pengana/upload-client";
 import { storeFileInIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
 import { useCallback, useState } from "react";
 import { client } from "@/shared/api/orpc";
@@ -16,7 +16,7 @@ const fileStorage = {
 };
 
 type TodoWithAttachments = WebTodo & {
-	attachments: WebMedia[];
+	attachments: LocalMedia[];
 };
 
 interface TodoListProps {

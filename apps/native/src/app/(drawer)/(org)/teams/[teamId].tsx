@@ -13,6 +13,7 @@ import {
 import { TeamMemberAddForm } from "@/features/org/team-member-add-form";
 import { TeamMemberRow } from "@/features/org/team-member-row";
 import { TeamNameEditor } from "@/features/org/team-name-editor";
+import { client } from "@/shared/api/orpc";
 import {
 	useActiveOrg,
 	useOrgRole,
@@ -41,7 +42,17 @@ export default function TeamDetailScreen() {
 		activeOrg?.id,
 	);
 	const { data: teamMembers = [], isPending: isMembersPending } =
-		useTeamMembers(teamId);
+		useTeamMembers(teamId, {
+			organizationId: activeOrg?.id,
+			isAdmin,
+			adminFetchFn: async (tid, orgId) => {
+				const res = await client.team.listTeamMembers({
+					teamId: tid,
+					organizationId: orgId,
+				});
+				return res.data;
+			},
+		});
 
 	const { handleDeleteTeam, handleRemoveMember } = useTeamActions({
 		onDeleteSuccess: () => router.back(),

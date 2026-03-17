@@ -22,17 +22,19 @@ interface SharedNotifySubscription {
 const channels = new Map<string, SharedNotifyChannel>();
 let nextSubscriberId = 1;
 
-function broadcast(
+function broadcastNotify(
 	channel: SharedNotifyChannel,
-	handler: keyof NotifyTransportCallbacks,
-	kind?: Exclude<RealtimeMessageKind, "heartbeat">,
+	kind: Exclude<RealtimeMessageKind, "heartbeat">,
 ) {
 	for (const subscriber of channel.subscribers.values()) {
 		if (!subscriber.enabled) continue;
-		if (handler === "onNotify") {
-			if (kind) subscriber.onNotify(kind);
-			continue;
-		}
+		subscriber.onNotify(kind);
+	}
+}
+
+function broadcastOpen(channel: SharedNotifyChannel) {
+	for (const subscriber of channel.subscribers.values()) {
+		if (!subscriber.enabled) continue;
 		subscriber.onOpen?.();
 	}
 }
@@ -43,8 +45,8 @@ function createChannel(
 ): SharedNotifyChannel {
 	const channel: SharedNotifyChannel = {
 		transport: createNotifyTransport(notifyKey, {
-			onNotify: (kind) => broadcast(channel, "onNotify", kind),
-			onOpen: () => broadcast(channel, "onOpen"),
+			onNotify: (kind) => broadcastNotify(channel, kind),
+			onOpen: () => broadcastOpen(channel),
 		}),
 		subscribers: new Map(),
 	};

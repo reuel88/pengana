@@ -23,25 +23,15 @@ export const toggleTodo = (id: string) => actions.toggleTodo(id);
 export const deleteTodo = (id: string) => actions.deleteTodo(id);
 export const resolveConflict = (id: string, resolution: "local" | "server") =>
 	actions.resolveConflict(id, resolution);
-export const addMedia = (
-	userId: string,
-	localUri: string,
-	mimeType: string,
-	scopeType: "personal" | "org",
-	scopeId: string,
-	organizationId: string | null,
-	createdBy: string | null,
-) =>
-	_addMedia(
-		appDb,
-		userId,
-		localUri,
-		mimeType,
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy,
-	);
+export const addMedia = (options: {
+	userId: string;
+	localUri: string;
+	mimeType: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string | null;
+	createdBy: string | null;
+}) => _addMedia(appDb, options);
 export const attachMedia = (
 	mediaId: string,
 	entityType: string,

@@ -1,10 +1,12 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, max } from "drizzle-orm";
 
 import type {
 	BaseSQLiteDatabase,
 	SQLiteColumn,
 	SQLiteTable,
 } from "drizzle-orm/sqlite-core";
+
+import type { AddMediaOptions } from "./db";
 
 type DrizzleDb = BaseSQLiteDatabase<"sync" | "async", unknown>;
 
@@ -36,29 +38,23 @@ export async function addMedia(
 	db: DrizzleDb,
 	table: MediaTable,
 	generateId: () => string,
-	userId: string,
-	localUri: string,
-	mimeType: string,
-	scopeType: "personal" | "org",
-	scopeId: string,
-	organizationId: string | null,
-	createdBy: string | null,
+	options: AddMediaOptions,
 ): Promise<string> {
 	const id = generateId();
 
 	await db.insert(table).values({
 		id,
-		userId,
+		userId: options.userId,
 		url: null,
-		localUri,
+		localUri: options.localUri,
 		status: "queued",
-		mimeType,
+		mimeType: options.mimeType,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy,
+		scopeType: options.scopeType,
+		scopeId: options.scopeId,
+		organizationId: options.organizationId,
+		createdBy: options.createdBy,
 	});
 
 	return id;
@@ -73,10 +69,10 @@ export async function attachMediaToEntity(
 	entityId: string,
 ): Promise<string> {
 	const [row] = await db
-		.select({ value: count() })
+		.select({ value: max(table.position) })
 		.from(table)
 		.where(eq(table.entityId, entityId));
-	const position = row?.value ?? 0;
+	const position = (Number(row?.value) || 0) + 1;
 
 	const id = generateId();
 	await db.insert(table).values({

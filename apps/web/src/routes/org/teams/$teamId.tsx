@@ -13,6 +13,7 @@ import { cn } from "@pengana/ui/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { client } from "@/shared/api/orpc";
 import {
 	useOrgRole,
 	useTeamMembers,
@@ -245,7 +246,17 @@ function TeamDetailPage() {
 		data: teamMembers,
 		isPending: membersLoading,
 		isError: membersError,
-	} = useTeamMembers(teamId);
+	} = useTeamMembers(teamId, {
+		organizationId: guard.ready ? guard.activeOrg.id : undefined,
+		isAdmin,
+		adminFetchFn: async (tid, orgId) => {
+			const res = await client.team.listTeamMembers({
+				teamId: tid,
+				organizationId: orgId,
+			});
+			return res.data;
+		},
+	});
 
 	const { handleDeleteTeam, handleRemoveMember } = useTeamActions({
 		onDeleteSuccess: () => {

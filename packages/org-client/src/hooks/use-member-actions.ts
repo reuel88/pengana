@@ -76,13 +76,10 @@ export function useMemberActions({
 		});
 	};
 
-	const handleLeave = async (memberId: string) => {
-		setActingId(memberId);
+	const handleLeave = async (organizationId: string) => {
+		setActingId(organizationId);
 		await authMutation({
-			mutationFn: () =>
-				authClient.organization.removeMember({
-					memberIdOrEmail: memberId,
-				}),
+			mutationFn: () => authClient.organization.leave({ organizationId }),
 			errorMessage: errorMessages?.leave ?? "Failed to leave organization",
 			onSuccess: async () => {
 				await invalidateAll();

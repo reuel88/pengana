@@ -168,16 +168,15 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				const filesToProcess = files.slice(0, available);
 
 				for (const file of filesToProcess) {
-					const mediaId = await addMedia(
-						db,
+					const mediaId = await addMedia(db, {
 						userId,
-						"",
-						file.type,
+						localUri: "",
+						mimeType: file.type,
 						scopeType,
 						scopeId,
 						organizationId,
-						userId,
-					);
+						createdBy: userId,
+					});
 					await attachMediaToEntity(db, mediaId, entityType, todoId);
 					await storeFile(mediaId, file);
 					const fileRef = createFileRef(mediaId, file);

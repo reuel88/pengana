@@ -1,5 +1,5 @@
 import { type EntityDatabase, useDexieEntity } from "@pengana/entity-store";
-import type { WebMedia, WebMediaAttachment } from "@pengana/upload-client";
+import type { LocalMedia, LocalMediaAttachment } from "@pengana/upload-client";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo, useRef } from "react";
 
@@ -7,7 +7,7 @@ import type { WebTodo } from "../lib/db";
 import type { TodoConfig } from "../lib/todo-config";
 
 export interface WebTodoWithAttachments extends WebTodo {
-	attachments: WebMedia[];
+	attachments: LocalMedia[];
 }
 
 export function useTodos(
@@ -35,16 +35,16 @@ export function useTodos(
 	}, [items]);
 
 	const attachmentRecords = useLiveQuery(
-		(): Promise<WebMediaAttachment[]> => {
+		(): Promise<LocalMediaAttachment[]> => {
 			if (todoIds.length === 0) return Promise.resolve([]);
 			return db
-				.getTable<WebMediaAttachment>("mediaAttachments")
+				.getTable<LocalMediaAttachment>("mediaAttachments")
 				.where("entityId")
 				.anyOf(todoIds)
 				.toArray();
 		},
 		[db, todoIds],
-		[] as WebMediaAttachment[],
+		[] as LocalMediaAttachment[],
 	);
 
 	const mediaIds = useMemo(() => {
@@ -53,26 +53,29 @@ export function useTodos(
 	}, [attachmentRecords]);
 
 	const mediaRecords = useLiveQuery(
-		(): Promise<WebMedia[]> => {
+		(): Promise<LocalMedia[]> => {
 			if (mediaIds.length === 0) return Promise.resolve([]);
 			return db
-				.getTable<WebMedia>("media")
+				.getTable<LocalMedia>("media")
 				.where("id")
 				.anyOf(mediaIds)
 				.toArray();
 		},
 		[db, mediaIds],
-		[] as WebMedia[],
+		[] as LocalMedia[],
 	);
 
 	const todos: WebTodoWithAttachments[] = useMemo(() => {
-		const mediaById = new Map<string, WebMedia>();
+		const mediaById = new Map<string, LocalMedia>();
 		for (const m of mediaRecords) {
 			mediaById.set(m.id, m);
 		}
 
-		const byTodo = new Map<string, WebMedia[]>();
-		for (const att of attachmentRecords) {
+		const byTodo = new Map<string, LocalMedia[]>();
+		const sorted = [...attachmentRecords].sort(
+			(a, b) => a.position - b.position,
+		);
+		for (const att of sorted) {
 			const m = mediaById.get(att.mediaId);
 			if (!m) continue;
 			const list = byTodo.get(att.entityId) ?? [];

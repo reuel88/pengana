@@ -10,7 +10,7 @@ export function useWebSocketReconnect(
 	isOnline: boolean,
 	engineRef: RefObject<SyncEngine | null>,
 	getWsUrl: () => string | Promise<string>,
-	onSyncNotify?: () => void,
+	onRefreshNotify?: () => void,
 ) {
 	const createNotifyTransport = useMemo(
 		() =>
@@ -52,6 +52,6 @@ export function useWebSocketReconnect(
 		isOnline,
 		engineRef,
 		createNotifyTransport,
-		onSyncNotify,
+		onRefreshNotify,
 	);
 }

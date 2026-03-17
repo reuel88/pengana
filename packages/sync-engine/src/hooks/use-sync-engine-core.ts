@@ -21,7 +21,7 @@ import { useUploadQueue } from "./use-upload-queue";
 // --- Types ---
 export interface SyncEnginePlatformDeps<T extends { id: string } = Todo> {
 	generateUUID: () => string;
-	onSyncNotify?: () => void;
+	onRefreshNotify?: () => void;
 	createNotifyTransport: CreateRealtimeTransport;
 
 	// Adapter/transport factories
@@ -144,7 +144,7 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 		effectiveOnline && isForeground,
 		engineRef,
 		deps.createNotifyTransport,
-		deps.onSyncNotify,
+		deps.onRefreshNotify,
 	);
 
 	// --- Public API ---
