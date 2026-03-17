@@ -1,7 +1,7 @@
 import { Skeleton } from "@pengana/ui/components/skeleton";
 import type { LocalMedia } from "@pengana/upload-client";
 import { removeMedia } from "@pengana/upload-client";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { client } from "@/shared/api/orpc";
@@ -55,8 +55,11 @@ export function MediaGrid({
 	t,
 	onDeleted,
 }: MediaGridProps) {
+	const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+
 	const handleDelete = useCallback(
 		async (mediaId: string) => {
+			setDeletingIds((prev) => new Set(prev).add(mediaId));
 			try {
 				await Promise.all([
 					client.upload.deleteMedia({ mediaId }),
@@ -66,6 +69,12 @@ export function MediaGrid({
 				onDeleted();
 			} catch {
 				toast.error(t("upload.error"));
+			} finally {
+				setDeletingIds((prev) => {
+					const next = new Set(prev);
+					next.delete(mediaId);
+					return next;
+				});
 			}
 		},
 		[t, onDeleted],
@@ -104,7 +113,9 @@ export function MediaGrid({
 		})),
 	];
 
-	if (allItems.length === 0) {
+	const visibleItems = allItems.filter((item) => !deletingIds.has(item.id));
+
+	if (visibleItems.length === 0) {
 		return (
 			<p className="py-8 text-center text-sm opacity-60">{t("grid.empty")}</p>
 		);
@@ -112,7 +123,7 @@ export function MediaGrid({
 
 	return (
 		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-			{allItems.map((item) => {
+			{visibleItems.map((item) => {
 				const src = item.url;
 
 				return (
