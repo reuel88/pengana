@@ -10,7 +10,8 @@ import { client } from "@/shared/api/orpc";
 import { useOrgRole } from "@/shared/hooks/use-org-queries";
 import type { Column } from "@/shared/ui/data-table";
 import { DataTable } from "@/shared/ui/data-table";
-import { useOrgGuard } from "@/widgets/org-guard";
+import type { ActiveOrg } from "@/widgets/org-guard";
+import { OrgGuard } from "@/widgets/org-guard";
 
 export const Route = createFileRoute("/org/members")({
 	component: MembersPage,
@@ -21,11 +22,35 @@ function MembersPage() {
 	const navigate = useNavigate();
 	const { session } = Route.useRouteContext();
 	const { isAdmin } = useOrgRole();
-	const guard = useOrgGuard();
-	if (!guard.ready) return guard.guardElement;
 
-	const { activeOrg } = guard;
+	return (
+		<OrgGuard>
+			{(activeOrg) => (
+				<MembersContent
+					activeOrg={activeOrg}
+					t={t}
+					navigate={navigate}
+					session={session}
+					isAdmin={isAdmin}
+				/>
+			)}
+		</OrgGuard>
+	);
+}
 
+function MembersContent({
+	activeOrg,
+	t,
+	navigate,
+	session,
+	isAdmin,
+}: {
+	activeOrg: ActiveOrg;
+	t: ReturnType<typeof useTranslation<"organization">>["t"];
+	navigate: ReturnType<typeof useNavigate>;
+	session: ReturnType<typeof Route.useRouteContext>["session"];
+	isAdmin: boolean;
+}) {
 	const orgId = activeOrg.id;
 	const removeMemberFn = useCallback(
 		(memberIdOrEmail: string) => {
@@ -62,11 +87,8 @@ function MembersPage() {
 	};
 
 	const onLeave = async () => {
-		if (!currentUserId) return;
-		const currentMember = members.find((m) => m.userId === currentUserId);
-		if (!currentMember) return;
 		if (!confirm(t("members.leaveConfirm"))) return;
-		await handleLeave(currentMember.id);
+		await handleLeave(orgId);
 	};
 
 	const columns: Column<OrgMember>[] = [

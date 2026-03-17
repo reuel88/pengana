@@ -2,6 +2,7 @@ import { useOrgSync } from "@/features/sync/org-sync-context";
 
 import {
 	addMedia,
+	attachMedia,
 	getMediaCountForEntity,
 	updateMediaLocalUri,
 } from "../todo-actions";
@@ -12,6 +13,7 @@ export function useOrgFilePicker(userId: string, orgId: string) {
 	const { enqueueUpload } = useOrgSync();
 	return useFilePickerBase({
 		addMedia,
+		attachMedia,
 		updateMediaLocalUri,
 		enqueueUpload,
 		getMediaCount: getMediaCountForEntity,

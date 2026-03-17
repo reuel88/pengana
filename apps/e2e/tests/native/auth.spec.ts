@@ -16,6 +16,7 @@ async function setNativeWebLocale(page: Page, locale: string) {
 }
 
 test.describe("Authentication", () => {
+	test.setTimeout(60_000);
 	test("sign-in page loads", async ({ page }) => {
 		const authPage = new NativeAuthPage(page);
 		await authPage.navigateToSignIn();

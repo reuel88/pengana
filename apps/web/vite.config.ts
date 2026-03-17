@@ -37,7 +37,11 @@ export default defineConfig({
 						if (id.includes("i18next")) return "i18n";
 						if (id.includes("lucide-react")) return "icons";
 						if (id.includes("@radix-ui")) return "radix";
-						if (id.includes("better-auth") || id.includes("@better-auth"))
+						if (
+							id.includes("better-auth") ||
+							id.includes("@better-auth") ||
+							id.includes("@pengana/auth")
+						)
 							return "auth";
 					}
 				},

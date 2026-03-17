@@ -28,8 +28,6 @@ describe("createIndexedDbUploadTransport", () => {
 		const transport = createIndexedDbUploadTransport({ rpc, db: fakeDb });
 
 		await transport.upload({
-			entityType: "todo",
-			entityId: "todo-1",
 			fileUri: "indexeddb://media-123",
 			mimeType: "image/png",
 			idempotencyKey: "idem-1",
@@ -37,8 +35,6 @@ describe("createIndexedDbUploadTransport", () => {
 
 		expect(getFileFromIndexedDB).toHaveBeenCalledWith(fakeDb, "media-123");
 		expect(rpc.upload).toHaveBeenCalledWith({
-			entityType: "todo",
-			entityId: "todo-1",
 			fileName: expect.stringMatching(/^attachment-\d+\.png$/),
 			mimeType: "image/png",
 			data: "YWJj",
@@ -56,8 +52,6 @@ describe("createIndexedDbUploadTransport", () => {
 
 		await expect(
 			transport.upload({
-				entityType: "todo",
-				entityId: "todo-1",
 				fileUri: "indexeddb://media-456",
 				mimeType: "image/png",
 				idempotencyKey: "idem-1",
@@ -73,8 +67,6 @@ describe("createIndexedDbUploadTransport", () => {
 			db: fakeDb,
 		});
 
-		await expect(
-			transport.onFailed?.("todo", "todo-1", "blob:file"),
-		).resolves.toBeUndefined();
+		await expect(transport.onFailed?.("blob:file")).resolves.toBeUndefined();
 	});
 });

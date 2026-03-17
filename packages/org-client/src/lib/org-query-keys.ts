@@ -4,8 +4,8 @@ export const orgQueryKeys = {
 	listOrgs: ["auth", "list-organizations"] as const,
 	sessions: ["auth", "sessions"] as const,
 	teams: (orgId: string | undefined) => ["auth", "teams", orgId] as const,
-	teamMembers: (teamId: string | undefined) =>
-		["auth", "team-members", teamId] as const,
+	teamMembers: (teamId: string | undefined, isAdmin?: boolean) =>
+		["auth", "team-members", teamId, { isAdmin: !!isAdmin }] as const,
 	userInvitations: ["auth", "user-invitations"] as const,
 	invitation: (id: string) => ["auth", "invitation", id] as const,
 };

@@ -4,7 +4,7 @@ export {
 	createDrizzleSyncAdapter,
 	createDrizzleSyncAdapter as createSyncAdapter,
 } from "./adapter";
-export { media, syncMeta, todos } from "./schema";
+export { media, mediaAttachments, syncMeta, todos } from "./schema";
 
 import { appDb as nativeAppDb } from "./db";
 import type { appDb as webAppDb } from "./db.web";

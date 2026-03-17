@@ -52,10 +52,10 @@ export class UploadQueue {
 
 	async enqueue(item: {
 		id: string;
-		entityType: string;
-		entityId: string;
 		fileUri: string;
 		mimeType: string;
+		entityType?: string;
+		entityId?: string;
 	}): Promise<void> {
 		await this.adapter.addToQueue({
 			...item,
@@ -78,28 +78,21 @@ export class UploadQueue {
 		this.events.emit({
 			type: "upload:start",
 			timestamp: new Date().toISOString(),
-			detail: `Uploading file for ${item.entityType} ${item.entityId}`,
+			detail: `Uploading file ${item.id}`,
 			itemId: item.id,
-			entityType: item.entityType,
-			entityId: item.entityId,
 		});
 
 		try {
 			const result = await this.transport.upload({
-				entityType: item.entityType,
-				entityId: item.entityId,
 				fileUri: item.fileUri,
 				mimeType: item.mimeType,
 				idempotencyKey: item.id,
+				entityType: item.entityType,
+				entityId: item.entityId,
 			});
 			await this.adapter.markCompleted(item.id, result.url);
 			try {
-				await this.lifecycleCallbacks?.onCompleted(
-					item.entityType,
-					item.entityId,
-					result.url,
-					item.id,
-				);
+				await this.lifecycleCallbacks?.onCompleted(result.url, item.id);
 			} catch (lcError) {
 				console.error("lifecycleCallbacks.onCompleted threw:", lcError);
 			}
@@ -109,8 +102,6 @@ export class UploadQueue {
 				timestamp: new Date().toISOString(),
 				detail: `Upload complete: ${result.url}`,
 				itemId: item.id,
-				entityType: item.entityType,
-				entityId: item.entityId,
 			});
 		} catch (error) {
 			await this.handleUploadError(item, error);
@@ -127,20 +118,12 @@ export class UploadQueue {
 			await this.adapter.updateRetry(item.id, newRetryCount);
 			await this.adapter.markFailed(item.id);
 			try {
-				await this.transport.onFailed?.(
-					item.entityType,
-					item.entityId,
-					item.fileUri,
-				);
+				await this.transport.onFailed?.(item.fileUri);
 			} catch (onFailedError) {
 				console.error("transport.onFailed threw:", onFailedError);
 			}
 			try {
-				await this.lifecycleCallbacks?.onFailed(
-					item.entityType,
-					item.entityId,
-					item.id,
-				);
+				await this.lifecycleCallbacks?.onFailed(item.id);
 			} catch (lcError) {
 				console.error("lifecycleCallbacks.onFailed threw:", lcError);
 			}
@@ -150,8 +133,6 @@ export class UploadQueue {
 				timestamp: new Date().toISOString(),
 				detail: `Upload failed after ${this.maxRetries} attempts: ${error instanceof Error ? error.message : "Unknown error"}`,
 				itemId: item.id,
-				entityType: item.entityType,
-				entityId: item.entityId,
 			});
 		} else {
 			await this.adapter.updateStatus(item.id, "queued");
@@ -165,8 +146,6 @@ export class UploadQueue {
 				timestamp: new Date().toISOString(),
 				detail: `Upload attempt ${newRetryCount} failed, retrying in ${backoff}ms`,
 				itemId: item.id,
-				entityType: item.entityType,
-				entityId: item.entityId,
 			});
 		}
 	}

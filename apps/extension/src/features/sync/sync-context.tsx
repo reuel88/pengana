@@ -28,7 +28,8 @@ const personalTransportFactory = () =>
 	createSyncTransport(
 		async (input) =>
 			(await client.todo.sync(input, { signal: input.signal })).data,
-		(media, entityIds) => reconcileMedia(appDb, media, entityIds),
+		(media, attachments, entityIds) =>
+			reconcileMedia(appDb, media, attachments, entityIds),
 	);
 
 export function SyncProvider({
@@ -78,7 +79,8 @@ const orgDeps = createExtensionPlatformDeps(
 				return (await client.orgTodo.sync(input, { signal: input.signal }))
 					.data;
 			},
-			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
+			(media, attachments, entityIds) =>
+				reconcileMedia(appDb, media, attachments, entityIds),
 		),
 );
 

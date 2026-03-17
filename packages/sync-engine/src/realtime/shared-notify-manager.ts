@@ -1,6 +1,7 @@
 import type {
 	CreateNotifyTransport,
 	NotifyTransportCallbacks,
+	RealtimeMessageKind,
 	RealtimeTransport,
 } from "./types";
 
@@ -21,13 +22,20 @@ interface SharedNotifySubscription {
 const channels = new Map<string, SharedNotifyChannel>();
 let nextSubscriberId = 1;
 
-function broadcast(
+function broadcastNotify(
 	channel: SharedNotifyChannel,
-	handler: keyof NotifyTransportCallbacks,
+	kind: Exclude<RealtimeMessageKind, "heartbeat">,
 ) {
 	for (const subscriber of channel.subscribers.values()) {
 		if (!subscriber.enabled) continue;
-		subscriber[handler]?.();
+		subscriber.onNotify(kind);
+	}
+}
+
+function broadcastOpen(channel: SharedNotifyChannel) {
+	for (const subscriber of channel.subscribers.values()) {
+		if (!subscriber.enabled) continue;
+		subscriber.onOpen?.();
 	}
 }
 
@@ -37,8 +45,8 @@ function createChannel(
 ): SharedNotifyChannel {
 	const channel: SharedNotifyChannel = {
 		transport: createNotifyTransport(notifyKey, {
-			onNotify: () => broadcast(channel, "onNotify"),
-			onOpen: () => broadcast(channel, "onOpen"),
+			onNotify: (kind) => broadcastNotify(channel, kind),
+			onOpen: () => broadcastOpen(channel),
 		}),
 		subscribers: new Map(),
 	};
@@ -68,7 +76,7 @@ export function subscribeToSharedNotifyChannel({
 }: {
 	notifyKey: string;
 	createNotifyTransport: CreateNotifyTransport;
-	onNotify: () => void;
+	onNotify: (kind: Exclude<RealtimeMessageKind, "heartbeat">) => void;
 	onOpen?: () => void;
 	enabled: boolean;
 }): SharedNotifySubscription {

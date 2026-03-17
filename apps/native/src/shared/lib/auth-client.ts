@@ -1,6 +1,9 @@
-import { expoClient } from "@better-auth/expo/client";
-import { organizationClient } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react";
+import {
+	createAuthClient,
+	i18nClient,
+	organizationClient,
+} from "@pengana/auth/client";
+import { expoClient } from "@pengana/auth/client-expo";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
@@ -33,6 +36,7 @@ export const authClient = createAuthClient({
 			storagePrefix: Constants.expoConfig?.scheme as string,
 			storage: SecureStore,
 		}),
+		i18nClient(),
 	],
 	sessionOptions: {
 		refetchOnWindowFocus: false,

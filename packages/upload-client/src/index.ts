@@ -9,11 +9,17 @@ export {
 	createUploadTransport,
 	type UploadTransportInput,
 } from "./adapters/upload-transport";
-export type { WebMedia } from "./lib/db";
+export type {
+	AddMediaOptions,
+	LocalMedia,
+	LocalMediaAttachment,
+} from "./lib/db";
 export * as drizzleMedia from "./lib/drizzle-media-actions";
 export { readFileAsBase64 } from "./lib/file-utils";
 export {
 	addMedia,
+	attachMediaToEntity,
+	detachMediaFromEntity,
 	getMediaCountForEntity,
 	markMediaFailed,
 	reconcileMedia,
@@ -21,7 +27,12 @@ export {
 	updateMediaLocalUri,
 	updateMediaUploaded,
 } from "./lib/media-actions";
-export { mediaEntity } from "./lib/media-entity";
+export { mediaAttachmentEntity, mediaEntity } from "./lib/media-entity";
+export {
+	buildReconcilePlan,
+	type ReconcilePlan,
+	type ReconcilePlanInput,
+} from "./lib/reconcile-plan";
 export {
 	createWebStorageHealthProvider,
 	getStorageLevel,

@@ -63,6 +63,7 @@ export type {
 } from "./realtime/types";
 export { createWebSocketRealtimeTransport } from "./realtime/websocket-realtime-transport";
 export {
+	mediaAttachmentSchema,
 	mediaSchema,
 	syncInputSchema,
 	syncOutputSchema,
@@ -73,6 +74,7 @@ export {
 } from "./schemas";
 export type {
 	Media,
+	MediaAttachment,
 	StorageEstimate,
 	StorageHealthProvider,
 	StorageLevel,

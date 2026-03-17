@@ -1,5 +1,6 @@
 import type {
 	Media,
+	MediaAttachment,
 	SyncOutput,
 	SyncTransport,
 	Todo,
@@ -13,10 +14,15 @@ export function createSyncTransport(
 	}) => Promise<{
 		serverChanges: Todo[];
 		media?: Media[];
+		mediaAttachments?: MediaAttachment[];
 		conflicts: string[];
 		syncedAt: string;
 	}>,
-	onMedia?: (media: Media[], entityIds: string[]) => Promise<void>,
+	onMedia?: (
+		media: Media[],
+		mediaAttachments: MediaAttachment[],
+		entityIds: string[],
+	) => Promise<void>,
 ): SyncTransport {
 	return {
 		async sync(input): Promise<SyncOutput> {
@@ -27,11 +33,16 @@ export function createSyncTransport(
 			});
 			const entityIds = result.serverChanges.map((c) => c.id);
 			if (onMedia && entityIds.length > 0) {
-				await onMedia(result.media ?? [], entityIds);
+				await onMedia(
+					result.media ?? [],
+					result.mediaAttachments ?? [],
+					entityIds,
+				);
 			}
 			return {
 				serverChanges: result.serverChanges,
 				media: result.media ?? [],
+				mediaAttachments: result.mediaAttachments ?? [],
 				conflicts: result.conflicts,
 				syncedAt: result.syncedAt,
 			};

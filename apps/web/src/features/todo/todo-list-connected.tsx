@@ -3,7 +3,7 @@ import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
 import type { TodoActions, TodoConfig, WebTodo } from "@pengana/todo-client";
 import { useTodoListWiring } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
-import type { WebMedia } from "@pengana/upload-client";
+import type { LocalMedia } from "@pengana/upload-client";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";
@@ -22,14 +22,14 @@ export function TodoListConnected({
 	scopeId,
 	organizationId,
 }: {
-	todos: (WebTodo & { attachments: WebMedia[] })[];
+	todos: (WebTodo & { attachments: LocalMedia[] })[];
 	triggerSync: () => void;
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		fileUri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	actions?: TodoActions;
 	entityType?: string;
@@ -70,7 +70,7 @@ export function TodoListConnected({
 		t,
 		actions,
 		deleteAttachment: (attachmentId) =>
-			client.upload.deleteAttachment({ attachmentId }),
+			client.upload.deleteMedia({ mediaId: attachmentId }),
 		db: appDb,
 		entityType,
 		userId,

@@ -11,7 +11,7 @@ import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/stora
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import { appDb } from "@/shared/db";
 
-function createNoopRealtimeTransport(): RealtimeTransport {
+export function createNoopRealtimeTransport(): RealtimeTransport {
 	return {
 		start() {},
 		stop() {},

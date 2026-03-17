@@ -61,11 +61,13 @@ function App() {
 		content = <LoadingState />;
 	} else if (!session) {
 		content = (
-			<ActionPrompt
-				messageKey="loginPrompt"
-				buttonKey="loginButton"
-				url={`${env.VITE_WEB_URL}/login`}
-			/>
+			<div data-testid="login-prompt">
+				<ActionPrompt
+					messageKey="loginPrompt"
+					buttonKey="loginButton"
+					url={`${env.VITE_WEB_URL}/login`}
+				/>
+			</div>
 		);
 	} else if (isOrgsPending) {
 		content = <LoadingState />;
@@ -79,11 +81,13 @@ function App() {
 		);
 	} else if (!Array.isArray(orgs) || orgs.length === 0) {
 		content = (
-			<ActionPrompt
-				messageKey="onboardingPrompt"
-				buttonKey="onboardingButton"
-				url={`${env.VITE_WEB_URL}/onboarding`}
-			/>
+			<div data-testid="onboarding-prompt">
+				<ActionPrompt
+					messageKey="onboardingPrompt"
+					buttonKey="onboardingButton"
+					url={`${env.VITE_WEB_URL}/onboarding`}
+				/>
+			</div>
 		);
 	} else {
 		content = (

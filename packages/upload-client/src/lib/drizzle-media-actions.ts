@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, max } from "drizzle-orm";
 
 import type {
 	BaseSQLiteDatabase,
@@ -6,18 +6,17 @@ import type {
 	SQLiteTable,
 } from "drizzle-orm/sqlite-core";
 
+import type { AddMediaOptions } from "./db";
+
 type DrizzleDb = BaseSQLiteDatabase<"sync" | "async", unknown>;
 
 type MediaTable = SQLiteTable & {
 	id: SQLiteColumn;
-	entityId: SQLiteColumn;
-	entityType: SQLiteColumn;
 	userId: SQLiteColumn;
 	url: SQLiteColumn;
 	localUri: SQLiteColumn;
 	status: SQLiteColumn;
 	mimeType: SQLiteColumn;
-	position: SQLiteColumn;
 	createdAt: SQLiteColumn;
 	updatedAt: SQLiteColumn;
 	scopeType: SQLiteColumn;
@@ -26,43 +25,63 @@ type MediaTable = SQLiteTable & {
 	createdBy: SQLiteColumn;
 };
 
+type MediaAttachmentTable = SQLiteTable & {
+	id: SQLiteColumn;
+	mediaId: SQLiteColumn;
+	entityType: SQLiteColumn;
+	entityId: SQLiteColumn;
+	position: SQLiteColumn;
+	createdAt: SQLiteColumn;
+};
+
 export async function addMedia(
 	db: DrizzleDb,
 	table: MediaTable,
 	generateId: () => string,
-	entityId: string,
-	entityType: string,
-	userId: string,
-	localUri: string,
-	mimeType: string,
-	scopeType: "personal" | "org",
-	scopeId: string,
-	organizationId: string | null,
-	createdBy: string | null,
+	options: AddMediaOptions,
 ): Promise<string> {
 	const id = generateId();
-	const [row] = await db
-		.select({ value: count() })
-		.from(table)
-		.where(eq(table.entityId, entityId));
-	const position = row?.value ?? 0;
 
 	await db.insert(table).values({
 		id,
-		entityId,
-		entityType,
-		userId,
+		userId: options.userId,
 		url: null,
-		localUri,
+		localUri: options.localUri,
 		status: "queued",
-		mimeType,
-		position,
+		mimeType: options.mimeType,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy,
+		scopeType: options.scopeType,
+		scopeId: options.scopeId,
+		organizationId: options.organizationId,
+		createdBy: options.createdBy,
+	});
+
+	return id;
+}
+
+export async function attachMediaToEntity(
+	db: DrizzleDb,
+	table: MediaAttachmentTable,
+	generateId: () => string,
+	mediaId: string,
+	entityType: string,
+	entityId: string,
+): Promise<string> {
+	const [row] = await db
+		.select({ value: max(table.position) })
+		.from(table)
+		.where(eq(table.entityId, entityId));
+	const position = (Number(row?.value) || 0) + 1;
+
+	const id = generateId();
+	await db.insert(table).values({
+		id,
+		mediaId,
+		entityType,
+		entityId,
+		position,
+		createdAt: new Date().toISOString(),
 	});
 
 	return id;
@@ -74,6 +93,14 @@ export async function removeMedia(
 	mediaId: string,
 ): Promise<void> {
 	await db.delete(table).where(eq(table.id, mediaId));
+}
+
+export async function removeMediaAttachments(
+	db: DrizzleDb,
+	table: MediaAttachmentTable,
+	mediaId: string,
+): Promise<void> {
+	await db.delete(table).where(eq(table.mediaId, mediaId));
 }
 
 export async function updateMediaUploaded(
@@ -118,7 +145,7 @@ export async function retryMedia(
 
 export async function getMediaCountForEntity(
 	db: DrizzleDb,
-	table: MediaTable,
+	table: MediaAttachmentTable,
 	entityId: string,
 ): Promise<number> {
 	const [row] = await db

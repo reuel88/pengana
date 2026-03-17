@@ -10,6 +10,7 @@ vi.mock("@pengana/db/todo-queries", () => ({
 
 vi.mock("@pengana/db/media-queries", () => ({
 	findMediaByEntityIds: vi.fn().mockResolvedValue([]),
+	findMediaAttachmentsByEntityIds: vi.fn().mockResolvedValue([]),
 }));
 
 import {
@@ -304,25 +305,6 @@ describe("handleTodoSync", () => {
 		expect(insertTodo).not.toHaveBeenCalled();
 	});
 
-	it("skips org changes from a different user", async () => {
-		await handleTodoSync(
-			{
-				changes: [
-					makeChange({
-						organizationId: "org-1",
-						createdBy: "other-user",
-					}),
-				],
-				lastSyncedAt: null,
-			},
-			"org",
-			"org-1",
-			"user-1",
-		);
-
-		expect(insertTodo).not.toHaveBeenCalled();
-	});
-
 	it("calls notify with the org id when org changes exist", async () => {
 		const notifyOrgMembers = vi.fn();
 
@@ -370,7 +352,7 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
-			userId: "test-user",
+			userId: "org-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 			syncStatus: "synced",

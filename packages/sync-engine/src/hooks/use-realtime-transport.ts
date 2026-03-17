@@ -13,15 +13,15 @@ export function useRealtimeTransport(
 	enabled: boolean,
 	engineRef: RefObject<Syncable | null>,
 	createNotifyTransport: CreateNotifyTransport,
-	onSyncNotify?: () => void,
+	onRefreshNotify?: () => void,
 ) {
 	const subscriptionRef = useRef<ReturnType<
 		typeof subscribeToSharedNotifyChannel
 	> | null>(null);
 	const enabledRef = useRef(enabled);
 	enabledRef.current = enabled;
-	const onSyncNotifyRef = useRef(onSyncNotify);
-	onSyncNotifyRef.current = onSyncNotify;
+	const onRefreshNotifyRef = useRef(onRefreshNotify);
+	onRefreshNotifyRef.current = onRefreshNotify;
 
 	useEffect(() => {
 		if (!notifyKey) {
@@ -34,9 +34,12 @@ export function useRealtimeTransport(
 			notifyKey,
 			createNotifyTransport,
 			enabled: enabledRef.current,
-			onNotify: () => {
-				engineRef.current?.sync();
-				onSyncNotifyRef.current?.();
+			onNotify: (kind) => {
+				if (kind === "sync") {
+					engineRef.current?.sync();
+					return;
+				}
+				onRefreshNotifyRef.current?.();
 			},
 			onOpen: () => {
 				engineRef.current?.sync();

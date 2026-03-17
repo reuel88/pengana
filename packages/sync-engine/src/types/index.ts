@@ -1,5 +1,6 @@
 export type {
 	Media,
+	MediaAttachment,
 	SyncInput,
 	SyncOutput,
 	SyncStatus,
@@ -14,7 +15,13 @@ export type {
 	StorageLevel,
 } from "./storage-health";
 
-import type { Media, Todo, UploadItem, UploadStatus } from "../schemas";
+import type {
+	Media,
+	MediaAttachment,
+	Todo,
+	UploadItem,
+	UploadStatus,
+} from "../schemas";
 
 export interface UploadAdapter {
 	addToQueue(item: UploadItem): Promise<void>;
@@ -29,17 +36,13 @@ export interface UploadAdapter {
 
 export interface UploadTransport {
 	upload(input: {
-		entityType: string;
-		entityId: string;
 		fileUri: string;
 		mimeType: string;
 		idempotencyKey: string;
+		entityType?: string;
+		entityId?: string;
 	}): Promise<{ url: string }>;
-	onFailed?(
-		entityType: string,
-		entityId: string,
-		fileUri: string,
-	): void | Promise<void>;
+	onFailed?(fileUri: string): void | Promise<void>;
 }
 
 export interface SyncAdapter<T extends { id: string } = Todo> {
@@ -59,6 +62,7 @@ export interface SyncTransport<T extends { id: string } = Todo> {
 	}): Promise<{
 		serverChanges: T[];
 		media?: Media[];
+		mediaAttachments?: MediaAttachment[];
 		conflicts: string[];
 		syncedAt: string;
 	}>;
@@ -89,22 +93,11 @@ export interface UploadEvent {
 	timestamp: string;
 	detail: string;
 	itemId: string;
-	entityType: string;
-	entityId: string;
 }
 
 export interface UploadLifecycleCallbacks {
-	onCompleted(
-		entityType: string,
-		entityId: string,
-		attachmentUrl: string,
-		uploadItemId: string,
-	): Promise<void>;
-	onFailed(
-		entityType: string,
-		entityId: string,
-		uploadItemId: string,
-	): Promise<void>;
+	onCompleted(attachmentUrl: string, uploadItemId: string): Promise<void>;
+	onFailed(uploadItemId: string): Promise<void>;
 }
 
 import type { StorageLevel } from "./storage-health";
@@ -117,11 +110,11 @@ export interface SyncContextValue {
 	storageLevel: StorageLevel;
 	triggerSync: () => void;
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		fileUri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 }
 

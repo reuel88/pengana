@@ -33,8 +33,9 @@ export default defineConfig({
 			name: "extension",
 			testDir: "./tests/extension",
 			use: {
-				browserName: "chromium",
-				baseURL: "http://localhost:3001",
+				headless: false,
+				trace: "on",
+				screenshot: "only-on-failure",
 			},
 		},
 	],

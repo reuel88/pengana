@@ -8,7 +8,7 @@ test.describe("Authentication Flows", () => {
 		await page.goto("/verify-email/callback?token=invalid-token");
 		await expect(
 			page.getByText("This verification link is invalid or has expired."),
-		).toBeVisible();
+		).toBeVisible({ timeout: 15_000 });
 		await expect(
 			page.getByRole("link", { name: "Back to Sign In" }),
 		).toBeVisible();

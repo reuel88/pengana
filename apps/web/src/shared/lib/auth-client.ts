@@ -1,12 +1,12 @@
+import {
+	createAuthClient,
+	i18nClient,
+	organizationClient,
+} from "@pengana/auth/client";
+import { magicLinkClient, polarClient } from "@pengana/auth/client-web";
 import { env } from "@pengana/env/web";
 import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
-import { polarClient } from "@polar-sh/better-auth";
 import { redirect } from "@tanstack/react-router";
-import {
-	magicLinkClient,
-	organizationClient,
-} from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react";
 
 const orgDesignPresetField = {
 	type: "json",
@@ -29,7 +29,7 @@ const basePlugins = [
 
 export const authClient = createAuthClient({
 	baseURL: env.VITE_SERVER_URL,
-	plugins: [...basePlugins, polarClient(), magicLinkClient()],
+	plugins: [...basePlugins, polarClient(), magicLinkClient(), i18nClient()],
 	sessionOptions: {
 		refetchOnWindowFocus: false,
 	},

@@ -3,7 +3,12 @@ import { and, eq, inArray } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
 
-import { appDb, media, todos } from "@/features/todo/entities/todo";
+import {
+	appDb,
+	media,
+	mediaAttachments,
+	todos,
+} from "@/features/todo/entities/todo";
 
 import type { TodoItemRow } from "./components/todo-item";
 
@@ -25,27 +30,54 @@ function useTodosWithAttachments(scopeId: string, organizationId?: string) {
 
 	const todoIds = useMemo(() => (allTodos ?? []).map((t) => t.id), [allTodos]);
 
-	const { data: attachments } = useLiveQuery(
+	const { data: attachmentRecords } = useLiveQuery(
 		todoIds.length > 0
-			? appDb.select().from(media).where(inArray(media.entityId, todoIds))
-			: appDb.select().from(media).where(eq(media.entityId, "__none__")),
+			? appDb
+					.select()
+					.from(mediaAttachments)
+					.where(inArray(mediaAttachments.entityId, todoIds))
+			: appDb
+					.select()
+					.from(mediaAttachments)
+					.where(eq(mediaAttachments.entityId, "__none__")),
 		[todoIds],
 	);
 
+	const mediaIds = useMemo(() => {
+		const ids = [...new Set((attachmentRecords ?? []).map((a) => a.mediaId))];
+		return ids;
+	}, [attachmentRecords]);
+
+	const { data: mediaRecords } = useLiveQuery(
+		mediaIds.length > 0
+			? appDb.select().from(media).where(inArray(media.id, mediaIds))
+			: appDb.select().from(media).where(eq(media.id, "__none__")),
+		[mediaIds],
+	);
+
 	const todosWithAttachments: TodoItemRow[] = useMemo(() => {
-		const attachmentsByTodo = new Map<string, typeof attachments>();
-		for (const a of attachments ?? []) {
-			if (!a.entityId) continue;
-			const existing = attachmentsByTodo.get(a.entityId) ?? [];
-			existing.push(a);
-			attachmentsByTodo.set(a.entityId, existing);
+		const mediaById = new Map<
+			string,
+			typeof mediaRecords extends (infer T)[] | undefined ? T : never
+		>();
+		for (const m of mediaRecords ?? []) {
+			mediaById.set(m.id, m);
+		}
+
+		const byTodo = new Map<string, typeof mediaRecords>();
+		for (const att of attachmentRecords ?? []) {
+			const m = mediaById.get(att.mediaId);
+			if (!m) continue;
+			const list = byTodo.get(att.entityId) ?? [];
+			list.push(m);
+			byTodo.set(att.entityId, list);
 		}
 
 		return (allTodos ?? []).map((t) => ({
 			...t,
 			organizationId: t.organizationId ?? t.userId,
 			createdBy: t.createdBy ?? null,
-			attachments: (attachmentsByTodo.get(t.id) ?? []).map((a) => ({
+			attachments: (byTodo.get(t.id) ?? []).map((a) => ({
 				id: a.id,
 				url: a.url,
 				localUri: a.localUri,
@@ -53,7 +85,7 @@ function useTodosWithAttachments(scopeId: string, organizationId?: string) {
 				mimeType: a.mimeType,
 			})),
 		}));
-	}, [allTodos, attachments]);
+	}, [allTodos, attachmentRecords, mediaRecords]);
 
 	const { activeTodos, conflictTodos } = filterTodos(todosWithAttachments);
 	return { todos: activeTodos, conflictTodos };

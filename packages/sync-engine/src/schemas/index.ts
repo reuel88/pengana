@@ -23,12 +23,9 @@ export const todoSchema = z.object({
 
 export const mediaSchema = z.object({
 	id: z.string(),
-	entityId: z.string().nullable(),
-	entityType: z.string().nullable(),
 	userId: z.string(),
 	url: z.string().nullable(),
 	mimeType: z.string(),
-	position: z.number(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 	scopeType: z.enum(["personal", "org"]),
@@ -37,12 +34,21 @@ export const mediaSchema = z.object({
 	createdBy: z.string().nullable(),
 });
 
-export const uploadItemSchema = z.object({
+export const mediaAttachmentSchema = z.object({
 	id: z.string(),
+	mediaId: z.string(),
 	entityType: z.string(),
 	entityId: z.string(),
+	position: z.number(),
+	createdAt: z.string(),
+});
+
+export const uploadItemSchema = z.object({
+	id: z.string(),
 	fileUri: z.string(),
 	mimeType: z.string(),
+	entityType: z.string().optional(),
+	entityId: z.string().optional(),
 	status: uploadStatusSchema,
 	retryCount: z.number(),
 	createdAt: z.string(),
@@ -56,6 +62,7 @@ export const syncInputSchema = z.object({
 export const syncOutputSchema = z.object({
 	serverChanges: z.array(todoSchema),
 	media: z.array(mediaSchema),
+	mediaAttachments: z.array(mediaAttachmentSchema),
 	conflicts: z.array(z.string()),
 	syncedAt: z.string(),
 });
@@ -63,6 +70,7 @@ export const syncOutputSchema = z.object({
 export type SyncStatus = z.infer<typeof syncStatusSchema>;
 export type Todo = z.infer<typeof todoSchema>;
 export type Media = z.infer<typeof mediaSchema>;
+export type MediaAttachment = z.infer<typeof mediaAttachmentSchema>;
 export type UploadStatus = z.infer<typeof uploadStatusSchema>;
 export type UploadItem = z.infer<typeof uploadItemSchema>;
 export type SyncInput = z.infer<typeof syncInputSchema>;

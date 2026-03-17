@@ -6,14 +6,11 @@ export const media = pgTable(
 	"media",
 	{
 		id: text("id").primaryKey(),
-		entityId: text("entity_id"),
-		entityType: text("entity_type"),
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		url: text("url"),
 		mimeType: text("mime_type").notNull(),
-		position: integer("position").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		scopeType: text("scope_type", { enum: ["personal", "org"] }).notNull(),
@@ -26,7 +23,6 @@ export const media = pgTable(
 		}),
 	},
 	(table) => [
-		index("media_entity_id_idx").on(table.entityId),
 		index("media_scope_updatedAt_idx").on(
 			table.scopeType,
 			table.scopeId,
@@ -35,5 +31,25 @@ export const media = pgTable(
 		index("media_user_id_idx").on(table.userId),
 		index("media_organization_id_idx").on(table.organizationId),
 		index("media_created_by_idx").on(table.createdBy),
+	],
+);
+
+export const mediaAttachments = pgTable(
+	"media_attachments",
+	{
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => crypto.randomUUID()),
+		mediaId: text("media_id")
+			.notNull()
+			.references(() => media.id, { onDelete: "cascade" }),
+		entityType: text("entity_type").notNull(),
+		entityId: text("entity_id").notNull(),
+		position: integer("position").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("media_attachments_entity_idx").on(table.entityType, table.entityId),
+		index("media_attachments_media_id_idx").on(table.mediaId),
 	],
 );
