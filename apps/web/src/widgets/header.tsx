@@ -12,6 +12,7 @@ export function Header() {
 	const links = [
 		{ to: "/", label: t("nav.dashboard") },
 		{ to: "/todos", label: t("nav.todos") },
+		{ to: "/media", label: t("nav.media") },
 	] as const;
 
 	return (

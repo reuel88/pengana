@@ -1,0 +1,28 @@
+{
+	"title": "Phương tiện",
+	"dropzone": {
+		"idle": "Kéo và thả tệp vào đây, hoặc nhấp để duyệt",
+		"active": "Thả tệp vào đây...",
+		"rejected": {
+			"type": "Loại tệp không được hỗ trợ. Vui lòng sử dụng JPEG, PNG, HEIC hoặc PDF.",
+			"size": "Tệp quá lớn. Kích thước tối đa là 10MB."
+		}
+	},
+	"grid": {
+		"empty": "Chưa có phương tiện nào"
+	},
+	"upload": {
+		"success": "Tệp đã được tải lên thành công",
+		"error": "Tải lên thất bại"
+	},
+	"delete": {
+		"success": "Đã xóa phương tiện"
+	},
+	"source": {
+		"standalone": "độc lập",
+		"todo": "công việc"
+	},
+	"actions": {
+		"delete": "Xóa"
+	}
+}
