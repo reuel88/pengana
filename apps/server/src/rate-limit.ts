@@ -9,7 +9,7 @@ const HTTP_TOO_MANY_REQUESTS = 429;
 const isDev = env.NODE_ENV === "development";
 // Dev servers share an IP (localhost) and tools like HMR generate bursts of
 // requests, so rate limits are relaxed by this factor during development.
-const DEV_MULTIPLIER = 10;
+const DEV_MULTIPLIER = 100;
 
 // NOTE: getConnInfo returns the direct connection address. Behind a reverse proxy
 // (e.g. nginx, CloudFront), this will be the proxy's IP, not the client's.

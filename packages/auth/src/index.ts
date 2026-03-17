@@ -10,6 +10,7 @@ import {
 	getOrgSubscription,
 	upsertSubscription,
 } from "@pengana/db/subscription-queries";
+import { addTeamMember, deleteTeamById } from "@pengana/db/team-queries";
 import { sendEmail } from "@pengana/email-dev/send-email";
 import { env } from "@pengana/env/server";
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
@@ -54,9 +55,9 @@ const secrets = env.BETTER_AUTH_SECRETS
 
 const baseURL = env.BETTER_AUTH_ALLOWED_HOSTS
 	? {
-			allowedHosts: env.BETTER_AUTH_ALLOWED_HOSTS.split(",").map((h) =>
-				h.trim(),
-			),
+			allowedHosts: env.BETTER_AUTH_ALLOWED_HOSTS.split(",")
+				.map((h) => h.trim())
+				.filter((h) => h.length > 0),
 			fallback: env.BETTER_AUTH_URL,
 			protocol:
 				env.NODE_ENV === "development" ? ("http" as const) : ("auto" as const),
@@ -265,14 +266,15 @@ export const auth = betterAuth({
 				afterCreateTeam: async (data) => {
 					if (!data.user) return;
 					try {
-						await db.insert(schema.teamMember).values({
-							id: crypto.randomUUID(),
-							teamId: data.team.id,
-							userId: data.user.id,
-							createdAt: new Date(),
-						});
+						await addTeamMember(data.team.id, data.user.id);
 					} catch (error) {
-						logger.error`Failed to auto-add creator to team: ${error}`;
+						logger.error`Failed to auto-add creator to team, rolling back team creation: ${error}`;
+						try {
+							await deleteTeamById(data.team.id);
+						} catch (deleteError) {
+							logger.error`Failed to rollback team ${data.team.id}: ${deleteError}`;
+						}
+						throw error;
 					}
 				},
 				afterCreateInvitation: async (data) => {

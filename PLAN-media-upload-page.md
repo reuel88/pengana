@@ -98,10 +98,11 @@ Pass `userId` and `organizationId` to `MediaPage`.
 - Gets `enqueueUpload` and `triggerSync` from `useSync()`
 - On file selection:
   1. Validate MIME type against `ALLOWED_MIME_TYPES` and size against `MAX_FILE_SIZE_BYTES`
-  2. `storeFileInIndexedDB(appDb, mediaId, file)` — store in IndexedDB
-  3. `addMedia(appDb, { userId, localUri: "indexeddb://{mediaId}", mimeType, scopeType, scopeId, organizationId, createdBy })` — returns `mediaId`
-  4. `enqueueUpload(fileUri, mimeType, mediaId)` — no entityType/entityId for standalone
-  5. `triggerSync()`
+  2. `const mediaId = await addMedia(appDb, { userId, localUri: "", mimeType, scopeType, scopeId, organizationId, createdBy })` — creates record, returns `mediaId`
+  3. `await storeFileInIndexedDB(appDb, mediaId, file)` — store in IndexedDB using the returned `mediaId`
+  4. `await updateMediaLocalUri(mediaId, "indexeddb://" + mediaId)` — update the media record with the correct localUri
+  5. `enqueueUpload("indexeddb://" + mediaId, mimeType, mediaId)` — no entityType/entityId for standalone
+  6. `triggerSync()`
 - The queue processes it automatically; lifecycle callbacks update local status
 - Invalidate `listMedia` query after upload completes
 

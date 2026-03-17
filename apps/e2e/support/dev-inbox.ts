@@ -30,6 +30,10 @@ export async function pollDevInbox(
 	while (Date.now() < deadline) {
 		const emailsResponse = await page.request.get(DEV_INBOX_URL);
 		if (!emailsResponse.ok()) {
+			if (emailsResponse.status() === 429) {
+				await page.waitForTimeout(pollIntervalMs);
+				continue;
+			}
 			throw new Error(
 				`Failed to load dev inbox: ${emailsResponse.status()} ${emailsResponse.statusText()}`,
 			);
@@ -46,6 +50,10 @@ export async function pollDevInbox(
 				`${DEV_INBOX_URL}/${match.id}`,
 			);
 			if (!detailResponse.ok()) {
+				if (detailResponse.status() === 429) {
+					await page.waitForTimeout(pollIntervalMs);
+					continue;
+				}
 				throw new Error(
 					`Failed to load dev email ${match.id}: ${detailResponse.status()} ${detailResponse.statusText()}`,
 				);

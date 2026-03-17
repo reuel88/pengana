@@ -19,6 +19,19 @@ export async function isOrgAdmin(
 	return !!row && ["admin", "owner"].includes(row.role);
 }
 
+export async function addTeamMember(teamId: string, userId: string) {
+	await db.insert(teamMember).values({
+		id: crypto.randomUUID(),
+		teamId,
+		userId,
+		createdAt: new Date(),
+	});
+}
+
+export async function deleteTeamById(teamId: string) {
+	await db.delete(team).where(eq(team.id, teamId));
+}
+
 export async function getTeamMembersAsAdmin(
 	teamId: string,
 	organizationId: string,

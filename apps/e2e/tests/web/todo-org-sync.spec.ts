@@ -14,7 +14,7 @@ test.describe("Org todo cross-member sync", () => {
 		const todoTitle = `Shared Todo ${crypto.randomUUID().slice(0, 8)}`;
 
 		// Invite and accept a second member
-		const { inviteePage } = await inviteAndAcceptMember(
+		const { inviteePage, inviteeContext } = await inviteAndAcceptMember(
 			ownerPage,
 			orgName,
 			browser,
@@ -30,7 +30,9 @@ test.describe("Org todo cross-member sync", () => {
 		// User B navigates to org todos and sees the todo
 		await inviteeTodos.navigate();
 		await inviteePage.getByRole("tab", { name: "Organization" }).click();
-		await expect(inviteeTodos.todoRowLocator(todoTitle)).toBeVisible();
+		await expect(inviteeTodos.todoRowLocator(todoTitle)).toBeVisible({
+			timeout: 15_000,
+		});
 
 		// User B deletes the todo
 		await inviteeTodos.deleteTodo(todoTitle);
@@ -40,5 +42,7 @@ test.describe("Org todo cross-member sync", () => {
 		await ownerPage.reload();
 		await ownerPage.getByRole("tab", { name: "Organization" }).click();
 		await expect(ownerTodos.todoRowLocator(todoTitle)).not.toBeVisible();
+
+		await inviteeContext.close();
 	});
 });

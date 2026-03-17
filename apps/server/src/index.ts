@@ -51,6 +51,13 @@ app.use(
 	}),
 );
 
+// Dev inbox must be mounted before the global rate limiter so that
+// e2e polling requests are never throttled (dev-only route).
+if (env.NODE_ENV === "development" || env.ENABLE_EMAIL_DEV) {
+	const { createEmailDevApp } = await import("@pengana/email-dev");
+	app.route("/dev/email", createEmailDevApp(db));
+}
+
 app.use("/*", globalLimiter);
 
 // Rate-limit sensitive auth endpoints individually (not all of /api/auth/*
@@ -98,11 +105,6 @@ app.get("/", (c) => {
 app.use("/uploads/*", serveStatic({ root: "./" }));
 
 await initServerI18n();
-
-if (env.NODE_ENV === "development" || env.ENABLE_EMAIL_DEV) {
-	const { createEmailDevApp } = await import("@pengana/email-dev");
-	app.route("/dev/email", createEmailDevApp(db));
-}
 
 const server = serve(
 	{

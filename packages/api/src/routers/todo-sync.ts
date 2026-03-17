@@ -124,7 +124,7 @@ export async function handleTodoSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
-			userId: scopeType === "org" ? scopeId : t.userId,
+			userId: scopeType === "org" ? t.scopeId : t.userId,
 			organizationId:
 				scopeType === "org" ? t.scopeId : (t.organizationId ?? null),
 			createdBy: t.createdBy ?? null,
