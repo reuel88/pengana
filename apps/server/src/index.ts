@@ -53,7 +53,10 @@ app.use(
 
 // Dev inbox must be mounted before the global rate limiter so that
 // e2e polling requests are never throttled (dev-only route).
-if (env.NODE_ENV === "development" || env.ENABLE_EMAIL_DEV) {
+if (
+	env.NODE_ENV === "development" ||
+	(env.NODE_ENV !== "production" && env.ENABLE_EMAIL_DEV)
+) {
 	const { createEmailDevApp } = await import("@pengana/email-dev");
 	app.route("/dev/email", createEmailDevApp(db));
 }
