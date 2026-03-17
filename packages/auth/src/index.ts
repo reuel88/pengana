@@ -1,4 +1,5 @@
 import { expo } from "@better-auth/expo";
+import { i18n } from "@better-auth/i18n";
 import { getLogger } from "@logtape/logtape";
 import { db } from "@pengana/db";
 import { findUserByEmail } from "@pengana/db/notification-queries";
@@ -9,6 +10,7 @@ import {
 	getOrgSubscription,
 	upsertSubscription,
 } from "@pengana/db/subscription-queries";
+import { addTeamMember, deleteTeamById } from "@pengana/db/team-queries";
 import { sendEmail } from "@pengana/email-dev/send-email";
 import { env } from "@pengana/env/server";
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
@@ -36,14 +38,35 @@ const orgDesignPresetField = {
 	input: true,
 } as const;
 
-let _notifyUser: (userId: string) => void = () => {};
+type NotifyKind = "sync" | "refresh";
 
-export function setNotifyUser(fn: (userId: string) => void) {
+let _notifyUser: (userId: string, kind?: NotifyKind) => void = () => {};
+
+export function setNotifyUser(fn: (userId: string, kind?: NotifyKind) => void) {
 	_notifyUser = fn;
 }
 
+const secrets = env.BETTER_AUTH_SECRETS
+	? env.BETTER_AUTH_SECRETS.split(",").map((entry) => {
+			const [version, ...rest] = entry.split(":");
+			return { version: Number(version), value: rest.join(":") };
+		})
+	: undefined;
+
+const baseURL = env.BETTER_AUTH_ALLOWED_HOSTS
+	? {
+			allowedHosts: env.BETTER_AUTH_ALLOWED_HOSTS.split(",")
+				.map((h) => h.trim())
+				.filter((h) => h.length > 0),
+			fallback: env.BETTER_AUTH_URL,
+			protocol:
+				env.NODE_ENV === "development" ? ("http" as const) : ("auto" as const),
+		}
+	: env.BETTER_AUTH_URL;
+
 export const auth = betterAuth({
-	baseURL: env.BETTER_AUTH_URL,
+	baseURL,
+	secrets,
 	database: drizzleAdapter(db, {
 		provider: "pg",
 
@@ -213,7 +236,12 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
-			teams: { enabled: true, defaultTeam: { enabled: false } },
+			teams: {
+				enabled: true,
+				defaultTeam: { enabled: false },
+				allowRemovingAllTeams: true,
+			},
+			membershipLimit: Number.MAX_SAFE_INTEGER,
 			schema: {
 				organization: {
 					additionalFields: {
@@ -235,17 +263,31 @@ export const auth = betterAuth({
 				});
 			},
 			organizationHooks: {
+				afterCreateTeam: async (data) => {
+					if (!data.user) return;
+					try {
+						await addTeamMember(data.team.id, data.user.id);
+					} catch (error) {
+						logger.error`Failed to auto-add creator to team, rolling back team creation: ${error}`;
+						try {
+							await deleteTeamById(data.team.id);
+						} catch (deleteError) {
+							logger.error`Failed to rollback team ${data.team.id}: ${deleteError}`;
+						}
+						throw error;
+					}
+				},
 				afterCreateInvitation: async (data) => {
 					try {
 						const user = await findUserByEmail(data.invitation.email);
-						if (user) _notifyUser(user.id);
+						if (user) _notifyUser(user.id, "refresh");
 					} catch (error) {
 						logger.error`Failed to notify after invitation created: ${error}`;
 					}
 				},
 				afterAcceptInvitation: async (data) => {
 					try {
-						_notifyUser(data.invitation.inviterId);
+						_notifyUser(data.invitation.inviterId, "refresh");
 					} catch (error) {
 						logger.error`Failed to notify after invitation accepted: ${error}`;
 					}
@@ -274,7 +316,7 @@ export const auth = betterAuth({
 				},
 				afterRejectInvitation: async (data) => {
 					try {
-						_notifyUser(data.invitation.inviterId);
+						_notifyUser(data.invitation.inviterId, "refresh");
 					} catch (error) {
 						logger.error`Failed to notify after invitation rejected: ${error}`;
 					}
@@ -282,7 +324,7 @@ export const auth = betterAuth({
 				afterCancelInvitation: async (data) => {
 					try {
 						const user = await findUserByEmail(data.invitation.email);
-						if (user) _notifyUser(user.id);
+						if (user) _notifyUser(user.id, "refresh");
 					} catch (error) {
 						logger.error`Failed to notify after invitation cancelled: ${error}`;
 					}
@@ -290,5 +332,11 @@ export const auth = betterAuth({
 			},
 		}),
 		expo(),
+		i18n({
+			defaultLocale: "en",
+			translations: {
+				en: {},
+			},
+		}),
 	],
 });

@@ -11,6 +11,7 @@ import {
 import { billingRouter } from "./billing";
 import { notificationRouter } from "./notification";
 import { orgTodoRouter } from "./org-todo";
+import { teamRouter } from "./team";
 import { todoRouter } from "./todo";
 import { uploadRouter } from "./upload";
 
@@ -94,6 +95,7 @@ export const appRouter = {
 	billing: billingRouter,
 	notification: notificationRouter,
 	orgTodo: orgTodoRouter,
+	team: teamRouter,
 	todo: todoRouter,
 	upload: uploadRouter,
 };

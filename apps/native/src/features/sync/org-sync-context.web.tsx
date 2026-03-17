@@ -21,7 +21,8 @@ const orgDeps = createPlatformDeps(
 				return (await client.orgTodo.sync(input, { signal: input.signal }))
 					.data;
 			},
-			(media, entityIds) => reconcileMedia(appDb, media, entityIds),
+			(media, attachments, entityIds) =>
+				reconcileMedia(appDb, media, attachments, entityIds),
 		),
 );
 

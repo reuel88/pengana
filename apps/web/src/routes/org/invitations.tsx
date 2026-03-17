@@ -31,7 +31,9 @@ function InvitationsPage() {
 	if (!guard.ready) return guard.guardElement;
 
 	const { activeOrg } = guard;
-	const invitations = activeOrg.invitations || [];
+	const invitations = (activeOrg.invitations || []).filter(
+		(inv) => inv.status === "pending",
+	);
 
 	return (
 		<div className="flex flex-col gap-6">

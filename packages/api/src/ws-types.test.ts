@@ -25,6 +25,12 @@ describe("parseWsMessage", () => {
 		});
 	});
 
+	it("parses a refresh notification payload", () => {
+		expect(parseWsMessage('{"type":"refresh-notify"}')).toEqual({
+			type: "refresh-notify",
+		});
+	});
+
 	it("parses an ArrayBuffer payload", () => {
 		const bytes = new TextEncoder().encode('{"type":"connected"}');
 		const payload = bytes.buffer.slice(

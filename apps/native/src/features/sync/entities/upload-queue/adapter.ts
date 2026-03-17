@@ -12,10 +12,10 @@ export function createNativeUploadAdapter(): UploadAdapter {
 			try {
 				await appDb.insert(uploadQueue).values({
 					id: item.id,
-					entityType: item.entityType,
-					entityId: item.entityId,
 					fileUri: item.fileUri,
 					mimeType: item.mimeType,
+					entityType: item.entityType ?? null,
+					entityId: item.entityId ?? null,
 					status: item.status,
 					retryCount: item.retryCount,
 					createdAt: item.createdAt,
@@ -38,10 +38,10 @@ export function createNativeUploadAdapter(): UploadAdapter {
 
 			return {
 				id: row.id,
-				entityType: row.entityType,
-				entityId: row.entityId,
 				fileUri: row.fileUri,
 				mimeType: row.mimeType,
+				entityType: row.entityType ?? undefined,
+				entityId: row.entityId ?? undefined,
 				status: row.status,
 				retryCount: row.retryCount,
 				createdAt: row.createdAt,
@@ -87,10 +87,10 @@ export function createNativeUploadAdapter(): UploadAdapter {
 
 			return rows.map((row) => ({
 				id: row.id,
-				entityType: row.entityType,
-				entityId: row.entityId,
 				fileUri: row.fileUri,
 				mimeType: row.mimeType,
+				entityType: row.entityType ?? undefined,
+				entityId: row.entityId ?? undefined,
 				status: row.status,
 				retryCount: row.retryCount,
 				createdAt: row.createdAt,

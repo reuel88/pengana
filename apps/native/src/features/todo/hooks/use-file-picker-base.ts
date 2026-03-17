@@ -69,26 +69,27 @@ async function pickAssets(
 }
 
 export function useFilePickerBase(deps: {
-	addMedia: (
-		entityId: string,
+	addMedia: (options: {
+		userId: string;
+		localUri: string;
+		mimeType: string;
+		scopeType: "personal" | "org";
+		scopeId: string;
+		organizationId: string | null;
+		createdBy: string | null;
+	}) => Promise<string>;
+	attachMedia: (
+		mediaId: string,
 		entityType: string,
-		userId: string,
-		uri: string,
-		mimeType: string,
-		scopeType: "personal" | "org",
-		scopeId: string,
-		organizationId: string | null,
-		createdBy: string | null,
+		entityId: string,
 	) => Promise<string>;
-	// Native files are available from the picker URI directly; web must store in
-	// IndexedDB first, then update the URI — hence this is optional on native.
 	updateMediaLocalUri?: (mediaId: string, localUri: string) => Promise<void>;
 	enqueueUpload: (
-		entity: string,
-		entityId: string,
 		uri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
@@ -107,23 +108,22 @@ export function useFilePickerBase(deps: {
 
 		for (const asset of toProcess) {
 			try {
-				const mediaId = await deps.addMedia(
-					todoId,
-					deps.entityType,
-					deps.userId,
-					asset.uri,
-					asset.mimeType,
-					deps.scopeType,
-					deps.scopeId,
-					deps.organizationId,
-					deps.createdBy,
-				);
+				const mediaId = await deps.addMedia({
+					userId: deps.userId,
+					localUri: asset.uri,
+					mimeType: asset.mimeType,
+					scopeType: deps.scopeType,
+					scopeId: deps.scopeId,
+					organizationId: deps.organizationId,
+					createdBy: deps.createdBy,
+				});
+				await deps.attachMedia(mediaId, deps.entityType, todoId);
 				deps.enqueueUpload(
-					deps.entityType,
-					todoId,
 					asset.uri,
 					asset.mimeType,
 					mediaId,
+					deps.entityType,
+					todoId,
 				);
 			} catch {
 				Alert.alert(t("errors:failedToAttachFile"));

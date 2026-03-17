@@ -15,16 +15,12 @@ describe("createUploadTransport", () => {
 		});
 
 		const result = await transport.upload({
-			entityType: "todo",
-			entityId: "todo-1",
 			fileUri: "/tmp/file.png",
 			mimeType: "image/png",
 			idempotencyKey: "idem-1",
 		});
 
 		expect(rpc.upload).toHaveBeenCalledWith({
-			entityType: "todo",
-			entityId: "todo-1",
 			fileName: expect.stringMatching(/^attachment-\d+\.png$/),
 			mimeType: "image/png",
 			data: "YWJj",
@@ -44,8 +40,6 @@ describe("createUploadTransport", () => {
 
 		await expect(
 			transport.upload({
-				entityType: "todo",
-				entityId: "todo-1",
 				fileUri: "/tmp/file.png",
 				mimeType: "image/png",
 				idempotencyKey: "idem-1",
@@ -68,14 +62,12 @@ describe("createUploadTransport", () => {
 		});
 
 		await transport.upload({
-			entityType: "todo",
-			entityId: "todo-1",
 			fileUri: "/tmp/file.png",
 			mimeType: "image/png",
 			idempotencyKey: "idem-1",
 		});
 
-		expect(onUploaded).toHaveBeenCalledWith("todo", "todo-1", "/tmp/file.png");
+		expect(onUploaded).toHaveBeenCalledWith("/tmp/file.png");
 	});
 
 	it("passes through onFailed", async () => {
@@ -86,8 +78,8 @@ describe("createUploadTransport", () => {
 			onFailed,
 		});
 
-		await transport.onFailed?.("todo", "todo-1", "/tmp/file.png");
+		await transport.onFailed?.("/tmp/file.png");
 
-		expect(onFailed).toHaveBeenCalledWith("todo", "todo-1", "/tmp/file.png");
+		expect(onFailed).toHaveBeenCalledWith("/tmp/file.png");
 	});
 });

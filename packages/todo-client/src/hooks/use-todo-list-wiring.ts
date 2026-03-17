@@ -12,11 +12,11 @@ import { useTodoHandlers } from "./use-todo-handlers";
 interface UseTodoListWiringConfigBase {
 	triggerSync: () => void;
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		fileUri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	entityType?: string;
 	userId?: string;

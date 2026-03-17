@@ -26,7 +26,7 @@ describe("shared notify manager", () => {
 		const transport = createFakeTransport();
 		let callbacks:
 			| {
-					onNotify: () => void;
+					onNotify: (kind: "sync" | "refresh") => void;
 					onOpen?: () => void;
 			  }
 			| undefined;
@@ -59,7 +59,7 @@ describe("shared notify manager", () => {
 		expect(createNotifyTransport).toHaveBeenCalledTimes(1);
 
 		callbacks?.onOpen?.();
-		callbacks?.onNotify();
+		callbacks?.onNotify("sync");
 
 		expect(onOpenA).toHaveBeenCalledTimes(1);
 		expect(onOpenB).toHaveBeenCalledTimes(1);
@@ -75,7 +75,7 @@ describe("shared notify manager", () => {
 		const transport = createFakeTransport();
 		let callbacks:
 			| {
-					onNotify: () => void;
+					onNotify: (kind: "sync" | "refresh") => void;
 					onOpen?: () => void;
 			  }
 			| undefined;
@@ -100,7 +100,7 @@ describe("shared notify manager", () => {
 			onNotify: onNotifyDisabled,
 		});
 
-		callbacks?.onNotify();
+		callbacks?.onNotify("sync");
 		expect(onNotifyEnabled).toHaveBeenCalledTimes(1);
 		expect(onNotifyDisabled).not.toHaveBeenCalled();
 
@@ -108,7 +108,7 @@ describe("shared notify manager", () => {
 		expect(transport.stop).toHaveBeenCalled();
 
 		disabledSubscription.setEnabled(true);
-		callbacks?.onNotify();
+		callbacks?.onNotify("refresh");
 		expect(onNotifyDisabled).toHaveBeenCalledTimes(1);
 
 		enabledSubscription.unsubscribe();

@@ -6,12 +6,7 @@ import { media } from "@/features/todo/entities/todo/schema";
 
 export function createNativeUploadLifecycleCallbacks(): UploadLifecycleCallbacks {
 	return {
-		async onCompleted(
-			_entityType: string,
-			_entityId: string,
-			url: string,
-			uploadItemId: string,
-		): Promise<void> {
+		async onCompleted(url: string, uploadItemId: string): Promise<void> {
 			await appDb
 				.update(media)
 				.set({
@@ -21,11 +16,7 @@ export function createNativeUploadLifecycleCallbacks(): UploadLifecycleCallbacks
 				.where(eq(media.id, uploadItemId));
 		},
 
-		async onFailed(
-			_entityType: string,
-			_entityId: string,
-			uploadItemId: string,
-		): Promise<void> {
+		async onFailed(uploadItemId: string): Promise<void> {
 			await appDb
 				.update(media)
 				.set({

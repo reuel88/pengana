@@ -18,6 +18,9 @@ export class NativeAuthPage extends BaseAuthPage {
 
 	async signUp(name: string, email: string, password: string) {
 		await this.navigateToSignUp();
+		await this.page
+			.getByPlaceholder("Name")
+			.waitFor({ state: "visible", timeout: 15_000 });
 		await this.page.getByPlaceholder("Name").fill(name);
 		await this.page.getByPlaceholder("Email").fill(email);
 		await this.page.getByPlaceholder("Password").fill(password);

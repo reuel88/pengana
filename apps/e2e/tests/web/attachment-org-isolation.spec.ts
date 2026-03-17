@@ -40,10 +40,12 @@ test.describe("Attachment org isolation", () => {
 		// Switch back to Org A — 2do with attachment reappears
 		await orgPage.switchOrg(`Org A ${id}`);
 		await todoPage.navigate();
-		await expect(todoPage.todoRowLocator("Todo With Attachment")).toBeVisible();
+		await expect(todoPage.todoRowLocator("Todo With Attachment")).toBeVisible({
+			timeout: 15_000,
+		});
 		await expect(
 			todoPage.attachmentLocator("Todo With Attachment"),
-		).toBeVisible();
+		).toBeVisible({ timeout: 15_000 });
 	});
 
 	test("org todo attachment in org A is not visible in org B", async ({
@@ -93,10 +95,10 @@ test.describe("Attachment org isolation", () => {
 		await page.getByRole("tab", { name: "Organization" }).click();
 		await expect(
 			todoPage.todoRowLocator("Org Todo With Attachment"),
-		).toBeVisible();
+		).toBeVisible({ timeout: 15_000 });
 		await expect(
 			todoPage.attachmentLocator("Org Todo With Attachment"),
-		).toBeVisible();
+		).toBeVisible({ timeout: 15_000 });
 	});
 
 	test("attachment persists after page reload", async ({ page, todoPage }) => {

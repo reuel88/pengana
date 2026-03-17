@@ -7,13 +7,13 @@ import { createUploadTransport } from "./upload-transport";
 
 interface UploadRpc {
 	upload(input: {
-		entityType: string;
-		entityId: string;
 		fileName: string;
 		mimeType: string;
 		data: string;
 		idempotencyKey: string;
 		attachmentId: string;
+		entityType?: string;
+		entityId?: string;
 	}): Promise<{ data: { url: string; mediaId: string } }>;
 }
 
@@ -38,10 +38,10 @@ export function createIndexedDbUploadTransport({
 			}
 			return fileData.base64;
 		},
-		onUploaded(_entityType, _entityId, _fileUri) {
+		onUploaded(_fileUri) {
 			// File cleanup handled via lifecycle callbacks
 		},
-		onFailed(_entityType, _entityId, _fileUri) {
+		onFailed(_fileUri) {
 			// File cleanup handled via lifecycle callbacks
 		},
 	});

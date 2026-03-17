@@ -2,6 +2,7 @@ import type { EntityDatabase } from "@pengana/entity-store";
 import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync-engine";
 import {
 	addMedia,
+	attachMediaToEntity,
 	getMediaCountForEntity,
 	removeMedia,
 } from "@pengana/upload-client";
@@ -46,11 +47,11 @@ function resolveActions({
 export interface TodoHandlerDeps {
 	triggerSync: () => void;
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		fileUri: string,
 		mimeType: string,
 		mediaId: string,
+		entityType?: string,
+		entityId?: string,
 	) => void;
 	entityType?: string;
 	userId?: string;
@@ -167,18 +168,16 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				const filesToProcess = files.slice(0, available);
 
 				for (const file of filesToProcess) {
-					const mediaId = await addMedia(
-						db,
-						todoId,
-						entityType,
+					const mediaId = await addMedia(db, {
 						userId,
-						"",
-						file.type,
+						localUri: "",
+						mimeType: file.type,
 						scopeType,
 						scopeId,
 						organizationId,
-						userId,
-					);
+						createdBy: userId,
+					});
+					await attachMediaToEntity(db, mediaId, entityType, todoId);
 					await storeFile(mediaId, file);
 					const fileRef = createFileRef(mediaId, file);
 					refs.push(fileRef);
@@ -187,7 +186,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 						.getTable("media")
 						.update(mediaId, { localUri: fileRef.uri } as never);
 
-					enqueueUpload(entityType, todoId, fileRef.uri, file.type, mediaId);
+					enqueueUpload(fileRef.uri, file.type, mediaId, entityType, todoId);
 				}
 				triggerSync();
 			} catch (e) {

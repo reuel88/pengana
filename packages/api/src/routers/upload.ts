@@ -1,8 +1,11 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+	attachMedia,
 	countMediaByEntityId,
 	deleteMedia,
+	detachMedia,
+	findAttachmentsByMedia,
 	findMediaById,
 	insertMedia,
 } from "@pengana/db/media-queries";
@@ -13,7 +16,6 @@ import {
 import { findTodoById, updateTodo } from "@pengana/db/todo-queries";
 import {
 	ALLOWED_MIME_TYPES,
-	ENTITY_TYPE_TODO,
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 	MIME_TO_EXT,
@@ -25,22 +27,57 @@ import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
 
+type EntityScope = {
+	scopeType: "org" | "personal";
+	scopeId: string;
+	organizationId: string | null;
+};
+
+async function validateEntityAccess(
+	entityType: string,
+	entityId: string,
+	userId: string,
+	activeOrgId: string | null,
+	t: (key: string) => string,
+): Promise<EntityScope> {
+	if (entityType === "todo") {
+		const todoRow = await findTodoById(entityId);
+		if (!todoRow) throw apiError("NOT_FOUND", t("todoNotFound"));
+		if (todoRow.scopeType === "org") {
+			if (!activeOrgId || todoRow.scopeId !== activeOrgId) {
+				throw apiError("NOT_FOUND", t("todoNotFound"));
+			}
+			let seated = await isMemberSeatedByUserId(activeOrgId, userId);
+			if (!seated) seated = await autoSeatOwner(activeOrgId, userId);
+			if (!seated) throw apiError("FORBIDDEN", t("seatRequiredForWrite"));
+		} else if (todoRow.userId !== userId) {
+			throw apiError("NOT_FOUND", t("todoNotFound"));
+		}
+		return {
+			scopeType: todoRow.scopeType as "org" | "personal",
+			scopeId: todoRow.scopeId,
+			organizationId: todoRow.organizationId,
+		};
+	}
+	return { scopeType: "personal", scopeId: userId, organizationId: null };
+}
+
 export const uploadRouter = {
 	upload: protectedProcedure
 		.route({
 			method: "POST",
 			path: "/upload",
-			summary: "Upload a file attachment",
+			summary: "Upload a file",
 		})
 		.input(
 			z.object({
-				entityType: z.string(),
-				entityId: z.string(),
 				fileName: z.string(),
 				mimeType: z.enum(ALLOWED_MIME_TYPES),
 				data: z.string(),
 				idempotencyKey: z.string().uuid(),
 				attachmentId: z.string().uuid(),
+				entityType: z.string().optional(),
+				entityId: z.string().optional(),
 			}),
 		)
 		.output(
@@ -55,36 +92,12 @@ export const uploadRouter = {
 			const userId = context.session.user.id;
 			const activeOrgId = context.session.session.activeOrganizationId;
 
-			const todoRow = await findTodoById(input.entityId);
-			if (!todoRow) {
-				throw apiError("NOT_FOUND", context.t("todoNotFound"));
-			}
-
-			if (todoRow.scopeType === "org") {
-				if (!activeOrgId) {
-					throw apiError("BAD_REQUEST", context.t("noActiveOrganization"));
-				}
-				if (todoRow.scopeId !== activeOrgId) {
-					throw apiError("NOT_FOUND", context.t("todoNotFound"));
-				}
-
-				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
-				if (!seated) {
-					seated = await autoSeatOwner(activeOrgId, userId);
-				}
-
-				if (!seated) {
-					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
-				}
-			} else {
-				if (todoRow.userId !== userId) {
-					throw apiError("NOT_FOUND", context.t("todoNotFound"));
-				}
-			}
-
-			const count = await countMediaByEntityId(input.entityId);
-			if (count >= MAX_ATTACHMENTS) {
-				throw apiError("BAD_REQUEST", context.t("tooManyAttachments"));
+			const existingMedia = await findMediaById(input.attachmentId);
+			if (existingMedia && existingMedia.userId !== userId) {
+				throw apiError(
+					"FORBIDDEN",
+					context.t("attachmentBelongsToAnotherUser"),
+				);
 			}
 
 			const buffer = Buffer.from(input.data, "base64");
@@ -93,12 +106,22 @@ export const uploadRouter = {
 				throw apiError("BAD_REQUEST", context.t("fileTooLarge"));
 			}
 
-			const existingMedia = await findMediaById(input.attachmentId);
-			if (existingMedia && existingMedia.userId !== userId) {
-				throw apiError(
-					"FORBIDDEN",
-					context.t("attachmentBelongsToAnotherUser"),
+			let entityScope: EntityScope | undefined;
+			if (input.entityType && input.entityId) {
+				entityScope = await validateEntityAccess(
+					input.entityType,
+					input.entityId,
+					userId,
+					activeOrgId ?? null,
+					context.t,
 				);
+
+				const entityAttachmentCount = await countMediaByEntityId(
+					input.entityId,
+				);
+				if (entityAttachmentCount >= MAX_ATTACHMENTS) {
+					throw apiError("BAD_REQUEST", context.t("tooManyAttachments"));
+				}
 			}
 
 			await mkdir(UPLOADS_DIR, { recursive: true });
@@ -115,27 +138,39 @@ export const uploadRouter = {
 				await writeFile(filepath, buffer);
 			}
 
-			const now = new Date();
+			const scopeType = entityScope
+				? entityScope.scopeType
+				: activeOrgId
+					? "org"
+					: "personal";
+			const scopeId = entityScope
+				? entityScope.scopeId
+				: (activeOrgId ?? userId);
+			const organizationId = entityScope
+				? entityScope.organizationId
+				: (activeOrgId ?? null);
 
 			await insertMedia({
 				id: input.attachmentId,
-				entityId: input.entityId,
-				entityType: ENTITY_TYPE_TODO,
 				userId,
 				url,
 				mimeType: input.mimeType,
-				position: count,
-				scopeType: todoRow.scopeType,
-				scopeId: todoRow.scopeId,
-				organizationId: todoRow.organizationId,
+				scopeType,
+				scopeId,
+				organizationId,
 				createdBy: userId,
-				updatedAt: now,
+				updatedAt: new Date(),
 			});
 
-			await updateTodo(input.entityId, { updatedAt: now });
+			if (input.entityType && input.entityId && entityScope) {
+				await attachMedia(input.attachmentId, input.entityType, input.entityId);
+				if (input.entityType === "todo") {
+					await updateTodo(input.entityId, { updatedAt: new Date() });
+				}
+			}
 
-			if (todoRow.scopeType === "org" && activeOrgId) {
-				context.notifyOrgMembers(activeOrgId);
+			if (scopeType === "org" && organizationId) {
+				context.notifyOrgMembers(organizationId);
 			} else {
 				context.notifyUser(userId);
 			}
@@ -146,32 +181,143 @@ export const uploadRouter = {
 			});
 		}),
 
-	deleteAttachment: protectedProcedure
+	attachMedia: protectedProcedure
 		.route({
 			method: "POST",
-			path: "/delete-attachment",
-			summary: "Delete a file attachment",
+			path: "/attach-media",
+			summary: "Attach a media item to an entity",
 		})
 		.input(
 			z.object({
-				attachmentId: z.string().uuid(),
+				mediaId: z.string().uuid(),
+				entityType: z.string(),
+				entityId: z.string(),
+			}),
+		)
+		.output(envelopeOutput(z.object({ attachmentId: z.string() })))
+		.handler(async ({ input, context }) => {
+			const userId = context.session.user.id;
+			const activeOrgId = context.session.session.activeOrganizationId;
+
+			const mediaRecord = await findMediaById(input.mediaId);
+			if (!mediaRecord) {
+				throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
+			}
+			if (mediaRecord.userId !== userId) {
+				throw apiError(
+					"FORBIDDEN",
+					context.t("attachmentBelongsToAnotherUser"),
+				);
+			}
+
+			const entityScope = await validateEntityAccess(
+				input.entityType,
+				input.entityId,
+				userId,
+				activeOrgId ?? null,
+				context.t,
+			);
+
+			const count = await countMediaByEntityId(input.entityId);
+			if (count >= MAX_ATTACHMENTS) {
+				throw apiError("BAD_REQUEST", context.t("tooManyAttachments"));
+			}
+
+			const row = await attachMedia(
+				input.mediaId,
+				input.entityType,
+				input.entityId,
+			);
+
+			const now = new Date();
+			if (input.entityType === "todo") {
+				await updateTodo(input.entityId, { updatedAt: now });
+			}
+
+			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+				context.notifyOrgMembers(entityScope.organizationId);
+			} else {
+				context.notifyUser(userId);
+			}
+
+			return envelope({ attachmentId: row.id });
+		}),
+
+	detachMedia: protectedProcedure
+		.route({
+			method: "POST",
+			path: "/detach-media",
+			summary: "Detach a media item from an entity",
+		})
+		.input(
+			z.object({
+				mediaId: z.string().uuid(),
+				entityType: z.string(),
+				entityId: z.string(),
+			}),
+		)
+		.output(envelopeOutput(z.object({ detached: z.boolean() })))
+		.handler(async ({ input, context }) => {
+			const userId = context.session.user.id;
+			const activeOrgId = context.session.session.activeOrganizationId;
+
+			const mediaRecord = await findMediaById(input.mediaId);
+			if (!mediaRecord) {
+				throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
+			}
+			if (mediaRecord.userId !== userId) {
+				throw apiError("FORBIDDEN", context.t("notAttachmentOwner"));
+			}
+
+			const entityScope = await validateEntityAccess(
+				input.entityType,
+				input.entityId,
+				userId,
+				activeOrgId ?? null,
+				context.t,
+			);
+
+			await detachMedia(input.mediaId, input.entityType, input.entityId);
+
+			const now = new Date();
+			if (input.entityType === "todo") {
+				await updateTodo(input.entityId, { updatedAt: now });
+			}
+
+			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+				context.notifyOrgMembers(entityScope.organizationId);
+			} else {
+				context.notifyUser(userId);
+			}
+
+			return envelope({ detached: true });
+		}),
+
+	deleteMedia: protectedProcedure
+		.route({
+			method: "POST",
+			path: "/delete-media",
+			summary: "Delete a media item and all its attachments",
+		})
+		.input(
+			z.object({
+				mediaId: z.string().uuid(),
 			}),
 		)
 		.output(envelopeOutput(z.object({ deleted: z.boolean() })))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
-			const mediaRecord = await findMediaById(input.attachmentId);
+			const activeOrgId = context.session.session.activeOrganizationId;
 
+			const mediaRecord = await findMediaById(input.mediaId);
 			if (!mediaRecord) {
 				throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
 			}
 
 			if (mediaRecord.scopeType === "org") {
-				const activeOrgId = context.session.session.activeOrganizationId;
 				if (!activeOrgId || mediaRecord.organizationId !== activeOrgId) {
 					throw apiError("NOT_FOUND", context.t("attachmentNotFound"));
 				}
-
 				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
 				if (!seated) {
 					seated = await autoSeatOwner(activeOrgId, userId);
@@ -183,11 +329,27 @@ export const uploadRouter = {
 				throw apiError("FORBIDDEN", context.t("notAttachmentOwner"));
 			}
 
-			await deleteMedia(input.attachmentId);
+			const attachments = await findAttachmentsByMedia(input.mediaId);
 
-			if (mediaRecord.entityId) {
-				const now = new Date();
-				await updateTodo(mediaRecord.entityId, { updatedAt: now });
+			if (mediaRecord.url) {
+				const filename = mediaRecord.url.replace(/^\/uploads\//, "");
+				const filepath = join(UPLOADS_DIR, filename);
+				try {
+					await unlink(filepath);
+				} catch {
+					// File may already be gone — not critical
+				}
+			}
+
+			await deleteMedia(input.mediaId);
+
+			const now = new Date();
+			const updatedEntityIds = new Set<string>();
+			for (const att of attachments) {
+				if (att.entityType === "todo" && !updatedEntityIds.has(att.entityId)) {
+					await updateTodo(att.entityId, { updatedAt: now });
+					updatedEntityIds.add(att.entityId);
+				}
 			}
 
 			if (mediaRecord.scopeType === "org" && mediaRecord.organizationId) {

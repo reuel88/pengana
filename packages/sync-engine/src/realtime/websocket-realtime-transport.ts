@@ -94,7 +94,7 @@ export function createWebSocketRealtimeTransport(
 	function startFallback() {
 		if (fallbackTimer || !active) return;
 		fallbackTimer = setInterval(() => {
-			options.onNotify();
+			options.onNotify("sync");
 		}, fallbackIntervalMs);
 	}
 
@@ -185,8 +185,8 @@ export function createWebSocketRealtimeTransport(
 				if (status === "degraded") {
 					emitStatus("open");
 				}
-				if (kind === "notify") {
-					options.onNotify();
+				if (kind === "sync" || kind === "refresh") {
+					options.onNotify(kind);
 				}
 				scheduleHealthCheck();
 			};

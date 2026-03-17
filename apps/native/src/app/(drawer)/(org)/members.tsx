@@ -110,15 +110,12 @@ export default function MembersScreen() {
 	};
 
 	const onLeave = () => {
-		if (!currentUserId) return;
-		const currentMember = members.find((m) => m.userId === currentUserId);
-		if (!currentMember) return;
 		Alert.alert(t("members.leave"), t("members.leaveConfirm"), [
 			{ text: t("common:confirm.cancel"), style: "cancel" },
 			{
 				text: t("members.leave"),
 				style: "destructive",
-				onPress: () => handleLeave(currentMember.id),
+				onPress: () => handleLeave(activeOrg.id),
 			},
 		]);
 	};

@@ -2,6 +2,7 @@ import { useSync } from "@/features/sync/sync-context";
 
 import {
 	addMedia,
+	attachMedia,
 	getMediaCountForEntity,
 	updateMediaLocalUri,
 } from "../todo-actions";
@@ -12,6 +13,7 @@ export function useFilePicker(userId: string, organizationId?: string) {
 	const { enqueueUpload } = useSync();
 	return useFilePickerBase({
 		addMedia,
+		attachMedia,
 		updateMediaLocalUri,
 		enqueueUpload,
 		getMediaCount: getMediaCountForEntity,

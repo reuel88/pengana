@@ -31,8 +31,8 @@ const rpcHandler = new RPCHandler(appRouter, {
 });
 
 export interface NotificationHandlers {
-	notifyUser: (userId: string) => void;
-	notifyOrgMembers: (orgId: string) => void;
+	notifyUser: (userId: string, kind?: "sync" | "refresh") => void;
+	notifyOrgMembers: (orgId: string, kind?: "sync" | "refresh") => void;
 }
 
 // Initialized after server starts — WebSocket setup needs the HTTP server
@@ -49,8 +49,8 @@ const notificationHandlers: NotificationHandlers = {
 };
 
 export function wireNotifications(
-	notifyUser: (userId: string) => void,
-	notifyOrgMembers: (orgId: string) => void,
+	notifyUser: (userId: string, kind?: "sync" | "refresh") => void,
+	notifyOrgMembers: (orgId: string, kind?: "sync" | "refresh") => void,
 ) {
 	notificationHandlers.notifyUser = notifyUser;
 	notificationHandlers.notifyOrgMembers = notifyOrgMembers;

@@ -5,10 +5,10 @@ export type RealtimeTransportStatus =
 	| "degraded"
 	| "closed";
 
-export type RealtimeMessageKind = "notify" | "heartbeat";
+export type RealtimeMessageKind = "sync" | "refresh" | "heartbeat";
 
 export interface RealtimeTransportCallbacks {
-	onNotify: () => void;
+	onNotify: (kind: Exclude<RealtimeMessageKind, "heartbeat">) => void;
 	onOpen?: () => void;
 }
 

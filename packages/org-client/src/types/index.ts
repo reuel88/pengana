@@ -151,6 +151,10 @@ export interface AuthClientOrg {
 			data?: unknown;
 			error?: { message?: string } | null;
 		}>;
+		leave: (opts: { organizationId: string }) => Promise<{
+			data?: unknown;
+			error?: { message?: string } | null;
+		}>;
 		cancelInvitation: (opts: { invitationId: string }) => Promise<{
 			data?: unknown;
 			error?: { message?: string } | null;

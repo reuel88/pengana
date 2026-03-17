@@ -1,5 +1,8 @@
 import { getLogger } from "@logtape/logtape";
-import { findMediaByEntityIds } from "@pengana/db/media-queries";
+import {
+	findMediaAttachmentsByEntityIds,
+	findMediaByEntityIds,
+} from "@pengana/db/media-queries";
 import type { ScopeType } from "@pengana/db/todo-queries";
 import {
 	findTodosByIds,
@@ -36,7 +39,6 @@ export async function handleTodoSync(
 			if (change.userId !== scopeId) continue;
 		} else {
 			if (change.organizationId !== scopeId) continue;
-			if (change.createdBy !== createdBy) continue;
 		}
 
 		const existing = existingTodos.get(change.id);
@@ -50,7 +52,7 @@ export async function handleTodoSync(
 				updatedAt: now,
 				scopeType,
 				scopeId,
-				userId: scopeType === "org" ? scopeId : createdBy,
+				userId: createdBy,
 				organizationId:
 					scopeType === "org"
 						? scopeId
@@ -95,6 +97,15 @@ export async function handleTodoSync(
 
 	const todoIds = serverChanges.map((t) => t.id);
 	const mediaRows = await findMediaByEntityIds(todoIds);
+	const attachmentRows = await findMediaAttachmentsByEntityIds(todoIds);
+
+	// Deduplicate media (a media item may appear multiple times if attached to multiple todos in the result)
+	const uniqueMedia = new Map<string, (typeof mediaRows)[number]>();
+	for (const row of mediaRows) {
+		if (!uniqueMedia.has(row.id)) {
+			uniqueMedia.set(row.id, row);
+		}
+	}
 
 	if (conflicts.length > 0) {
 		logger.warn`Sync conflicts for ${scopeType}:${scopeId}: ${String(conflicts.length)} conflict(s) on ids [${conflicts.join(", ")}]`;
@@ -113,26 +124,31 @@ export async function handleTodoSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
-			userId: t.userId,
+			userId: scopeType === "org" ? t.scopeId : t.userId,
 			organizationId:
 				scopeType === "org" ? t.scopeId : (t.organizationId ?? null),
 			createdBy: t.createdBy ?? null,
 			syncStatus: "synced" as const,
 		})),
-		media: mediaRows.map((a) => ({
+		media: [...uniqueMedia.values()].map((a) => ({
 			id: a.id,
-			entityId: a.entityId,
-			entityType: a.entityType,
 			userId: a.userId,
 			url: a.url ?? null,
 			mimeType: a.mimeType,
-			position: a.position,
 			createdAt: a.createdAt.toISOString(),
 			updatedAt: a.updatedAt.toISOString(),
 			scopeType: a.scopeType,
 			scopeId: a.scopeId,
 			organizationId: a.organizationId ?? null,
 			createdBy: a.createdBy ?? null,
+		})),
+		mediaAttachments: attachmentRows.map((att) => ({
+			id: att.id,
+			mediaId: att.mediaId,
+			entityType: att.entityType,
+			entityId: att.entityId,
+			position: att.position,
+			createdAt: att.createdAt.toISOString(),
 		})),
 		conflicts,
 		syncedAt: now.toISOString(),

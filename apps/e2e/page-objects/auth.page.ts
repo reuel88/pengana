@@ -44,6 +44,7 @@ export class AuthPage extends BaseAuthPage {
 
 	async signUp(name: string, email: string, password: string) {
 		await this.navigateToSignUp();
+		await this.nameInput().waitFor({ state: "visible", timeout: 15_000 });
 		await this.nameInput().fill(name);
 		await this.emailInput().fill(email);
 		await this.passwordInput().fill(password);

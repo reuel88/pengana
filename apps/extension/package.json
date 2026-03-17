@@ -12,6 +12,8 @@
 		"zip": "wxt zip",
 		"zip:firefox": "wxt zip -b firefox",
 		"check-types": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"postinstall": "wxt prepare"
 	},
 	"dependencies": {
@@ -28,7 +30,7 @@
 		"@pengana/ui": "workspace:*",
 		"zod": "catalog:",
 		"@orpc/client": "catalog:",
-		"better-auth": "catalog:",
+		"@pengana/auth": "workspace:*",
 		"dexie": "^4.0.11",
 		"dexie-react-hooks": "^4.2.0",
 		"lucide-react": "^0.577.0",
@@ -45,6 +47,7 @@
 		"tailwindcss": "^4.0.15",
 		"typescript": "^5.9.3",
 		"vite": "catalog:",
+		"vitest": "catalog:",
 		"wxt": "^0.20.19"
 	}
 }

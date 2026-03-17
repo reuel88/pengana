@@ -17,6 +17,16 @@ vi.mock("@pengana/db/media-queries", () => ({
 	insertMedia: vi.fn().mockResolvedValue(undefined),
 	findMediaById: vi.fn().mockResolvedValue(undefined),
 	deleteMedia: vi.fn().mockResolvedValue(undefined),
+	attachMedia: vi.fn().mockResolvedValue({
+		id: "att-1",
+		mediaId: "m-1",
+		entityType: "todo",
+		entityId: "todo-1",
+		position: 0,
+		createdAt: new Date(),
+	}),
+	detachMedia: vi.fn().mockResolvedValue(undefined),
+	findAttachmentsByMedia: vi.fn().mockResolvedValue([]),
 }));
 
 const fsMocks = vi.hoisted(() => ({
@@ -43,11 +53,6 @@ process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
 import { insertMedia } from "@pengana/db/media-queries";
-import {
-	autoSeatOwner,
-	isMemberSeatedByUserId,
-} from "@pengana/db/seat-queries";
-import { findTodoById } from "@pengana/db/todo-queries";
 import { uploadRouter } from "./upload";
 
 function makeContext(overrides: Partial<Context> = {}): Context {
@@ -72,8 +77,6 @@ function makeContext(overrides: Partial<Context> = {}): Context {
 
 function makeInput(overrides: Record<string, unknown> = {}) {
 	return {
-		entityType: "todo" as const,
-		entityId: "todo-1",
 		fileName: "photo.jpg",
 		mimeType: "image/jpeg" as const,
 		data: Buffer.from("test").toString("base64"),
@@ -89,25 +92,9 @@ describe("upload.upload", () => {
 		vi.mocked(fsMocks.access).mockRejectedValue(
 			Object.assign(new Error("missing"), { code: "ENOENT" }),
 		);
-		vi.mocked(findTodoById).mockResolvedValue(undefined);
-		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(false);
-		vi.mocked(autoSeatOwner).mockResolvedValue(false);
 	});
 
-	it("allows uploading attachments for personal todos without an active organization", async () => {
-		vi.mocked(findTodoById).mockResolvedValue({
-			id: "todo-1",
-			title: "Personal",
-			completed: false,
-			deleted: false,
-			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
-			scopeType: "personal",
-			scopeId: "user-1",
-			userId: "user-1",
-			organizationId: null,
-			createdBy: "user-1",
-		});
-
+	it("uploads a file without entity association", async () => {
 		const ctx = makeContext();
 		const result = await call(uploadRouter.upload, makeInput(), {
 			context: ctx,
@@ -115,7 +102,6 @@ describe("upload.upload", () => {
 
 		expect(result.data.url).toContain("/uploads/");
 		expect(fsMocks.writeFile).toHaveBeenCalledOnce();
-		expect(isMemberSeatedByUserId).not.toHaveBeenCalled();
 		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");
 
 		expect(insertMedia).toHaveBeenCalledWith(
@@ -128,57 +114,7 @@ describe("upload.upload", () => {
 		);
 	});
 
-	it("requires a seat when uploading attachments for org todos", async () => {
-		vi.mocked(findTodoById).mockResolvedValue({
-			id: "todo-1",
-			title: "Org",
-			completed: false,
-			deleted: false,
-			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
-			scopeType: "org",
-			scopeId: "org-1",
-			userId: "user-1",
-			organizationId: "org-1",
-			createdBy: "user-1",
-		});
-
-		await expect(
-			call(uploadRouter.upload, makeInput(), {
-				context: makeContext({
-					session: {
-						user: {
-							id: "user-1",
-							email: "user@example.com",
-							name: "Test User",
-						},
-						session: {
-							activeOrganizationId: "org-1",
-						},
-					} as Context["session"],
-				}),
-			}),
-		).rejects.toThrow("seatRequiredForWrite");
-
-		expect(isMemberSeatedByUserId).toHaveBeenCalledWith("org-1", "user-1");
-		expect(fsMocks.mkdir).not.toHaveBeenCalled();
-		expect(fsMocks.writeFile).not.toHaveBeenCalled();
-	});
-
-	it("notifies org members after a successful org todo upload", async () => {
-		vi.mocked(findTodoById).mockResolvedValue({
-			id: "todo-1",
-			title: "Org",
-			completed: false,
-			deleted: false,
-			updatedAt: new Date("2026-03-13T00:00:00.000Z"),
-			scopeType: "org",
-			scopeId: "org-1",
-			userId: "user-1",
-			organizationId: "org-1",
-			createdBy: "user-1",
-		});
-		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
-
+	it("derives org scope when activeOrganizationId is set", async () => {
 		const ctx = makeContext({
 			session: {
 				user: {

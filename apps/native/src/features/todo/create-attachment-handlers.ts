@@ -4,17 +4,17 @@ import { Alert } from "react-native";
 
 import { client } from "@/shared/api/orpc";
 
-import { retryMedia } from "./todo-actions";
+import { getAttachmentForMedia, retryMedia } from "./todo-actions";
 
 export function useAttachmentHandlers(
 	removeMediaFn: (attachmentId: string) => Promise<void>,
 	triggerSync: () => void,
 	enqueueUpload: (
-		entityType: string,
-		entityId: string,
 		localUri: string,
 		mimeType: string,
 		id: string,
+		entityType?: string,
+		entityId?: string,
 	) => void,
 ) {
 	const { t } = useTranslation("todos");
@@ -23,7 +23,7 @@ export function useAttachmentHandlers(
 		async (attachmentId: string) => {
 			try {
 				await removeMediaFn(attachmentId);
-				client.upload.deleteAttachment({ attachmentId }).catch((err) => {
+				client.upload.deleteMedia({ mediaId: attachmentId }).catch((err) => {
 					if (__DEV__)
 						console.warn(
 							"Failed to delete attachment on server:",
@@ -43,13 +43,14 @@ export function useAttachmentHandlers(
 		async (attachmentId: string) => {
 			try {
 				const record = await retryMedia(attachmentId);
-				if (record?.localUri && record.entityType && record.entityId) {
+				if (record?.localUri) {
+					const att = await getAttachmentForMedia(attachmentId);
 					enqueueUpload(
-						record.entityType,
-						record.entityId,
 						record.localUri,
 						record.mimeType,
 						record.id,
+						att?.entityType,
+						att?.entityId,
 					);
 				}
 			} catch {

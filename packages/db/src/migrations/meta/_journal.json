@@ -127,6 +127,13 @@
 			"when": 1773660841333,
 			"tag": "0017_melted_giant_man",
 			"breakpoints": true
+		},
+		{
+			"idx": 18,
+			"version": "7",
+			"when": 1773693309270,
+			"tag": "0018_cooing_forge",
+			"breakpoints": true
 		}
 	]
 }
