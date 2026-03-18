@@ -5,6 +5,7 @@ import {
 	attachMediaToEntity,
 	getMediaCountForEntity,
 	removeMedia,
+	updateMediaLocalUri,
 } from "@pengana/upload-client";
 import { useCallback, useMemo } from "react";
 import { createTodoActions } from "../lib/todo-actions";
@@ -52,6 +53,7 @@ export interface TodoHandlerDeps {
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 	entityType?: string;
 	userId?: string;
@@ -177,17 +179,18 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 						organizationId,
 						createdBy: userId,
 					});
+
 					await attachMediaToEntity(db, mediaId, entityType, todoId);
+
 					await storeFile(mediaId, file);
 					const fileRef = createFileRef(mediaId, file);
 					refs.push(fileRef);
 
-					await db
-						.getTable("media")
-						.update(mediaId, { localUri: fileRef.uri } as never);
+					await updateMediaLocalUri(db, mediaId, fileRef.uri);
 
 					enqueueUpload(fileRef.uri, file.type, mediaId, entityType, todoId);
 				}
+
 				triggerSync();
 			} catch (e) {
 				for (const ref of refs) ref.revoke?.();

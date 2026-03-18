@@ -30,6 +30,7 @@ export function TodoListConnected({
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 	actions?: TodoActions;
 	entityType?: string;

@@ -7,6 +7,7 @@ export interface UploadTransportInput {
 	idempotencyKey: string;
 	entityType?: string;
 	entityId?: string;
+	scopeType?: "personal" | "org";
 }
 
 interface UploadRpc {
@@ -18,6 +19,7 @@ interface UploadRpc {
 		attachmentId: string;
 		entityType?: string;
 		entityId?: string;
+		scopeType?: "personal" | "org";
 	}): Promise<{ data: { url: string; mediaId: string } }>;
 }
 
@@ -53,6 +55,7 @@ export function createUploadTransport(
 				attachmentId: input.idempotencyKey,
 				entityType: input.entityType,
 				entityId: input.entityId,
+				scopeType: input.scopeType,
 			});
 			await options.onUploaded?.(input.fileUri);
 

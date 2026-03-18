@@ -49,6 +49,7 @@ export const uploadItemSchema = z.object({
 	mimeType: z.string(),
 	entityType: z.string().optional(),
 	entityId: z.string().optional(),
+	scopeType: z.enum(["personal", "org"]).optional(),
 	status: uploadStatusSchema,
 	retryCount: z.number(),
 	createdAt: z.string(),

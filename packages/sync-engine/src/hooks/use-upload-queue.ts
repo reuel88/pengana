@@ -86,6 +86,7 @@ export function useUploadQueue(
 			mediaId: string,
 			entityType?: string,
 			entityId?: string,
+			scopeType?: "personal" | "org",
 		) => {
 			uploadQueueRef.current?.enqueue({
 				id: mediaId,
@@ -93,6 +94,7 @@ export function useUploadQueue(
 				mimeType,
 				entityType,
 				entityId,
+				scopeType,
 			});
 		},
 		[],

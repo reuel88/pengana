@@ -14,6 +14,7 @@ interface UploadRpc {
 		attachmentId: string;
 		entityType?: string;
 		entityId?: string;
+		scopeType?: "personal" | "org";
 	}): Promise<{ data: { url: string; mediaId: string } }>;
 }
 

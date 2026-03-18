@@ -15,7 +15,10 @@ import { env } from "@pengana/env/web";
 
 export const link = new RPCLink({
 	url: `${env.VITE_SERVER_URL}/rpc`,
-	headers: () => ({ "Accept-Language": navigator.language }),
+	headers: () => ({
+		"Accept-Language": navigator.language,
+		"X-Client-Id": "extension",
+	}),
 	fetch(url, options) {
 		return fetch(url, {
 			...options,

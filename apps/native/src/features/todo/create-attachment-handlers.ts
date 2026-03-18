@@ -15,6 +15,7 @@ export function useAttachmentHandlers(
 		id: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void,
 ) {
 	const { t } = useTranslation("todos");

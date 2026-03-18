@@ -41,6 +41,7 @@ export interface UploadTransport {
 		idempotencyKey: string;
 		entityType?: string;
 		entityId?: string;
+		scopeType?: "personal" | "org";
 	}): Promise<{ url: string }>;
 	onFailed?(fileUri: string): void | Promise<void>;
 }
@@ -115,6 +116,7 @@ export interface SyncContextValue {
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 }
 

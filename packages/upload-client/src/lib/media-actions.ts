@@ -110,6 +110,18 @@ export async function markMediaFailed(
 	} as never);
 }
 
+export async function retryMedia(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<LocalMedia | null> {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
+		status: "queued",
+	} as never);
+
+	const record = await db.getTable<LocalMedia>("media").get(mediaId);
+	return record ?? null;
+}
+
 export async function getMediaCountForEntity(
 	db: EntityDatabase,
 	entityId: string,

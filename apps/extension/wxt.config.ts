@@ -11,15 +11,17 @@ export default defineConfig({
 			`${process.env.VITE_SERVER_URL ?? "http://localhost:3000"}/*`,
 		],
 	},
-	vite: () => ({
-		plugins: [tailwindcss()],
-		resolve: {
-			alias: {
-				"@pengana/org-client": path.resolve(
-					__dirname,
-					"../../packages/org-client/src/index.ts",
-				),
+	vite: () =>
+		({
+			// WXT currently types Vite against an older plugin surface than the repo's Vite version.
+			plugins: tailwindcss(),
+			resolve: {
+				alias: {
+					"@pengana/org-client": path.resolve(
+						__dirname,
+						"../../packages/org-client/src/index.ts",
+					),
+				},
 			},
-		},
-	}),
+		}) as never,
 });

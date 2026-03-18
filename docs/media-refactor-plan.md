@@ -78,8 +78,9 @@ Goal: create the media equivalent of the todo client primitives.
 
 Proposed package surface:
 
-- `useMedia`
-- `useMediaListWiring`
+- `useMedia` (returns unified view of local+server media)
+- `useMediaListWiring` (composes handlers and config)
+- `useMediaHandlers` (low-level actions, mirroring `useTodoHandlers`)
 - `createMediaActions`
 - media config helpers for personal and org scope if needed
 
@@ -125,6 +126,7 @@ Likely shared additions:
 
 - `packages/upload-client/src/hooks/use-media.ts`
 - `packages/upload-client/src/hooks/use-media-list-wiring.ts`
+- `packages/upload-client/src/hooks/use-media-handlers.ts`
 - `packages/upload-client/src/lib/media-config.ts`
 - `packages/upload-client/src/lib/media-actions.ts` updates if needed
 

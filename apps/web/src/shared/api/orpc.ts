@@ -23,7 +23,10 @@ export const queryClient = new QueryClient({
 
 export const link = new RPCLink({
 	url: `${env.VITE_SERVER_URL}/rpc`,
-	headers: () => ({ "Accept-Language": i18next.language }),
+	headers: () => ({
+		"Accept-Language": i18next.language,
+		"X-Client-Id": "web",
+	}),
 	fetch(url, options) {
 		return fetch(url, {
 			...options,

@@ -8,6 +8,9 @@
 		"./lib/*": {
 			"default": "./src/lib/*.ts"
 		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
+		},
 		"./adapters/*": {
 			"default": "./src/adapters/*.ts"
 		}
@@ -18,11 +21,17 @@
 	"dependencies": {
 		"@pengana/entity-store": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
+		"@pengana/upload-client": "workspace:*",
 		"dexie": "^4.0.11",
+		"dexie-react-hooks": "^4.2.0",
 		"drizzle-orm": "^0.45.1"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0"
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.14",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

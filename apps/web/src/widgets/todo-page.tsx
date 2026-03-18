@@ -80,8 +80,8 @@ export function TodoPage({
 	userId: string;
 	organizationId?: string;
 }) {
-	const [activeTab, setActiveTab] = useState<Tab>("personal");
 	const { t } = useTranslation("todos");
+	const [activeTab, setActiveTab] = useState<Tab>("personal");
 	const showTabs = Boolean(organizationId);
 
 	return (

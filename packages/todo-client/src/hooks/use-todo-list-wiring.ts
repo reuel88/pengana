@@ -17,6 +17,7 @@ interface UseTodoListWiringConfigBase {
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 	entityType?: string;
 	userId?: string;

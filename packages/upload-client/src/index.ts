@@ -9,6 +9,15 @@ export {
 	createUploadTransport,
 	type UploadTransportInput,
 } from "./adapters/upload-transport";
+export { useMedia } from "./hooks/use-media";
+export type {
+	MediaAttachmentTarget,
+	MediaFileStorageStrategy,
+	MediaHandlerDeps,
+} from "./hooks/use-media-handlers";
+export { useMediaHandlers } from "./hooks/use-media-handlers";
+export type { UseMediaListWiringConfig } from "./hooks/use-media-list-wiring";
+export { useMediaListWiring } from "./hooks/use-media-list-wiring";
 export type {
 	AddMediaOptions,
 	LocalMedia,
@@ -24,10 +33,17 @@ export {
 	markMediaFailed,
 	reconcileMedia,
 	removeMedia,
+	retryMedia,
 	updateMediaLocalUri,
 	updateMediaUploaded,
 } from "./lib/media-actions";
+export type { MediaConfig } from "./lib/media-config";
+export { orgMediaConfig, personalMediaConfig } from "./lib/media-config";
 export { mediaAttachmentEntity, mediaEntity } from "./lib/media-entity";
+export type {
+	MediaListItem,
+	ServerMediaRecord,
+} from "./lib/merge-media";
 export {
 	buildReconcilePlan,
 	type ReconcilePlan,

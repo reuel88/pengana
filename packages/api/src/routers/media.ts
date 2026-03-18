@@ -4,6 +4,7 @@ import {
 } from "@pengana/db/media-queries";
 import { z } from "zod";
 
+import { apiError } from "../errors";
 import { envelope, envelopeOutput, protectedProcedure } from "../index";
 
 const mediaOutputSchema = z.object({
@@ -43,6 +44,7 @@ export const mediaRouter = {
 			z.object({
 				limit: z.number().int().min(1).max(100).optional(),
 				offset: z.number().int().min(0).optional(),
+				scopeType: z.enum(["personal", "org"]).optional(),
 			}),
 		)
 		.output(envelopeOutput(z.array(mediaWithAttachmentsSchema)))
@@ -50,8 +52,17 @@ export const mediaRouter = {
 			const userId = context.session.user.id;
 			const activeOrgId = context.session.session.activeOrganizationId;
 
-			const scopeType = activeOrgId ? "org" : "personal";
-			const scopeId = activeOrgId ?? userId;
+			const scopeType = input.scopeType ?? (activeOrgId ? "org" : "personal");
+			const scopeId =
+				scopeType === "org"
+					? (activeOrgId ??
+						(() => {
+							throw apiError(
+								"BAD_REQUEST",
+								"Organization scope requires an active organization.",
+							);
+						})())
+					: userId;
 
 			const mediaRows = await findMediaByScope({
 				scopeType,

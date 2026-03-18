@@ -90,6 +90,7 @@ export function useFilePickerBase(deps: {
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;

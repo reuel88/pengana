@@ -78,6 +78,7 @@ export const uploadRouter = {
 				attachmentId: z.string().uuid(),
 				entityType: z.string().optional(),
 				entityId: z.string().optional(),
+				scopeType: z.enum(["personal", "org"]).optional(),
 			}),
 		)
 		.output(
@@ -138,17 +139,27 @@ export const uploadRouter = {
 				await writeFile(filepath, buffer);
 			}
 
+			const standaloneScopeType =
+				input.scopeType ?? (activeOrgId ? "org" : "personal");
 			const scopeType = entityScope
 				? entityScope.scopeType
-				: activeOrgId
-					? "org"
-					: "personal";
+				: standaloneScopeType;
 			const scopeId = entityScope
 				? entityScope.scopeId
-				: (activeOrgId ?? userId);
+				: scopeType === "org"
+					? (activeOrgId ??
+						(() => {
+							throw apiError(
+								"BAD_REQUEST",
+								"Organization scope requires an active organization.",
+							);
+						})())
+					: userId;
 			const organizationId = entityScope
 				? entityScope.organizationId
-				: (activeOrgId ?? null);
+				: scopeType === "org"
+					? activeOrgId
+					: null;
 
 			await insertMedia({
 				id: input.attachmentId,

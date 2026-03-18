@@ -145,4 +145,33 @@ describe("upload.upload", () => {
 			}),
 		);
 	});
+
+	it("allows standalone personal uploads even when an active organization exists", async () => {
+		const ctx = makeContext({
+			session: {
+				user: {
+					id: "user-1",
+					email: "user@example.com",
+					name: "Test User",
+				},
+				session: {
+					activeOrganizationId: "org-1",
+				},
+			} as Context["session"],
+		});
+
+		await call(uploadRouter.upload, makeInput({ scopeType: "personal" }), {
+			context: ctx,
+		});
+
+		expect(insertMedia).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "personal",
+				scopeId: "user-1",
+				organizationId: null,
+			}),
+		);
+		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");
+		expect(ctx.notifyOrgMembers).not.toHaveBeenCalled();
+	});
 });
