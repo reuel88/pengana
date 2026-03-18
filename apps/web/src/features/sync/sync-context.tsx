@@ -38,24 +38,17 @@ export function SyncProvider({
 	children,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 	children: ReactNode;
 }) {
 	const deps = useMemo(
 		() =>
 			createWebPlatformDeps(
 				(uid) =>
-					createTodoSyncAdapter(
-						appDb,
-						uid,
-						personalTodoConfig,
-						organizationId
-							? {
-									filter: (todo) => todo.organizationId === organizationId,
-									syncKeySuffix: organizationId,
-								}
-							: undefined,
-					),
+					createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+						filter: (todo) => todo.organizationId === organizationId,
+						syncKeySuffix: organizationId,
+					}),
 				personalTransportFactory,
 			),
 		[organizationId],

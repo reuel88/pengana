@@ -101,18 +101,18 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId: string | undefined;
+	organizationId: string;
 }) {
 	const { t } = useTranslation("todos");
 	const [activeTab, setActiveTab] = useState<Tab>("personal");
 
-	const scopes = useMemo<SyncScope[]>(() => {
-		const s: SyncScope[] = [{ scopeType: "personal", scopeId: userId }];
-		if (organizationId) {
-			s.push({ scopeType: "organization", scopeId: organizationId });
-		}
-		return s;
-	}, [userId, organizationId]);
+	const scopes = useMemo<SyncScope[]>(
+		() => [
+			{ scopeType: "personal", scopeId: userId },
+			{ scopeType: "organization", scopeId: organizationId },
+		],
+		[userId, organizationId],
+	);
 
 	useBackgroundPort(scopes);
 
@@ -150,7 +150,7 @@ export function TodoPage({
 				))}
 			</div>
 
-			{activeTab === "personal" && organizationId && (
+			{activeTab === "personal" && (
 				<SyncProvider userId={userId} organizationId={organizationId}>
 					<div
 						id="panel-personal"
@@ -165,7 +165,7 @@ export function TodoPage({
 				</SyncProvider>
 			)}
 
-			{activeTab === "organization" && organizationId && (
+			{activeTab === "organization" && (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
 						id="panel-organization"

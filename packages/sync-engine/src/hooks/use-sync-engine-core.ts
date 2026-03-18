@@ -43,7 +43,7 @@ export interface SyncEnginePlatformDeps<T extends { id: string } = Todo> {
 }
 
 export interface SyncEngineOptions<T extends { id: string } = Todo> {
-	scopeId: string | undefined;
+	scopeId: string;
 	isOnline: boolean;
 	deps: SyncEnginePlatformDeps<T>;
 	isForeground?: boolean;
@@ -71,8 +71,6 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 
 	// --- Engine Init Effect ---
 	useEffect(() => {
-		if (!scopeId) return;
-
 		const adapter = deps.createSyncAdapter(scopeId);
 		const transport = deps.createSyncTransport();
 
@@ -106,7 +104,6 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 	// --- Storage Health ---
 	const uploadAdapterRef = useRef<UploadAdapter | null>(null);
 	useEffect(() => {
-		if (!scopeId) return;
 		uploadAdapterRef.current = deps.createUploadAdapter();
 		return () => {
 			uploadAdapterRef.current = null;

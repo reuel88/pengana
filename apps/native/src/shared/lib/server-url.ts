@@ -7,10 +7,16 @@ import { Platform } from "react-native";
  * Native keeps the original IP (needed to reach dev machine from device).
  */
 export function getServerUrl(): string {
+	const url = new URL(env.EXPO_PUBLIC_SERVER_URL);
+
 	if (Platform.OS === "web") {
-		const url = new URL(env.EXPO_PUBLIC_SERVER_URL);
 		url.hostname = "localhost";
 		return url.origin;
 	}
-	return env.EXPO_PUBLIC_SERVER_URL;
+
+	if (Platform.OS === "android" && url.hostname === "localhost") {
+		url.hostname = "10.0.2.2";
+	}
+
+	return url.origin;
 }

@@ -26,7 +26,7 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const { success, error } = useMigrations(appDb, migrations);
 	const { theme } = useTheme();
@@ -45,7 +45,7 @@ export function TodoPage({
 		);
 	}
 
-	if (!success || !organizationId) {
+	if (!success) {
 		return (
 			<View style={styles.center}>
 				<ActivityIndicator size="large" color={theme.primary} />

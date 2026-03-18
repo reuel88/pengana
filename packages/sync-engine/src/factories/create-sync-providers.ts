@@ -10,7 +10,7 @@ interface SyncProviderProps {
 }
 
 interface OrgSyncProviderProps {
-	organizationId?: string;
+	organizationId: string;
 	userId: string;
 	children: ReactNode;
 }

@@ -13,7 +13,7 @@ export function useBatchInvite({
 	onSuccess,
 	onError,
 }: {
-	organizationId: string | undefined;
+	organizationId: string;
 	onSuccess?: () => void;
 	onError?: (message: string) => void;
 }) {
@@ -24,17 +24,6 @@ export function useBatchInvite({
 	const batchInvite = async (entries: BatchInviteEntry[]) => {
 		if (entries.length === 0) {
 			return { successes: [], failures: [] };
-		}
-
-		if (!organizationId) {
-			onError?.("Missing organization");
-			return {
-				successes: [],
-				failures: entries.map((entry) => ({
-					...entry,
-					reason: "missing-organization",
-				})),
-			};
 		}
 
 		setLoading(true);

@@ -15,17 +15,13 @@ export function SyncProvider({
 	children,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 	children: React.ReactNode;
 }) {
 	const deps = useMemo(
 		() =>
 			createPlatformDeps(
-				(uid) =>
-					createSyncAdapter(
-						uid,
-						organizationId ? { syncKeySuffix: organizationId } : undefined,
-					),
+				(uid) => createSyncAdapter(uid, { syncKeySuffix: organizationId }),
 				() =>
 					createSyncTransport(
 						async (input) =>

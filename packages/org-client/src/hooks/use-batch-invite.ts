@@ -8,7 +8,7 @@ export function useBatchInvite({
 	onSuccess,
 	onError,
 }: {
-	organizationId: string | undefined;
+	organizationId: string;
 	onSuccess?: () => void;
 	onError?: (message: string) => void;
 }) {
@@ -19,7 +19,7 @@ export function useBatchInvite({
 	const batchInvite = async (
 		entries: Array<{ email: string; role: "member" | "admin" }>,
 	) => {
-		if (!organizationId || entries.length === 0) {
+		if (entries.length === 0) {
 			return { successes: [], failures: [] };
 		}
 

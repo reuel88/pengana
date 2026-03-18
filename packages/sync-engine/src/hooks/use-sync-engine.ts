@@ -7,7 +7,7 @@ import { useSyncEngineCore } from "./use-sync-engine-core";
  * with platform-specific `isForeground` detection.
  */
 export function useSyncEngine(
-	scopeId: string | undefined,
+	scopeId: string,
 	deps: SyncEnginePlatformDeps,
 	notifyKey?: string,
 ) {

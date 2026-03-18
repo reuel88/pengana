@@ -32,7 +32,7 @@ interface TodoListProps {
 	};
 	actions: TodoActions;
 	entityType?: string;
-	userId?: string;
+	userId: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
 	organizationId: string;

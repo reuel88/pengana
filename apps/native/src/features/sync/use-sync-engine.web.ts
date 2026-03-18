@@ -23,7 +23,7 @@ function useDocumentVisible() {
 }
 
 export function useSyncEngine(
-	scopeId: string | undefined,
+	scopeId: string,
 	deps: SyncEnginePlatformDeps,
 	notifyKey?: string,
 ) {
