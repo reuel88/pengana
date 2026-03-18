@@ -2,8 +2,8 @@ import { createSyncTransport } from "@pengana/sync-client";
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
 import { createTodoSyncAdapter, orgTodoConfig } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
-import { appDb } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 import { createPlatformDeps } from "./platform-deps";
 import { useSyncEngine } from "./use-sync-engine";
 

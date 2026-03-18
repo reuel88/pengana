@@ -1,6 +1,6 @@
 import { createSyncTransport } from "@pengana/sync-client";
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
-import { createOrgSyncAdapter } from "@/features/todo/entities/todo";
+import { createDrizzleOrgSyncAdapter as createOrgSyncAdapter } from "@/features/todo/entities/todo/adapter";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
 import { reconcileNativeMedia } from "./reconcile-media";

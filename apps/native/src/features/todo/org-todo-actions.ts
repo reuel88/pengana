@@ -1,6 +1,6 @@
 import { randomUUID } from "expo-crypto";
 
-import { appDb, todos } from "@/features/todo/entities/todo";
+import { appDb, todos } from "@/shared/db";
 
 export {
 	deleteTodo as deleteOrgTodo,
@@ -18,7 +18,8 @@ export async function addOrgTodo(
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
-		userId: organizationId,
+		userId,
+		scopeId: organizationId,
 		organizationId,
 		createdBy: userId,
 		scopeType: "org",

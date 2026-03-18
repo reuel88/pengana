@@ -47,7 +47,7 @@ function MediaContent({
 }: {
 	userId: string;
 	scopeId: string;
-	organizationId: string | null;
+	organizationId: string;
 	scopeType: "personal" | "org";
 	syncState: ReturnType<typeof useSync>;
 }) {
@@ -115,14 +115,20 @@ function MediaContent({
 	);
 }
 
-function PersonalMediaContent({ userId }: { userId: string }) {
+function PersonalMediaContent({
+	userId,
+	organizationId,
+}: {
+	userId: string;
+	organizationId: string;
+}) {
 	const syncState = useSync();
 
 	return (
 		<MediaContent
 			userId={userId}
 			scopeId={userId}
-			organizationId={null}
+			organizationId={organizationId}
 			scopeType="personal"
 			syncState={syncState}
 		/>
@@ -154,11 +160,10 @@ export function MediaPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const { t } = useTranslation("media");
 	const [activeTab, setActiveTab] = useState<Tab>("personal");
-	const showTabs = Boolean(organizationId);
 
 	return (
 		<div
@@ -167,41 +172,46 @@ export function MediaPage({
 		>
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 
-			{showTabs && (
-				<div className="flex gap-2 border-b" role="tablist">
-					{(
-						[
-							{ key: "personal", label: "Personal" },
-							{ key: "organization", label: "Organization" },
-						] as const
-					).map(({ key, label }) => (
-						<button
-							key={key}
-							id={`tab-${key}`}
-							type="button"
-							role="tab"
-							aria-selected={activeTab === key}
-							aria-controls={`panel-${key}`}
-							className={`px-3 py-2 font-medium text-sm ${
-								activeTab === key ? "border-current border-b-2" : "opacity-60"
-							}`}
-							onClick={() => setActiveTab(key)}
-						>
-							{label}
-						</button>
-					))}
-				</div>
-			)}
+			<div className="flex gap-2 border-b" role="tablist">
+				{(
+					[
+						{ key: "personal", label: "Personal" },
+						{ key: "organization", label: "Organization" },
+					] as const
+				).map(({ key, label }) => (
+					<button
+						key={key}
+						id={`tab-${key}`}
+						type="button"
+						role="tab"
+						aria-selected={activeTab === key}
+						aria-controls={`panel-${key}`}
+						className={`px-3 py-2 font-medium text-sm ${
+							activeTab === key ? "border-current border-b-2" : "opacity-60"
+						}`}
+						onClick={() => setActiveTab(key)}
+					>
+						{label}
+					</button>
+				))}
+			</div>
 
-			{(!showTabs || activeTab === "personal") && (
+			{activeTab === "personal" && (
 				<SyncProvider userId={userId}>
-					<div id={showTabs ? "panel-personal" : undefined}>
-						<PersonalMediaContent userId={userId} />
+					<div
+						id="panel-personal"
+						role="tabpanel"
+						aria-labelledby="tab-personal"
+					>
+						<PersonalMediaContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
 					</div>
 				</SyncProvider>
 			)}
 
-			{organizationId && activeTab === "organization" && (
+			{activeTab === "organization" && (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
 						id="panel-organization"

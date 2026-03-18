@@ -15,12 +15,12 @@ export const media = pgTable(
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 		scopeType: text("scope_type", { enum: ["personal", "org"] }).notNull(),
 		scopeId: text("scope_id").notNull(),
-		organizationId: text("organization_id").references(() => organization.id, {
-			onDelete: "set null",
-		}),
-		createdBy: text("created_by").references(() => user.id, {
-			onDelete: "set null",
-		}),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		createdBy: text("created_by")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
 	},
 	(table) => [
 		index("media_scope_updatedAt_idx").on(

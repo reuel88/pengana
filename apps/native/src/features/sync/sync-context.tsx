@@ -1,7 +1,7 @@
 import { createSyncTransport } from "@pengana/sync-client";
 import { SyncContext, SyncDevtoolsContext } from "@pengana/sync-engine";
 import { useMemo } from "react";
-import { createSyncAdapter } from "@/features/todo/entities/todo";
+import { createDrizzleSyncAdapter as createSyncAdapter } from "@/features/todo/entities/todo/adapter";
 import { client } from "@/shared/api/orpc";
 import { createPlatformDeps } from "./platform-deps";
 import { reconcileNativeMedia } from "./reconcile-media";

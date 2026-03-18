@@ -6,8 +6,8 @@ export const todos = sqliteTable("todos", {
 	title: text("title").notNull(),
 	completed: integer("completed", { mode: "boolean" }).notNull().default(false),
 	scopeType: text("scope_type").notNull().default("personal"),
-	organizationId: text("organization_id"),
-	createdBy: text("created_by"),
+	organizationId: text("organization_id").notNull(),
+	createdBy: text("created_by").notNull(),
 });
 
 export const media = sqliteTable("media", {
@@ -23,8 +23,8 @@ export const media = sqliteTable("media", {
 	updatedAt: text("updated_at").notNull(),
 	scopeType: text("scope_type").notNull().default("personal"),
 	scopeId: text("scope_id").notNull().default(""),
-	organizationId: text("organization_id"),
-	createdBy: text("created_by"),
+	organizationId: text("organization_id").notNull(),
+	createdBy: text("created_by").notNull(),
 });
 
 export const mediaAttachments = sqliteTable("media_attachments", {

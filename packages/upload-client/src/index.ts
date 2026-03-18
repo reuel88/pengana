@@ -9,7 +9,11 @@ export {
 	createUploadTransport,
 	type UploadTransportInput,
 } from "./adapters/upload-transport";
+export type { FileSelectionDeps } from "./hooks/use-file-selection";
+export { useFileSelection } from "./hooks/use-file-selection";
 export { useMedia } from "./hooks/use-media";
+export type { MediaDeletionDeps } from "./hooks/use-media-deletion";
+export { useMediaDeletion } from "./hooks/use-media-deletion";
 export type {
 	MediaAttachmentTarget,
 	MediaFileStorageStrategy,
@@ -18,6 +22,8 @@ export type {
 export { useMediaHandlers } from "./hooks/use-media-handlers";
 export type { UseMediaListWiringConfig } from "./hooks/use-media-list-wiring";
 export { useMediaListWiring } from "./hooks/use-media-list-wiring";
+export type { MediaRetryDeps } from "./hooks/use-media-retry";
+export { useMediaRetry } from "./hooks/use-media-retry";
 export type {
 	AddMediaOptions,
 	LocalMedia,
@@ -29,8 +35,12 @@ export {
 	addMedia,
 	attachMediaToEntity,
 	detachMediaFromEntity,
+	getAttachmentForMedia,
 	getMediaCountForEntity,
 	markMediaFailed,
+	type ProcessMediaFileParams,
+	type ProcessMediaFileResult,
+	processMediaFile,
 	reconcileMedia,
 	removeMedia,
 	retryMedia,

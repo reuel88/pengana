@@ -12,8 +12,8 @@ export interface MediaRow {
 	updatedAt: Date;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }
 
 export interface MediaAttachmentRow {
@@ -61,8 +61,8 @@ export async function insertMedia(values: {
 	updatedAt?: Date;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId?: string | null;
-	createdBy?: string | null;
+	organizationId: string;
+	createdBy: string;
 }): Promise<void> {
 	await db
 		.insert(media)

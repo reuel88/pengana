@@ -1,8 +1,8 @@
 import type { UploadLifecycleCallbacks } from "@pengana/sync-engine";
 import { eq } from "drizzle-orm";
 
-import { appDb } from "@/features/todo/entities/todo/db";
-import { media } from "@/features/todo/entities/todo/schema";
+import { appDb } from "@/shared/db/db";
+import { media } from "@/shared/db/schema";
 
 export function createNativeUploadLifecycleCallbacks(): UploadLifecycleCallbacks {
 	return {

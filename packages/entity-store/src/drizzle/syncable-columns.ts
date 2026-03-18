@@ -14,6 +14,7 @@ export const syncableColumns = {
 	id: text("id").primaryKey(),
 	updatedAt: text("updated_at").notNull(),
 	userId: text("user_id").notNull(),
+	scopeId: text("scope_id").notNull().default(""),
 	syncStatus: text("sync_status", {
 		enum: ["synced", "pending", "conflict"],
 	})

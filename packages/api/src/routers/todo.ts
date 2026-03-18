@@ -19,9 +19,8 @@ export const todoRouter = {
 					"personal",
 					userId,
 					userId,
+					orgId!,
 					context.notifyUser,
-					false,
-					orgId ?? undefined,
 				),
 			);
 		}),

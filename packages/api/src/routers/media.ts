@@ -16,8 +16,8 @@ const mediaOutputSchema = z.object({
 	updatedAt: z.coerce.string(),
 	scopeType: z.enum(["personal", "org"]),
 	scopeId: z.string(),
-	organizationId: z.string().nullable(),
-	createdBy: z.string().nullable(),
+	organizationId: z.string(),
+	createdBy: z.string(),
 });
 
 const mediaAttachmentOutputSchema = z.object({

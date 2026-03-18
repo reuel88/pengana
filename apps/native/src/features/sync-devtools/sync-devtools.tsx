@@ -9,8 +9,8 @@ import {
 	View,
 } from "react-native";
 import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
-import { appDb, todos } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
+import { appDb, todos } from "@/shared/db";
 import { useTheme } from "@/shared/lib/theme";
 import {
 	inputThemed,

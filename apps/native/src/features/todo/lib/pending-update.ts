@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { appDb, todos } from "@/features/todo/entities/todo";
+import { appDb, todos } from "@/shared/db";
 
 type PendingTodoUpdate = Partial<{
 	title: string;

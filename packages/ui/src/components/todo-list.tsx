@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { MediaAttachmentTarget } from "@pengana/upload-client";
 import { TodoItem, type TodoItemData } from "./todo-item";
 
 interface TodoListProps {
@@ -6,7 +7,7 @@ interface TodoListProps {
 	onToggle: (id: string) => void;
 	onDelete: (id: string) => void;
 	onResolve: (id: string, resolution: "local" | "server") => void;
-	onFilesSelected: (id: string, files: File[]) => void;
+	onFilesSelected: (files: File[], target: MediaAttachmentTarget) => void;
 	onRemoveAttachment?: (id: string, attachmentId: string) => void;
 	onRetryAttachment?: (id: string, attachmentId: string) => void;
 	onValidationError?: (id: string, message: string) => void;
@@ -47,7 +48,9 @@ export function TodoList({
 					onToggle={() => onToggle(todo.id)}
 					onDelete={() => onDelete(todo.id)}
 					onResolve={(resolution) => onResolve(todo.id, resolution)}
-					onFilesSelected={(files) => onFilesSelected(todo.id, files)}
+					onFilesSelected={(files) =>
+						onFilesSelected(files, { entityId: todo.id, entityType: "todo" })
+					}
 					onRemoveAttachment={(attachmentId) =>
 						onRemoveAttachment?.(todo.id, attachmentId)
 					}

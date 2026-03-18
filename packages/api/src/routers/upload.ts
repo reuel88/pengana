@@ -30,7 +30,7 @@ const UPLOADS_DIR = join(process.cwd(), "uploads");
 type EntityScope = {
 	scopeType: "org" | "personal";
 	scopeId: string;
-	organizationId: string | null;
+	organizationId: string;
 };
 
 async function validateEntityAccess(
@@ -59,7 +59,11 @@ async function validateEntityAccess(
 			organizationId: todoRow.organizationId,
 		};
 	}
-	return { scopeType: "personal", scopeId: userId, organizationId: null };
+	return {
+		scopeType: "personal",
+		scopeId: userId,
+		organizationId: activeOrgId ?? userId,
+	};
 }
 
 export const uploadRouter = {
@@ -157,9 +161,7 @@ export const uploadRouter = {
 					: userId;
 			const organizationId = entityScope
 				? entityScope.organizationId
-				: scopeType === "org"
-					? activeOrgId
-					: null;
+				: (activeOrgId ?? userId);
 
 			await insertMedia({
 				id: input.attachmentId,
@@ -180,7 +182,7 @@ export const uploadRouter = {
 				}
 			}
 
-			if (scopeType === "org" && organizationId) {
+			if (scopeType === "org") {
 				context.notifyOrgMembers(organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -245,7 +247,7 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+			if (entityScope.scopeType === "org") {
 				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -295,7 +297,7 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+			if (entityScope.scopeType === "org") {
 				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -363,7 +365,7 @@ export const uploadRouter = {
 				}
 			}
 
-			if (mediaRecord.scopeType === "org" && mediaRecord.organizationId) {
+			if (mediaRecord.scopeType === "org") {
 				context.notifyOrgMembers(mediaRecord.organizationId);
 			} else {
 				context.notifyUser(userId);

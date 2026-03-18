@@ -14,8 +14,8 @@ export interface TodoRow {
 	scopeType: ScopeType;
 	scopeId: string;
 	userId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }
 
 export async function findTodoById(id: string): Promise<TodoRow | undefined> {
@@ -40,8 +40,8 @@ export async function insertTodo(values: {
 	scopeType: ScopeType;
 	scopeId: string;
 	userId: string;
-	organizationId?: string | null;
-	createdBy?: string | null;
+	organizationId: string;
+	createdBy: string;
 }): Promise<void> {
 	await db.insert(todo).values(values);
 }
@@ -85,18 +85,15 @@ export async function getTodosUpdatedSince(
 	scopeType: ScopeType,
 	scopeId: string,
 	since: Date,
-	organizationId?: string,
 ): Promise<TodoRow[]> {
-	const conditions = [
-		eq(todo.scopeType, scopeType),
-		eq(todo.scopeId, scopeId),
-		gte(todo.updatedAt, since),
-	];
-	if (organizationId) {
-		conditions.push(eq(todo.organizationId, organizationId));
-	}
 	return db
 		.select()
 		.from(todo)
-		.where(and(...conditions));
+		.where(
+			and(
+				eq(todo.scopeType, scopeType),
+				eq(todo.scopeId, scopeId),
+				gte(todo.updatedAt, since),
+			),
+		);
 }

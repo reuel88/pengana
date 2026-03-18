@@ -6,8 +6,8 @@ import {
 } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
 import { useMemo } from "react";
-import { appDb } from "@/features/todo/entities/todo";
 import { client } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 import { createPlatformDeps } from "./platform-deps";
 import { useSyncEngine } from "./use-sync-engine";
 

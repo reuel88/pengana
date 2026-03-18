@@ -23,7 +23,7 @@ export interface UseMediaListWiringConfig {
 
 	userId: string;
 	scopeId: string;
-	organizationId: string | null;
+	organizationId: string;
 	config: MediaConfig;
 	fileStorage: MediaFileStorageStrategy;
 	deleteMedia?: (mediaId: string) => Promise<unknown>;

@@ -9,14 +9,14 @@ export function createTodoActions(db: EntityDatabase, config: TodoConfig) {
 	return {
 		async addTodo(
 			scopeId: string,
-			actorId: string,
-			organizationId: string | null,
+			userId: string,
+			organizationId: string,
 			title: string,
 		): Promise<void> {
 			const actions = createDexieActions<WebTodo>(db, tableName);
 			await actions.add({
 				id: crypto.randomUUID(),
-				...config.buildNewTodo({ scopeId, actorId, organizationId, title }),
+				...config.buildNewTodo({ scopeId, userId, organizationId, title }),
 			});
 		},
 

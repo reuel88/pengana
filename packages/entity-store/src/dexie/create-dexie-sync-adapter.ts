@@ -43,7 +43,7 @@ export function createDexieSyncAdapter<TLocal>(
 	return {
 		async getPendingChanges(): Promise<Todo[]> {
 			let rows = await table
-				.where({ userId: scopeId, syncStatus: "pending" })
+				.where({ scopeId, syncStatus: "pending" })
 				.toArray();
 			if (config.filter) rows = rows.filter(config.filter);
 			return rows.map(config.toWire);

@@ -1,8 +1,7 @@
 import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/entity-store/drizzle/create-drizzle-sync-adapter";
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 
-import { appDb } from "./db";
-import { syncMeta, todos } from "./schema";
+import { appDb, syncMeta, todos } from "@/shared/db";
 
 function rowToTodo(row: typeof todos.$inferSelect): Todo {
 	return {
@@ -11,42 +10,41 @@ function rowToTodo(row: typeof todos.$inferSelect): Todo {
 		completed: row.completed,
 		updatedAt: row.updatedAt,
 		userId: row.userId,
-		organizationId: row.organizationId ?? row.userId,
-		createdBy: row.createdBy ?? null,
+		organizationId: row.organizationId,
+		createdBy: row.createdBy,
 		syncStatus: row.syncStatus,
 		deleted: row.deleted,
 	};
 }
 
-function todoToRow(todo: Todo, syncStatus: string) {
-	const orgTodo = todo as Todo & {
-		organizationId?: string | null;
-		createdBy?: string | null;
-	};
-
+function personalToRow(todo: Todo, syncStatus: string) {
 	return {
 		id: todo.id,
 		title: todo.title,
 		completed: todo.completed,
 		updatedAt: todo.updatedAt,
 		userId: todo.userId,
-		organizationId: orgTodo.organizationId ?? todo.userId,
-		createdBy: orgTodo.createdBy ?? null,
+		scopeId: todo.userId,
+		organizationId: todo.organizationId,
+		createdBy: todo.createdBy,
 		syncStatus: syncStatus as "synced" | "pending" | "conflict",
 		deleted: todo.deleted,
-	};
-}
-
-function personalToRow(todo: Todo, syncStatus: string) {
-	return {
-		...todoToRow(todo, syncStatus),
 		scopeType: "personal" as const,
 	};
 }
 
 function orgToRow(todo: Todo, syncStatus: string) {
 	return {
-		...todoToRow(todo, syncStatus),
+		id: todo.id,
+		title: todo.title,
+		completed: todo.completed,
+		updatedAt: todo.updatedAt,
+		userId: todo.userId,
+		scopeId: todo.organizationId,
+		organizationId: todo.organizationId,
+		createdBy: todo.createdBy,
+		syncStatus: syncStatus as "synced" | "pending" | "conflict",
+		deleted: todo.deleted,
 		scopeType: "org" as const,
 	};
 }
@@ -57,7 +55,7 @@ const drizzleAdapterConfig = {
 	syncMetaTable: syncMeta,
 	columns: {
 		id: todos.id,
-		userId: todos.userId,
+		scopeId: todos.scopeId,
 		syncStatus: todos.syncStatus,
 		updatedAt: todos.updatedAt,
 	},

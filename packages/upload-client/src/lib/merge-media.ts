@@ -9,8 +9,8 @@ export interface ServerMediaRecord {
 	updatedAt: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 	attachments: LocalMediaAttachment[];
 }
 
@@ -25,8 +25,8 @@ export interface MediaListItem {
 	updatedAt: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 	attachments: LocalMediaAttachment[];
 	isLocalOnly: boolean;
 }
@@ -77,8 +77,8 @@ export function mergeMediaRecords(params: {
 					localRecord?.scopeType ?? serverRecord?.scopeType ?? "personal",
 				scopeId: localRecord?.scopeId ?? serverRecord?.scopeId ?? "",
 				organizationId:
-					localRecord?.organizationId ?? serverRecord?.organizationId ?? null,
-				createdBy: localRecord?.createdBy ?? serverRecord?.createdBy ?? null,
+					localRecord?.organizationId ?? serverRecord?.organizationId ?? "",
+				createdBy: localRecord?.createdBy ?? serverRecord?.createdBy ?? "",
 				attachments,
 				isLocalOnly: !serverRecord,
 			} satisfies MediaListItem;

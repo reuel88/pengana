@@ -10,15 +10,15 @@ import {
 	updateMediaUploaded as _updateMediaUploaded,
 } from "@pengana/upload-client";
 
-import { appDb } from "@/features/todo/entities/todo";
+import { appDb } from "@/shared/db";
 
 const actions = createTodoActions(appDb, personalTodoConfig);
 
 export const addTodo = (
 	userId: string,
 	title: string,
-	organizationId?: string,
-) => actions.addTodo(userId, userId, organizationId ?? null, title);
+	organizationId: string,
+) => actions.addTodo(userId, userId, organizationId, title);
 export const toggleTodo = (id: string) => actions.toggleTodo(id);
 export const deleteTodo = (id: string) => actions.deleteTodo(id);
 export const resolveConflict = (id: string, resolution: "local" | "server") =>
@@ -29,8 +29,8 @@ export const addMedia = (options: {
 	mimeType: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }) => _addMedia(appDb, options);
 export const attachMedia = (
 	mediaId: string,

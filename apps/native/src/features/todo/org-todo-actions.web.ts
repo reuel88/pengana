@@ -1,5 +1,5 @@
 import { createTodoActions, orgTodoConfig } from "@pengana/todo-client";
-import { appDb } from "@/features/todo/entities/todo";
+import { appDb } from "@/shared/db";
 
 const actions = createTodoActions(appDb, orgTodoConfig);
 

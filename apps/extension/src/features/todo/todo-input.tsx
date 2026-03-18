@@ -1,3 +1,4 @@
+import { useTranslation } from "@pengana/i18n";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 
 export function TodoInput({
@@ -7,6 +8,8 @@ export function TodoInput({
 	onAdd: (title: string) => Promise<void>;
 	triggerSync: () => void;
 }) {
+	const { t } = useTranslation();
+
 	return (
 		<TodoInputBase
 			onSubmit={async (title) => {
@@ -17,6 +20,7 @@ export function TodoInput({
 					console.error("[TodoInput] failed to add todo:", err);
 				}
 			}}
+			onError={() => console.error(t("errors:failedToAddTodo"))}
 		/>
 	);
 }

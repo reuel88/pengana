@@ -2,18 +2,13 @@ import { drizzleMedia } from "@pengana/upload-client";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
-import {
-	appDb,
-	media,
-	mediaAttachments,
-	todos,
-} from "@/features/todo/entities/todo";
+import { appDb, media, mediaAttachments, todos } from "@/shared/db";
 import { pendingUpdate } from "./lib/pending-update";
 
 export async function addTodo(
 	userId: string,
 	title: string,
-	organizationId?: string,
+	organizationId: string,
 ): Promise<void> {
 	await appDb.insert(todos).values({
 		id: randomUUID(),
@@ -21,7 +16,9 @@ export async function addTodo(
 		completed: false,
 		updatedAt: new Date().toISOString(),
 		userId,
-		organizationId: organizationId ?? null,
+		scopeId: userId,
+		organizationId,
+		createdBy: userId,
 		scopeType: "personal",
 		syncStatus: "pending",
 		deleted: false,
@@ -66,8 +63,8 @@ export const addMedia = (options: {
 	mimeType: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }): Promise<string> => drizzleMedia.addMedia(appDb, media, randomUUID, options);
 
 export const attachMedia = (

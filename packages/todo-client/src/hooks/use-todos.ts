@@ -4,7 +4,6 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo, useRef } from "react";
 
 import type { WebTodo } from "../lib/db";
-import type { TodoConfig } from "../lib/todo-config";
 
 export interface WebTodoWithAttachments extends WebTodo {
 	attachments: LocalMedia[];
@@ -12,17 +11,18 @@ export interface WebTodoWithAttachments extends WebTodo {
 
 export function useTodos(
 	db: EntityDatabase,
-	config: TodoConfig,
 	scopeId: string,
 	filter?: (item: WebTodo) => boolean,
 ) {
+	// Get todos
 	const { items, conflicts } = useDexieEntity<WebTodo>(
 		db,
-		config.entity.name,
+		"todos",
 		scopeId,
 		filter,
 	);
 
+	// All 2do ids
 	const todoIdsRef = useRef<string[]>([]);
 	const todoIds = useMemo(() => {
 		const next = items.map((t) => t.id);
@@ -34,6 +34,7 @@ export function useTodos(
 		return next;
 	}, [items]);
 
+	// Get attachments for the todos
 	const attachmentRecords = useLiveQuery(
 		(): Promise<LocalMediaAttachment[]> => {
 			if (todoIds.length === 0) return Promise.resolve([]);
@@ -47,11 +48,12 @@ export function useTodos(
 		[] as LocalMediaAttachment[],
 	);
 
+	// All media ids for the attachments
 	const mediaIds = useMemo(() => {
-		const ids = [...new Set(attachmentRecords.map((a) => a.mediaId))];
-		return ids;
+		return [...new Set(attachmentRecords.map((a) => a.mediaId))];
 	}, [attachmentRecords]);
 
+	// Get media records for the attachments
 	const mediaRecords = useLiveQuery(
 		(): Promise<LocalMedia[]> => {
 			if (mediaIds.length === 0) return Promise.resolve([]);
@@ -65,7 +67,7 @@ export function useTodos(
 		[] as LocalMedia[],
 	);
 
-	const todos: WebTodoWithAttachments[] = useMemo(() => {
+	const todosWithAttachments: WebTodoWithAttachments[] = useMemo(() => {
 		const mediaById = new Map<string, LocalMedia>();
 		for (const m of mediaRecords) {
 			mediaById.set(m.id, m);
@@ -75,7 +77,11 @@ export function useTodos(
 		const sorted = [...attachmentRecords].sort(
 			(a, b) => a.position - b.position,
 		);
-		for (const att of sorted) {
+		const seen = new Set<string>();
+		for (const att of sorted ?? []) {
+			const dedupeKey = `${att.entityId}:${att.mediaId}`;
+			if (seen.has(dedupeKey)) continue;
+			seen.add(dedupeKey);
 			const m = mediaById.get(att.mediaId);
 			if (!m) continue;
 			const list = byTodo.get(att.entityId) ?? [];
@@ -88,5 +94,5 @@ export function useTodos(
 		}));
 	}, [items, attachmentRecords, mediaRecords]);
 
-	return { todos, conflictTodos: conflicts };
+	return { todos: todosWithAttachments, conflictTodos: conflicts };
 }

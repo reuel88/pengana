@@ -5,24 +5,44 @@ import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
 import { useOrgSync } from "@/features/sync/org-sync-context";
 import { useSync } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
-import { OrgTodoInput } from "@/features/todo/org-todo-input";
-import { OrgTodoList } from "@/features/todo/org-todo-list";
+import {
+	addOrgTodo,
+	deleteOrgTodo,
+	resolveOrgConflict,
+	toggleOrgTodo,
+} from "@/features/todo/org-todo-actions";
+import {
+	addTodo,
+	deleteTodo,
+	resolveConflict,
+	toggleTodo,
+} from "@/features/todo/todo-actions";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
+import type { TodoListActions } from "@/features/todo/todo-list-base";
 import { useOrgTodos, useTodos } from "@/features/todo/use-todos";
 import { useTheme } from "@/shared/lib/theme";
 import { themedText } from "@/shared/styles/shared";
+
+const personalActions: TodoListActions = {
+	toggleTodo,
+	deleteTodo,
+	resolveConflict,
+};
+const orgActions: TodoListActions = {
+	toggleTodo: toggleOrgTodo,
+	deleteTodo: deleteOrgTodo,
+	resolveConflict: resolveOrgConflict,
+};
 
 export type TodoTab = "personal" | "organization";
 
 export function TodoShell({
 	activeTab,
 	onTabChange,
-	showTabs,
 }: {
 	activeTab: TodoTab;
 	onTabChange: (tab: TodoTab) => void;
-	showTabs: boolean;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("todos");
@@ -35,37 +55,36 @@ export function TodoShell({
 			>
 				{t("title")}
 			</Text>
-			{showTabs ? (
-				<View
-					accessibilityRole="tablist"
-					style={[styles.tabList, { borderBottomColor: theme.border }]}
-				>
-					{(
-						[
-							{ key: "personal", label: t("tabs.personal") },
-							{ key: "organization", label: t("tabs.organization") },
-						] as const
-					).map(({ key, label }) => (
-						<TouchableOpacity
-							key={key}
-							accessibilityRole="tab"
-							accessibilityState={{ selected: activeTab === key }}
-							onPress={() => onTabChange(key)}
-							testID={`todo-tab-${key}`}
-							style={[
-								styles.tabButton,
-								{
-									borderBottomColor:
-										activeTab === key ? theme.text : "transparent",
-									opacity: activeTab === key ? 1 : 0.6,
-								},
-							]}
-						>
-							<Text style={[styles.tabText, themedText(theme)]}>{label}</Text>
-						</TouchableOpacity>
-					))}
-				</View>
-			) : null}
+
+			<View
+				accessibilityRole="tablist"
+				style={[styles.tabList, { borderBottomColor: theme.border }]}
+			>
+				{(
+					[
+						{ key: "personal", label: t("tabs.personal") },
+						{ key: "organization", label: t("tabs.organization") },
+					] as const
+				).map(({ key, label }) => (
+					<TouchableOpacity
+						key={key}
+						accessibilityRole="tab"
+						accessibilityState={{ selected: activeTab === key }}
+						onPress={() => onTabChange(key)}
+						testID={`todo-tab-${key}`}
+						style={[
+							styles.tabButton,
+							{
+								borderBottomColor:
+									activeTab === key ? theme.text : "transparent",
+								opacity: activeTab === key ? 1 : 0.6,
+							},
+						]}
+					>
+						<Text style={[styles.tabText, themedText(theme)]}>{label}</Text>
+					</TouchableOpacity>
+				))}
+			</View>
 		</View>
 	);
 }
@@ -75,16 +94,27 @@ export function PersonalTodoContent({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const { todos } = useTodos(userId, organizationId);
-	const { isOnline, isSyncing } = useSync();
+	const sync = useSync();
 
 	return (
 		<View style={styles.panel}>
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<TodoInput userId={userId} organizationId={organizationId} />
-			<TodoList todos={todos} userId={userId} />
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) => addTodo(userId, title, organizationId)}
+				triggerSync={sync.triggerSync}
+			/>
+			<TodoList
+				todos={todos}
+				syncHook={sync}
+				actions={personalActions}
+				userId={userId}
+				scopeType="personal"
+				scopeId={userId}
+				organizationId={organizationId}
+			/>
 			<SyncDevtools />
 		</View>
 	);
@@ -98,15 +128,22 @@ export function OrganizationTodoContent({
 	userId: string;
 }) {
 	const { todos } = useOrgTodos(organizationId);
-	const { isOnline, isSyncing } = useOrgSync();
+	const sync = useOrgSync();
 
 	return (
 		<View style={styles.panel}>
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) => addOrgTodo(organizationId, userId, title)}
+				triggerSync={sync.triggerSync}
+			/>
+			<TodoList
 				todos={todos}
+				syncHook={sync}
+				actions={orgActions}
 				userId={userId}
+				scopeType="org"
+				scopeId={organizationId}
 				organizationId={organizationId}
 			/>
 			<SyncDevtools />

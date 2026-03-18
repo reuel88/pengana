@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import {
+	createTodoActions,
 	orgTodoConfig,
 	personalTodoConfig,
 	useTodos,
@@ -13,11 +14,12 @@ import {
 	useSync,
 } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
-import { OrgTodoInput } from "@/features/todo/org-todo-input";
-import { OrgTodoList } from "@/features/todo/org-todo-list";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import { appDb } from "@/shared/db";
+
+const personalActions = createTodoActions(appDb, personalTodoConfig);
+const orgActions = createTodoActions(appDb, orgTodoConfig);
 
 type Tab = "personal" | "organization";
 
@@ -26,24 +28,34 @@ function PersonalTodoContent({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
-	const orgFilter = useMemo(
-		() =>
-			organizationId
-				? (t: { organizationId: string | null }) =>
-						t.organizationId === organizationId
-				: undefined,
-		[organizationId],
-	);
-	const { todos } = useTodos(appDb, personalTodoConfig, userId, orgFilter);
-	const { isOnline, isSyncing } = useSync();
+	const orgFilter = useMemo(() => {
+		return (t: { organizationId: string }) =>
+			t.organizationId === organizationId;
+	}, [organizationId]);
+	const { todos } = useTodos(appDb, userId, orgFilter);
+	const sync = useSync();
 
 	return (
 		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<TodoInput userId={userId} organizationId={organizationId} />
-			<TodoList todos={todos} userId={userId} organizationId={organizationId} />
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) =>
+					personalActions.addTodo(userId, userId, organizationId, title)
+				}
+				triggerSync={sync.triggerSync}
+			/>
+			<TodoList
+				todos={todos}
+				syncHook={sync}
+				entityType="todo"
+				userId={userId}
+				scopeType="personal"
+				scopeId={userId}
+				organizationId={organizationId}
+				actions={personalActions}
+			/>
 			<SyncDevtools />
 		</div>
 	);
@@ -56,18 +68,30 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
-	const { todos } = useTodos(appDb, orgTodoConfig, organizationId);
-	const { isOnline, isSyncing } = useOrgSync();
+	const { todos } = useTodos(appDb, organizationId);
+	const sync = useOrgSync();
 
 	return (
 		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
-			<OrgTodoInput organizationId={organizationId} userId={userId} />
-			<OrgTodoList
-				todos={todos}
-				userId={userId}
-				organizationId={organizationId}
+			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
+			<TodoInput
+				onAdd={(title) =>
+					orgActions.addTodo(organizationId, userId, organizationId, title)
+				}
+				triggerSync={sync.triggerSync}
 			/>
+
+			<TodoList
+				todos={todos}
+				syncHook={sync}
+				entityType="todo"
+				userId={userId}
+				scopeType="org"
+				scopeId={userId}
+				organizationId={organizationId}
+				actions={orgActions}
+			/>
+
 			<SyncDevtools />
 		</div>
 	);
@@ -78,11 +102,10 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const { t } = useTranslation("todos");
 	const [activeTab, setActiveTab] = useState<Tab>("personal");
-	const showTabs = Boolean(organizationId);
 
 	return (
 		<div
@@ -91,57 +114,46 @@ export function TodoPage({
 		>
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 
-			{showTabs && (
-				<div className="flex gap-2 border-b" role="tablist">
-					{(
-						[
-							{ key: "personal", label: t("tabs.personal") },
-							{ key: "organization", label: t("tabs.organization") },
-						] as const
-					).map(({ key, label }) => (
-						<button
-							key={key}
-							id={`tab-${key}`}
-							type="button"
-							role="tab"
-							aria-selected={activeTab === key}
-							aria-controls={`panel-${key}`}
-							className={`px-3 py-2 font-medium text-sm ${
-								activeTab === key ? "border-current border-b-2" : "opacity-60"
-							}`}
-							onClick={() => setActiveTab(key)}
-						>
-							{label}
-						</button>
-					))}
-				</div>
-			)}
+			<div className="flex gap-2 border-b" role="tablist">
+				{(
+					[
+						{ key: "personal", label: t("tabs.personal") },
+						{ key: "organization", label: t("tabs.organization") },
+					] as const
+				).map(({ key, label }) => (
+					<button
+						key={key}
+						id={`tab-${key}`}
+						type="button"
+						role="tab"
+						aria-selected={activeTab === key}
+						aria-controls={`panel-${key}`}
+						className={`px-3 py-2 font-medium text-sm ${
+							activeTab === key ? "border-current border-b-2" : "opacity-60"
+						}`}
+						onClick={() => setActiveTab(key)}
+					>
+						{label}
+					</button>
+				))}
+			</div>
 
-			{(!showTabs || activeTab === "personal") && (
+			{activeTab === "personal" && (
 				<SyncProvider userId={userId} organizationId={organizationId}>
-					{showTabs ? (
-						<div
-							id="panel-personal"
-							role="tabpanel"
-							aria-labelledby="tab-personal"
-						>
-							<PersonalTodoContent
-								userId={userId}
-								organizationId={organizationId}
-							/>
-						</div>
-					) : (
-						<div>
-							<PersonalTodoContent
-								userId={userId}
-								organizationId={organizationId}
-							/>
-						</div>
-					)}
+					<div
+						id="panel-personal"
+						role="tabpanel"
+						aria-labelledby="tab-personal"
+					>
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
+					</div>
 				</SyncProvider>
 			)}
 
-			{organizationId && activeTab === "organization" && (
+			{activeTab === "organization" && (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
 						id="panel-organization"

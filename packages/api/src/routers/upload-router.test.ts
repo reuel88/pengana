@@ -108,7 +108,7 @@ describe("upload.upload", () => {
 			expect.objectContaining({
 				scopeType: "personal",
 				scopeId: "user-1",
-				organizationId: null,
+				organizationId: "user-1",
 				createdBy: "user-1",
 			}),
 		);
@@ -168,7 +168,7 @@ describe("upload.upload", () => {
 			expect.objectContaining({
 				scopeType: "personal",
 				scopeId: "user-1",
-				organizationId: null,
+				organizationId: "org-1",
 			}),
 		);
 		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");

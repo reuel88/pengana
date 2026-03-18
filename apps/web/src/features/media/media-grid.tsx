@@ -1,9 +1,4 @@
-import {
-	ItemPreview,
-	MediaGridItem,
-} from "@pengana/ui/components/media-grid-item";
 import { MediaGridList } from "@pengana/ui/components/media-grid-list";
-import { SyncDot } from "@pengana/ui/components/sync-dot";
 import type { MediaListItem } from "@pengana/upload-client";
 import { useCallback, useState } from "react";
 
@@ -11,20 +6,6 @@ interface MediaGridProps {
 	media: MediaListItem[];
 	t: (key: string) => string;
 	onDelete: (mediaId: string) => Promise<void>;
-}
-
-function sourceBadge(
-	attachments: MediaListItem["attachments"],
-	t: (key: string) => string,
-) {
-	if (attachments.length === 0) return t("source.standalone");
-	return attachments
-		.map((attachment) => {
-			const key = `source.${attachment.entityType}`;
-			const translated = t(key);
-			return translated === key ? attachment.entityType : translated;
-		})
-		.join(", ");
 }
 
 export function MediaGrid({ media, t, onDelete }: MediaGridProps) {

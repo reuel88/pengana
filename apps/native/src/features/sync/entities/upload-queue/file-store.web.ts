@@ -4,7 +4,7 @@ import {
 	storeFileInIndexedDB as storeFile,
 } from "@pengana/upload-client/adapters/dexie-file-store";
 
-import { appDb } from "@/features/todo/entities/todo/db.web";
+import { appDb } from "@/shared/db/db.web";
 
 export function storeFileInIndexedDB(attachmentId: string, file: File) {
 	return storeFile(appDb, attachmentId, file);

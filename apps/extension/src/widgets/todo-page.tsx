@@ -26,22 +26,18 @@ const orgActions = createTodoActions(appDb, orgTodoConfig);
 
 type Tab = "personal" | "organization";
 
-function TodoContent({
+function PersonalTodoContent({
 	userId,
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
-	const orgFilter = useMemo(
-		() =>
-			organizationId
-				? (t: { organizationId: string | null }) =>
-						t.organizationId === organizationId
-				: undefined,
-		[organizationId],
-	);
-	const { todos } = useTodos(appDb, personalTodoConfig, userId, orgFilter);
+	const orgFilter = useMemo(() => {
+		return (t: { organizationId: string }) =>
+			t.organizationId === organizationId;
+	}, [organizationId]);
+	const { todos } = useTodos(appDb, userId, orgFilter);
 	const sync = useSync();
 
 	return (
@@ -49,17 +45,19 @@ function TodoContent({
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
 				onAdd={(title) =>
-					personalActions.addTodo(userId, userId, organizationId ?? null, title)
+					personalActions.addTodo(userId, userId, organizationId, title)
 				}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList
 				todos={todos}
 				syncHook={sync}
+				entityType="todo"
 				userId={userId}
 				scopeType="personal"
 				scopeId={userId}
-				organizationId={organizationId ?? null}
+				organizationId={organizationId}
+				actions={personalActions}
 			/>
 		</div>
 	);
@@ -72,7 +70,7 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
-	const { todos } = useTodos(appDb, orgTodoConfig, organizationId);
+	const { todos } = useTodos(appDb, organizationId);
 	const sync = useOrgSync();
 
 	return (
@@ -87,12 +85,12 @@ function OrgTodoContent({
 			<TodoList
 				todos={todos}
 				syncHook={sync}
-				actions={orgActions}
 				entityType="todo"
 				userId={userId}
 				scopeType="org"
-				scopeId={organizationId}
+				scopeId={userId}
 				organizationId={organizationId}
+				actions={orgActions}
 			/>
 		</div>
 	);
@@ -103,10 +101,10 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string | undefined;
 }) {
-	const [activeTab, setActiveTab] = useState<Tab>("personal");
 	const { t } = useTranslation("todos");
+	const [activeTab, setActiveTab] = useState<Tab>("personal");
 
 	const scopes = useMemo<SyncScope[]>(() => {
 		const s: SyncScope[] = [{ scopeType: "personal", scopeId: userId }];
@@ -127,59 +125,57 @@ export function TodoPage({
 					<LanguageSwitcher />
 				</div>
 			</div>
-			{organizationId ? (
-				<div className="flex gap-2 border-b" role="tablist">
-					{(
-						[
-							{ key: "personal", label: t("tabs.personal") },
-							{ key: "organization", label: t("tabs.organization") },
-						] as const
-					).map(({ key, label }) => (
-						<button
-							key={key}
-							id={`tab-${key}`}
-							type="button"
-							role="tab"
-							aria-selected={activeTab === key}
-							aria-controls={`panel-${key}`}
-							className={`px-3 py-2 font-medium text-sm ${
-								activeTab === key ? "border-current border-b-2" : "opacity-60"
-							}`}
-							onClick={() => setActiveTab(key)}
-						>
-							{label}
-						</button>
-					))}
-				</div>
-			) : null}
-			<SyncProvider userId={userId} organizationId={organizationId}>
-				{organizationId ? (
+
+			<div className="flex gap-2 border-b" role="tablist">
+				{(
+					[
+						{ key: "personal", label: t("tabs.personal") },
+						{ key: "organization", label: t("tabs.organization") },
+					] as const
+				).map(({ key, label }) => (
+					<button
+						key={key}
+						id={`tab-${key}`}
+						type="button"
+						role="tab"
+						aria-selected={activeTab === key}
+						aria-controls={`panel-${key}`}
+						className={`px-3 py-2 font-medium text-sm ${
+							activeTab === key ? "border-current border-b-2" : "opacity-60"
+						}`}
+						onClick={() => setActiveTab(key)}
+					>
+						{label}
+					</button>
+				))}
+			</div>
+
+			{activeTab === "personal" && organizationId && (
+				<SyncProvider userId={userId} organizationId={organizationId}>
 					<div
 						id="panel-personal"
 						role="tabpanel"
 						aria-labelledby="tab-personal"
-						className={activeTab !== "personal" ? "hidden" : undefined}
 					>
-						<TodoContent userId={userId} organizationId={organizationId} />
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
 					</div>
-				) : (
-					<div>
-						<TodoContent userId={userId} organizationId={organizationId} />
-					</div>
-				)}
-			</SyncProvider>
-			{organizationId ? (
+				</SyncProvider>
+			)}
+
+			{activeTab === "organization" && organizationId && (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
 					<div
 						id="panel-organization"
 						role="tabpanel"
 						aria-labelledby="tab-organization"
-						className={activeTab !== "organization" ? "hidden" : undefined}
 					>
 						<OrgTodoContent organizationId={organizationId} userId={userId} />
 					</div>
 				</OrgSyncProvider>
-			) : null}
+			)}
 		</div>
 	);
 }

@@ -21,7 +21,7 @@ export function useStandaloneUpload({
 	onUploadEnqueued,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 	t: (key: string) => string;
 	onUploadEnqueued?: () => void;
 }) {
@@ -48,7 +48,7 @@ export function useStandaloneUpload({
 					mimeType: file.type,
 					scopeType,
 					scopeId,
-					organizationId: organizationId ?? null,
+					organizationId,
 					createdBy: userId,
 				});
 
