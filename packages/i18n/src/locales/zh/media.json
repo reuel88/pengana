@@ -22,6 +22,10 @@
 		"standalone": "独立",
 		"todo": "待办事项"
 	},
+	"tabs": {
+		"personal": "个人",
+		"organization": "组织"
+	},
 	"actions": {
 		"delete": "删除"
 	}

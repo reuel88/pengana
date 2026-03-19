@@ -70,6 +70,7 @@ export function TodoList({
 		handleResolve,
 		handleRemoveAttachment,
 		handleFilesSelected,
+		handleRetry,
 	} = useTodoHandlers({
 		triggerSync: syncHook.triggerSync,
 		enqueueUpload: syncHook.enqueueUpload,
@@ -96,6 +97,7 @@ export function TodoList({
 			onResolve={handleResolve}
 			onFilesSelected={handleFilesSelected}
 			onRemoveAttachment={handleRemoveAttachment}
+			onRetryAttachment={(_todoId, attachmentId) => handleRetry(attachmentId)}
 			onValidationError={handleToastError}
 		/>
 	);

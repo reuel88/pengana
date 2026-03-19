@@ -22,6 +22,10 @@
 		"standalone": "отдельный",
 		"todo": "задача"
 	},
+	"tabs": {
+		"personal": "Личное",
+		"organization": "Организация"
+	},
 	"actions": {
 		"delete": "Удалить"
 	}

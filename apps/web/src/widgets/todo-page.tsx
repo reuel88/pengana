@@ -87,7 +87,7 @@ function OrgTodoContent({
 				entityType="todo"
 				userId={userId}
 				scopeType="org"
-				scopeId={userId}
+				scopeId={organizationId}
 				organizationId={organizationId}
 				actions={orgActions}
 			/>

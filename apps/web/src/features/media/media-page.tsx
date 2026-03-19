@@ -173,12 +173,10 @@ export function MediaPage({
 			<h1 className="font-bold text-xl">{t("title")}</h1>
 
 			<div className="flex gap-2 border-b" role="tablist">
-				{(
-					[
-						{ key: "personal", label: "Personal" },
-						{ key: "organization", label: "Organization" },
-					] as const
-				).map(({ key, label }) => (
+				{[
+					{ key: "personal" as const, label: t("tabs.personal") },
+					{ key: "organization" as const, label: t("tabs.organization") },
+				].map(({ key, label }) => (
 					<button
 						key={key}
 						id={`tab-${key}`}

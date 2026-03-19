@@ -155,7 +155,7 @@ export const uploadRouter = {
 						(() => {
 							throw apiError(
 								"BAD_REQUEST",
-								"Organization scope requires an active organization.",
+								context.t("orgScopeRequiresActiveOrg"),
 							);
 						})())
 					: userId;

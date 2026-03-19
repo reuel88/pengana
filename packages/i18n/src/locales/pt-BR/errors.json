@@ -20,5 +20,6 @@
 	"noActiveOrganization": "Nenhuma organização ativa",
 	"seatRequiredForWrite": "Um assento é necessário para operações de escrita. Entre em contato com o proprietário da sua organização.",
 	"failedToRetryAttachment": "Falha ao reenviar anexo",
-	"attachmentBelongsToAnotherUser": "O anexo pertence a outro usuário"
+	"attachmentBelongsToAnotherUser": "O anexo pertence a outro usuário",
+	"orgScopeRequiresActiveOrg": "O escopo de organização requer uma organização ativa."
 }

@@ -20,5 +20,6 @@
 	"noActiveOrganization": "Нет активной организации",
 	"seatRequiredForWrite": "Для операций записи необходимо место. Обратитесь к владельцу организации.",
 	"failedToRetryAttachment": "Не удалось повторить отправку вложения",
-	"attachmentBelongsToAnotherUser": "Вложение принадлежит другому пользователю"
+	"attachmentBelongsToAnotherUser": "Вложение принадлежит другому пользователю",
+	"orgScopeRequiresActiveOrg": "Область организации требует активной организации."
 }

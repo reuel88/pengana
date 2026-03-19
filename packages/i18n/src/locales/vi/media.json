@@ -22,6 +22,10 @@
 		"standalone": "độc lập",
 		"todo": "công việc"
 	},
+	"tabs": {
+		"personal": "Cá nhân",
+		"organization": "Tổ chức"
+	},
 	"actions": {
 		"delete": "Xóa"
 	}

@@ -22,6 +22,10 @@
 		"standalone": "autonome",
 		"todo": "tâche"
 	},
+	"tabs": {
+		"personal": "Personnel",
+		"organization": "Organisation"
+	},
 	"actions": {
 		"delete": "Supprimer"
 	}

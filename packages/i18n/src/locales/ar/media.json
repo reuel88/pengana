@@ -22,6 +22,10 @@
 		"standalone": "مستقل",
 		"todo": "مهمة"
 	},
+	"tabs": {
+		"personal": "شخصي",
+		"organization": "منظمة"
+	},
 	"actions": {
 		"delete": "حذف"
 	}

@@ -22,6 +22,10 @@
 		"standalone": "nagsasarili",
 		"todo": "gawain"
 	},
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organisasyon"
+	},
 	"actions": {
 		"delete": "I-delete"
 	}

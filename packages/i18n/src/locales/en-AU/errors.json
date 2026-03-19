@@ -20,5 +20,6 @@
 	"noActiveOrganization": "No active organization",
 	"seatRequiredForWrite": "A seat is required for write operations. Contact your organization owner.",
 	"failedToRetryAttachment": "Failed to retry attachment",
-	"attachmentBelongsToAnotherUser": "Attachment belongs to another user"
+	"attachmentBelongsToAnotherUser": "Attachment belongs to another user",
+	"orgScopeRequiresActiveOrg": "Organisation scope requires an active organisation."
 }

@@ -22,8 +22,13 @@ export function useBatchInvite({
 	const [loading, setLoading] = useState(false);
 
 	const batchInvite = async (entries: BatchInviteEntry[]) => {
-		if (entries.length === 0 || !organizationId) {
+		if (entries.length === 0) {
 			return { successes: [], failures: [] };
+		}
+
+		if (!organizationId) {
+			onError?.("Organization ID is required");
+			return { successes: [], failures: entries };
 		}
 
 		setLoading(true);

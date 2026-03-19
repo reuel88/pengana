@@ -20,5 +20,6 @@
 	"noActiveOrganization": "Aucune organisation active",
 	"seatRequiredForWrite": "Un poste est requis pour les opérations d'écriture. Contactez le propriétaire de votre organisation.",
 	"failedToRetryAttachment": "Impossible de relancer la pièce jointe",
-	"attachmentBelongsToAnotherUser": "La pièce jointe appartient à un autre utilisateur"
+	"attachmentBelongsToAnotherUser": "La pièce jointe appartient à un autre utilisateur",
+	"orgScopeRequiresActiveOrg": "Le périmètre organisation nécessite une organisation active."
 }

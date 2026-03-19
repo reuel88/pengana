@@ -22,6 +22,10 @@
 		"standalone": "standalone",
 		"todo": "todo"
 	},
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organisation"
+	},
 	"actions": {
 		"delete": "Delete"
 	}

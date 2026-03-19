@@ -22,6 +22,10 @@
 		"standalone": "independente",
 		"todo": "tarefa"
 	},
+	"tabs": {
+		"personal": "Pessoal",
+		"organization": "Organização"
+	},
 	"actions": {
 		"delete": "Excluir"
 	}

@@ -47,7 +47,6 @@ export interface TodoHandlerDeps {
 	t: (key: string) => string;
 	onDeleteSuccess?: (id: string) => void;
 	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
-	onDeleteAttachmentSuccess?: (attachmentId: string) => void;
 	actions: TodoActions;
 	db?: EntityDatabase;
 }
@@ -57,7 +56,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		db,
 		triggerSync,
 		enqueueUpload,
-		userId = "",
+		userId,
 		scopeId,
 		organizationId,
 		fileStorage,

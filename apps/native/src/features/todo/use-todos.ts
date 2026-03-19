@@ -53,11 +53,11 @@ function useTodosWithAttachments(scopeId: string) {
 		}
 
 		const byTodo = new Map<string, typeof mediaRecords>();
-		const sorted = [...attachmentRecords].sort(
+		const sorted = [...(attachmentRecords ?? [])].sort(
 			(a, b) => a.position - b.position,
 		);
 		const seen = new Set<string>();
-		for (const att of sorted ?? []) {
+		for (const att of sorted) {
 			const dedupeKey = `${att.entityId}:${att.mediaId}`;
 			if (seen.has(dedupeKey)) continue;
 			seen.add(dedupeKey);
