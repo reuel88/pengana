@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { OrgSyncProvider } from "@/features/sync/org-sync-context";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { OrgSyncProvider, SyncProvider } from "@/features/sync/sync-context";
 import {
 	OrganizationTodoContent,
 	PersonalTodoContent,

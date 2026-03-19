@@ -2,8 +2,7 @@ import { useTranslation } from "@pengana/i18n";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
-import { useOrgSync } from "@/features/sync/org-sync-context";
-import { useSync } from "@/features/sync/sync-context";
+import { useOrgSync, useSync } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import {
 	addOrgTodo,

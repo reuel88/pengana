@@ -34,7 +34,7 @@ type EntityScope = {
 };
 
 async function validateEntityAccess(
-	entityType: string,
+	entityType: "todo",
 	entityId: string,
 	userId: string,
 	activeOrgId: string | null,
@@ -59,11 +59,7 @@ async function validateEntityAccess(
 			organizationId: todoRow.organizationId,
 		};
 	}
-	return {
-		scopeType: "personal",
-		scopeId: userId,
-		organizationId: activeOrgId ?? userId,
-	};
+	throw apiError("BAD_REQUEST", t("unsupportedEntityType"));
 }
 
 export const uploadRouter = {
@@ -80,7 +76,7 @@ export const uploadRouter = {
 				data: z.string(),
 				idempotencyKey: z.string().uuid(),
 				attachmentId: z.string().uuid(),
-				entityType: z.string().optional(),
+				entityType: z.enum(["todo"]).optional(),
 				entityId: z.string().optional(),
 				scopeType: z.enum(["personal", "org"]).optional(),
 			}),
@@ -163,6 +159,16 @@ export const uploadRouter = {
 				? entityScope.organizationId
 				: (activeOrgId ?? userId);
 
+			if (!entityScope && scopeType === "org") {
+				let seated = await isMemberSeatedByUserId(activeOrgId!, userId);
+				if (!seated) {
+					seated = await autoSeatOwner(activeOrgId!, userId);
+				}
+				if (!seated) {
+					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
+				}
+			}
+
 			await insertMedia({
 				id: input.attachmentId,
 				userId,
@@ -203,7 +209,7 @@ export const uploadRouter = {
 		.input(
 			z.object({
 				mediaId: z.string().uuid(),
-				entityType: z.string(),
+				entityType: z.enum(["todo"]),
 				entityId: z.string(),
 			}),
 		)
@@ -265,7 +271,7 @@ export const uploadRouter = {
 		.input(
 			z.object({
 				mediaId: z.string().uuid(),
-				entityType: z.string(),
+				entityType: z.enum(["todo"]),
 				entityId: z.string(),
 			}),
 		)

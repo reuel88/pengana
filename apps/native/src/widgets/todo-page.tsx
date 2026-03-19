@@ -8,8 +8,7 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { OrgSyncProvider } from "@/features/sync/org-sync-context";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { OrgSyncProvider, SyncProvider } from "@/features/sync/sync-context";
 import { appDb } from "@/shared/db";
 import { useTheme } from "@/shared/lib/theme";
 import { destructiveText } from "@/shared/styles/shared";

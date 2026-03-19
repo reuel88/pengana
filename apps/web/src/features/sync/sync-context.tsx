@@ -1,8 +1,8 @@
 import { createSyncTransport } from "@pengana/sync-client";
 import {
-	createSyncProviders,
 	SyncContext,
 	SyncDevtoolsContext,
+	useNetworkStatus,
 	useSyncEngine,
 } from "@pengana/sync-engine";
 import {
@@ -41,6 +41,8 @@ export function SyncProvider({
 	organizationId: string;
 	children: ReactNode;
 }) {
+	const { isOnline } = useNetworkStatus();
+
 	const deps = useMemo(
 		() =>
 			createWebPlatformDeps(
@@ -54,7 +56,7 @@ export function SyncProvider({
 		[organizationId],
 	);
 
-	const { core, devtools } = useSyncEngine(userId, deps);
+	const { core, devtools } = useSyncEngine({ isOnline, scopeId: userId, deps });
 
 	return (
 		<SyncContext value={core}>
@@ -63,24 +65,42 @@ export function SyncProvider({
 	);
 }
 
-const orgDeps = createWebPlatformDeps(
-	(organizationId) =>
-		createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
-	() =>
-		createSyncTransport(
-			async (input) => {
-				return (await client.orgTodo.sync(input, { signal: input.signal }))
-					.data;
-			},
-			(media, attachments, entityIds) =>
-				reconcileMedia(appDb, media, attachments, entityIds),
-		),
-);
+export function OrgSyncProvider({
+	organizationId,
+	children,
+}: {
+	userId: string;
+	organizationId: string;
+	children: ReactNode;
+}) {
+	const orgDeps = useMemo(
+		() =>
+			createWebPlatformDeps(
+				(orgId) => createTodoSyncAdapter(appDb, orgId, orgTodoConfig),
+				() =>
+					createSyncTransport(
+						async (input) => {
+							return (
+								await client.orgTodo.sync(input, { signal: input.signal })
+							).data;
+						},
+						(media, attachments, entityIds) =>
+							reconcileMedia(appDb, media, attachments, entityIds),
+					),
+			),
+		[organizationId],
+	);
+	const { isOnline } = useNetworkStatus();
 
-const orgProviders = createSyncProviders(
-	// personalDeps not used — we have a custom SyncProvider above
-	orgDeps,
-	orgDeps,
-);
+	const { core, devtools } = useSyncEngine({
+		scopeId: organizationId,
+		isOnline,
+		deps: orgDeps,
+	});
 
-export const OrgSyncProvider = orgProviders.OrgSyncProvider;
+	return (
+		<SyncContext value={core}>
+			<SyncDevtoolsContext value={devtools}>{children}</SyncDevtoolsContext>
+		</SyncContext>
+	);
+}

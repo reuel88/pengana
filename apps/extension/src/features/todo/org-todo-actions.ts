@@ -26,7 +26,10 @@ export async function addOrgTodo(
 }
 
 export {
+	deleteTodo,
 	deleteTodo as deleteOrgTodo,
+	resolveConflict,
 	resolveConflict as resolveOrgConflict,
+	toggleTodo,
 	toggleTodo as toggleOrgTodo,
-} from "./todo-actions.web";
+} from "./todo-actions";

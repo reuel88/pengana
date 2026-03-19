@@ -1,10 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	createTodoActions,
-	orgTodoConfig,
-	personalTodoConfig,
-	useTodos,
-} from "@pengana/todo-client";
+import { useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
 import {
@@ -14,12 +9,11 @@ import {
 	useSync,
 } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
+import * as orgActions from "@/features/todo/org-todo-actions";
+import * as personalActions from "@/features/todo/todo-actions";
 import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import { appDb } from "@/shared/db";
-
-const personalActions = createTodoActions(appDb, personalTodoConfig);
-const orgActions = createTodoActions(appDb, orgTodoConfig);
 
 type Tab = "personal" | "organization";
 
@@ -42,7 +36,7 @@ function PersonalTodoContent({
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
 				onAdd={(title) =>
-					personalActions.addTodo(userId, userId, organizationId, title)
+					personalActions.addTodo(userId, title, organizationId)
 				}
 				triggerSync={sync.triggerSync}
 			/>
@@ -75,9 +69,7 @@ function OrgTodoContent({
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInput
-				onAdd={(title) =>
-					orgActions.addTodo(organizationId, userId, organizationId, title)
-				}
+				onAdd={(title) => orgActions.addOrgTodo(organizationId, userId, title)}
 				triggerSync={sync.triggerSync}
 			/>
 
