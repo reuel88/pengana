@@ -108,7 +108,7 @@ export function useSyncEngineCore<T extends { id: string } = Todo>(
 		return () => {
 			uploadAdapterRef.current = null;
 		};
-	}, [scopeId, deps]);
+	}, [deps]);
 
 	const cleanupDeps = useMemo(
 		() =>

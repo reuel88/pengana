@@ -12,7 +12,7 @@ export default function TodosScreen() {
 		return null;
 	}
 
-	if (!session || !userId) {
+	if (!session || !userId || !organizationId) {
 		return <Redirect href="/" />;
 	}
 

@@ -197,7 +197,7 @@ export function MediaPage({
 			</div>
 
 			{activeTab === "personal" && (
-				<SyncProvider userId={userId}>
+				<SyncProvider userId={userId} organizationId={organizationId}>
 					<div
 						id="panel-personal"
 						role="tabpanel"

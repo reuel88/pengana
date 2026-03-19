@@ -12,14 +12,14 @@ export const todoRouter = {
 		.output(envelopeOutput(syncOutputSchema))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
-			const orgId = context.session.session.activeOrganizationId;
+			const orgId = context.session.session.activeOrganizationId as string;
 			return envelope(
 				await handleTodoSync(
 					input,
 					"personal",
 					userId,
 					userId,
-					orgId!,
+					orgId,
 					context.notifyUser,
 				),
 			);
