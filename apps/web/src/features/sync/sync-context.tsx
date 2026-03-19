@@ -88,7 +88,7 @@ export function OrgSyncProvider({
 							reconcileMedia(appDb, media, attachments, entityIds),
 					),
 			),
-		[organizationId],
+		[],
 	);
 	const { isOnline } = useNetworkStatus();
 

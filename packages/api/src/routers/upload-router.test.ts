@@ -53,6 +53,7 @@ process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
 import { insertMedia } from "@pengana/db/media-queries";
+import { isMemberSeatedByUserId } from "@pengana/db/seat-queries";
 import { uploadRouter } from "./upload";
 
 function makeContext(overrides: Partial<Context> = {}): Context {
@@ -115,6 +116,7 @@ describe("upload.upload", () => {
 	});
 
 	it("derives org scope when activeOrganizationId is set", async () => {
+		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
 		const ctx = makeContext({
 			session: {
 				user: {
@@ -147,6 +149,7 @@ describe("upload.upload", () => {
 	});
 
 	it("allows standalone personal uploads even when an active organization exists", async () => {
+		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
 		const ctx = makeContext({
 			session: {
 				user: {

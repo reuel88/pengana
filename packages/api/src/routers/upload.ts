@@ -160,9 +160,12 @@ export const uploadRouter = {
 				: (activeOrgId ?? userId);
 
 			if (!entityScope && scopeType === "org") {
-				let seated = await isMemberSeatedByUserId(activeOrgId!, userId);
+				if (!activeOrgId) {
+					throw apiError("BAD_REQUEST", context.t("orgScopeRequiresActiveOrg"));
+				}
+				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
 				if (!seated) {
-					seated = await autoSeatOwner(activeOrgId!, userId);
+					seated = await autoSeatOwner(activeOrgId, userId);
 				}
 				if (!seated) {
 					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
