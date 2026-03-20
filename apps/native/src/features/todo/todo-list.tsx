@@ -1,3 +1,4 @@
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import type { TodoItemRow } from "./components/todo-item";
 import { useAttachmentHandlers } from "./create-attachment-handlers";
 import { useFilePickerBase } from "./hooks/use-file-picker-base";
@@ -17,14 +18,7 @@ interface TodoListProps {
 	todos: TodoItemRow[];
 	syncHook: {
 		triggerSync: () => void;
-		enqueueUpload: (
-			fileUri: string,
-			mimeType: string,
-			mediaId: string,
-			entityType?: string,
-			entityId?: string,
-			scopeType?: "personal" | "org",
-		) => void;
+		enqueueUpload: (params: EnqueueUploadParams) => void;
 	};
 	actions: TodoListActions;
 	userId: string;

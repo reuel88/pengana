@@ -1,9 +1,9 @@
 import { useRealtimeTransport } from "@pengana/realtime-transport";
 import type { StorageLevel } from "@pengana/storage-health";
 import { useStorageHealth } from "@pengana/storage-health";
-import { createSyncTransport } from "@pengana/sync-client";
 import type { SyncEvent } from "@pengana/sync-engine";
 import {
+	createSyncTransport,
 	MAX_EVENT_LOG_SIZE,
 	SyncEngine,
 	usePeriodicSync,
@@ -14,7 +14,7 @@ import {
 	personalTodoConfig,
 } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
-import type { UploadEvent } from "@pengana/upload-queue";
+import type { EnqueueUploadParams, UploadEvent } from "@pengana/upload-queue";
 import { useUploadQueue } from "@pengana/upload-queue";
 import {
 	createContext,
@@ -43,14 +43,7 @@ interface SyncContextValue {
 	isUploading: boolean;
 	storageLevel: StorageLevel;
 	triggerSync: () => void;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 }
 
 interface SyncDevtoolsValue {
@@ -154,7 +147,7 @@ function useComposedSyncEngine(options: {
 			createUploadAdapter: getUploadAdapter,
 			createUploadTransport: getUploadTransport,
 			lifecycleCallbacks: getUploadLifecycleCallbacks(),
-			onUploadComplete: () => engineRef.current?.sync(),
+			onSettled: () => engineRef.current?.sync(),
 		},
 	);
 

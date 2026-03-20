@@ -7,6 +7,7 @@ import {
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import type { LocalMedia } from "@pengana/upload-client";
 import { storeFileInIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/upload-queue";
 import { useCallback, useMemo, useState } from "react";
 import { client } from "@/shared/api/orpc";
@@ -20,14 +21,7 @@ interface TodoListProps {
 	todos: TodoWithAttachments[];
 	syncHook: {
 		triggerSync: () => void;
-		enqueueUpload: (
-			fileUri: string,
-			mimeType: string,
-			mediaId: string,
-			entityType?: string,
-			entityId?: string,
-			scopeType?: "personal" | "org",
-		) => void;
+		enqueueUpload: (params: EnqueueUploadParams) => void;
 	};
 	actions: TodoActions;
 	entityType?: string;

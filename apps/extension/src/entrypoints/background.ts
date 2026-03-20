@@ -1,7 +1,6 @@
 import { env } from "@pengana/env/web";
 import { STORAGE_WARNING_RATIO } from "@pengana/storage-health";
-import { createSyncTransport } from "@pengana/sync-client";
-import { SyncEngine } from "@pengana/sync-engine";
+import { createSyncTransport, SyncEngine } from "@pengana/sync-engine";
 import {
 	createTodoSyncAdapter,
 	orgTodoConfig,

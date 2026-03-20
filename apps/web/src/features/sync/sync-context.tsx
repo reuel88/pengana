@@ -4,9 +4,9 @@ import {
 } from "@pengana/realtime-transport";
 import type { StorageLevel } from "@pengana/storage-health";
 import { useStorageHealth } from "@pengana/storage-health";
-import { createSyncTransport } from "@pengana/sync-client";
 import type { SyncEvent } from "@pengana/sync-engine";
 import {
+	createSyncTransport,
 	MAX_EVENT_LOG_SIZE,
 	SyncEngine,
 	usePeriodicSync,
@@ -23,7 +23,7 @@ import {
 } from "@pengana/upload-client";
 import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
-import type { UploadEvent } from "@pengana/upload-queue";
+import type { EnqueueUploadParams, UploadEvent } from "@pengana/upload-queue";
 import { cleanupUploaded, useUploadQueue } from "@pengana/upload-queue";
 import type { ReactNode } from "react";
 import {
@@ -48,14 +48,7 @@ interface SyncContextValue {
 	isUploading: boolean;
 	storageLevel: StorageLevel;
 	triggerSync: () => void;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 }
 
 interface SyncDevtoolsValue {
@@ -147,7 +140,7 @@ function useComposedSyncEngine(options: {
 			createUploadAdapter: () => createWebUploadAdapter(appDb),
 			createUploadTransport: createIndexedDbUploadTransport,
 			lifecycleCallbacks: uploadLifecycleCallbacks,
-			onUploadComplete: () => engineRef.current?.sync(),
+			onSettled: () => engineRef.current?.sync(),
 		},
 	);
 

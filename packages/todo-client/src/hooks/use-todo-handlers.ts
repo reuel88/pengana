@@ -6,6 +6,7 @@ import {
 	useMediaDeletion,
 	useMediaRetry,
 } from "@pengana/upload-client";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 
@@ -28,14 +29,7 @@ export interface TodoActions {
 
 export interface TodoHandlerDeps {
 	triggerSync: () => void;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 	entityType?: string;
 	userId: string;
 	scopeType: "personal" | "org";

@@ -18,7 +18,10 @@ export {
 export type { UploadQueueConfig } from "./core/upload-queue";
 export { UploadQueue } from "./core/upload-queue";
 export { isQuotaError, StorageFullError } from "./errors/storage-error";
-export type { UseUploadQueueOptions } from "./hooks/use-upload-queue";
+export type {
+	EnqueueUploadParams,
+	UseUploadQueueOptions,
+} from "./hooks/use-upload-queue";
 export { useUploadQueue } from "./hooks/use-upload-queue";
 export {
 	uploadItemSchema,

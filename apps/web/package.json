@@ -26,7 +26,6 @@
 		"@pengana/env": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/org-client": "workspace:*",
-		"@pengana/sync-client": "workspace:*",
 		"@pengana/realtime-transport": "workspace:*",
 		"@pengana/storage-health": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",

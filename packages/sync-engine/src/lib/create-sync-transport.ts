@@ -4,7 +4,7 @@ import type {
 	SyncOutput,
 	SyncTransport,
 	Todo,
-} from "@pengana/sync-engine";
+} from "../types";
 
 export function createSyncTransport(
 	serverSync: (input: {
