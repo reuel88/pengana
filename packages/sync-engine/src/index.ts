@@ -4,6 +4,7 @@ export type { EventEmitter } from "./core/event-emitter";
 export { createEventEmitter } from "./core/event-emitter";
 export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
 export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
+export { createSyncTransport } from "./lib/create-sync-transport";
 export {
 	mediaAttachmentSchema,
 	mediaSchema,

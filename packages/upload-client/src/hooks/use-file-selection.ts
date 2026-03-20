@@ -1,4 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/upload-queue";
 import { useCallback } from "react";
 import { processMediaFile } from "../lib/media-actions";
@@ -14,14 +15,7 @@ export interface FileSelectionDeps {
 	scopeId: string;
 	organizationId: string;
 	fileStorage: MediaFileStorageStrategy;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 	triggerSync: () => void;
 	onError?: (id: string | null, message: string) => void;
 	t: (key: string) => string;

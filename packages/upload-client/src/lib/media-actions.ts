@@ -1,6 +1,7 @@
 import type { EntityDatabase } from "@pengana/entity-store";
 import type { Media, MediaAttachment } from "@pengana/sync-engine";
 
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import type { AddMediaOptions, LocalMedia, LocalMediaAttachment } from "./db";
 import { buildReconcilePlan } from "./reconcile-plan";
 
@@ -156,14 +157,7 @@ export interface ProcessMediaFileParams {
 		id: string,
 		file: File,
 	) => { uri: string; revoke?: () => void };
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 }
 
 export interface ProcessMediaFileResult {
@@ -205,14 +199,14 @@ export async function processMediaFile(
 	const fileRef = createFileRef(mediaId, file);
 	await updateMediaLocalUri(db, mediaId, fileRef.uri);
 
-	enqueueUpload(
-		fileRef.uri,
-		file.type,
+	enqueueUpload({
+		fileUri: fileRef.uri,
+		mimeType: file.type,
 		mediaId,
-		target?.entityType,
-		target?.entityId,
-		target ? undefined : scopeType,
-	);
+		entityType: target?.entityType,
+		entityId: target?.entityId,
+		scopeType: target ? undefined : scopeType,
+	});
 
 	return { mediaId, fileRef };
 }

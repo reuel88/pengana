@@ -19,6 +19,9 @@
 		},
 		"./constants/*": {
 			"default": "./src/constants/*.ts"
+		},
+		"./lib/*": {
+			"default": "./src/lib/*.ts"
 		}
 	},
 	"scripts": {

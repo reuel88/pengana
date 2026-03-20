@@ -1,4 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { useMemo } from "react";
 
 import type { MediaConfig } from "../lib/media-config";
@@ -12,14 +13,7 @@ export interface UseMediaListWiringConfig {
 	db: EntityDatabase;
 
 	triggerSync: () => void;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 
 	userId: string;
 	scopeId: string;

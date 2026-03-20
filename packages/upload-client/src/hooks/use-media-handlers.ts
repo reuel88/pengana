@@ -1,4 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { isQuotaError } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 import type { MediaConfig } from "../lib/media-config";
@@ -22,14 +23,7 @@ export interface MediaAttachmentTarget {
 export interface MediaHandlerDeps {
 	db: EntityDatabase;
 	triggerSync: () => void;
-	enqueueUpload: (
-		fileUri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 	userId: string;
 	scopeId: string;
 	organizationId: string;

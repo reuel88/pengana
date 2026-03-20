@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { useCallback } from "react";
 import { Alert } from "react-native";
 
@@ -9,14 +10,7 @@ import { getAttachmentForMedia, retryMedia } from "./todo-actions";
 export function useAttachmentHandlers(
 	removeMediaFn: (attachmentId: string) => Promise<void>,
 	triggerSync: () => void,
-	enqueueUpload: (
-		localUri: string,
-		mimeType: string,
-		id: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void,
+	enqueueUpload: (params: EnqueueUploadParams) => void,
 ) {
 	const { t } = useTranslation("todos");
 
@@ -46,13 +40,13 @@ export function useAttachmentHandlers(
 				const record = await retryMedia(attachmentId);
 				if (record?.localUri) {
 					const att = await getAttachmentForMedia(attachmentId);
-					enqueueUpload(
-						record.localUri,
-						record.mimeType,
-						record.id,
-						att?.entityType,
-						att?.entityId,
-					);
+					enqueueUpload({
+						fileUri: record.localUri,
+						mimeType: record.mimeType,
+						mediaId: record.id,
+						entityType: att?.entityType,
+						entityId: att?.entityId,
+					});
 				}
 			} catch {
 				Alert.alert(t("error.title"), t("errors:failedToRetryAttachment"));

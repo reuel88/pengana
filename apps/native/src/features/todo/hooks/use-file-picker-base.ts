@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import {
 	isAllowedMimeType,
 	MAX_ATTACHMENTS,
@@ -84,14 +85,7 @@ export function useFilePickerBase(deps: {
 		entityId: string,
 	) => Promise<string>;
 	updateMediaLocalUri?: (mediaId: string, localUri: string) => Promise<void>;
-	enqueueUpload: (
-		uri: string,
-		mimeType: string,
-		mediaId: string,
-		entityType?: string,
-		entityId?: string,
-		scopeType?: "personal" | "org",
-	) => void;
+	enqueueUpload: (params: EnqueueUploadParams) => void;
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
 	userId: string;
@@ -119,13 +113,13 @@ export function useFilePickerBase(deps: {
 					createdBy: deps.createdBy,
 				});
 				await deps.attachMedia(mediaId, deps.entityType, todoId);
-				deps.enqueueUpload(
-					asset.uri,
-					asset.mimeType,
+				deps.enqueueUpload({
+					fileUri: asset.uri,
+					mimeType: asset.mimeType,
 					mediaId,
-					deps.entityType,
-					todoId,
-				);
+					entityType: deps.entityType,
+					entityId: todoId,
+				});
 			} catch {
 				Alert.alert(t("errors:failedToAttachFile"));
 			}
