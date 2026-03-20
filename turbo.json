@@ -57,8 +57,9 @@
 			"cache": false
 		},
 		"e2e": {
-			"cache": false,
-			"dependsOn": ["^build"]
+			"dependsOn": ["^build"],
+			"passThroughEnv": ["PLAYWRIGHT_*"],
+			"outputs": ["playwright-report/**", "test-results/**"]
 		},
 		"check:i18n": {}
 	}
