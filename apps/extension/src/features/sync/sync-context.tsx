@@ -70,18 +70,23 @@ export function OrgSyncProvider({
 	organizationId: string;
 	children: ReactNode;
 }) {
-	const orgDeps = createExtensionPlatformDeps(
-		(organizationId) =>
-			createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
+	const orgDeps = useMemo(
 		() =>
-			createSyncTransport(
-				async (input) => {
-					return (await client.orgTodo.sync(input, { signal: input.signal }))
-						.data;
-				},
-				(media, attachments, entityIds) =>
-					reconcileMedia(appDb, media, attachments, entityIds),
+			createExtensionPlatformDeps(
+				(organizationId) =>
+					createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
+				() =>
+					createSyncTransport(
+						async (input) => {
+							return (
+								await client.orgTodo.sync(input, { signal: input.signal })
+							).data;
+						},
+						(media, attachments, entityIds) =>
+							reconcileMedia(appDb, media, attachments, entityIds),
+					),
 			),
+		[],
 	);
 	const { isOnline } = useNetworkStatus();
 
