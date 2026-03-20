@@ -9,12 +9,13 @@ import {
 	usePeriodicSync,
 } from "@pengana/sync-engine";
 import type { UploadEvent } from "@pengana/upload-queue";
-import { useUploadQueue } from "@pengana/upload-queue";
+import { cleanupUploaded, useUploadQueue } from "@pengana/upload-queue";
 import {
 	createContext,
 	use,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -156,8 +157,15 @@ function useComposedSyncEngine(options: {
 	);
 
 	// --- Storage Health ---
+	const uploadAdapter = useMemo(() => getUploadAdapter(), []);
+
+	const onStorageWarning = useCallback(async () => {
+		await cleanupUploaded({ uploadAdapter });
+	}, [uploadAdapter]);
+
 	const { storageLevel } = useStorageHealth({
 		provider: getStorageHealthProvider(),
+		onStorageWarning,
 	});
 
 	// --- Online Reactivity ---

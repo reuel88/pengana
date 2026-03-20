@@ -154,15 +154,17 @@ function useComposedSyncEngine(options: {
 	// --- Storage Health ---
 	const uploadAdapter = useMemo(() => createWebUploadAdapter(appDb), []);
 
+	const onStorageWarning = useCallback(async () => {
+		await cleanupUploaded({
+			uploadAdapter,
+			removeFile: (entityId: string) =>
+				removeFileFromIndexedDB(appDb, entityId),
+		});
+	}, [uploadAdapter]);
+
 	const { storageLevel } = useStorageHealth({
 		provider: storageHealthProvider,
-		onStorageWarning: async () => {
-			await cleanupUploaded({
-				uploadAdapter,
-				removeFile: (entityId: string) =>
-					removeFileFromIndexedDB(appDb, entityId),
-			});
-		},
+		onStorageWarning,
 	});
 
 	// --- Online Reactivity ---
