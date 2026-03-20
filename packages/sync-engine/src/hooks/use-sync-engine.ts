@@ -106,23 +106,25 @@ export function useSyncEngine<T extends { id: string } = Todo>(
 	);
 
 	// --- Storage Health ---
-	const uploadAdapterRef = useRef<UploadAdapter | null>(null);
+	const [uploadAdapter, setUploadAdapter] = useState<UploadAdapter | null>(
+		null,
+	);
 	useEffect(() => {
-		uploadAdapterRef.current = deps.createUploadAdapter();
+		setUploadAdapter(deps.createUploadAdapter());
 		return () => {
-			uploadAdapterRef.current = null;
+			setUploadAdapter(null);
 		};
 	}, [deps]);
 
 	const cleanupDeps = useMemo(
 		() =>
-			uploadAdapterRef.current
+			uploadAdapter
 				? {
-						uploadAdapter: uploadAdapterRef.current,
+						uploadAdapter,
 						removeFile: deps.removeFile,
 					}
 				: undefined,
-		[deps.removeFile],
+		[uploadAdapter, deps.removeFile],
 	);
 
 	const { storageLevel } = useStorageHealth({
