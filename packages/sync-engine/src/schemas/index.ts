@@ -2,13 +2,6 @@ import { z } from "zod";
 
 export const syncStatusSchema = z.enum(["synced", "pending", "conflict"]);
 
-export const uploadStatusSchema = z.enum([
-	"queued",
-	"uploading",
-	"uploaded",
-	"failed",
-]);
-
 export const todoSchema = z.object({
 	id: z.string(),
 	title: z.string(),
@@ -43,18 +36,6 @@ export const mediaAttachmentSchema = z.object({
 	createdAt: z.string(),
 });
 
-export const uploadItemSchema = z.object({
-	id: z.string(),
-	fileUri: z.string(),
-	mimeType: z.string(),
-	entityType: z.string().optional(),
-	entityId: z.string().optional(),
-	scopeType: z.enum(["personal", "org"]).optional(),
-	status: uploadStatusSchema,
-	retryCount: z.number(),
-	createdAt: z.string(),
-});
-
 export const syncInputSchema = z.object({
 	changes: z.array(todoSchema),
 	lastSyncedAt: z.string().nullable(),
@@ -72,7 +53,5 @@ export type SyncStatus = z.infer<typeof syncStatusSchema>;
 export type Todo = z.infer<typeof todoSchema>;
 export type Media = z.infer<typeof mediaSchema>;
 export type MediaAttachment = z.infer<typeof mediaAttachmentSchema>;
-export type UploadStatus = z.infer<typeof uploadStatusSchema>;
-export type UploadItem = z.infer<typeof uploadItemSchema>;
 export type SyncInput = z.infer<typeof syncInputSchema>;
 export type SyncOutput = z.infer<typeof syncOutputSchema>;

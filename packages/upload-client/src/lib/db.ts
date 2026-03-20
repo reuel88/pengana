@@ -1,4 +1,4 @@
-import type { UploadStatus } from "@pengana/sync-engine";
+import type { UploadStatus } from "@pengana/upload-queue";
 
 export interface AddMediaOptions {
 	userId: string;

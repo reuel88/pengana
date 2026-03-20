@@ -1,5 +1,4 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync-engine";
 import {
 	getMediaCountForEntity,
 	type MediaAttachmentTarget,
@@ -7,6 +6,7 @@ import {
 	useMediaDeletion,
 	useMediaRetry,
 } from "@pengana/upload-client";
+import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 
 export interface FileStorageStrategy {

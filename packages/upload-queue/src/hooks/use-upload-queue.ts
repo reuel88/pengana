@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { MAX_EVENT_LOG_SIZE } from "../constants/sync";
 import { UploadQueue } from "../core/upload-queue";
 import type {
 	UploadAdapter,
@@ -8,30 +7,40 @@ import type {
 	UploadLifecycleCallbacks,
 	UploadTransport,
 } from "../types";
-import { useStableSyncRef } from "./use-stable-sync-ref";
 
-interface Syncable {
-	sync(): Promise<void>;
+/** Max number of upload events kept in devtools log */
+const MAX_UPLOAD_EVENT_LOG_SIZE = 99;
+
+export interface UseUploadQueueOptions {
+	createUploadAdapter: () => UploadAdapter;
+	createUploadTransport: () => UploadTransport;
+	lifecycleCallbacks?: UploadLifecycleCallbacks;
+	onUploadComplete?: () => void;
 }
 
 export function useUploadQueue(
-	userId: string,
+	scopeId: string,
 	isOnline: boolean,
-	engineRef: React.RefObject<Syncable | null>,
-	createUploadAdapter: () => UploadAdapter,
-	createUploadTransport: () => UploadTransport,
-	lifecycleCallbacks?: UploadLifecycleCallbacks,
+	options: UseUploadQueueOptions,
 ) {
+	const {
+		createUploadAdapter,
+		createUploadTransport,
+		lifecycleCallbacks,
+		onUploadComplete,
+	} = options;
+
 	// --- State ---
 	const uploadQueueRef = useRef<UploadQueue | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadEvents, setUploadEvents] = useState<UploadEvent[]>([]);
 
-	const syncRef = useStableSyncRef(engineRef);
 	const isOnlineRef = useRef(isOnline);
 	isOnlineRef.current = isOnline;
+	const onUploadCompleteRef = useRef(onUploadComplete);
+	onUploadCompleteRef.current = onUploadComplete;
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref — its .current is reassigned every render, so listing it would cause infinite re-runs
+	// biome-ignore lint/correctness/useExhaustiveDependencies: onUploadCompleteRef is a stable ref
 	useEffect(() => {
 		setIsUploading(false);
 		setUploadEvents([]);
@@ -45,7 +54,7 @@ export function useUploadQueue(
 
 		const unsubscribe = queue.onEvent((event) => {
 			setUploadEvents((prev) => [
-				...prev.slice(-(MAX_EVENT_LOG_SIZE - 1)),
+				...prev.slice(-(MAX_UPLOAD_EVENT_LOG_SIZE - 1)),
 				event,
 			]);
 			if (event.type === "upload:start") setIsUploading(true);
@@ -53,7 +62,7 @@ export function useUploadQueue(
 				setIsUploading(false);
 			}
 			if (event.type === "upload:complete") {
-				syncRef.current();
+				onUploadCompleteRef.current?.();
 			}
 		});
 
@@ -67,7 +76,7 @@ export function useUploadQueue(
 			setIsUploading(false);
 			setUploadEvents([]);
 		};
-	}, [userId]);
+	}, [scopeId]);
 
 	useEffect(() => {
 		if (isOnline) {

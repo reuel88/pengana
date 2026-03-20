@@ -1,8 +1,5 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
-import {
-	createWebSocketRealtimeTransport,
-	type SyncEnginePlatformDeps,
-} from "@pengana/sync-engine";
+import { createWebSocketRealtimeTransport } from "@pengana/realtime-transport";
 import {
 	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
@@ -14,7 +11,7 @@ function getWsUrl() {
 	return `${getServerUrl().replace(/^http/, "ws")}/ws`;
 }
 
-function createRealtimeTransport(
+export function createRealtimeTransport(
 	_id: string,
 	callbacks: {
 		onNotify: (kind: "sync" | "refresh") => void;
@@ -35,27 +32,13 @@ function createRealtimeTransport(
 	});
 }
 
-type AdapterFactory = SyncEnginePlatformDeps["createSyncAdapter"];
-type TransportFactory = SyncEnginePlatformDeps["createSyncTransport"];
+export {
+	createNativeUploadLifecycleCallbacks as getUploadLifecycleCallbacks,
+	createUploadAdapter as getUploadAdapter,
+	createUploadTransport as getUploadTransport,
+};
 
-export function createPlatformDeps(
-	createSyncAdapter: AdapterFactory,
-	createSyncTransport: TransportFactory,
-): SyncEnginePlatformDeps {
-	return {
-		generateUUID: () => crypto.randomUUID(),
-		createNotifyTransport: createRealtimeTransport,
-		createSyncAdapter,
-		createSyncTransport,
-		createUploadAdapter,
-		createUploadTransport,
-		uploadLifecycleCallbacks: createNativeUploadLifecycleCallbacks(),
-		onFocusSubscribe: (triggerSync) => {
-			const handler = () => {
-				if (document.visibilityState === "visible") triggerSync();
-			};
-			document.addEventListener("visibilitychange", handler);
-			return () => document.removeEventListener("visibilitychange", handler);
-		},
-	};
+// Web variant has no native storage health — return undefined
+export function getStorageHealthProvider() {
+	return undefined;
 }

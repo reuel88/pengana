@@ -1,5 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
 import {
 	type TodoActions,
 	useTodoHandlers,
@@ -7,6 +6,7 @@ import {
 } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import type { LocalMedia } from "@pengana/upload-client";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";

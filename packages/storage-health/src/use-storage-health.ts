@@ -1,26 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-	STORAGE_CRITICAL_RATIO,
-	STORAGE_WARNING_RATIO,
-} from "../constants/sync";
-import type { CleanupDeps } from "../core/storage-cleanup";
-import { cleanupUploaded } from "../core/storage-cleanup";
-import type {
-	StorageHealthProvider,
-	StorageLevel,
-} from "../types/storage-health";
+import { STORAGE_CRITICAL_RATIO, STORAGE_WARNING_RATIO } from "./constants";
+import type { StorageHealthProvider, StorageLevel } from "./types";
 
 const CHECK_INTERVAL_MS = 60_000;
 
 export interface UseStorageHealthOptions {
 	provider?: StorageHealthProvider;
-	cleanupDeps?: CleanupDeps;
+	onStorageWarning?: () => Promise<void>;
 	onStorageCritical?: () => void;
 }
 
 export function useStorageHealth(options: UseStorageHealthOptions) {
-	const { provider, cleanupDeps, onStorageCritical } = options;
+	const { provider, onStorageWarning, onStorageCritical } = options;
 	const [storageLevel, setStorageLevel] = useState<StorageLevel>("ok");
 	const criticalFiredRef = useRef(false);
 
@@ -39,8 +31,8 @@ export function useStorageHealth(options: UseStorageHealthOptions) {
 
 		setStorageLevel(level);
 
-		if (level === "warning" && cleanupDeps) {
-			await cleanupUploaded(cleanupDeps);
+		if (level === "warning" && onStorageWarning) {
+			await onStorageWarning();
 		}
 
 		if (level === "critical" && !criticalFiredRef.current) {
@@ -51,7 +43,7 @@ export function useStorageHealth(options: UseStorageHealthOptions) {
 		if (level !== "critical") {
 			criticalFiredRef.current = false;
 		}
-	}, [provider, cleanupDeps, onStorageCritical]);
+	}, [provider, onStorageWarning, onStorageCritical]);
 
 	useEffect(() => {
 		check();

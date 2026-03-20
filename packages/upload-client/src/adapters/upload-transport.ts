@@ -1,5 +1,5 @@
-import type { AllowedMimeType, UploadTransport } from "@pengana/sync-engine";
-import { MIME_TO_EXT } from "@pengana/sync-engine";
+import type { AllowedMimeType, UploadTransport } from "@pengana/upload-queue";
+import { MIME_TO_EXT } from "@pengana/upload-queue";
 
 export interface UploadTransportInput {
 	fileUri: string;

@@ -1,16 +1,18 @@
-import type { RefObject } from "react";
 import { useMemo } from "react";
 
-import type { SyncEngine } from "../core/engine";
 import { createWebSocketRealtimeTransport } from "../realtime/websocket-realtime-transport";
+import type { UseRealtimeTransportOptions } from "./use-realtime-transport";
 import { useRealtimeTransport } from "./use-realtime-transport";
 
 export function useWebSocketReconnect(
 	notifyKey: string | undefined,
 	isOnline: boolean,
-	engineRef: RefObject<SyncEngine | null>,
 	getWsUrl: () => string | Promise<string>,
-	onRefreshNotify?: () => void,
+	options?: {
+		onSyncNotify?: () => void;
+		onOpen?: () => void;
+		onRefreshNotify?: () => void;
+	},
 ) {
 	const createNotifyTransport = useMemo(
 		() =>
@@ -47,11 +49,12 @@ export function useWebSocketReconnect(
 		[getWsUrl],
 	);
 
-	useRealtimeTransport(
-		notifyKey,
-		isOnline,
-		engineRef,
+	const realtimeOptions: UseRealtimeTransportOptions = {
 		createNotifyTransport,
-		onRefreshNotify,
-	);
+		onSyncNotify: options?.onSyncNotify,
+		onOpen: options?.onOpen,
+		onRefreshNotify: options?.onRefreshNotify,
+	};
+
+	useRealtimeTransport(notifyKey, isOnline, realtimeOptions);
 }

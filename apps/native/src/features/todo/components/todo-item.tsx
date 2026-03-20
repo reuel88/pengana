@@ -1,5 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import { MAX_ATTACHMENTS, type Todo } from "@pengana/sync-engine";
+import type { Todo } from "@pengana/sync-engine";
+import { MAX_ATTACHMENTS } from "@pengana/upload-queue";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/shared/lib/theme";

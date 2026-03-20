@@ -3,7 +3,7 @@ import {
 	WS_DEGRADED_THRESHOLD,
 	WS_MAX_BACKOFF_MS,
 	WS_STALE_TIMEOUT_MS,
-} from "../constants/sync";
+} from "../constants/realtime";
 import type {
 	RealtimeMessageKind,
 	RealtimeTransport,

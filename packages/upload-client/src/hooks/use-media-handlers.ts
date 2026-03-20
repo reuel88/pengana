@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import { isQuotaError } from "@pengana/sync-engine";
+import { isQuotaError } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 import type { MediaConfig } from "../lib/media-config";
 import { useFileSelection } from "./use-file-selection";

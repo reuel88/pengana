@@ -1,12 +1,8 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
 import { env } from "@pengana/env/native";
 import { i18next } from "@pengana/i18n";
-import {
-	createWebSocketRealtimeTransport,
-	type SyncEnginePlatformDeps,
-} from "@pengana/sync-engine";
-import { randomUUID } from "expo-crypto";
-import { AppState, Platform } from "react-native";
+import { createWebSocketRealtimeTransport } from "@pengana/realtime-transport";
+import { Platform } from "react-native";
 import {
 	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
@@ -53,7 +49,7 @@ function getWsUrl() {
 	return getNativeWsUrl();
 }
 
-function createRealtimeTransport(
+export function createRealtimeTransport(
 	_id: string,
 	callbacks: {
 		onNotify: (kind: "sync" | "refresh") => void;
@@ -74,30 +70,9 @@ function createRealtimeTransport(
 	});
 }
 
-type AdapterFactory = SyncEnginePlatformDeps["createSyncAdapter"];
-type TransportFactory = SyncEnginePlatformDeps["createSyncTransport"];
-
-export function createPlatformDeps(
-	createSyncAdapter: AdapterFactory,
-	createSyncTransport: TransportFactory,
-): SyncEnginePlatformDeps {
-	return {
-		generateUUID: randomUUID,
-		createNotifyTransport: createRealtimeTransport,
-		createSyncAdapter,
-		createSyncTransport,
-		createUploadAdapter,
-		createUploadTransport,
-		onFocusSubscribe: (triggerSync) => {
-			const subscription = AppState.addEventListener(
-				"change",
-				(nextAppState) => {
-					if (nextAppState === "active") triggerSync();
-				},
-			);
-			return () => subscription.remove();
-		},
-		storageHealth: createNativeStorageHealthProvider(),
-		uploadLifecycleCallbacks: createNativeUploadLifecycleCallbacks(),
-	};
-}
+export {
+	createNativeStorageHealthProvider as getStorageHealthProvider,
+	createNativeUploadLifecycleCallbacks as getUploadLifecycleCallbacks,
+	createUploadAdapter as getUploadAdapter,
+	createUploadTransport as getUploadTransport,
+};

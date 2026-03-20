@@ -1,8 +1,12 @@
+import { useRealtimeTransport } from "@pengana/realtime-transport";
+import type { StorageLevel } from "@pengana/storage-health";
+import { useStorageHealth } from "@pengana/storage-health";
 import { createSyncTransport } from "@pengana/sync-client";
+import type { SyncEvent } from "@pengana/sync-engine";
 import {
-	SyncContext,
-	SyncDevtoolsContext,
-	useSyncEngine,
+	MAX_EVENT_LOG_SIZE,
+	SyncEngine,
+	usePeriodicSync,
 } from "@pengana/sync-engine";
 import {
 	createTodoSyncAdapter,
@@ -10,18 +14,76 @@ import {
 	personalTodoConfig,
 } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
-import { useEffect, useMemo, useState } from "react";
+import type { UploadEvent } from "@pengana/upload-queue";
+import { useUploadQueue } from "@pengana/upload-queue";
+import {
+	createContext,
+	use,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useNetworkStatus } from "@/features/sync/use-network-status";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
-import { createPlatformDeps } from "./platform-deps";
+import {
+	createRealtimeTransport,
+	getStorageHealthProvider,
+	getUploadAdapter,
+	getUploadLifecycleCallbacks,
+	getUploadTransport,
+} from "./platform-deps";
 
-export {
-	useSync,
-	useSync as useOrgSync,
-	useSyncDevtools,
-	useSyncDevtools as useOrgSyncDevtools,
-} from "@pengana/sync-engine";
+// --- Context types ---
+
+interface SyncContextValue {
+	isOnline: boolean;
+	isSyncing: boolean;
+	isUploading: boolean;
+	storageLevel: StorageLevel;
+	triggerSync: () => void;
+	enqueueUpload: (
+		fileUri: string,
+		mimeType: string,
+		mediaId: string,
+		entityType?: string,
+		entityId?: string,
+		scopeType?: "personal" | "org",
+	) => void;
+}
+
+interface SyncDevtoolsValue {
+	events: SyncEvent[];
+	uploadEvents: UploadEvent[];
+	simulateOffline: boolean;
+	setSimulateOffline: (value: boolean) => void;
+}
+
+const SyncContext = createContext<SyncContextValue | null>(null);
+const SyncDevtoolsContext = createContext<SyncDevtoolsValue | null>(null);
+
+export function useSync(): SyncContextValue {
+	const context = use(SyncContext);
+	if (!context) {
+		throw new Error("useSync must be used within a SyncProvider");
+	}
+	return context;
+}
+
+export { useSync as useOrgSync };
+
+export function useSyncDevtools(): SyncDevtoolsValue {
+	const context = use(SyncDevtoolsContext);
+	if (!context) {
+		throw new Error("useSyncDevtools must be used within a SyncProvider");
+	}
+	return context;
+}
+
+export { useSyncDevtools as useOrgSyncDevtools };
+
+// --- Helpers ---
 
 function useDocumentVisible() {
 	const [isVisible, setIsVisible] = useState(
@@ -39,6 +101,121 @@ function useDocumentVisible() {
 
 	return isVisible;
 }
+
+function useComposedSyncEngine(options: {
+	scopeId: string;
+	isOnline: boolean;
+	isForeground: boolean;
+	notifyKey?: string;
+	createSyncAdapter: (id: string) => ReturnType<typeof createTodoSyncAdapter>;
+	createSyncTransport: () => ReturnType<typeof createSyncTransport>;
+}) {
+	const {
+		scopeId,
+		isOnline,
+		isForeground,
+		notifyKey = scopeId,
+		createSyncAdapter,
+		createSyncTransport: createTransport,
+	} = options;
+
+	const engineRef = useRef<SyncEngine | null>(null);
+	const [events, setEvents] = useState<SyncEvent[]>([]);
+	const [isSyncing, setIsSyncing] = useState(false);
+	const [simulateOffline, setSimulateOffline] = useState(false);
+	const effectiveOnline = isOnline && !simulateOffline;
+
+	// --- Engine Init ---
+	useEffect(() => {
+		const adapter = createSyncAdapter(scopeId);
+		const transport = createTransport();
+		const engine = new SyncEngine(adapter, transport);
+		engineRef.current = engine;
+
+		const unsubscribe = engine.onEvent((event) => {
+			setEvents((prev) => [...prev.slice(-(MAX_EVENT_LOG_SIZE - 1)), event]);
+			if (event.type === "sync:start") setIsSyncing(true);
+			if (event.type === "sync:complete" || event.type === "sync:error")
+				setIsSyncing(false);
+		});
+
+		return () => {
+			unsubscribe();
+			void engine.shutdown();
+			engineRef.current = null;
+		};
+	}, [scopeId, createSyncAdapter, createTransport]);
+
+	// --- Upload Queue ---
+	const { isUploading, uploadEvents, enqueueUpload } = useUploadQueue(
+		scopeId,
+		effectiveOnline,
+		{
+			createUploadAdapter: getUploadAdapter,
+			createUploadTransport: getUploadTransport,
+			lifecycleCallbacks: getUploadLifecycleCallbacks(),
+			onUploadComplete: () => engineRef.current?.sync(),
+		},
+	);
+
+	// --- Storage Health ---
+	const { storageLevel } = useStorageHealth({
+		provider: getStorageHealthProvider(),
+	});
+
+	// --- Online Reactivity ---
+	useEffect(() => {
+		if (effectiveOnline) {
+			engineRef.current?.sync();
+		}
+	}, [effectiveOnline]);
+
+	// --- Periodic Sync ---
+	usePeriodicSync(effectiveOnline, engineRef);
+
+	// --- Realtime Transport ---
+	useRealtimeTransport(notifyKey, effectiveOnline && isForeground, {
+		createNotifyTransport: createRealtimeTransport,
+		onSyncNotify: () => engineRef.current?.sync(),
+		onOpen: () => engineRef.current?.sync(),
+	});
+
+	// --- Focus Subscription ---
+	useEffect(() => {
+		if (!effectiveOnline) return;
+		const handler = () => {
+			if (document.visibilityState === "visible") engineRef.current?.sync();
+		};
+		document.addEventListener("visibilitychange", handler);
+		return () => document.removeEventListener("visibilitychange", handler);
+	}, [effectiveOnline]);
+
+	// --- Public API ---
+	const triggerSync = useCallback(() => {
+		if (effectiveOnline) {
+			engineRef.current?.sync();
+		}
+	}, [effectiveOnline]);
+
+	return {
+		core: {
+			isOnline: effectiveOnline,
+			isSyncing,
+			isUploading,
+			storageLevel,
+			triggerSync,
+			enqueueUpload,
+		},
+		devtools: {
+			events,
+			uploadEvents,
+			simulateOffline,
+			setSimulateOffline,
+		},
+	};
+}
+
+// --- Providers ---
 
 const personalTransportFactory = () =>
 	createSyncTransport(
@@ -60,24 +237,21 @@ export function SyncProvider({
 	const { isOnline } = useNetworkStatus();
 	const isForeground = useDocumentVisible();
 
-	const deps = useMemo(
-		() =>
-			createPlatformDeps(
-				(uid) =>
-					createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
-						filter: (todo) => todo.organizationId === organizationId,
-						syncKeySuffix: organizationId,
-					}),
-				personalTransportFactory,
-			),
+	const createAdapter = useCallback(
+		(uid: string) =>
+			createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+				filter: (todo) => todo.organizationId === organizationId,
+				syncKeySuffix: organizationId,
+			}),
 		[organizationId],
 	);
 
-	const { core, devtools } = useSyncEngine({
+	const { core, devtools } = useComposedSyncEngine({
 		isOnline,
 		scopeId: userId,
-		deps,
 		isForeground,
+		createSyncAdapter: createAdapter,
+		createSyncTransport: personalTransportFactory,
 	});
 
 	return (
@@ -87,19 +261,17 @@ export function SyncProvider({
 	);
 }
 
-const orgDeps = createPlatformDeps(
-	(organizationId) =>
-		createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
-	() =>
-		createSyncTransport(
-			async (input) => {
-				return (await client.orgTodo.sync(input, { signal: input.signal }))
-					.data;
-			},
-			(media, attachments, entityIds) =>
-				reconcileMedia(appDb, media, attachments, entityIds),
-		),
-);
+const orgAdapter = (organizationId: string) =>
+	createTodoSyncAdapter(appDb, organizationId, orgTodoConfig);
+
+const orgTransport = () =>
+	createSyncTransport(
+		async (input) => {
+			return (await client.orgTodo.sync(input, { signal: input.signal })).data;
+		},
+		(media, attachments, entityIds) =>
+			reconcileMedia(appDb, media, attachments, entityIds),
+	);
 
 export function OrgSyncProvider({
 	organizationId,
@@ -113,12 +285,13 @@ export function OrgSyncProvider({
 	const { isOnline } = useNetworkStatus();
 	const isForeground = useDocumentVisible();
 
-	const { core, devtools } = useSyncEngine({
+	const { core, devtools } = useComposedSyncEngine({
 		isOnline,
 		scopeId: organizationId,
-		deps: orgDeps,
-		notifyKey: userId,
 		isForeground,
+		notifyKey: userId,
+		createSyncAdapter: orgAdapter,
+		createSyncTransport: orgTransport,
 	});
 
 	return (

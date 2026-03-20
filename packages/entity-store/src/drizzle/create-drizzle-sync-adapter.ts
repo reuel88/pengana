@@ -1,5 +1,5 @@
 import type { SyncAdapter, Todo } from "@pengana/sync-engine";
-import { isQuotaError, StorageFullError } from "@pengana/sync-engine";
+import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
 import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase, SQLiteColumn } from "drizzle-orm/sqlite-core";
 

@@ -1,4 +1,4 @@
-import type { UploadLifecycleCallbacks } from "@pengana/sync-engine";
+import type { UploadLifecycleCallbacks } from "@pengana/upload-queue";
 import { eq } from "drizzle-orm";
 
 import { appDb } from "@/shared/db/db";
