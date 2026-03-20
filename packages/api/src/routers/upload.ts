@@ -19,7 +19,7 @@ import {
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 	MIME_TO_EXT,
-} from "@pengana/sync-engine";
+} from "@pengana/upload-queue";
 import { z } from "zod";
 
 import { apiError } from "../errors";

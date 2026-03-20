@@ -14,6 +14,7 @@ export default defineConfig({
 	vite: () => ({
 		plugins: tailwindcss(),
 		resolve: {
+			dedupe: ["react", "react-dom"],
 			alias: {
 				"@pengana/org-client": path.resolve(
 					__dirname,

@@ -19,6 +19,7 @@
 		"@pengana/db": "workspace:*",
 		"@pengana/env": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
+		"@pengana/upload-queue": "workspace:*",
 		"@orpc/client": "catalog:",
 		"@orpc/openapi": "catalog:",
 		"@orpc/server": "catalog:",

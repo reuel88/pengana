@@ -1,11 +1,7 @@
 import { env } from "@pengana/env/web";
+import { STORAGE_WARNING_RATIO } from "@pengana/storage-health";
 import { createSyncTransport } from "@pengana/sync-client";
-import {
-	cleanupUploaded,
-	STORAGE_WARNING_RATIO,
-	SyncEngine,
-	UploadQueue,
-} from "@pengana/sync-engine";
+import { SyncEngine } from "@pengana/sync-engine";
 import {
 	createTodoSyncAdapter,
 	orgTodoConfig,
@@ -18,6 +14,7 @@ import {
 } from "@pengana/upload-client";
 import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
+import { cleanupUploaded, UploadQueue } from "@pengana/upload-queue";
 import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
 import type { SyncScope } from "@/shared/api/background-messages";
 import { client } from "@/shared/api/orpc";

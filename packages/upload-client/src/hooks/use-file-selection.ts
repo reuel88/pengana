@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync-engine";
+import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/upload-queue";
 import { useCallback } from "react";
 import { processMediaFile } from "../lib/media-actions";
 import type {

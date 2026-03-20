@@ -8,7 +8,17 @@ export type CreateContextOptions = {
 	context: HonoContext;
 };
 
-export async function createContext({ context }: CreateContextOptions) {
+type CreateContextResult = {
+	session: Awaited<ReturnType<typeof auth.api.getSession>>;
+	locale: string;
+	t: ReturnType<typeof getServerT>;
+	headers: Headers;
+	webBaseUrl: string;
+};
+
+export async function createContext({
+	context,
+}: CreateContextOptions): Promise<CreateContextResult> {
 	const session = await auth.api.getSession({
 		headers: context.req.raw.headers,
 	});

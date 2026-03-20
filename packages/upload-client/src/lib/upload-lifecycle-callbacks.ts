@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { UploadLifecycleCallbacks } from "@pengana/sync-engine";
+import type { UploadLifecycleCallbacks } from "@pengana/upload-queue";
 
 import { markMediaFailed, updateMediaUploaded } from "./media-actions";
 

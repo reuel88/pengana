@@ -14,9 +14,6 @@
 		"./core/*": {
 			"default": "./src/core/*.ts"
 		},
-		"./context/*": {
-			"default": "./src/context/*.ts"
-		},
 		"./hooks/*": {
 			"default": "./src/hooks/*.ts"
 		},

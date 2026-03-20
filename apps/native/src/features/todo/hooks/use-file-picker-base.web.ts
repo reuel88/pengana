@@ -4,7 +4,7 @@ import {
 	isAllowedMimeType,
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
-} from "@pengana/sync-engine";
+} from "@pengana/upload-queue";
 import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file-store.web";
 
 export function useFilePickerBase(deps: {
