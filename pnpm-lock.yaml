@@ -129,9 +129,15 @@ importers:
       '@types/pg':
         specifier: ^8.16.0
         version: 8.18.0
+      server:
+        specifier: workspace:*
+        version: link:../server
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      web:
+        specifier: workspace:*
+        version: link:../web
 
   apps/extension:
     dependencies:

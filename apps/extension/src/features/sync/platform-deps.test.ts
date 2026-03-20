@@ -4,6 +4,10 @@ vi.mock("@/shared/db", () => ({
 	appDb: {},
 }));
 
+vi.mock("@/features/sync/entities/upload-queue", () => ({
+	createIndexedDbUploadTransport: () => ({}),
+}));
+
 const { createNoopRealtimeTransport } = await import("./platform-deps");
 
 describe("createNoopRealtimeTransport", () => {
