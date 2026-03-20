@@ -1,5 +1,5 @@
+import { createDexieActions } from "@pengana/entity-store";
 import type { WebTodo } from "@pengana/todo-client";
-import { createTodoActions, personalTodoConfig } from "@pengana/todo-client";
 import {
 	addMedia as _addMedia,
 	attachMediaToEntity as _attachMedia,
@@ -10,27 +10,55 @@ import {
 	updateMediaUploaded as _updateMediaUploaded,
 } from "@pengana/upload-client";
 
-import { appDb } from "@/features/todo/entities/todo";
+import { appDb } from "@/shared/db";
 
-const actions = createTodoActions(appDb, personalTodoConfig);
+const actions = createDexieActions<WebTodo>(appDb, "todos");
 
-export const addTodo = (
+export async function addTodo(
 	userId: string,
 	title: string,
-	organizationId?: string,
-) => actions.addTodo(userId, userId, organizationId ?? null, title);
-export const toggleTodo = (id: string) => actions.toggleTodo(id);
-export const deleteTodo = (id: string) => actions.deleteTodo(id);
-export const resolveConflict = (id: string, resolution: "local" | "server") =>
-	actions.resolveConflict(id, resolution);
+	organizationId: string,
+): Promise<void> {
+	await actions.add({
+		id: crypto.randomUUID(),
+		title,
+		completed: false,
+		updatedAt: new Date().toISOString(),
+		scopeId: userId,
+		userId,
+		organizationId,
+		createdBy: userId,
+		syncStatus: "pending",
+		deleted: false,
+		scopeType: "personal",
+	});
+}
+
+export async function toggleTodo(id: string): Promise<void> {
+	const todo = await appDb.getTable<WebTodo>("todos").get(id);
+	if (!todo) throw new Error(`Todo not found: ${id}`);
+	await actions.update(id, { completed: !todo.completed });
+}
+
+export async function deleteTodo(id: string): Promise<void> {
+	await actions.softDelete(id);
+}
+
+export async function resolveConflict(
+	id: string,
+	resolution: "local" | "server",
+): Promise<void> {
+	await actions.resolveConflict(id, resolution);
+}
+
 export const addMedia = (options: {
 	userId: string;
 	localUri: string;
 	mimeType: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }) => _addMedia(appDb, options);
 export const attachMedia = (
 	mediaId: string,

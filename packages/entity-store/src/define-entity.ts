@@ -5,6 +5,7 @@ export interface SyncableBase {
 	id: string;
 	updatedAt: string;
 	userId: string;
+	scopeId: string;
 	syncStatus: SyncStatus;
 	deleted: boolean;
 }

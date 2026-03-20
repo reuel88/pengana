@@ -20,5 +20,6 @@
 	"noActiveOrganization": "Walang aktibong organisasyon",
 	"seatRequiredForWrite": "Kailangan ng seat para sa mga write na operasyon. Makipag-ugnayan sa may-ari ng iyong organisasyon.",
 	"failedToRetryAttachment": "Nabigong subukang muli ang kalakip",
-	"attachmentBelongsToAnotherUser": "Ang kalakip ay pag-aari ng ibang user"
+	"attachmentBelongsToAnotherUser": "Ang kalakip ay pag-aari ng ibang user",
+	"orgScopeRequiresActiveOrg": "Ang saklaw ng organisasyon ay nangangailangan ng aktibong organisasyon."
 }

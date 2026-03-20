@@ -134,6 +134,13 @@
 			"when": 1773693309270,
 			"tag": "0018_cooing_forge",
 			"breakpoints": true
+		},
+		{
+			"idx": 19,
+			"version": "7",
+			"when": 1773831419302,
+			"tag": "0019_gigantic_vargas",
+			"breakpoints": true
 		}
 	]
 }

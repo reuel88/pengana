@@ -15,7 +15,7 @@ interface Syncable {
 }
 
 export function useUploadQueue(
-	userId: string | undefined,
+	userId: string,
 	isOnline: boolean,
 	engineRef: React.RefObject<Syncable | null>,
 	createUploadAdapter: () => UploadAdapter,
@@ -33,8 +33,6 @@ export function useUploadQueue(
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: syncRef is a stable ref — its .current is reassigned every render, so listing it would cause infinite re-runs
 	useEffect(() => {
-		if (!userId) return;
-
 		setIsUploading(false);
 		setUploadEvents([]);
 
@@ -86,6 +84,7 @@ export function useUploadQueue(
 			mediaId: string,
 			entityType?: string,
 			entityId?: string,
+			scopeType?: "personal" | "org",
 		) => {
 			uploadQueueRef.current?.enqueue({
 				id: mediaId,
@@ -93,6 +92,7 @@ export function useUploadQueue(
 				mimeType,
 				entityType,
 				entityId,
+				scopeType,
 			});
 		},
 		[],

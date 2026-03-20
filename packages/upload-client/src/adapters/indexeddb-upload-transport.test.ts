@@ -43,6 +43,30 @@ describe("createIndexedDbUploadTransport", () => {
 		});
 	});
 
+	it("forwards standalone scope to the upload rpc", async () => {
+		const rpc = {
+			upload: vi.fn().mockResolvedValue({
+				data: { url: "https://cdn.example.com/file.png" },
+			}),
+		};
+		getFileFromIndexedDB.mockResolvedValue({ base64: "YWJj" });
+
+		const transport = createIndexedDbUploadTransport({ rpc, db: fakeDb });
+
+		await transport.upload({
+			fileUri: "indexeddb://media-123",
+			mimeType: "image/png",
+			idempotencyKey: "idem-1",
+			scopeType: "org",
+		});
+
+		expect(rpc.upload).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "org",
+			}),
+		);
+	});
+
 	it("throws the storage-specific missing file error", async () => {
 		getFileFromIndexedDB.mockResolvedValue(undefined);
 		const transport = createIndexedDbUploadTransport({

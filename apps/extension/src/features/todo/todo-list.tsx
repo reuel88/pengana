@@ -1,19 +1,16 @@
 import { useTranslation } from "@pengana/i18n";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/sync-engine";
-import type { TodoActions, TodoConfig, WebTodo } from "@pengana/todo-client";
-import { useTodoListWiring } from "@pengana/todo-client";
+import {
+	type TodoActions,
+	useTodoHandlers,
+	type WebTodo,
+} from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import type { LocalMedia } from "@pengana/upload-client";
 import { storeFileInIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
-
-const fileStorage = {
-	storeFile: (entityId: string, file: File) =>
-		storeFileInIndexedDB(appDb, entityId, file),
-	createFileRef: (id: string) => ({ uri: `${INDEXEDDB_URI_PREFIX}${id}` }),
-};
 
 type TodoWithAttachments = WebTodo & {
 	attachments: LocalMedia[];
@@ -29,15 +26,15 @@ interface TodoListProps {
 			mediaId: string,
 			entityType?: string,
 			entityId?: string,
+			scopeType?: "personal" | "org",
 		) => void;
 	};
-	actions?: TodoActions;
+	actions: TodoActions;
 	entityType?: string;
-	userId?: string;
-	config?: TodoConfig;
+	userId: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
+	organizationId: string;
 }
 
 export function TodoList({
@@ -46,13 +43,12 @@ export function TodoList({
 	actions,
 	entityType,
 	userId,
-	config,
 	scopeType,
 	scopeId,
 	organizationId,
 }: TodoListProps) {
-	const { triggerSync, enqueueUpload } = syncHook;
 	const { t } = useTranslation();
+
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	const onError = useCallback((id: string, message: string) => {
@@ -64,29 +60,40 @@ export function TodoList({
 		setErrors(({ [id]: _, ...rest }) => rest);
 	}, []);
 
+	const fileStorage = useMemo(
+		() => ({
+			storeFile: (entityId: string, file: File) =>
+				storeFileInIndexedDB(appDb, entityId, file),
+			createFileRef: (id: string) => ({
+				uri: `${INDEXEDDB_URI_PREFIX}${id}`,
+			}),
+		}),
+		[],
+	);
+
 	const {
 		handleToggle,
 		handleDelete,
 		handleResolve,
 		handleRemoveAttachment,
 		handleFilesSelected,
-	} = useTodoListWiring({
-		triggerSync,
-		enqueueUpload,
+	} = useTodoHandlers({
+		triggerSync: syncHook.triggerSync,
+		enqueueUpload: syncHook.enqueueUpload,
 		onError,
 		clearError,
 		fileStorage,
 		t,
 		onDeleteSuccess: clearError,
 		deleteAttachment: (attachmentId) =>
-			client.upload.deleteMedia({ mediaId: attachmentId }),
+			client.upload.deleteMedia({ mediaId: attachmentId }), // Delete attachment is a direct API call
 		db: appDb,
 		userId,
-		config,
 		scopeType,
 		scopeId,
 		organizationId,
-		...(actions ? { actions, entityType } : {}),
+		entityType,
+		actions,
 	});
 
 	return (

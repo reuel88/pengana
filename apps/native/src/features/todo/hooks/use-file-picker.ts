@@ -9,7 +9,7 @@ import {
 
 import { useFilePickerBase } from "./use-file-picker-base";
 
-export function useFilePicker(userId: string, organizationId?: string) {
+export function useFilePicker(userId: string, organizationId: string) {
 	const { enqueueUpload } = useSync();
 	return useFilePickerBase({
 		addMedia,
@@ -21,7 +21,7 @@ export function useFilePicker(userId: string, organizationId?: string) {
 		userId,
 		scopeType: "personal",
 		scopeId: userId,
-		organizationId: organizationId ?? null,
+		organizationId,
 		createdBy: userId,
 	});
 }

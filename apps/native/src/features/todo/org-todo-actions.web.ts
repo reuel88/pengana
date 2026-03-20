@@ -1,19 +1,32 @@
-import { createTodoActions, orgTodoConfig } from "@pengana/todo-client";
-import { appDb } from "@/features/todo/entities/todo";
+import { createDexieActions } from "@pengana/entity-store";
+import type { WebTodo } from "@pengana/todo-client";
 
-const actions = createTodoActions(appDb, orgTodoConfig);
+import { appDb } from "@/shared/db";
 
-export const addOrgTodo = (
+const actions = createDexieActions<WebTodo>(appDb, "todos");
+
+export async function addOrgTodo(
 	organizationId: string,
 	userId: string,
 	title: string,
-) => actions.addTodo(organizationId, userId, organizationId, title);
+): Promise<void> {
+	await actions.add({
+		id: crypto.randomUUID(),
+		title,
+		completed: false,
+		updatedAt: new Date().toISOString(),
+		scopeId: organizationId,
+		userId,
+		organizationId,
+		createdBy: userId,
+		syncStatus: "pending",
+		deleted: false,
+		scopeType: "org",
+	});
+}
 
-export const toggleOrgTodo = (id: string) => actions.toggleTodo(id);
-
-export const deleteOrgTodo = (id: string) => actions.deleteTodo(id);
-
-export const resolveOrgConflict = (
-	id: string,
-	resolution: "local" | "server",
-) => actions.resolveConflict(id, resolution);
+export {
+	deleteTodo as deleteOrgTodo,
+	resolveConflict as resolveOrgConflict,
+	toggleTodo as toggleOrgTodo,
+} from "./todo-actions.web";

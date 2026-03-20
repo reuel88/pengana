@@ -8,9 +8,8 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { OrgSyncProvider } from "@/features/sync/org-sync-context";
-import { SyncProvider } from "@/features/sync/sync-context";
-import { appDb } from "@/features/todo/entities/todo";
+import { OrgSyncProvider, SyncProvider } from "@/features/sync/sync-context";
+import { appDb } from "@/shared/db";
 import { useTheme } from "@/shared/lib/theme";
 import { destructiveText } from "@/shared/styles/shared";
 import migrations from "../../drizzle/migrations";
@@ -26,7 +25,7 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const { success, error } = useMigrations(appDb, migrations);
 	const { theme } = useTheme();
@@ -56,27 +55,20 @@ export function TodoPage({
 	return (
 		<View style={styles.page}>
 			<ScrollView style={styles.scroll}>
-				<TodoShell
-					activeTab={activeTab}
-					onTabChange={setActiveTab}
-					showTabs={Boolean(organizationId)}
-				/>
-				<SyncProvider userId={userId} organizationId={organizationId}>
-					<View
-						testID="personal-todo-panel"
-						style={
-							activeTab !== "personal" && organizationId
-								? styles.hiddenPanel
-								: undefined
-						}
-					>
-						<PersonalTodoContent
-							userId={userId}
-							organizationId={organizationId}
-						/>
-					</View>
-				</SyncProvider>
-				{organizationId ? (
+				<TodoShell activeTab={activeTab} onTabChange={setActiveTab} />
+
+				{activeTab === "personal" && (
+					<SyncProvider userId={userId} organizationId={organizationId}>
+						<View testID="personal-todo-panel">
+							<PersonalTodoContent
+								userId={userId}
+								organizationId={organizationId}
+							/>
+						</View>
+					</SyncProvider>
+				)}
+
+				{activeTab === "organization" && (
 					<OrgSyncProvider organizationId={organizationId} userId={userId}>
 						<View
 							testID="organization-todo-panel"
@@ -90,7 +82,7 @@ export function TodoPage({
 							/>
 						</View>
 					</OrgSyncProvider>
-				) : null}
+				)}
 			</ScrollView>
 		</View>
 	);

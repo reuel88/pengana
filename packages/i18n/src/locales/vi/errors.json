@@ -20,5 +20,6 @@
 	"noActiveOrganization": "Không có tổ chức nào đang hoạt động",
 	"seatRequiredForWrite": "Cần có chỗ ngồi để thực hiện thao tác ghi. Liên hệ với chủ sở hữu tổ chức của bạn.",
 	"failedToRetryAttachment": "Không thể thử lại tệp đính kèm",
-	"attachmentBelongsToAnotherUser": "Tệp đính kèm thuộc về người dùng khác"
+	"attachmentBelongsToAnotherUser": "Tệp đính kèm thuộc về người dùng khác",
+	"orgScopeRequiresActiveOrg": "Phạm vi tổ chức yêu cầu một tổ chức đang hoạt động."
 }

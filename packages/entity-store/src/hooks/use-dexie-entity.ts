@@ -18,7 +18,7 @@ export function useDexieEntity<TLocal extends SyncableBase>(
 ) {
 	const allItems = useLiveQuery(
 		() => {
-			const query = db.getTable<TLocal>(tableName).where({ userId: scopeId });
+			const query = db.getTable<TLocal>(tableName).where({ scopeId: scopeId });
 			if (filter) return query.filter(filter).toArray();
 			return query.toArray();
 		},

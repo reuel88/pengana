@@ -1,4 +1,4 @@
-import { useOrgSync } from "@/features/sync/org-sync-context";
+import { useOrgSync } from "@/features/sync/sync-context";
 
 import {
 	addMedia,

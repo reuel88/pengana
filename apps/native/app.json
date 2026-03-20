@@ -51,7 +51,11 @@
 						"backgroundColor": "#000000"
 					}
 				}
-			]
+			],
+			"expo-localization",
+			"expo-secure-store",
+			"expo-sqlite",
+			"expo-web-browser"
 		],
 		"experiments": {
 			"typedRoutes": true,

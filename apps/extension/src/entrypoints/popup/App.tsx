@@ -89,11 +89,21 @@ function App() {
 				/>
 			</div>
 		);
+	} else if (!session.session.activeOrganizationId) {
+		content = (
+			<div data-testid="onboarding-prompt">
+				<ActionPrompt
+					messageKey="onboardingPrompt"
+					buttonKey="onboardingButton"
+					url={`${env.VITE_WEB_URL}/onboarding`}
+				/>
+			</div>
+		);
 	} else {
 		content = (
 			<TodoPage
 				userId={session.user.id}
-				organizationId={session.session.activeOrganizationId ?? undefined}
+				organizationId={session.session.activeOrganizationId}
 			/>
 		);
 	}

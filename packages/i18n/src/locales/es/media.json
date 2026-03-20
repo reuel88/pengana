@@ -1,0 +1,32 @@
+{
+	"title": "Medios",
+	"dropzone": {
+		"idle": "Arrastra y suelta archivos aquí, o haz clic para buscar",
+		"active": "Suelta los archivos aquí...",
+		"rejected": {
+			"type": "Tipo de archivo no compatible. Usa JPEG, PNG, HEIC o PDF.",
+			"size": "El archivo es demasiado grande. El tamaño máximo es 10MB."
+		}
+	},
+	"grid": {
+		"empty": "Aún no hay medios"
+	},
+	"upload": {
+		"success": "Archivo subido correctamente",
+		"error": "Error al subir"
+	},
+	"delete": {
+		"success": "Medio eliminado"
+	},
+	"source": {
+		"standalone": "independiente",
+		"todo": "tarea"
+	},
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organización"
+	},
+	"actions": {
+		"delete": "Eliminar"
+	}
+}

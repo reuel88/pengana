@@ -1,6 +1,6 @@
 import { randomUUID } from "expo-crypto";
 
-import { appDb, todos } from "@/features/todo/entities/todo";
+import { actions } from "./todo-actions";
 
 export {
 	deleteTodo as deleteOrgTodo,
@@ -13,12 +13,13 @@ export async function addOrgTodo(
 	userId: string,
 	title: string,
 ): Promise<void> {
-	await appDb.insert(todos).values({
+	await actions.add({
 		id: randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
-		userId: organizationId,
+		userId,
+		scopeId: organizationId,
 		organizationId,
 		createdBy: userId,
 		scopeType: "org",

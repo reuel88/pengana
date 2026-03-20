@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { OrgSyncProvider } from "@/features/sync/org-sync-context";
-import { SyncProvider } from "@/features/sync/sync-context";
+import { OrgSyncProvider, SyncProvider } from "@/features/sync/sync-context";
 import {
 	OrganizationTodoContent,
 	PersonalTodoContent,
@@ -13,46 +12,34 @@ export function TodoPage({
 	organizationId,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 }) {
 	const [activeTab, setActiveTab] = useState<TodoTab>("personal");
 
 	return (
 		<div style={{ flex: 1, overflowY: "auto" }}>
-			<TodoShell
-				activeTab={activeTab}
-				onTabChange={setActiveTab}
-				showTabs={Boolean(organizationId)}
-			/>
-			<SyncProvider userId={userId} organizationId={organizationId}>
-				<div
-					data-testid="personal-todo-panel"
-					style={{
-						display:
-							activeTab !== "personal" && organizationId ? "none" : undefined,
-					}}
-				>
-					<PersonalTodoContent
-						userId={userId}
-						organizationId={organizationId}
-					/>
-				</div>
-			</SyncProvider>
-			{organizationId ? (
+			<TodoShell activeTab={activeTab} onTabChange={setActiveTab} />
+
+			{activeTab === "personal" && (
+				<SyncProvider userId={userId} organizationId={organizationId}>
+					<div data-testid="personal-todo-panel">
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
+					</div>
+				</SyncProvider>
+			)}
+			{activeTab === "organization" && (
 				<OrgSyncProvider organizationId={organizationId} userId={userId}>
-					<div
-						data-testid="organization-todo-panel"
-						style={{
-							display: activeTab !== "organization" ? "none" : undefined,
-						}}
-					>
+					<div data-testid="organization-todo-panel">
 						<OrganizationTodoContent
 							organizationId={organizationId}
 							userId={userId}
 						/>
 					</div>
 				</OrgSyncProvider>
-			) : null}
+			)}
 		</div>
 	);
 }

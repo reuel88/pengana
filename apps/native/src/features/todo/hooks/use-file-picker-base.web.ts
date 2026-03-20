@@ -14,8 +14,8 @@ export function useFilePickerBase(deps: {
 		mimeType: string;
 		scopeType: "personal" | "org";
 		scopeId: string;
-		organizationId: string | null;
-		createdBy: string | null;
+		organizationId: string;
+		createdBy: string;
 	}) => Promise<string>;
 	attachMedia: (
 		mediaId: string,
@@ -29,14 +29,15 @@ export function useFilePickerBase(deps: {
 		mediaId: string,
 		entityType?: string,
 		entityId?: string,
+		scopeType?: "personal" | "org",
 	) => void;
 	getMediaCount: (entityId: string) => Promise<number>;
 	entityType: string;
 	userId: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }) {
 	const { t } = useTranslation();
 

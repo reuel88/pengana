@@ -2,8 +2,8 @@ import type { Media, MediaAttachment } from "@pengana/sync-engine";
 import { buildReconcilePlan } from "@pengana/upload-client";
 import { and, eq, inArray, notInArray } from "drizzle-orm";
 
-import { appDb } from "@/features/todo/entities/todo/db";
-import { media, mediaAttachments } from "@/features/todo/entities/todo/schema";
+import { appDb } from "@/shared/db/db";
+import { media, mediaAttachments } from "@/shared/db/schema";
 
 export async function reconcileNativeMedia(
 	serverMedia: Media[],

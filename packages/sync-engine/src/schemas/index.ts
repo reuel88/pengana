@@ -15,8 +15,8 @@ export const todoSchema = z.object({
 	completed: z.boolean(),
 	updatedAt: z.string(),
 	userId: z.string(),
-	organizationId: z.string().nullable(),
-	createdBy: z.string().nullable(),
+	organizationId: z.string(),
+	createdBy: z.string(),
 	syncStatus: syncStatusSchema,
 	deleted: z.boolean(),
 });
@@ -30,8 +30,8 @@ export const mediaSchema = z.object({
 	updatedAt: z.string(),
 	scopeType: z.enum(["personal", "org"]),
 	scopeId: z.string(),
-	organizationId: z.string().nullable(),
-	createdBy: z.string().nullable(),
+	organizationId: z.string(),
+	createdBy: z.string(),
 });
 
 export const mediaAttachmentSchema = z.object({
@@ -49,6 +49,7 @@ export const uploadItemSchema = z.object({
 	mimeType: z.string(),
 	entityType: z.string().optional(),
 	entityId: z.string().optional(),
+	scopeType: z.enum(["personal", "org"]).optional(),
 	status: uploadStatusSchema,
 	retryCount: z.number(),
 	createdAt: z.string(),

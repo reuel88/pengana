@@ -12,8 +12,8 @@ export interface MediaRow {
 	updatedAt: Date;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }
 
 export interface MediaAttachmentRow {
@@ -61,8 +61,8 @@ export async function insertMedia(values: {
 	updatedAt?: Date;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId?: string | null;
-	createdBy?: string | null;
+	organizationId: string;
+	createdBy: string;
 }): Promise<void> {
 	await db
 		.insert(media)
@@ -149,4 +149,31 @@ export async function findMediaAttachmentsByEntityIds(
 		.select()
 		.from(mediaAttachments)
 		.where(inArray(mediaAttachments.entityId, entityIds));
+}
+
+export async function findMediaByScope(opts: {
+	scopeType: "personal" | "org";
+	scopeId: string;
+	limit?: number;
+	offset?: number;
+}): Promise<MediaRow[]> {
+	return db
+		.select()
+		.from(media)
+		.where(
+			and(eq(media.scopeType, opts.scopeType), eq(media.scopeId, opts.scopeId)),
+		)
+		.orderBy(sql`${media.createdAt} desc`)
+		.limit(opts.limit ?? 50)
+		.offset(opts.offset ?? 0);
+}
+
+export async function findMediaAttachmentsByMediaIds(
+	mediaIds: string[],
+): Promise<MediaAttachmentRow[]> {
+	if (mediaIds.length === 0) return [];
+	return db
+		.select()
+		.from(mediaAttachments)
+		.where(inArray(mediaAttachments.mediaId, mediaIds));
 }

@@ -32,6 +32,31 @@ describe("createUploadTransport", () => {
 		});
 	});
 
+	it("passes standalone scope through to the rpc client", async () => {
+		const rpc = {
+			upload: vi.fn().mockResolvedValue({
+				data: { url: "https://cdn.example.com/file.png" },
+			}),
+		};
+		const transport = createUploadTransport({
+			rpc,
+			getBase64: vi.fn().mockResolvedValue("YWJj"),
+		});
+
+		await transport.upload({
+			fileUri: "/tmp/file.png",
+			mimeType: "image/png",
+			idempotencyKey: "idem-1",
+			scopeType: "personal",
+		});
+
+		expect(rpc.upload).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "personal",
+			}),
+		);
+	});
+
 	it("throws when the file data is missing", async () => {
 		const transport = createUploadTransport({
 			rpc: { upload: vi.fn() },

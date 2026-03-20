@@ -29,8 +29,8 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		deleted: false,
 		updatedAt: "2025-06-01T00:00:10.000Z",
 		userId: "test-user",
-		organizationId: null,
-		createdBy: null as string | null,
+		organizationId: "test-org",
+		createdBy: "test-user",
 		syncStatus: "pending" as const,
 		...overrides,
 	};
@@ -46,8 +46,8 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 		scopeType: "personal",
 		scopeId: "test-user",
 		userId: "test-user",
-		organizationId: null,
-		createdBy: null,
+		organizationId: "test-org",
+		createdBy: "test-user",
 		...overrides,
 	};
 }
@@ -66,6 +66,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(insertTodo).toHaveBeenCalledWith(
@@ -93,6 +94,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(updateTodo).toHaveBeenCalledWith(
@@ -115,6 +117,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(updateTodo).not.toHaveBeenCalled();
@@ -130,6 +133,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(insertTodo).not.toHaveBeenCalled();
@@ -142,6 +146,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
@@ -156,6 +161,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		const calledDate = vi.mocked(getTodosUpdatedSince).mock.calls[0]?.[2];
@@ -175,6 +181,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(result.serverChanges[0]).toEqual({
@@ -184,8 +191,8 @@ describe("handleTodoSync", () => {
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
 			userId: "test-user",
-			organizationId: null,
-			createdBy: null,
+			organizationId: "test-org",
+			createdBy: "test-user",
 			syncStatus: "synced",
 		});
 	});
@@ -218,6 +225,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 		);
 
 		expect(insertTodo).toHaveBeenCalledTimes(1);
@@ -234,6 +242,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 			notifyUser,
 		);
 
@@ -248,6 +257,7 @@ describe("handleTodoSync", () => {
 			"personal",
 			"test-user",
 			"test-user",
+			"test-org",
 			notifyUser,
 		);
 
@@ -264,7 +274,7 @@ describe("handleTodoSync", () => {
 					makeChange({
 						organizationId: "org-1",
 						createdBy: "user-1",
-						userId: "org-1",
+						userId: "user-1",
 					}),
 				],
 				lastSyncedAt: null,
@@ -272,6 +282,7 @@ describe("handleTodoSync", () => {
 			"org",
 			"org-1",
 			"user-1",
+			"org-1",
 		);
 
 		expect(insertTodo).toHaveBeenCalledWith(
@@ -300,6 +311,7 @@ describe("handleTodoSync", () => {
 			"org",
 			"org-1",
 			"user-1",
+			"org-1",
 		);
 
 		expect(insertTodo).not.toHaveBeenCalled();
@@ -321,6 +333,7 @@ describe("handleTodoSync", () => {
 			"org",
 			"org-1",
 			"user-1",
+			"org-1",
 			notifyOrgMembers,
 		);
 
@@ -334,6 +347,7 @@ describe("handleTodoSync", () => {
 			updatedAt: new Date("2025-06-01T12:00:00.000Z"),
 			scopeType: "org",
 			scopeId: "org-1",
+			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 		});
@@ -344,6 +358,7 @@ describe("handleTodoSync", () => {
 			"org",
 			"org-1",
 			"user-1",
+			"org-1",
 		);
 
 		expect(result.serverChanges[0]).toEqual({
@@ -352,7 +367,7 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
-			userId: "org-1",
+			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",
 			syncStatus: "synced",

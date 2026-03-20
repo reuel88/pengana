@@ -19,9 +19,9 @@ export async function handleTodoSync(
 	scopeType: ScopeType,
 	scopeId: string,
 	createdBy: string,
+	organizationId: string,
 	notify?: (id: string) => void,
 	skipChanges = false,
-	organizationId?: string,
 ) {
 	const conflicts: string[] = [];
 	const now = new Date();
@@ -53,10 +53,7 @@ export async function handleTodoSync(
 				scopeType,
 				scopeId,
 				userId: createdBy,
-				organizationId:
-					scopeType === "org"
-						? scopeId
-						: (organizationId ?? (change.organizationId || null)),
+				organizationId,
 				createdBy,
 			});
 			appliedCount++;
@@ -92,7 +89,6 @@ export async function handleTodoSync(
 		scopeType,
 		scopeId,
 		lastSyncedAt,
-		organizationId,
 	);
 
 	const todoIds = serverChanges.map((t) => t.id);
@@ -124,10 +120,9 @@ export async function handleTodoSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
-			userId: scopeType === "org" ? t.scopeId : t.userId,
-			organizationId:
-				scopeType === "org" ? t.scopeId : (t.organizationId ?? null),
-			createdBy: t.createdBy ?? null,
+			userId: t.userId,
+			organizationId: t.organizationId,
+			createdBy: t.createdBy,
 			syncStatus: "synced" as const,
 		})),
 		media: [...uniqueMedia.values()].map((a) => ({
@@ -139,8 +134,8 @@ export async function handleTodoSync(
 			updatedAt: a.updatedAt.toISOString(),
 			scopeType: a.scopeType,
 			scopeId: a.scopeId,
-			organizationId: a.organizationId ?? null,
-			createdBy: a.createdBy ?? null,
+			organizationId: a.organizationId,
+			createdBy: a.createdBy,
 		})),
 		mediaAttachments: attachmentRows.map((att) => ({
 			id: att.id,

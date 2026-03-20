@@ -1,37 +1,72 @@
-import { useSync } from "@/features/sync/sync-context";
-
 import type { TodoItemRow } from "./components/todo-item";
 import { useAttachmentHandlers } from "./create-attachment-handlers";
-import { useFilePicker } from "./hooks/use-file-picker";
+import { useFilePickerBase } from "./hooks/use-file-picker-base";
 import {
-	deleteTodo,
+	addMedia,
+	attachMedia,
+	getMediaCountForEntity,
 	removeMedia,
-	resolveConflict,
-	toggleTodo,
+	updateMediaLocalUri,
 } from "./todo-actions";
 import type { TodoListActions } from "./todo-list-base";
 import { TodoListBase } from "./todo-list-base";
 
 export type { TodoItemRow };
 
-const actions: TodoListActions = { toggleTodo, deleteTodo, resolveConflict };
+interface TodoListProps {
+	todos: TodoItemRow[];
+	syncHook: {
+		triggerSync: () => void;
+		enqueueUpload: (
+			fileUri: string,
+			mimeType: string,
+			mediaId: string,
+			entityType?: string,
+			entityId?: string,
+			scopeType?: "personal" | "org",
+		) => void;
+	};
+	actions: TodoListActions;
+	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string;
+}
 
 export function TodoList({
 	todos,
+	syncHook,
+	actions,
 	userId,
-}: {
-	todos: TodoItemRow[];
-	userId: string;
-}) {
-	const { triggerSync, enqueueUpload } = useSync();
-	const { showPickerForTodo } = useFilePicker(userId);
+	scopeType,
+	scopeId,
+	organizationId,
+}: TodoListProps) {
+	const { showPickerForTodo } = useFilePickerBase({
+		addMedia,
+		attachMedia,
+		updateMediaLocalUri,
+		enqueueUpload: syncHook.enqueueUpload,
+		getMediaCount: getMediaCountForEntity,
+		entityType: "todo",
+		userId,
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy: userId,
+	});
+
 	const { handleRemoveAttachment, handleRetryAttachment } =
-		useAttachmentHandlers(removeMedia, triggerSync, enqueueUpload);
+		useAttachmentHandlers(
+			removeMedia,
+			syncHook.triggerSync,
+			syncHook.enqueueUpload,
+		);
 
 	return (
 		<TodoListBase
 			todos={todos}
-			triggerSync={triggerSync}
+			triggerSync={syncHook.triggerSync}
 			showPickerForTodo={showPickerForTodo}
 			actions={actions}
 			onRemoveAttachment={handleRemoveAttachment}

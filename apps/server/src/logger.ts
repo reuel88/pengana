@@ -21,12 +21,13 @@ export const authResponseGuardLogger = getLogger([
 export const requestLogger: MiddlewareHandler = async (c, next) => {
 	const start = Date.now();
 	const { method, path } = c.req;
+	const clientId = c.req.header("X-Client-Id") ?? "unknown";
 	await next();
 	const status = c.res.status;
 	const elapsed = Date.now() - start;
 	if (status >= 400) {
-		httpLogger.warn`${method} ${path} ${String(status)} ${String(elapsed)}ms`;
+		httpLogger.warn`[${clientId}] ${method} ${path} ${String(status)} ${String(elapsed)}ms`;
 	} else {
-		httpLogger.info`${method} ${path} ${String(status)} ${String(elapsed)}ms`;
+		httpLogger.info`[${clientId}] ${method} ${path} ${String(status)} ${String(elapsed)}ms`;
 	}
 };

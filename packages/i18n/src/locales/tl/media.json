@@ -1,0 +1,32 @@
+{
+	"title": "Media",
+	"dropzone": {
+		"idle": "I-drag at i-drop ang mga file dito, o mag-click para mag-browse",
+		"active": "I-drop ang mga file dito...",
+		"rejected": {
+			"type": "Hindi suportado ang uri ng file. Gumamit ng JPEG, PNG, HEIC, o PDF.",
+			"size": "Masyadong malaki ang file. Ang maximum na laki ay 10MB."
+		}
+	},
+	"grid": {
+		"empty": "Wala pang media"
+	},
+	"upload": {
+		"success": "Matagumpay na na-upload ang file",
+		"error": "Nabigo ang pag-upload"
+	},
+	"delete": {
+		"success": "Na-delete ang media"
+	},
+	"source": {
+		"standalone": "nagsasarili",
+		"todo": "gawain"
+	},
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organisasyon"
+	},
+	"actions": {
+		"delete": "I-delete"
+	}
+}

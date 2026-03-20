@@ -6,8 +6,8 @@ export interface AddMediaOptions {
 	mimeType: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }
 
 export interface LocalMedia {
@@ -21,8 +21,8 @@ export interface LocalMedia {
 	updatedAt: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
-	organizationId: string | null;
-	createdBy: string | null;
+	organizationId: string;
+	createdBy: string;
 }
 
 export interface LocalMediaAttachment {

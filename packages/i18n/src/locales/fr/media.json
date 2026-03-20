@@ -1,0 +1,32 @@
+{
+	"title": "Médias",
+	"dropzone": {
+		"idle": "Glissez-déposez des fichiers ici, ou cliquez pour parcourir",
+		"active": "Déposez les fichiers ici...",
+		"rejected": {
+			"type": "Type de fichier non pris en charge. Veuillez utiliser JPEG, PNG, HEIC ou PDF.",
+			"size": "Le fichier est trop volumineux. La taille maximale est de 10 Mo."
+		}
+	},
+	"grid": {
+		"empty": "Aucun média pour le moment"
+	},
+	"upload": {
+		"success": "Fichier téléversé avec succès",
+		"error": "Échec du téléversement"
+	},
+	"delete": {
+		"success": "Média supprimé"
+	},
+	"source": {
+		"standalone": "autonome",
+		"todo": "tâche"
+	},
+	"tabs": {
+		"personal": "Personnel",
+		"organization": "Organisation"
+	},
+	"actions": {
+		"delete": "Supprimer"
+	}
+}

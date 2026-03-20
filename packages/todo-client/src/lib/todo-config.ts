@@ -9,8 +9,8 @@ export interface TodoConfig {
 	scopeType: "personal" | "org";
 	buildNewTodo: (params: {
 		scopeId: string;
-		actorId: string;
-		organizationId: string | null;
+		userId: string;
+		organizationId: string;
 		title: string;
 	}) => Omit<WebTodo, "id">;
 }
@@ -19,13 +19,14 @@ export const personalTodoConfig: TodoConfig = {
 	entity: todoEntity,
 	syncKeyPrefix: "lastSyncedAt",
 	scopeType: "personal",
-	buildNewTodo: ({ scopeId, actorId, organizationId, title }) => ({
+	buildNewTodo: ({ scopeId, userId, organizationId, title }) => ({
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
-		userId: scopeId,
+		scopeId: scopeId,
+		userId: userId,
 		organizationId,
-		createdBy: actorId,
+		createdBy: userId,
 		syncStatus: "pending",
 		deleted: false,
 		scopeType: "personal",
@@ -36,13 +37,14 @@ export const orgTodoConfig: TodoConfig = {
 	entity: todoEntity,
 	syncKeyPrefix: "lastSyncedAt:org",
 	scopeType: "org",
-	buildNewTodo: ({ scopeId, actorId, organizationId, title }) => ({
+	buildNewTodo: ({ scopeId, userId, organizationId, title }) => ({
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
-		userId: scopeId, // org-scoped: userId = organizationId for sync engine
+		scopeId: scopeId,
+		userId: userId,
 		organizationId,
-		createdBy: actorId,
+		createdBy: userId,
 		syncStatus: "pending",
 		deleted: false,
 		scopeType: "org",

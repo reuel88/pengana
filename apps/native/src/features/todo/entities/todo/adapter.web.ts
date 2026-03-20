@@ -4,7 +4,7 @@ import {
 	personalTodoConfig,
 } from "@pengana/todo-client";
 
-import { appDb } from "./db.web";
+import { appDb } from "@/shared/db";
 
 export function createDexieSyncAdapter(userId: string) {
 	return createTodoSyncAdapter(appDb, userId, personalTodoConfig);

@@ -26,7 +26,7 @@ export function createTodoSyncAdapter(
 			updatedAt: local.updatedAt,
 			userId: local.userId,
 			organizationId: local.organizationId,
-			createdBy: local.createdBy || null,
+			createdBy: local.createdBy,
 			syncStatus: local.syncStatus,
 			deleted: local.deleted,
 		}),
@@ -42,9 +42,11 @@ export function createTodoSyncAdapter(
 				updatedAt: wire.updatedAt,
 				userId: wire.userId,
 				organizationId: wire.organizationId,
-				createdBy: wire.createdBy ?? "",
+				createdBy: wire.createdBy,
 				syncStatus,
 				deleted: wire.deleted,
+				scopeId:
+					config.scopeType === "personal" ? wire.userId : wire.organizationId,
 				scopeType: config.scopeType,
 			};
 

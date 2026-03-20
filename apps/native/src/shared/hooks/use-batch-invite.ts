@@ -27,14 +27,8 @@ export function useBatchInvite({
 		}
 
 		if (!organizationId) {
-			onError?.("Missing organization");
-			return {
-				successes: [],
-				failures: entries.map((entry) => ({
-					...entry,
-					reason: "missing-organization",
-				})),
-			};
+			onError?.("Organization ID is required");
+			return { successes: [], failures: entries };
 		}
 
 		setLoading(true);

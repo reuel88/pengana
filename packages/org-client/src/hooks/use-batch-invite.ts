@@ -19,8 +19,13 @@ export function useBatchInvite({
 	const batchInvite = async (
 		entries: Array<{ email: string; role: "member" | "admin" }>,
 	) => {
-		if (!organizationId || entries.length === 0) {
+		if (entries.length === 0) {
 			return { successes: [], failures: [] };
+		}
+
+		if (!organizationId) {
+			onError?.("Organization ID is required");
+			return { successes: [], failures: entries };
 		}
 
 		setLoading(true);

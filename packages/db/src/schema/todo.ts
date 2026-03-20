@@ -16,12 +16,12 @@ export const todo = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		organizationId: text("organization_id").references(() => organization.id, {
-			onDelete: "set null",
-		}),
-		createdBy: text("created_by").references(() => user.id, {
-			onDelete: "set null",
-		}),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		createdBy: text("created_by")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
 	},
 	(table) => [
 		index("todo_scope_updatedAt_idx").on(

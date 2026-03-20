@@ -20,5 +20,6 @@
 	"noActiveOrganization": "활성 조직이 없습니다",
 	"seatRequiredForWrite": "쓰기 작업에는 시트가 필요합니다. 조직 소유자에게 문의하세요.",
 	"failedToRetryAttachment": "첨부 파일 재시도에 실패했습니다",
-	"attachmentBelongsToAnotherUser": "첨부 파일이 다른 사용자에게 속합니다"
+	"attachmentBelongsToAnotherUser": "첨부 파일이 다른 사용자에게 속합니다",
+	"orgScopeRequiresActiveOrg": "조직 범위에는 활성 조직이 필요합니다."
 }

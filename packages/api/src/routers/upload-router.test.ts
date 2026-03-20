@@ -53,6 +53,7 @@ process.env.POLAR_WEBHOOK_SECRET ??= "webhook-secret";
 process.env.CORS_ORIGIN ??= "http://localhost:3001";
 
 import { insertMedia } from "@pengana/db/media-queries";
+import { isMemberSeatedByUserId } from "@pengana/db/seat-queries";
 import { uploadRouter } from "./upload";
 
 function makeContext(overrides: Partial<Context> = {}): Context {
@@ -108,13 +109,14 @@ describe("upload.upload", () => {
 			expect.objectContaining({
 				scopeType: "personal",
 				scopeId: "user-1",
-				organizationId: null,
+				organizationId: "user-1",
 				createdBy: "user-1",
 			}),
 		);
 	});
 
 	it("derives org scope when activeOrganizationId is set", async () => {
+		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
 		const ctx = makeContext({
 			session: {
 				user: {
@@ -144,5 +146,35 @@ describe("upload.upload", () => {
 				createdBy: "user-1",
 			}),
 		);
+	});
+
+	it("allows standalone personal uploads even when an active organization exists", async () => {
+		vi.mocked(isMemberSeatedByUserId).mockResolvedValue(true);
+		const ctx = makeContext({
+			session: {
+				user: {
+					id: "user-1",
+					email: "user@example.com",
+					name: "Test User",
+				},
+				session: {
+					activeOrganizationId: "org-1",
+				},
+			} as Context["session"],
+		});
+
+		await call(uploadRouter.upload, makeInput({ scopeType: "personal" }), {
+			context: ctx,
+		});
+
+		expect(insertMedia).toHaveBeenCalledWith(
+			expect.objectContaining({
+				scopeType: "personal",
+				scopeId: "user-1",
+				organizationId: "org-1",
+			}),
+		);
+		expect(ctx.notifyUser).toHaveBeenCalledWith("user-1");
+		expect(ctx.notifyOrgMembers).not.toHaveBeenCalled();
 	});
 });

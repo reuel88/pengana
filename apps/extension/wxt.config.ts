@@ -12,7 +12,7 @@ export default defineConfig({
 		],
 	},
 	vite: () => ({
-		plugins: [tailwindcss()],
+		plugins: tailwindcss(),
 		resolve: {
 			alias: {
 				"@pengana/org-client": path.resolve(

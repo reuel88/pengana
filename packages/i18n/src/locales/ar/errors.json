@@ -20,5 +20,6 @@
 	"noActiveOrganization": "لا توجد مؤسسة نشطة",
 	"seatRequiredForWrite": "مقعد مطلوب لإجراء عمليات الكتابة. تواصل مع مالك المؤسسة.",
 	"failedToRetryAttachment": "فشل في إعادة محاولة المرفق",
-	"attachmentBelongsToAnotherUser": "المرفق يخص مستخدمًا آخر"
+	"attachmentBelongsToAnotherUser": "المرفق يخص مستخدمًا آخر",
+	"orgScopeRequiresActiveOrg": "نطاق المؤسسة يتطلب مؤسسة نشطة."
 }

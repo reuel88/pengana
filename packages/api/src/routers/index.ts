@@ -9,6 +9,7 @@ import {
 	publicProcedure,
 } from "../index";
 import { billingRouter } from "./billing";
+import { mediaRouter } from "./media";
 import { notificationRouter } from "./notification";
 import { orgTodoRouter } from "./org-todo";
 import { teamRouter } from "./team";
@@ -93,6 +94,7 @@ export const appRouter = {
 			});
 		}),
 	billing: billingRouter,
+	media: mediaRouter,
 	notification: notificationRouter,
 	orgTodo: orgTodoRouter,
 	team: teamRouter,

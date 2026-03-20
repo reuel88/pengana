@@ -30,11 +30,11 @@ const UPLOADS_DIR = join(process.cwd(), "uploads");
 type EntityScope = {
 	scopeType: "org" | "personal";
 	scopeId: string;
-	organizationId: string | null;
+	organizationId: string;
 };
 
 async function validateEntityAccess(
-	entityType: string,
+	entityType: "todo",
 	entityId: string,
 	userId: string,
 	activeOrgId: string | null,
@@ -59,7 +59,7 @@ async function validateEntityAccess(
 			organizationId: todoRow.organizationId,
 		};
 	}
-	return { scopeType: "personal", scopeId: userId, organizationId: null };
+	throw apiError("BAD_REQUEST", t("unsupportedEntityType"));
 }
 
 export const uploadRouter = {
@@ -76,8 +76,9 @@ export const uploadRouter = {
 				data: z.string(),
 				idempotencyKey: z.string().uuid(),
 				attachmentId: z.string().uuid(),
-				entityType: z.string().optional(),
+				entityType: z.enum(["todo"]).optional(),
 				entityId: z.string().optional(),
+				scopeType: z.enum(["personal", "org"]).optional(),
 			}),
 		)
 		.output(
@@ -138,17 +139,38 @@ export const uploadRouter = {
 				await writeFile(filepath, buffer);
 			}
 
+			const standaloneScopeType =
+				input.scopeType ?? (activeOrgId ? "org" : "personal");
 			const scopeType = entityScope
 				? entityScope.scopeType
-				: activeOrgId
-					? "org"
-					: "personal";
+				: standaloneScopeType;
 			const scopeId = entityScope
 				? entityScope.scopeId
-				: (activeOrgId ?? userId);
+				: scopeType === "org"
+					? (activeOrgId ??
+						(() => {
+							throw apiError(
+								"BAD_REQUEST",
+								context.t("orgScopeRequiresActiveOrg"),
+							);
+						})())
+					: userId;
 			const organizationId = entityScope
 				? entityScope.organizationId
-				: (activeOrgId ?? null);
+				: (activeOrgId ?? userId);
+
+			if (!entityScope && scopeType === "org") {
+				if (!activeOrgId) {
+					throw apiError("BAD_REQUEST", context.t("orgScopeRequiresActiveOrg"));
+				}
+				let seated = await isMemberSeatedByUserId(activeOrgId, userId);
+				if (!seated) {
+					seated = await autoSeatOwner(activeOrgId, userId);
+				}
+				if (!seated) {
+					throw apiError("FORBIDDEN", context.t("seatRequiredForWrite"));
+				}
+			}
 
 			await insertMedia({
 				id: input.attachmentId,
@@ -169,7 +191,7 @@ export const uploadRouter = {
 				}
 			}
 
-			if (scopeType === "org" && organizationId) {
+			if (scopeType === "org") {
 				context.notifyOrgMembers(organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -190,7 +212,7 @@ export const uploadRouter = {
 		.input(
 			z.object({
 				mediaId: z.string().uuid(),
-				entityType: z.string(),
+				entityType: z.enum(["todo"]),
 				entityId: z.string(),
 			}),
 		)
@@ -234,7 +256,7 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+			if (entityScope.scopeType === "org") {
 				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -252,7 +274,7 @@ export const uploadRouter = {
 		.input(
 			z.object({
 				mediaId: z.string().uuid(),
-				entityType: z.string(),
+				entityType: z.enum(["todo"]),
 				entityId: z.string(),
 			}),
 		)
@@ -284,7 +306,7 @@ export const uploadRouter = {
 				await updateTodo(input.entityId, { updatedAt: now });
 			}
 
-			if (entityScope.scopeType === "org" && entityScope.organizationId) {
+			if (entityScope.scopeType === "org") {
 				context.notifyOrgMembers(entityScope.organizationId);
 			} else {
 				context.notifyUser(userId);
@@ -352,7 +374,7 @@ export const uploadRouter = {
 				}
 			}
 
-			if (mediaRecord.scopeType === "org" && mediaRecord.organizationId) {
+			if (mediaRecord.scopeType === "org") {
 				context.notifyOrgMembers(mediaRecord.organizationId);
 			} else {
 				context.notifyUser(userId);

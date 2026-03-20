@@ -13,7 +13,7 @@ export interface DrizzleSyncAdapterConfig {
 	syncMetaTable: any;
 	columns: {
 		id: SQLiteColumn;
-		userId: SQLiteColumn;
+		scopeId: SQLiteColumn;
 		syncStatus: SQLiteColumn;
 		updatedAt: SQLiteColumn;
 	};
@@ -61,7 +61,7 @@ export function createDrizzleSyncAdapter(
 				.select()
 				.from(table)
 				.where(
-					and(eq(columns.userId, scopeId), eq(columns.syncStatus, "pending")),
+					and(eq(columns.scopeId, scopeId), eq(columns.syncStatus, "pending")),
 				);
 			if (config.filter) rows = rows.filter(config.filter);
 			return rows.map(toWire);

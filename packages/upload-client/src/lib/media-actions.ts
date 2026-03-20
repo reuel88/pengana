@@ -110,6 +110,29 @@ export async function markMediaFailed(
 	} as never);
 }
 
+export async function getAttachmentForMedia(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<LocalMediaAttachment | undefined> {
+	const attachments = await db
+		.getTable<LocalMediaAttachment>("mediaAttachments")
+		.where({ mediaId })
+		.sortBy("position");
+	return attachments[0];
+}
+
+export async function retryMedia(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<LocalMedia | null> {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
+		status: "queued",
+	} as never);
+
+	const record = await db.getTable<LocalMedia>("media").get(mediaId);
+	return record ?? null;
+}
+
 export async function getMediaCountForEntity(
 	db: EntityDatabase,
 	entityId: string,
@@ -118,6 +141,80 @@ export async function getMediaCountForEntity(
 		.getTable<LocalMediaAttachment>("mediaAttachments")
 		.where({ entityId })
 		.count();
+}
+
+export interface ProcessMediaFileParams {
+	db: EntityDatabase;
+	file: File;
+	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string;
+	target?: { entityType: string; entityId: string };
+	storeFile: (id: string, file: File) => Promise<void> | void;
+	createFileRef: (
+		id: string,
+		file: File,
+	) => { uri: string; revoke?: () => void };
+	enqueueUpload: (
+		fileUri: string,
+		mimeType: string,
+		mediaId: string,
+		entityType?: string,
+		entityId?: string,
+		scopeType?: "personal" | "org",
+	) => void;
+}
+
+export interface ProcessMediaFileResult {
+	mediaId: string;
+	fileRef: { uri: string; revoke?: () => void };
+}
+
+export async function processMediaFile(
+	params: ProcessMediaFileParams,
+): Promise<ProcessMediaFileResult> {
+	const {
+		db,
+		file,
+		userId,
+		scopeType,
+		scopeId,
+		organizationId,
+		target,
+		storeFile,
+		createFileRef,
+		enqueueUpload,
+	} = params;
+
+	const mediaId = await addMedia(db, {
+		userId,
+		localUri: "",
+		mimeType: file.type,
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy: userId,
+	});
+
+	if (target) {
+		await attachMediaToEntity(db, mediaId, target.entityType, target.entityId);
+	}
+
+	await storeFile(mediaId, file);
+	const fileRef = createFileRef(mediaId, file);
+	await updateMediaLocalUri(db, mediaId, fileRef.uri);
+
+	enqueueUpload(
+		fileRef.uri,
+		file.type,
+		mediaId,
+		target?.entityType,
+		target?.entityId,
+		target ? undefined : scopeType,
+	);
+
+	return { mediaId, fileRef };
 }
 
 export async function reconcileMedia(

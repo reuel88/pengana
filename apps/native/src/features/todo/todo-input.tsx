@@ -1,21 +1,11 @@
-import { useSync } from "@/features/sync/sync-context";
-
-import { addTodo } from "./todo-actions";
 import { TodoInputBase } from "./todo-input-base";
 
 export function TodoInput({
-	userId,
-	organizationId,
+	onAdd,
+	triggerSync,
 }: {
-	userId: string;
-	organizationId?: string;
+	onAdd: (title: string) => Promise<void>;
+	triggerSync: () => void;
 }) {
-	const { triggerSync } = useSync();
-
-	return (
-		<TodoInputBase
-			onAdd={(title) => addTodo(userId, title, organizationId)}
-			triggerSync={triggerSync}
-		/>
-	);
+	return <TodoInputBase onAdd={onAdd} triggerSync={triggerSync} />;
 }

@@ -1,0 +1,32 @@
+{
+	"title": "媒体",
+	"dropzone": {
+		"idle": "将文件拖放到此处，或点击浏览",
+		"active": "将文件放到这里...",
+		"rejected": {
+			"type": "不支持该文件类型。请使用 JPEG、PNG、HEIC 或 PDF。",
+			"size": "文件太大。最大大小为 10MB。"
+		}
+	},
+	"grid": {
+		"empty": "暂无媒体"
+	},
+	"upload": {
+		"success": "文件上传成功",
+		"error": "上传失败"
+	},
+	"delete": {
+		"success": "媒体已删除"
+	},
+	"source": {
+		"standalone": "独立",
+		"todo": "待办事项"
+	},
+	"tabs": {
+		"personal": "个人",
+		"organization": "组织"
+	},
+	"actions": {
+		"delete": "删除"
+	}
+}

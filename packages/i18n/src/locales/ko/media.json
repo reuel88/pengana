@@ -1,0 +1,32 @@
+{
+	"title": "미디어",
+	"dropzone": {
+		"idle": "파일을 여기에 드래그 앤 드롭하거나 클릭하여 찾아보세요",
+		"active": "여기에 파일을 놓으세요...",
+		"rejected": {
+			"type": "지원되지 않는 파일 형식입니다. JPEG, PNG, HEIC 또는 PDF를 사용해 주세요.",
+			"size": "파일이 너무 큽니다. 최대 크기는 10MB입니다."
+		}
+	},
+	"grid": {
+		"empty": "아직 미디어가 없습니다"
+	},
+	"upload": {
+		"success": "파일이 성공적으로 업로드되었습니다",
+		"error": "업로드 실패"
+	},
+	"delete": {
+		"success": "미디어가 삭제되었습니다"
+	},
+	"source": {
+		"standalone": "독립형",
+		"todo": "할 일"
+	},
+	"tabs": {
+		"personal": "개인",
+		"organization": "조직"
+	},
+	"actions": {
+		"delete": "삭제"
+	}
+}

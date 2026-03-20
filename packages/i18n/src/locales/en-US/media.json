@@ -1,0 +1,32 @@
+{
+	"title": "Media",
+	"dropzone": {
+		"idle": "Drag and drop files here, or click to browse",
+		"active": "Drop files here...",
+		"rejected": {
+			"type": "File type not supported. Please use JPEG, PNG, HEIC, or PDF.",
+			"size": "File is too large. Maximum size is 10MB."
+		}
+	},
+	"grid": {
+		"empty": "No media yet"
+	},
+	"upload": {
+		"success": "File uploaded successfully",
+		"error": "Upload failed"
+	},
+	"delete": {
+		"success": "Media deleted"
+	},
+	"source": {
+		"standalone": "standalone",
+		"todo": "todo"
+	},
+	"tabs": {
+		"personal": "Personal",
+		"organization": "Organization"
+	},
+	"actions": {
+		"delete": "Delete"
+	}
+}

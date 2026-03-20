@@ -2,7 +2,6 @@ import { updateTodoForScope } from "@pengana/db/todo-queries";
 import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
-import { apiError } from "../errors";
 import { envelope, envelopeOutput, seatedProcedure } from "../index";
 import { handleTodoSync } from "./todo-sync";
 
@@ -17,14 +16,14 @@ export const orgTodoRouter = {
 		.output(envelopeOutput(syncOutputSchema))
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
-			const orgId = context.session.session.activeOrganizationId;
-			if (!orgId) throw apiError("BAD_REQUEST", "No active organization");
+			const orgId = context.session.session.activeOrganizationId as string;
 			return envelope(
 				await handleTodoSync(
 					input,
 					"org",
 					orgId,
 					userId,
+					orgId,
 					context.notifyOrgMembers,
 				),
 			);
@@ -39,8 +38,7 @@ export const orgTodoRouter = {
 		.input(z.object({ todoId: z.string() }))
 		.output(envelopeOutput(z.object({ success: z.boolean() })))
 		.handler(async ({ input, context }) => {
-			const orgId = context.session.session.activeOrganizationId;
-			if (!orgId) throw apiError("BAD_REQUEST", "No active organization");
+			const orgId = context.session.session.activeOrganizationId as string;
 
 			await updateTodoForScope(input.todoId, "org", orgId, {
 				title: `[Server Edit] ${Date.now()}`,

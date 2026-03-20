@@ -74,9 +74,8 @@ describe("todo.sync", () => {
 			"personal",
 			"user-1",
 			"user-1",
-			expect.any(Function),
-			false,
 			"org-1",
+			expect.any(Function),
 		);
 		expect(result.data).toEqual({
 			serverChanges: [],

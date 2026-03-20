@@ -28,11 +28,14 @@ export const link = new RPCLink({
 						credentials: "include",
 					}),
 	headers() {
+		const clientId =
+			Platform.OS === "web" ? "native-web" : `native-${Platform.OS}`;
 		if (Platform.OS === "web") {
-			return { "Accept-Language": i18next.language };
+			return { "Accept-Language": i18next.language, "X-Client-Id": clientId };
 		}
 		const headers = new Map<string, string>();
 		headers.set("Accept-Language", i18next.language);
+		headers.set("X-Client-Id", clientId);
 		const cookies = authClient.getCookie();
 		if (cookies) {
 			headers.set("Cookie", cookies);

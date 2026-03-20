@@ -56,6 +56,7 @@ export class UploadQueue {
 		mimeType: string;
 		entityType?: string;
 		entityId?: string;
+		scopeType?: "personal" | "org";
 	}): Promise<void> {
 		await this.adapter.addToQueue({
 			...item,
@@ -89,6 +90,7 @@ export class UploadQueue {
 				idempotencyKey: item.id,
 				entityType: item.entityType,
 				entityId: item.entityId,
+				scopeType: item.scopeType,
 			});
 			await this.adapter.markCompleted(item.id, result.url);
 			try {

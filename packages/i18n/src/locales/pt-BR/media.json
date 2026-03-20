@@ -1,0 +1,32 @@
+{
+	"title": "Mídia",
+	"dropzone": {
+		"idle": "Arraste e solte arquivos aqui, ou clique para procurar",
+		"active": "Solte os arquivos aqui...",
+		"rejected": {
+			"type": "Tipo de arquivo não suportado. Use JPEG, PNG, HEIC ou PDF.",
+			"size": "O arquivo é muito grande. O tamanho máximo é 10MB."
+		}
+	},
+	"grid": {
+		"empty": "Nenhuma mídia ainda"
+	},
+	"upload": {
+		"success": "Arquivo enviado com sucesso",
+		"error": "Falha no envio"
+	},
+	"delete": {
+		"success": "Mídia excluída"
+	},
+	"source": {
+		"standalone": "independente",
+		"todo": "tarefa"
+	},
+	"tabs": {
+		"personal": "Pessoal",
+		"organization": "Organização"
+	},
+	"actions": {
+		"delete": "Excluir"
+	}
+}

@@ -1,8 +1,8 @@
 import { createSyncTransport } from "@pengana/sync-client";
 import {
-	createSyncProviders,
 	SyncContext,
 	SyncDevtoolsContext,
+	useNetworkStatus,
 	useSyncEngine,
 } from "@pengana/sync-engine";
 import {
@@ -24,44 +24,36 @@ export {
 	useSyncDevtools as useOrgSyncDevtools,
 } from "@pengana/sync-engine";
 
-const personalTransportFactory = () =>
-	createSyncTransport(
-		async (input) =>
-			(await client.todo.sync(input, { signal: input.signal })).data,
-		(media, attachments, entityIds) =>
-			reconcileMedia(appDb, media, attachments, entityIds),
-	);
-
 export function SyncProvider({
 	userId,
 	organizationId,
 	children,
 }: {
 	userId: string;
-	organizationId?: string;
+	organizationId: string;
 	children: ReactNode;
 }) {
 	const deps = useMemo(
 		() =>
 			createExtensionPlatformDeps(
 				(uid) =>
-					createTodoSyncAdapter(
-						appDb,
-						uid,
-						personalTodoConfig,
-						organizationId
-							? {
-									filter: (todo) => todo.organizationId === organizationId,
-									syncKeySuffix: organizationId,
-								}
-							: undefined,
+					createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+						filter: (todo) => todo.organizationId === organizationId,
+						syncKeySuffix: organizationId,
+					}),
+				() =>
+					createSyncTransport(
+						async (input) =>
+							(await client.todo.sync(input, { signal: input.signal })).data,
+						(media, attachments, entityIds) =>
+							reconcileMedia(appDb, media, attachments, entityIds),
 					),
-				personalTransportFactory,
 			),
 		[organizationId],
 	);
+	const { isOnline } = useNetworkStatus();
 
-	const { core, devtools } = useSyncEngine(userId, deps);
+	const { core, devtools } = useSyncEngine({ scopeId: userId, isOnline, deps });
 
 	return (
 		<SyncContext value={core}>
@@ -70,20 +62,43 @@ export function SyncProvider({
 	);
 }
 
-const orgDeps = createExtensionPlatformDeps(
-	(organizationId) =>
-		createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
-	() =>
-		createSyncTransport(
-			async (input) => {
-				return (await client.orgTodo.sync(input, { signal: input.signal }))
-					.data;
-			},
-			(media, attachments, entityIds) =>
-				reconcileMedia(appDb, media, attachments, entityIds),
-		),
-);
+export function OrgSyncProvider({
+	organizationId,
+	children,
+}: {
+	userId: string;
+	organizationId: string;
+	children: ReactNode;
+}) {
+	const orgDeps = useMemo(
+		() =>
+			createExtensionPlatformDeps(
+				(organizationId) =>
+					createTodoSyncAdapter(appDb, organizationId, orgTodoConfig),
+				() =>
+					createSyncTransport(
+						async (input) => {
+							return (
+								await client.orgTodo.sync(input, { signal: input.signal })
+							).data;
+						},
+						(media, attachments, entityIds) =>
+							reconcileMedia(appDb, media, attachments, entityIds),
+					),
+			),
+		[],
+	);
+	const { isOnline } = useNetworkStatus();
 
-const orgProviders = createSyncProviders(orgDeps, orgDeps);
+	const { core, devtools } = useSyncEngine({
+		scopeId: organizationId,
+		isOnline,
+		deps: orgDeps,
+	});
 
-export const OrgSyncProvider = orgProviders.OrgSyncProvider;
+	return (
+		<SyncContext value={core}>
+			<SyncDevtoolsContext value={devtools}>{children}</SyncDevtoolsContext>
+		</SyncContext>
+	);
+}
