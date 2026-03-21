@@ -1,15 +1,14 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/upload-queue";
 import { useCallback } from "react";
-import { processMediaFile } from "../lib/media-actions";
+import type { MediaActions } from "./media-actions";
 import type {
 	MediaAttachmentTarget,
 	MediaFileStorageStrategy,
 } from "./use-media-handlers";
 
 export interface FileSelectionDeps {
-	db?: EntityDatabase;
+	processMediaFile: MediaActions["processMediaFile"];
 	userId: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
@@ -23,7 +22,7 @@ export interface FileSelectionDeps {
 
 export function useFileSelection(deps: FileSelectionDeps) {
 	const {
-		db,
+		processMediaFile,
 		userId,
 		scopeType,
 		scopeId,
@@ -37,7 +36,6 @@ export function useFileSelection(deps: FileSelectionDeps) {
 
 	return useCallback(
 		async (files: File[], target?: MediaAttachmentTarget) => {
-			if (!db) return;
 			const refs: Array<{ revoke?: () => void }> = [];
 
 			for (const file of files) {
@@ -52,7 +50,6 @@ export function useFileSelection(deps: FileSelectionDeps) {
 				}
 
 				const { fileRef } = await processMediaFile({
-					db,
 					file,
 					userId,
 					scopeType,
@@ -69,7 +66,7 @@ export function useFileSelection(deps: FileSelectionDeps) {
 			triggerSync();
 		},
 		[
-			db,
+			processMediaFile,
 			storeFile,
 			createFileRef,
 			userId,

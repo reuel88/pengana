@@ -1,10 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import {
+	createDexieMediaActions,
 	orgMediaConfig,
 	personalMediaConfig,
 	type ServerMediaRecord,
-	storeFileInIndexedDB,
+	storeFileInDexie,
 	useMedia,
 	useMediaListWiring,
 } from "@pengana/upload-client";
@@ -30,7 +31,7 @@ type Tab = "personal" | "organization";
 function createIndexedDbFileStrategy() {
 	return {
 		async storeFile(id: string, file: File) {
-			await storeFileInIndexedDB(appDb, id, file);
+			await storeFileInDexie(appDb, id, file);
 		},
 		createFileRef(id: string, _file: File) {
 			return { uri: `indexeddb://${id}` };
@@ -76,9 +77,10 @@ function MediaContent({
 	});
 
 	const fileStorage = useMemo(() => createIndexedDbFileStrategy(), []);
+	const actions = useMemo(() => createDexieMediaActions(appDb), []);
 
 	const { handleDelete, handleFilesSelected } = useMediaListWiring({
-		db: appDb,
+		actions,
 		triggerSync,
 		enqueueUpload,
 		userId,

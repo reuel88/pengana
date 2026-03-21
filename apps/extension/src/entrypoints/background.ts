@@ -11,10 +11,10 @@ import {
 	createWebUploadAdapter,
 	reconcileMedia,
 } from "@pengana/upload-client";
-import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import { cleanupUploaded, UploadQueue } from "@pengana/upload-queue";
-import { createIndexedDbUploadTransport } from "@/features/sync/entities/upload-queue";
+import { createDexieUploadTransport } from "@/features/upload-queue";
 import type { SyncScope } from "@/shared/api/background-messages";
 import { client } from "@/shared/api/orpc";
 import { sessionResponseSchema } from "@/shared/api/session-schema";
@@ -82,7 +82,7 @@ function createEngine(scope: SyncScope): {
 			}, onMedia);
 
 	const engine = new SyncEngine(adapter, transport);
-	const uploadTransport = createIndexedDbUploadTransport();
+	const uploadTransport = createDexieUploadTransport();
 	const uploadQueue = new UploadQueue(uploadAdapter, uploadTransport, {
 		lifecycleCallbacks: createUploadLifecycleCallbacks(appDb),
 	});
@@ -144,8 +144,7 @@ async function checkStorageHealth() {
 		if (ratio >= STORAGE_WARNING_RATIO) {
 			await cleanupUploaded({
 				uploadAdapter,
-				removeFile: (entityId: string) =>
-					removeFileFromIndexedDB(appDb, entityId),
+				removeFile: (item) => removeFileFromDexie(appDb, item.id),
 			});
 		}
 	} catch (err) {

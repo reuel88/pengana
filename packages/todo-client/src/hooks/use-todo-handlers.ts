@@ -1,6 +1,5 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import {
-	getMediaCountForEntity,
+	type MediaActions,
 	type MediaAttachmentTarget,
 	useFileSelection,
 	useMediaDeletion,
@@ -42,12 +41,12 @@ export interface TodoHandlerDeps {
 	onDeleteSuccess?: (id: string) => void;
 	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	actions: TodoActions;
-	db?: EntityDatabase;
+	mediaActions: MediaActions;
+	getMediaCountForEntity: (entityId: string) => Promise<number>;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {
 	const {
-		db,
 		triggerSync,
 		enqueueUpload,
 		userId,
@@ -61,10 +60,12 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		onDeleteSuccess,
 		scopeType,
 		actions,
+		mediaActions,
+		getMediaCountForEntity,
 	} = deps;
 
 	const selectFiles = useFileSelection({
-		db,
+		processMediaFile: mediaActions.processMediaFile,
 		userId,
 		scopeType,
 		scopeId,
@@ -77,13 +78,14 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 	});
 
 	const deleteAttachment = useMediaDeletion({
-		db,
+		removeMedia: mediaActions.removeMedia,
 		triggerSync,
 		deleteOnServer: deleteAttachmentOnServer,
 	});
 
 	const retryUpload = useMediaRetry({
-		db,
+		retryMedia: mediaActions.retryMedia,
+		getAttachmentForMedia: mediaActions.getAttachmentForMedia,
 		enqueueUpload,
 		triggerSync,
 	});
@@ -108,7 +110,6 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 
 	const handleDelete = useCallback(
 		async (id: string) => {
-			if (!db) return;
 			try {
 				clearError(id);
 				await actions.deleteTodo(id);
@@ -123,7 +124,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, actions, triggerSync, onError, onDeleteSuccess, t, db],
+		[clearError, actions, triggerSync, onError, onDeleteSuccess, t],
 	);
 
 	const handleResolve = useCallback(
@@ -146,10 +147,9 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 
 	const handleFilesSelected = useCallback(
 		async (files: File[], target: MediaAttachmentTarget) => {
-			if (!db) return;
 			try {
 				clearError(target.entityId);
-				const currentCount = await getMediaCountForEntity(db, target.entityId);
+				const currentCount = await getMediaCountForEntity(target.entityId);
 				const available = MAX_ATTACHMENTS - currentCount;
 				await selectFiles(files.slice(0, available), target);
 			} catch (e) {
@@ -161,12 +161,11 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[db, clearError, selectFiles, onError, t],
+		[clearError, selectFiles, onError, t, getMediaCountForEntity],
 	);
 
 	const handleRemoveAttachment = useCallback(
 		async (todoId: string, attachmentId: string) => {
-			if (!db) return;
 			try {
 				clearError(todoId);
 				await deleteAttachment(attachmentId);
@@ -174,7 +173,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				onError(todoId, t("errors:failedToDeleteAttachment"));
 			}
 		},
-		[db, clearError, deleteAttachment, onError, t],
+		[clearError, deleteAttachment, onError, t],
 	);
 
 	const handleRetry = useCallback(

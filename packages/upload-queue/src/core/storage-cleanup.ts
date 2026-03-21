@@ -1,8 +1,9 @@
+import type { UploadItem } from "../schemas/upload";
 import type { UploadAdapter } from "../types";
 
 export interface CleanupDeps {
 	uploadAdapter: UploadAdapter;
-	removeFile?: (fileKey: string) => Promise<void>;
+	removeFile?: (item: UploadItem) => Promise<void>;
 }
 
 /** Removes completed upload queue items and their associated file blobs. */
@@ -12,7 +13,7 @@ export async function cleanupUploaded(deps: CleanupDeps): Promise<number> {
 
 	for (const item of uploaded) {
 		if (deps.removeFile) {
-			await deps.removeFile(item.id);
+			await deps.removeFile(item);
 		}
 		await deps.uploadAdapter.removeItem(item.id);
 	}
@@ -34,7 +35,7 @@ export async function cleanupFailedOlderThan(
 
 	for (const item of stale) {
 		if (deps.removeFile) {
-			await deps.removeFile(item.id);
+			await deps.removeFile(item);
 		}
 		await deps.uploadAdapter.removeItem(item.id);
 	}

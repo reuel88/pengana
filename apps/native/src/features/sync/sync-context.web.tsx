@@ -1,12 +1,12 @@
-import { useRealtimeTransport } from "@pengana/realtime-transport";
+import { subscribeToSharedNotifyChannel } from "@pengana/realtime-transport";
 import type { StorageLevel } from "@pengana/storage-health";
-import { useStorageHealth } from "@pengana/storage-health";
+import { StorageHealthMonitor } from "@pengana/storage-health";
 import type { SyncEvent } from "@pengana/sync-engine";
 import {
+	createPeriodicSync,
 	createSyncTransport,
 	MAX_EVENT_LOG_SIZE,
 	SyncEngine,
-	usePeriodicSync,
 } from "@pengana/sync-engine";
 import {
 	createTodoSyncAdapter,
@@ -15,7 +15,7 @@ import {
 } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
 import type { EnqueueUploadParams, UploadEvent } from "@pengana/upload-queue";
-import { useUploadQueue } from "@pengana/upload-queue";
+import { UploadQueueManager } from "@pengana/upload-queue";
 import {
 	createContext,
 	use,
@@ -23,6 +23,7 @@ import {
 	useEffect,
 	useRef,
 	useState,
+	useSyncExternalStore,
 } from "react";
 import { useNetworkStatus } from "@/features/sync/use-network-status";
 import { client } from "@/shared/api/orpc";
@@ -140,21 +141,53 @@ function useComposedSyncEngine(options: {
 	}, [scopeId, createSyncAdapter, createTransport]);
 
 	// --- Upload Queue ---
-	const { isUploading, uploadEvents, enqueueUpload } = useUploadQueue(
-		scopeId,
-		effectiveOnline,
-		{
+	const managerRef = useRef(
+		new UploadQueueManager({
 			createUploadAdapter: getUploadAdapter,
 			createUploadTransport: getUploadTransport,
 			lifecycleCallbacks: getUploadLifecycleCallbacks(),
 			onSettled: () => engineRef.current?.sync(),
-		},
+		}),
+	);
+
+	useEffect(() => {
+		managerRef.current.init(scopeId);
+		return () => managerRef.current.dispose();
+	}, [scopeId]);
+
+	useEffect(() => {
+		managerRef.current.setOnline(effectiveOnline);
+	}, [effectiveOnline]);
+
+	const { isUploading, uploadEvents } = useSyncExternalStore(
+		(cb) => managerRef.current.subscribe(cb),
+		() => managerRef.current.getState(),
+	);
+
+	const enqueueUpload = useCallback(
+		(params: EnqueueUploadParams) => managerRef.current.enqueue(params),
+		[],
 	);
 
 	// --- Storage Health ---
-	const { storageLevel } = useStorageHealth({
-		provider: getStorageHealthProvider(),
-	});
+	const storageMonitorRef = useRef<StorageHealthMonitor | null>(null);
+	if (storageMonitorRef.current === null) {
+		storageMonitorRef.current = new StorageHealthMonitor({
+			provider: getStorageHealthProvider(),
+		});
+	}
+
+	const storageLevel = useSyncExternalStore(
+		storageMonitorRef.current.subscribe,
+		storageMonitorRef.current.getLevel,
+	);
+
+	useEffect(() => {
+		const monitor = storageMonitorRef.current;
+		if (!monitor) return;
+		monitor.start();
+		return () => monitor.stop();
+	}, []);
 
 	// --- Online Reactivity ---
 	useEffect(() => {
@@ -164,14 +197,56 @@ function useComposedSyncEngine(options: {
 	}, [effectiveOnline]);
 
 	// --- Periodic Sync ---
-	usePeriodicSync(effectiveOnline, engineRef);
+	const periodicSyncRef = useRef(createPeriodicSync(() => engineRef.current));
+
+	useEffect(() => {
+		const ps = periodicSyncRef.current;
+		if (effectiveOnline) {
+			ps.start();
+		} else {
+			ps.stop();
+		}
+		return () => ps.stop();
+	}, [effectiveOnline]);
 
 	// --- Realtime Transport ---
-	useRealtimeTransport(notifyKey, effectiveOnline && isForeground, {
-		createNotifyTransport: createRealtimeTransport,
-		onSyncNotify: () => engineRef.current?.sync(),
-		onOpen: () => engineRef.current?.sync(),
-	});
+	const realtimeSubRef = useRef<ReturnType<
+		typeof subscribeToSharedNotifyChannel
+	> | null>(null);
+
+	useEffect(() => {
+		if (!notifyKey) {
+			realtimeSubRef.current?.unsubscribe();
+			realtimeSubRef.current = null;
+			return;
+		}
+
+		const subscription = subscribeToSharedNotifyChannel({
+			notifyKey,
+			createNotifyTransport: createRealtimeTransport,
+			enabled: true,
+			onNotify: (kind) => {
+				if (kind === "sync") {
+					engineRef.current?.sync();
+				}
+			},
+			onOpen: () => {
+				engineRef.current?.sync();
+			},
+		});
+
+		realtimeSubRef.current = subscription;
+		return () => {
+			subscription.unsubscribe();
+			if (realtimeSubRef.current === subscription) {
+				realtimeSubRef.current = null;
+			}
+		};
+	}, [notifyKey]);
+
+	useEffect(() => {
+		realtimeSubRef.current?.setEnabled(effectiveOnline && isForeground);
+	}, [effectiveOnline, isForeground]);
 
 	// --- Focus Subscription ---
 	useEffect(() => {

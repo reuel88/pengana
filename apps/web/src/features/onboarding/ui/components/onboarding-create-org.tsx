@@ -7,7 +7,7 @@ import {
 	CardTitle,
 } from "@pengana/ui/components/card";
 
-import { OrgCreateForm } from "@/features/org-management/org-create-form";
+import { OrgCreateForm } from "@/features/org/org-create-form";
 
 export function OnboardingCreateOrg({
 	onCreated,

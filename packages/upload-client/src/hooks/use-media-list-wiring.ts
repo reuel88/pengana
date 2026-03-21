@@ -1,8 +1,8 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { useMemo } from "react";
 
 import type { MediaConfig } from "../lib/media-config";
+import type { MediaActions } from "./media-actions";
 import type {
 	MediaFileStorageStrategy,
 	MediaHandlerDeps,
@@ -10,7 +10,7 @@ import type {
 import { useMediaHandlers } from "./use-media-handlers";
 
 export interface UseMediaListWiringConfig {
-	db: EntityDatabase;
+	actions: MediaActions;
 
 	triggerSync: () => void;
 	enqueueUpload: (params: EnqueueUploadParams) => void;
@@ -30,7 +30,7 @@ export interface UseMediaListWiringConfig {
 export function useMediaListWiring(config: UseMediaListWiringConfig) {
 	const deps: MediaHandlerDeps = useMemo(
 		() => ({
-			db: config.db,
+			actions: config.actions,
 			triggerSync: config.triggerSync,
 			enqueueUpload: config.enqueueUpload,
 			userId: config.userId,

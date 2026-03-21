@@ -1,12 +1,12 @@
-import { useNetworkStatus } from "@pengana/realtime-transport";
+import { createNetworkStatusMonitor } from "@pengana/realtime-transport";
 import type { StorageLevel } from "@pengana/storage-health";
-import { useStorageHealth } from "@pengana/storage-health";
+import { StorageHealthMonitor } from "@pengana/storage-health";
 import type { SyncEvent } from "@pengana/sync-engine";
 import {
+	createPeriodicSync,
 	createSyncTransport,
 	MAX_EVENT_LOG_SIZE,
 	SyncEngine,
-	usePeriodicSync,
 } from "@pengana/sync-engine";
 import {
 	createTodoSyncAdapter,
@@ -18,10 +18,10 @@ import {
 	createWebUploadAdapter,
 	reconcileMedia,
 } from "@pengana/upload-client";
-import { removeFileFromIndexedDB } from "@pengana/upload-client/adapters/dexie-file-store";
+import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import type { EnqueueUploadParams, UploadEvent } from "@pengana/upload-queue";
-import { cleanupUploaded, useUploadQueue } from "@pengana/upload-queue";
+import { cleanupUploaded, UploadQueueManager } from "@pengana/upload-queue";
 import type { ReactNode } from "react";
 import {
 	createContext,
@@ -31,10 +31,15 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useSyncExternalStore,
 } from "react";
+import { createDexieUploadTransport } from "@/features/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
-import { createIndexedDbUploadTransport } from "./entities/upload-queue";
+
+// --- Network status ---
+
+const networkMonitor = createNetworkStatusMonitor();
 
 // --- Context types ---
 
@@ -123,15 +128,32 @@ function useComposedSyncEngine(options: {
 	}, [scopeId, createSyncAdapter, createTransport]);
 
 	// --- Upload Queue ---
-	const { isUploading, uploadEvents, enqueueUpload } = useUploadQueue(
-		scopeId,
-		effectiveOnline,
-		{
+	const managerRef = useRef(
+		new UploadQueueManager({
 			createUploadAdapter: () => createWebUploadAdapter(appDb),
-			createUploadTransport: createIndexedDbUploadTransport,
+			createUploadTransport: createDexieUploadTransport,
 			lifecycleCallbacks: uploadLifecycleCallbacks,
 			onSettled: () => engineRef.current?.sync(),
-		},
+		}),
+	);
+
+	useEffect(() => {
+		managerRef.current.init(scopeId);
+		return () => managerRef.current.dispose();
+	}, [scopeId]);
+
+	useEffect(() => {
+		managerRef.current.setOnline(effectiveOnline);
+	}, [effectiveOnline]);
+
+	const { isUploading, uploadEvents } = useSyncExternalStore(
+		(cb) => managerRef.current.subscribe(cb),
+		() => managerRef.current.getState(),
+	);
+
+	const enqueueUpload = useCallback(
+		(params: EnqueueUploadParams) => managerRef.current.enqueue(params),
+		[],
 	);
 
 	// --- Storage Health ---
@@ -140,15 +162,29 @@ function useComposedSyncEngine(options: {
 	const onStorageWarning = useCallback(async () => {
 		await cleanupUploaded({
 			uploadAdapter,
-			removeFile: (entityId: string) =>
-				removeFileFromIndexedDB(appDb, entityId),
+			removeFile: (item) => removeFileFromDexie(appDb, item.id),
 		});
 	}, [uploadAdapter]);
 
-	const { storageLevel } = useStorageHealth({
-		provider: storageHealthProvider,
-		onStorageWarning,
-	});
+	const storageMonitorRef = useRef<StorageHealthMonitor | null>(null);
+	if (storageMonitorRef.current === null) {
+		storageMonitorRef.current = new StorageHealthMonitor({
+			provider: storageHealthProvider,
+			onStorageWarning,
+		});
+	}
+
+	const storageLevel = useSyncExternalStore(
+		storageMonitorRef.current.subscribe,
+		storageMonitorRef.current.getLevel,
+	);
+
+	useEffect(() => {
+		const monitor = storageMonitorRef.current;
+		if (!monitor) return;
+		monitor.start();
+		return () => monitor.stop();
+	}, []);
 
 	// --- Online Reactivity ---
 	useEffect(() => {
@@ -158,7 +194,17 @@ function useComposedSyncEngine(options: {
 	}, [effectiveOnline]);
 
 	// --- Periodic Sync ---
-	usePeriodicSync(effectiveOnline, engineRef);
+	const periodicSyncRef = useRef(createPeriodicSync(() => engineRef.current));
+
+	useEffect(() => {
+		const ps = periodicSyncRef.current;
+		if (effectiveOnline) {
+			ps.start();
+		} else {
+			ps.stop();
+		}
+		return () => ps.stop();
+	}, [effectiveOnline]);
 
 	// --- No realtime for extension (uses background alarms) ---
 
@@ -228,7 +274,10 @@ export function SyncProvider({
 		[],
 	);
 
-	const { isOnline } = useNetworkStatus();
+	const isOnline = useSyncExternalStore(
+		(cb) => networkMonitor.subscribe(cb),
+		() => networkMonitor.isOnline,
+	);
 
 	const { core, devtools } = useComposedSyncEngine({
 		scopeId: userId,
@@ -270,7 +319,10 @@ export function OrgSyncProvider({
 		[],
 	);
 
-	const { isOnline } = useNetworkStatus();
+	const isOnline = useSyncExternalStore(
+		(cb) => networkMonitor.subscribe(cb),
+		() => networkMonitor.isOnline,
+	);
 
 	const { core, devtools } = useComposedSyncEngine({
 		scopeId: organizationId,

@@ -1,1 +1,0 @@
-export { createIndexedDbUploadTransport } from "./transport";

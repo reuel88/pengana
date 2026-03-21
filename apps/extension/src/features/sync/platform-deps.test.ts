@@ -4,8 +4,8 @@ vi.mock("@/shared/db", () => ({
 	appDb: {},
 }));
 
-vi.mock("@/features/sync/entities/upload-queue", () => ({
-	createIndexedDbUploadTransport: () => ({}),
+vi.mock("@/features/upload-queue", () => ({
+	createDexieUploadTransport: () => ({}),
 }));
 
 const { createNoopRealtimeTransport } = await import("./platform-deps");

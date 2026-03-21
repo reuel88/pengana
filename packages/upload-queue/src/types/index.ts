@@ -42,3 +42,12 @@ export interface UploadLifecycleCallbacks {
 	onCompleted(attachmentUrl: string, uploadItemId: string): Promise<void>;
 	onFailed(uploadItemId: string): Promise<void>;
 }
+
+export interface EnqueueUploadParams {
+	fileUri: string;
+	mimeType: string;
+	mediaId: string;
+	entityType?: string;
+	entityId?: string;
+	scopeType?: "personal" | "org";
+}

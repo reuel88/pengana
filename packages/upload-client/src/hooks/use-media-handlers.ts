@@ -1,8 +1,8 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { isQuotaError } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 import type { MediaConfig } from "../lib/media-config";
+import type { MediaActions } from "./media-actions";
 import { useFileSelection } from "./use-file-selection";
 import { useMediaDeletion } from "./use-media-deletion";
 import { useMediaRetry } from "./use-media-retry";
@@ -21,7 +21,7 @@ export interface MediaAttachmentTarget {
 }
 
 export interface MediaHandlerDeps {
-	db: EntityDatabase;
+	actions: MediaActions;
 	triggerSync: () => void;
 	enqueueUpload: (params: EnqueueUploadParams) => void;
 	userId: string;
@@ -38,7 +38,7 @@ export interface MediaHandlerDeps {
 
 export function useMediaHandlers(deps: MediaHandlerDeps) {
 	const {
-		db,
+		actions,
 		triggerSync,
 		enqueueUpload,
 		userId,
@@ -54,7 +54,7 @@ export function useMediaHandlers(deps: MediaHandlerDeps) {
 	} = deps;
 
 	const selectFiles = useFileSelection({
-		db,
+		processMediaFile: actions.processMediaFile,
 		userId,
 		scopeType: config.scopeType,
 		scopeId,
@@ -67,12 +67,17 @@ export function useMediaHandlers(deps: MediaHandlerDeps) {
 	});
 
 	const deleteMedia = useMediaDeletion({
-		db,
+		removeMedia: actions.removeMedia,
 		triggerSync,
 		deleteOnServer: deleteMediaOnServer,
 	});
 
-	const retryUpload = useMediaRetry({ db, enqueueUpload, triggerSync });
+	const retryUpload = useMediaRetry({
+		retryMedia: actions.retryMedia,
+		getAttachmentForMedia: actions.getAttachmentForMedia,
+		enqueueUpload,
+		triggerSync,
+	});
 
 	const handleFilesSelected = useCallback(
 		async (files: File[], target?: MediaAttachmentTarget) => {

@@ -17,17 +17,18 @@ export {
 } from "./core/storage-cleanup";
 export type { UploadQueueConfig } from "./core/upload-queue";
 export { UploadQueue } from "./core/upload-queue";
-export { isQuotaError, StorageFullError } from "./errors/storage-error";
 export type {
-	EnqueueUploadParams,
-	UseUploadQueueOptions,
-} from "./hooks/use-upload-queue";
-export { useUploadQueue } from "./hooks/use-upload-queue";
+	UploadQueueManagerOptions,
+	UploadQueueState,
+} from "./core/upload-queue-manager";
+export { UploadQueueManager } from "./core/upload-queue-manager";
+export { isQuotaError, StorageFullError } from "./errors/storage-error";
 export {
 	uploadItemSchema,
 	uploadStatusSchema,
 } from "./schemas/upload";
 export type {
+	EnqueueUploadParams,
 	UploadAdapter,
 	UploadEvent,
 	UploadEventType,

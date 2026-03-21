@@ -7,7 +7,7 @@ import {
 	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
 	createUploadTransport,
-} from "@/features/sync/entities/upload-queue";
+} from "@/features/upload-queue";
 import { authClient } from "@/shared/lib/auth-client";
 import { getServerUrl } from "@/shared/lib/server-url";
 import { createNativeStorageHealthProvider } from "@/shared/lib/storage-health";
