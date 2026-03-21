@@ -3,13 +3,8 @@ import { useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
-import {
-	OrgSyncProvider,
-	SyncProvider,
-	useOrgSync,
-	useSync,
-} from "@/features/sync/sync-context";
 import { useBackgroundPort } from "@/features/sync/use-background-port";
+import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { ModeToggle } from "@/features/theme/mode-toggle";
 import * as orgActions from "@/features/todo/org-todo-actions";
 import * as personalActions from "@/features/todo/todo-actions";
@@ -32,7 +27,11 @@ function PersonalTodoContent({
 			t.organizationId === organizationId;
 	}, [organizationId]);
 	const { todos } = useTodos(appDb, userId, orgFilter);
-	const sync = useSync();
+	const sync = useSyncEntry({
+		scopeType: "personal",
+		scopeId: userId,
+		entityKey: "todo",
+	});
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -65,7 +64,11 @@ function OrgTodoContent({
 	userId: string;
 }) {
 	const { todos } = useTodos(appDb, organizationId);
-	const sync = useOrgSync();
+	const sync = useSyncEntry({
+		scopeType: "organization",
+		scopeId: organizationId,
+		entityKey: "todo",
+	});
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -143,30 +146,22 @@ export function TodoPage({
 			</div>
 
 			{activeTab === "personal" && (
-				<SyncProvider userId={userId} organizationId={organizationId}>
-					<div
-						id="panel-personal"
-						role="tabpanel"
-						aria-labelledby="tab-personal"
-					>
-						<PersonalTodoContent
-							userId={userId}
-							organizationId={organizationId}
-						/>
-					</div>
-				</SyncProvider>
+				<div id="panel-personal" role="tabpanel" aria-labelledby="tab-personal">
+					<PersonalTodoContent
+						userId={userId}
+						organizationId={organizationId}
+					/>
+				</div>
 			)}
 
 			{activeTab === "organization" && (
-				<OrgSyncProvider organizationId={organizationId} userId={userId}>
-					<div
-						id="panel-organization"
-						role="tabpanel"
-						aria-labelledby="tab-organization"
-					>
-						<OrgTodoContent organizationId={organizationId} userId={userId} />
-					</div>
-				</OrgSyncProvider>
+				<div
+					id="panel-organization"
+					role="tabpanel"
+					aria-labelledby="tab-organization"
+				>
+					<OrgTodoContent organizationId={organizationId} userId={userId} />
+				</div>
 			)}
 		</div>
 	);

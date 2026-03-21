@@ -1,29 +1,14 @@
 import { env } from "@pengana/env/web";
-import { STORAGE_WARNING_RATIO } from "@pengana/storage-health";
-import { createSyncTransport, SyncEngine } from "@pengana/sync-engine";
+import type { SyncDescriptor } from "@pengana/sync-runtime";
+import { descriptorKey } from "@pengana/sync-runtime";
 import {
-	createTodoSyncAdapter,
-	orgTodoConfig,
-	personalTodoConfig,
-} from "@pengana/todo-client";
-import {
-	createUploadLifecycleCallbacks,
-	createWebUploadAdapter,
-	reconcileMedia,
-} from "@pengana/upload-client";
-import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
-import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
-import { cleanupUploaded, UploadQueue } from "@pengana/upload-queue";
-import { createDexieUploadTransport } from "@/features/upload-queue";
+	createOrgTodoEntryConfig,
+	createPersonalTodoEntryConfig,
+} from "@/features/sync/sync-runtime-config";
+import { syncRuntime } from "@/features/sync/sync-runtime-instance";
 import type { SyncScope } from "@/shared/api/background-messages";
-import { client } from "@/shared/api/orpc";
 import { sessionResponseSchema } from "@/shared/api/session-schema";
-import { appDb } from "@/shared/db";
-import {
-	isSyncScope,
-	mergeScopes,
-	scopeKey,
-} from "@/shared/lib/sync-scope-helpers";
+import { isSyncScope, mergeScopes } from "@/shared/lib/sync-scope-helpers";
 
 // --- Constants ---
 
@@ -31,18 +16,7 @@ const SYNC_ALARM_NAME = "periodic-sync";
 const SYNC_INTERVAL_MINUTES = 0.5; // 30 seconds
 const SCOPES_STORAGE_KEY = "sync-scopes";
 
-// --- State ---
-
-let popupAlive = false;
-let isOnline = true;
-const engines = new Map<
-	string,
-	{ engine: SyncEngine; uploadQueue: UploadQueue }
->();
-let teardownPromise: Promise<void> | null = null;
-
-const storageHealthProvider = createWebStorageHealthProvider();
-const uploadAdapter = createWebUploadAdapter(appDb);
+// --- Helpers ---
 
 async function fetchUserId(): Promise<string | null> {
 	try {
@@ -58,129 +32,43 @@ async function fetchUserId(): Promise<string | null> {
 	}
 }
 
-function createEngine(scope: SyncScope): {
-	engine: SyncEngine;
-	uploadQueue: UploadQueue;
-} {
-	const isOrg = scope.scopeType === "organization";
-	const config = isOrg ? orgTodoConfig : personalTodoConfig;
-	const adapter = createTodoSyncAdapter({
-		db: appDb,
+function scopeToDescriptor(scope: SyncScope): SyncDescriptor {
+	return {
+		scopeType: scope.scopeType,
 		scopeId: scope.scopeId,
-		config,
-	});
-
-	const onMedia = (
-		media: import("@pengana/sync-engine").Media[],
-		attachments: import("@pengana/sync-engine").MediaAttachment[],
-		entityIds: string[],
-	) =>
-		reconcileMedia({
-			db: appDb,
-			serverMedia: media,
-			serverAttachments: attachments,
-			entityIds,
-		});
-
-	const transport = isOrg
-		? createSyncTransport(async (input) => {
-				return (await client.orgTodo.sync(input, { signal: input.signal }))
-					.data;
-			}, onMedia)
-		: createSyncTransport(async (input) => {
-				return (await client.todo.sync(input, { signal: input.signal })).data;
-			}, onMedia);
-
-	const engine = new SyncEngine(adapter, transport);
-	const uploadTransport = createDexieUploadTransport();
-	const uploadQueue = new UploadQueue(uploadAdapter, uploadTransport, {
-		lifecycleCallbacks: createUploadLifecycleCallbacks(appDb),
-	});
-
-	uploadQueue.onEvent((event) => {
-		if (event.type === "upload:complete") {
-			engine.sync();
-		}
-	});
-
-	return { engine, uploadQueue };
+		entityKey: "todo",
+	};
 }
 
-async function teardownAllEngines() {
-	if (teardownPromise) {
-		return teardownPromise;
+function getEntryConfig(scope: SyncScope) {
+	if (scope.scopeType === "organization") {
+		return createOrgTodoEntryConfig(scope.scopeId);
 	}
-
-	const entries = Array.from(engines.values());
-	teardownPromise = (async () => {
-		for (const { uploadQueue } of entries) {
-			uploadQueue.pause();
-		}
-		await Promise.all(entries.map(({ engine }) => engine.shutdown()));
-		engines.clear();
-	})().finally(() => {
-		teardownPromise = null;
-	});
-
-	return teardownPromise;
-}
-
-function startEnginesForScopes(scopes: SyncScope[]) {
-	for (const scope of scopes) {
-		const key = scopeKey(scope);
-		if (engines.has(key)) continue;
-
-		const entry = createEngine(scope);
-		engines.set(key, entry);
-		entry.uploadQueue.resume();
-		entry.engine.sync();
-	}
+	return createPersonalTodoEntryConfig(scope.scopeId);
 }
 
 async function loadScopes(): Promise<SyncScope[]> {
 	const data = await browser.storage.local.get(SCOPES_STORAGE_KEY);
 	const stored = data[SCOPES_STORAGE_KEY];
 	if (!Array.isArray(stored)) return [];
-
 	return stored.filter(isSyncScope);
 }
 
-async function checkStorageHealth() {
-	try {
-		const estimate = await storageHealthProvider.estimate();
-		if (!estimate) return;
+/** Track which descriptors we've ensured so we can diff on scope changes */
+const activeDescriptorKeys = new Set<string>();
 
-		const ratio = estimate.usageRatio;
-		if (ratio >= STORAGE_WARNING_RATIO) {
-			await cleanupUploaded({
-				uploadAdapter,
-				removeFile: (item) => removeFileFromDexie(appDb, item.id),
-			});
-		}
-	} catch (err) {
-		console.error("[background] storage health check failed:", err);
-	}
-}
-
-async function ensureEnginesFromStorage() {
-	if (teardownPromise) {
-		await teardownPromise;
-	}
-
+async function ensureEntriesFromStorage() {
 	const userId = await fetchUserId();
 
-	// No session — clear stale scopes and stop
 	if (!userId) {
 		await browser.storage.local.remove(SCOPES_STORAGE_KEY);
-		if (engines.size > 0) {
-			await teardownAllEngines();
-		}
+		await syncRuntime.shutdownAll();
+		activeDescriptorKeys.clear();
 		return;
 	}
 
 	const persistedScopes = await loadScopes();
 
-	// Replace any stale personal scopes with the current user's
 	const validatedScopes = persistedScopes.filter(
 		(s) => s.scopeType !== "personal" || s.scopeId === userId,
 	);
@@ -192,14 +80,35 @@ async function ensureEnginesFromStorage() {
 		: [{ scopeType: "personal", scopeId: userId }];
 	const scopes = mergeScopes(validatedScopes, fallbackScopes);
 
-	// Persist validated scopes back
 	if (scopes.length !== persistedScopes.length || !hasCurrentPersonal) {
 		await browser.storage.local.set({ [SCOPES_STORAGE_KEY]: scopes });
 	}
 
-	if (scopes.length === 0) return;
+	// Determine next set of descriptors
+	const nextKeys = new Set<string>();
+	for (const scope of scopes) {
+		const descriptor = scopeToDescriptor(scope);
+		const key = descriptorKey(descriptor);
+		nextKeys.add(key);
+		if (!syncRuntime.has(descriptor)) {
+			syncRuntime.ensure(descriptor, getEntryConfig(scope));
+		}
+	}
 
-	startEnginesForScopes(scopes);
+	// Release entries no longer in scope
+	for (const key of activeDescriptorKeys) {
+		if (!nextKeys.has(key)) {
+			const [scopeType, scopeId, entityKey] = key.split(":");
+			void syncRuntime.release({
+				scopeType: scopeType as "personal" | "organization",
+				scopeId,
+				entityKey,
+			});
+		}
+	}
+
+	activeDescriptorKeys.clear();
+	for (const k of nextKeys) activeDescriptorKeys.add(k);
 }
 
 // --- Entry Point ---
@@ -211,37 +120,47 @@ export default defineBackground(() => {
 		});
 	}
 
-	// Popup lifecycle via port
+	// Popup lifecycle via port — background ALWAYS owns engines now.
+	// The popup only sends scope updates; it does not own sync.
 	browser.runtime.onConnect.addListener((port) => {
 		if (port.name !== "popup-sync") return;
 
-		popupAlive = true;
-		void teardownAllEngines().catch((err) =>
-			console.error("[background] failed to tear down engines:", err),
-		);
-
 		port.onMessage.addListener((msg: { scopes?: SyncScope[] }) => {
 			if (msg.scopes) {
+				const validScopes = msg.scopes.filter(isSyncScope);
 				browser.storage.local
-					.set({ [SCOPES_STORAGE_KEY]: msg.scopes.filter(isSyncScope) })
+					.set({ [SCOPES_STORAGE_KEY]: validScopes })
+					.then(() => ensureEntriesFromStorage())
+					.then(() => syncRuntime.triggerSyncAll())
 					.catch((err) =>
-						console.error("[background] failed to persist sync scopes:", err),
+						console.error("[background] failed to update sync scopes:", err),
 					);
 			}
 		});
 
-		port.onDisconnect.addListener(() => {
-			popupAlive = false;
-			void Promise.resolve(teardownPromise)
-				.then(() => ensureEnginesFromStorage())
-				.catch((err) =>
-					console.error(
-						"[background] failed to start engines on popup close:",
-						err,
-					),
-				);
-		});
+		// No teardown on popup connect — engines keep running
+		// No special action on disconnect — engines keep running
 	});
+
+	// Handle messages from popup
+	browser.runtime.onMessage.addListener(
+		(
+			msg: {
+				type?: string;
+				descriptor?: SyncDescriptor;
+				params?: import("@pengana/upload-queue").EnqueueUploadParams;
+			},
+			_sender,
+			_sendResponse,
+		) => {
+			if (msg?.type === "trigger-sync") {
+				syncRuntime.triggerSyncAll();
+			}
+			if (msg?.type === "enqueue-upload" && msg.descriptor && msg.params) {
+				syncRuntime.enqueueUpload(msg.descriptor, msg.params);
+			}
+		},
+	);
 
 	// Periodic sync alarm
 	browser.alarms.create(SYNC_ALARM_NAME, {
@@ -250,39 +169,13 @@ export default defineBackground(() => {
 
 	browser.alarms.onAlarm.addListener(async (alarm) => {
 		if (alarm.name !== SYNC_ALARM_NAME) return;
-		if (popupAlive) return; // popup handles sync
 
-		if (isOnline) {
-			await ensureEnginesFromStorage();
-			for (const { engine } of engines.values()) {
-				engine.sync();
-			}
-		}
-		await checkStorageHealth();
+		await ensureEntriesFromStorage();
+		syncRuntime.triggerSyncAll();
 	});
 
-	// Online/offline
-	self.addEventListener("online", () => {
-		isOnline = true;
-		if (popupAlive) return;
-		for (const { engine, uploadQueue } of engines.values()) {
-			engine.sync();
-			uploadQueue.resume();
-		}
-	});
-
-	self.addEventListener("offline", () => {
-		isOnline = false;
-		if (popupAlive) return;
-		for (const { uploadQueue } of engines.values()) {
-			uploadQueue.pause();
-		}
-	});
-
-	// Initial setup — only start engines if popup isn't already open
-	if (!popupAlive) {
-		ensureEnginesFromStorage().catch((err) =>
-			console.error("[background] initBackground failed:", err),
-		);
-	}
+	// Initial setup
+	ensureEntriesFromStorage().catch((err) =>
+		console.error("[background] initBackground failed:", err),
+	);
 });

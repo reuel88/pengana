@@ -29,6 +29,7 @@
 		"@pengana/realtime-transport": "workspace:*",
 		"@pengana/storage-health": "workspace:*",
 		"@pengana/sync-engine": "workspace:*",
+		"@pengana/sync-runtime": "workspace:*",
 		"@pengana/todo-client": "workspace:*",
 		"@pengana/upload-client": "workspace:*",
 		"@pengana/upload-queue": "workspace:*",

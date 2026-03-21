@@ -1,4 +1,4 @@
-import { useOrgSync } from "@/features/sync/sync-context";
+import { useSyncEntry } from "@/features/sync/use-sync-entry";
 
 import {
 	addMedia,
@@ -10,7 +10,11 @@ import {
 import { useFilePickerBase } from "./use-file-picker-base";
 
 export function useOrgFilePicker(userId: string, orgId: string) {
-	const { enqueueUpload } = useOrgSync();
+	const { enqueueUpload } = useSyncEntry({
+		scopeType: "organization",
+		scopeId: orgId,
+		entityKey: "todo",
+	});
 	return useFilePickerBase({
 		addMedia,
 		attachMedia,

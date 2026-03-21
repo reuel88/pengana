@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { SyncDescriptor } from "@pengana/sync-runtime";
 import { useState } from "react";
 import {
 	ScrollView,
@@ -8,7 +9,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
+import {
+	useSyncDevtoolsEntry,
+	useSyncEntry,
+} from "@/features/sync/use-sync-entry";
 import { client } from "@/shared/api/orpc";
 import { appDb, todos } from "@/shared/db";
 import { useTheme } from "@/shared/lib/theme";
@@ -34,9 +38,10 @@ function getLogEntryStyle(
 	return { color: colors.text, opacity: 0.5 };
 }
 
-function SyncDevtoolsContent() {
-	const { isOnline, isSyncing, triggerSync } = useSync();
-	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
+function SyncDevtoolsContent({ descriptor }: { descriptor: SyncDescriptor }) {
+	const { isOnline, isSyncing, triggerSync } = useSyncEntry(descriptor);
+	const { events } = useSyncDevtoolsEntry(descriptor);
+	const [simulateOffline, setSimulateOffline] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
 	const { theme } = useTheme();
@@ -172,9 +177,9 @@ function SyncDevtoolsContent() {
 	);
 }
 
-export function SyncDevtools() {
+export function SyncDevtools({ descriptor }: { descriptor: SyncDescriptor }) {
 	if (!__DEV__) return null;
-	return <SyncDevtoolsContent />;
+	return <SyncDevtoolsContent descriptor={descriptor} />;
 }
 
 const styles = StyleSheet.create({

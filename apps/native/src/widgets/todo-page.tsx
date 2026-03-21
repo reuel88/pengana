@@ -8,7 +8,6 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { OrgSyncProvider, SyncProvider } from "@/features/sync/sync-context";
 import { appDb } from "@/shared/db";
 import { useTheme } from "@/shared/lib/theme";
 import { destructiveText } from "@/shared/styles/shared";
@@ -58,30 +57,21 @@ export function TodoPage({
 				<TodoShell activeTab={activeTab} onTabChange={setActiveTab} />
 
 				{activeTab === "personal" && (
-					<SyncProvider userId={userId} organizationId={organizationId}>
-						<View testID="personal-todo-panel">
-							<PersonalTodoContent
-								userId={userId}
-								organizationId={organizationId}
-							/>
-						</View>
-					</SyncProvider>
+					<View testID="personal-todo-panel">
+						<PersonalTodoContent
+							userId={userId}
+							organizationId={organizationId}
+						/>
+					</View>
 				)}
 
 				{activeTab === "organization" && (
-					<OrgSyncProvider organizationId={organizationId} userId={userId}>
-						<View
-							testID="organization-todo-panel"
-							style={
-								activeTab !== "organization" ? styles.hiddenPanel : undefined
-							}
-						>
-							<OrganizationTodoContent
-								organizationId={organizationId}
-								userId={userId}
-							/>
-						</View>
-					</OrgSyncProvider>
+					<View testID="organization-todo-panel">
+						<OrganizationTodoContent
+							organizationId={organizationId}
+							userId={userId}
+						/>
+					</View>
 				)}
 			</ScrollView>
 		</View>
@@ -99,8 +89,5 @@ const styles = StyleSheet.create({
 	},
 	scroll: {
 		flex: 1,
-	},
-	hiddenPanel: {
-		display: "none",
 	},
 });
