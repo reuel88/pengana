@@ -1,10 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import {
 	isAllowedMimeType,
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
-} from "@pengana/upload-queue";
+} from "@pengana/sync/upload";
 import * as DocumentPicker from "expo-document-picker";
 import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";

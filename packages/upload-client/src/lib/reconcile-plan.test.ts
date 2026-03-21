@@ -1,4 +1,4 @@
-import type { Media, MediaAttachment } from "@pengana/sync-engine";
+import type { Media, MediaAttachment } from "@pengana/sync/core";
 import { describe, expect, it } from "vitest";
 
 import { buildReconcilePlan } from "./reconcile-plan";

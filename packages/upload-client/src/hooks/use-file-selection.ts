@@ -1,5 +1,5 @@
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
-import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
+import { isAllowedMimeType, MAX_FILE_SIZE_BYTES } from "@pengana/sync/upload";
 import { useCallback } from "react";
 import type { MediaActions } from "./media-actions";
 import type {

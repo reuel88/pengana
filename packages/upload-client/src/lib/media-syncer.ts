@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { Media, MediaAttachment } from "@pengana/sync-engine";
+import type { Media, MediaAttachment } from "@pengana/sync/core";
 
 import { reconcileMedia } from "./dexie-media-actions";
 

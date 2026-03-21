@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import { useCallback } from "react";
 import { Alert } from "react-native";
 

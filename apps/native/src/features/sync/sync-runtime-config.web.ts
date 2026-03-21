@@ -1,14 +1,14 @@
-import { subscribeToSharedNotifyChannel } from "@pengana/realtime-transport";
-import { StorageHealthMonitor } from "@pengana/storage-health";
-import { createPeriodicSync, createSyncTransport } from "@pengana/sync-engine";
-import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync-runtime";
+import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
+import { StorageHealthMonitor } from "@pengana/sync/health";
+import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
+import { subscribeToSharedNotifyChannel } from "@pengana/sync/transport";
+import { UploadQueueManager } from "@pengana/sync/upload";
 import {
 	createTodoSyncAdapter,
 	orgTodoConfig,
 	personalTodoConfig,
 } from "@pengana/todo-client";
 import { reconcileMedia } from "@pengana/upload-client";
-import { UploadQueueManager } from "@pengana/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 import {

@@ -1,7 +1,7 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
 import { env } from "@pengana/env/native";
 import { i18next } from "@pengana/i18n";
-import { createWebSocketRealtimeTransport } from "@pengana/realtime-transport";
+import { createWebSocketRealtimeTransport } from "@pengana/sync/transport";
 import { Platform } from "react-native";
 import {
 	createNativeUploadLifecycleCallbacks,

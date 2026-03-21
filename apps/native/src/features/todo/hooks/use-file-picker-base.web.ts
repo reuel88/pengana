@@ -1,11 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import {
 	INDEXEDDB_URI_PREFIX,
 	isAllowedMimeType,
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
-} from "@pengana/upload-queue";
+} from "@pengana/sync/upload";
 import { storeFileInDexie } from "@/features/upload-queue/file-store.web";
 
 export function useFilePickerBase(deps: {

@@ -1,5 +1,5 @@
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
-import { isQuotaError } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
+import { isQuotaError } from "@pengana/sync/upload";
 import { useCallback, useMemo } from "react";
 import type { MediaConfig } from "../lib/media-config";
 import type { MediaActions } from "./media-actions";

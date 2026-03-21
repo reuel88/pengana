@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { Todo } from "@pengana/sync-engine";
+import type { Todo } from "@pengana/sync/core";
 import { StyleSheet, View } from "react-native";
 
 import { useTheme } from "@/shared/lib/theme";

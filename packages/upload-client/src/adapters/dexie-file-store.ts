@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
+import { isQuotaError, StorageFullError } from "@pengana/sync/upload";
 
 import { readFileAsBase64 } from "../lib/file-utils";
 import type { FileDataRecord } from "../lib/upload-queue-stores";

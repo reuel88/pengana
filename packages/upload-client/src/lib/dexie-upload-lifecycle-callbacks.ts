@@ -1,5 +1,5 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { UploadLifecycleCallbacks } from "@pengana/upload-queue";
+import type { UploadLifecycleCallbacks } from "@pengana/sync/upload";
 
 import { markMediaFailed, updateMediaUploaded } from "./dexie-media-actions";
 

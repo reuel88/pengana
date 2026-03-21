@@ -1,4 +1,4 @@
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 
 export interface ProcessMediaFileInput {
 	file: File;

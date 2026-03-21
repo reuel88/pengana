@@ -1,7 +1,7 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { Media, MediaAttachment } from "@pengana/sync-engine";
+import type { Media, MediaAttachment } from "@pengana/sync/core";
 
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import type { MediaActions } from "../hooks/media-actions";
 import type { AddMediaOptions, LocalMedia, LocalMediaAttachment } from "./db";
 import { buildReconcilePlan } from "./reconcile-plan";

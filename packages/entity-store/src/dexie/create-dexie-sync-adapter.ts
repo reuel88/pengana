@@ -1,5 +1,5 @@
-import type { SyncAdapter, Todo } from "@pengana/sync-engine";
-import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
+import type { SyncAdapter, Todo } from "@pengana/sync/core";
+import { isQuotaError, StorageFullError } from "@pengana/sync/upload";
 
 import type { EntityDatabase } from "./entity-database";
 

@@ -1,4 +1,4 @@
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import type { TodoItemRow } from "./components/todo-item";
 import { useAttachmentHandlers } from "./create-attachment-handlers";
 import { useFilePickerBase } from "./hooks/use-file-picker-base";

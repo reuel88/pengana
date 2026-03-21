@@ -1,8 +1,8 @@
-import { subscribeToSharedNotifyChannel } from "@pengana/realtime-transport";
-import { StorageHealthMonitor } from "@pengana/storage-health";
-import { createPeriodicSync, createSyncTransport } from "@pengana/sync-engine";
-import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync-runtime";
-import { cleanupUploaded, UploadQueueManager } from "@pengana/upload-queue";
+import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
+import { StorageHealthMonitor } from "@pengana/sync/health";
+import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
+import { subscribeToSharedNotifyChannel } from "@pengana/sync/transport";
+import { cleanupUploaded, UploadQueueManager } from "@pengana/sync/upload";
 import { File } from "expo-file-system";
 import * as Network from "expo-network";
 import { AppState } from "react-native";

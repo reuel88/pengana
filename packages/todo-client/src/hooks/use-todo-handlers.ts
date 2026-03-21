@@ -1,3 +1,5 @@
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
+import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync/upload";
 import {
 	type MediaActions,
 	type MediaAttachmentTarget,
@@ -5,8 +7,6 @@ import {
 	useMediaDeletion,
 	useMediaRetry,
 } from "@pengana/upload-client";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
-import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 
 export interface FileStorageStrategy {

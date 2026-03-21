@@ -1,4 +1,4 @@
-import type { Media, MediaAttachment } from "@pengana/sync-engine";
+import type { Media, MediaAttachment } from "@pengana/sync/core";
 
 import type { LocalMedia, LocalMediaAttachment } from "./db";
 

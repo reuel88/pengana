@@ -10,8 +10,7 @@
 	},
 	"peerDependencies": {
 		"@pengana/i18n": "workspace:*",
-		"@pengana/sync-engine": "workspace:*",
-		"@pengana/upload-queue": "workspace:*",
+		"@pengana/sync": "workspace:*",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0"
 	},

@@ -2,7 +2,7 @@ import {
 	findMediaAttachmentsByMediaIds,
 	findMediaByScope,
 } from "@pengana/db/media-queries";
-import { mediaAttachmentSchema, mediaSchema } from "@pengana/sync-engine";
+import { mediaAttachmentSchema, mediaSchema } from "@pengana/sync/core";
 import { z } from "zod";
 
 import { apiError } from "../errors";
