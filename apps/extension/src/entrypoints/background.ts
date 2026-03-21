@@ -64,13 +64,23 @@ function createEngine(scope: SyncScope): {
 } {
 	const isOrg = scope.scopeType === "organization";
 	const config = isOrg ? orgTodoConfig : personalTodoConfig;
-	const adapter = createTodoSyncAdapter(appDb, scope.scopeId, config);
+	const adapter = createTodoSyncAdapter({
+		db: appDb,
+		scopeId: scope.scopeId,
+		config,
+	});
 
 	const onMedia = (
 		media: import("@pengana/sync-engine").Media[],
 		attachments: import("@pengana/sync-engine").MediaAttachment[],
 		entityIds: string[],
-	) => reconcileMedia(appDb, media, attachments, entityIds);
+	) =>
+		reconcileMedia({
+			db: appDb,
+			serverMedia: media,
+			serverAttachments: attachments,
+			entityIds,
+		});
 
 	const transport = isOrg
 		? createSyncTransport(async (input) => {

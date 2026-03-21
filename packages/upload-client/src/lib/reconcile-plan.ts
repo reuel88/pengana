@@ -18,6 +18,8 @@ export interface ReconcilePlanInput {
 	existingAttachmentIds: Set<string>;
 	uploadedMediaNotOnServer: { id: string; attachmentCount: number }[];
 	entityIds?: string[];
+	/** When true, delete local uploaded media not present on server (scope-wide sync). */
+	scopeWide?: boolean;
 }
 
 export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
@@ -74,7 +76,15 @@ export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
 	const attachmentIdsToDelete: string[] = [];
 	const mediaIdsToDelete: string[] = [];
 
-	if (entityIds && entityIds.length > 0) {
+	if (input.scopeWide) {
+		// Scope-wide sync: delete uploaded media not present on server
+		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
+		for (const candidate of uploadedMediaNotOnServer) {
+			if (!serverMediaIds.has(candidate.id)) {
+				mediaIdsToDelete.push(candidate.id);
+			}
+		}
+	} else if (entityIds && entityIds.length > 0) {
 		const serverAttIds = new Set(serverAttachments.map((a) => a.id));
 		const entityIdSet = new Set(entityIds);
 

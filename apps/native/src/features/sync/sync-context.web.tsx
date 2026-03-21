@@ -290,7 +290,12 @@ const personalTransportFactory = () =>
 		async (input) =>
 			(await client.todo.sync(input, { signal: input.signal })).data,
 		(media, attachments, entityIds) =>
-			reconcileMedia(appDb, media, attachments, entityIds),
+			reconcileMedia({
+				db: appDb,
+				serverMedia: media,
+				serverAttachments: attachments,
+				entityIds,
+			}),
 	);
 
 export function SyncProvider({
@@ -307,7 +312,10 @@ export function SyncProvider({
 
 	const createAdapter = useCallback(
 		(uid: string) =>
-			createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+			createTodoSyncAdapter({
+				db: appDb,
+				scopeId: uid,
+				config: personalTodoConfig,
 				filter: (todo) => todo.organizationId === organizationId,
 				syncKeySuffix: organizationId,
 			}),
@@ -330,7 +338,11 @@ export function SyncProvider({
 }
 
 const orgAdapter = (organizationId: string) =>
-	createTodoSyncAdapter(appDb, organizationId, orgTodoConfig);
+	createTodoSyncAdapter({
+		db: appDb,
+		scopeId: organizationId,
+		config: orgTodoConfig,
+	});
 
 const orgTransport = () =>
 	createSyncTransport(
@@ -338,7 +350,12 @@ const orgTransport = () =>
 			return (await client.orgTodo.sync(input, { signal: input.signal })).data;
 		},
 		(media, attachments, entityIds) =>
-			reconcileMedia(appDb, media, attachments, entityIds),
+			reconcileMedia({
+				db: appDb,
+				serverMedia: media,
+				serverAttachments: attachments,
+				entityIds,
+			}),
 	);
 
 export function OrgSyncProvider({

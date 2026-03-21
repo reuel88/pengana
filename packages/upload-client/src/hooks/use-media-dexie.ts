@@ -4,25 +4,17 @@ import { useMemo } from "react";
 
 import type { LocalMedia, LocalMediaAttachment } from "../lib/db";
 import type { MediaConfig } from "../lib/media-config";
-import {
-	type MediaListItem,
-	mergeMediaRecords,
-	type ServerMediaRecord,
-} from "../lib/merge-media";
+import type { MediaListItem } from "../lib/merge-media";
 
 export interface UseMediaOptions {
 	db: EntityDatabase;
 	config: MediaConfig;
 	scopeId: string;
-	serverMedia?: ServerMediaRecord[];
 }
 
-export function useMedia({
-	db,
-	config,
-	scopeId,
-	serverMedia = [],
-}: UseMediaOptions): { media: MediaListItem[] } {
+export function useMedia({ db, config, scopeId }: UseMediaOptions): {
+	media: MediaListItem[];
+} {
 	const localMedia =
 		useLiveQuery(
 			(): Promise<LocalMedia[]> =>
@@ -55,14 +47,41 @@ export function useMedia({
 			[] as LocalMediaAttachment[],
 		) ?? [];
 
+	const attachmentsByMediaId = useMemo(() => {
+		const map = new Map<string, LocalMediaAttachment[]>();
+		for (const att of localAttachments) {
+			const list = map.get(att.mediaId) ?? [];
+			list.push(att);
+			map.set(att.mediaId, list);
+		}
+		return map;
+	}, [localAttachments]);
+
 	const media = useMemo(
 		() =>
-			mergeMediaRecords({
-				localMedia,
-				localAttachments,
-				serverMedia,
-			}),
-		[localAttachments, localMedia, serverMedia],
+			localMedia
+				.map(
+					(m): MediaListItem => ({
+						id: m.id,
+						userId: m.userId,
+						url: m.url,
+						localUri: m.localUri,
+						mimeType: m.mimeType,
+						status: m.status,
+						createdAt: m.createdAt,
+						updatedAt: m.updatedAt,
+						scopeType: m.scopeType,
+						scopeId: m.scopeId,
+						organizationId: m.organizationId,
+						createdBy: m.createdBy,
+						attachments: (attachmentsByMediaId.get(m.id) ?? []).sort(
+							(a, b) => a.position - b.position,
+						),
+						isLocalOnly: m.status !== "uploaded",
+					}),
+				)
+				.sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+		[localMedia, attachmentsByMediaId],
 	);
 
 	return { media };

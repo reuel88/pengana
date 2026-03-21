@@ -7,18 +7,20 @@ import type { SyncAdapter, Todo } from "@pengana/sync-engine";
 import type { WebTodo } from "../lib/db";
 import type { TodoConfig } from "../lib/todo-config";
 
-export function createTodoSyncAdapter(
-	db: EntityDatabase,
-	scopeId: string,
-	config: TodoConfig,
-	options?: { filter?: (item: WebTodo) => boolean; syncKeySuffix?: string },
-): SyncAdapter {
+export function createTodoSyncAdapter(params: {
+	db: EntityDatabase;
+	scopeId: string;
+	config: TodoConfig;
+	filter?: (item: WebTodo) => boolean;
+	syncKeySuffix?: string;
+}): SyncAdapter {
+	const { db, scopeId, config, filter, syncKeySuffix } = params;
 	return createGenericAdapter<WebTodo>(scopeId, {
 		db,
 		tableName: config.entity.name,
 		syncKeyPrefix: config.syncKeyPrefix,
-		filter: options?.filter,
-		syncKeySuffix: options?.syncKeySuffix,
+		filter,
+		syncKeySuffix,
 		toWire: (local: WebTodo): Todo => ({
 			id: local.id,
 			title: local.title,

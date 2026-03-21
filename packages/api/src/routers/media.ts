@@ -2,10 +2,17 @@ import {
 	findMediaAttachmentsByMediaIds,
 	findMediaByScope,
 } from "@pengana/db/media-queries";
+import { mediaAttachmentSchema, mediaSchema } from "@pengana/sync-engine";
 import { z } from "zod";
 
 import { apiError } from "../errors";
-import { envelope, envelopeOutput, protectedProcedure } from "../index";
+import {
+	envelope,
+	envelopeOutput,
+	protectedProcedure,
+	seatedProcedure,
+} from "../index";
+import { handleMediaSync } from "./media-sync";
 
 const mediaOutputSchema = z.object({
 	id: z.string(),
@@ -33,7 +40,45 @@ const mediaWithAttachmentsSchema = mediaOutputSchema.extend({
 	attachments: z.array(mediaAttachmentOutputSchema),
 });
 
+const mediaSyncInputSchema = z.object({
+	lastSyncedAt: z.string().nullable(),
+});
+
+const mediaSyncOutputSchema = z.object({
+	media: z.array(mediaSchema),
+	mediaAttachments: z.array(mediaAttachmentSchema),
+	syncedAt: z.string(),
+});
+
 export const mediaRouter = {
+	sync: seatedProcedure
+		.route({
+			method: "POST",
+			path: "/media/sync",
+			summary: "Sync personal media",
+		})
+		.input(mediaSyncInputSchema)
+		.output(envelopeOutput(mediaSyncOutputSchema))
+		.handler(async ({ input, context }) => {
+			const userId = context.session.user.id;
+			return envelope(
+				await handleMediaSync(input.lastSyncedAt, "personal", userId),
+			);
+		}),
+
+	orgSync: seatedProcedure
+		.route({
+			method: "POST",
+			path: "/media/org-sync",
+			summary: "Sync organization media",
+		})
+		.input(mediaSyncInputSchema)
+		.output(envelopeOutput(mediaSyncOutputSchema))
+		.handler(async ({ input, context }) => {
+			const orgId = context.session.session.activeOrganizationId as string;
+			return envelope(await handleMediaSync(input.lastSyncedAt, "org", orgId));
+		}),
+
 	listMedia: protectedProcedure
 		.route({
 			method: "GET",

@@ -12,7 +12,12 @@ export function createDrizzleUploadLifecycleCallbacks(
 			attachmentUrl: string,
 			uploadItemId: string,
 		): Promise<void> {
-			await updateMediaUploaded(db, mediaTable, uploadItemId, attachmentUrl);
+			await updateMediaUploaded({
+				db,
+				table: mediaTable,
+				mediaId: uploadItemId,
+				url: attachmentUrl,
+			});
 		},
 
 		async onFailed(uploadItemId: string): Promise<void> {

@@ -64,7 +64,7 @@ export const attachMedia = (
 	mediaId: string,
 	entityType: string,
 	entityId: string,
-) => _attachMedia(appDb, mediaId, entityType, entityId);
+) => _attachMedia({ db: appDb, mediaId, entityType, entityId });
 export const removeMedia = (mediaId: string) => _removeMedia(appDb, mediaId);
 export const updateMediaUploaded = (mediaId: string, url: string) =>
 	_updateMediaUploaded(appDb, mediaId, url);

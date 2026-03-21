@@ -7,9 +7,17 @@ import {
 import { appDb } from "@/shared/db";
 
 export function createDexieSyncAdapter(userId: string) {
-	return createTodoSyncAdapter(appDb, userId, personalTodoConfig);
+	return createTodoSyncAdapter({
+		db: appDb,
+		scopeId: userId,
+		config: personalTodoConfig,
+	});
 }
 
 export function createDexieOrgSyncAdapter(organizationId: string) {
-	return createTodoSyncAdapter(appDb, organizationId, orgTodoConfig);
+	return createTodoSyncAdapter({
+		db: appDb,
+		scopeId: organizationId,
+		config: orgTodoConfig,
+	});
 }

@@ -256,7 +256,10 @@ export function SyncProvider({
 }) {
 	const createSyncAdapter = useCallback(
 		(uid: string) =>
-			createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+			createTodoSyncAdapter({
+				db: appDb,
+				scopeId: uid,
+				config: personalTodoConfig,
 				filter: (todo) => todo.organizationId === organizationId,
 				syncKeySuffix: organizationId,
 			}),
@@ -269,7 +272,12 @@ export function SyncProvider({
 				async (input) =>
 					(await client.todo.sync(input, { signal: input.signal })).data,
 				(media, attachments, entityIds) =>
-					reconcileMedia(appDb, media, attachments, entityIds),
+					reconcileMedia({
+						db: appDb,
+						serverMedia: media,
+						serverAttachments: attachments,
+						entityIds,
+					}),
 			),
 		[],
 	);
@@ -302,7 +310,12 @@ export function OrgSyncProvider({
 	children: ReactNode;
 }) {
 	const createSyncAdapter = useCallback(
-		(orgId: string) => createTodoSyncAdapter(appDb, orgId, orgTodoConfig),
+		(orgId: string) =>
+			createTodoSyncAdapter({
+				db: appDb,
+				scopeId: orgId,
+				config: orgTodoConfig,
+			}),
 		[],
 	);
 
@@ -314,7 +327,12 @@ export function OrgSyncProvider({
 						.data;
 				},
 				(media, attachments, entityIds) =>
-					reconcileMedia(appDb, media, attachments, entityIds),
+					reconcileMedia({
+						db: appDb,
+						serverMedia: media,
+						serverAttachments: attachments,
+						entityIds,
+					}),
 			),
 		[],
 	);

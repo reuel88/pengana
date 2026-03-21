@@ -64,21 +64,27 @@ export const addMedia = (options: {
 	scopeId: string;
 	organizationId: string;
 	createdBy: string;
-}): Promise<string> => drizzleMedia.addMedia(appDb, media, randomUUID, options);
+}): Promise<string> =>
+	drizzleMedia.addMedia({
+		db: appDb,
+		table: media,
+		generateId: randomUUID,
+		options,
+	});
 
 export const attachMedia = (
 	mediaId: string,
 	entityType: string,
 	entityId: string,
 ): Promise<string> =>
-	drizzleMedia.attachMediaToEntity(
-		appDb,
-		mediaAttachments,
-		randomUUID,
+	drizzleMedia.attachMediaToEntity({
+		db: appDb,
+		table: mediaAttachments,
+		generateId: randomUUID,
 		mediaId,
 		entityType,
 		entityId,
-	);
+	});
 
 export const removeMedia = async (mediaId: string): Promise<void> => {
 	await drizzleMedia.removeMediaAttachments(appDb, mediaAttachments, mediaId);
@@ -89,7 +95,7 @@ export const updateMediaUploaded = (
 	mediaId: string,
 	url: string,
 ): Promise<void> =>
-	drizzleMedia.updateMediaUploaded(appDb, media, mediaId, url);
+	drizzleMedia.updateMediaUploaded({ db: appDb, table: media, mediaId, url });
 
 export const markMediaFailed = (mediaId: string): Promise<void> =>
 	drizzleMedia.markMediaFailed(appDb, media, mediaId);
@@ -98,7 +104,12 @@ export const updateMediaLocalUri = (
 	mediaId: string,
 	localUri: string,
 ): Promise<void> =>
-	drizzleMedia.updateMediaLocalUri(appDb, media, mediaId, localUri);
+	drizzleMedia.updateMediaLocalUri({
+		db: appDb,
+		table: media,
+		mediaId,
+		localUri,
+	});
 
 export const retryMedia = (mediaId: string) =>
 	drizzleMedia.retryMedia(appDb, media, mediaId);

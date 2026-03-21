@@ -31,12 +31,13 @@ export async function addMedia(
 	return id;
 }
 
-export async function attachMediaToEntity(
-	db: EntityDatabase,
-	mediaId: string,
-	entityType: string,
-	entityId: string,
-): Promise<string> {
+export async function attachMediaToEntity(params: {
+	db: EntityDatabase;
+	mediaId: string;
+	entityType: string;
+	entityId: string;
+}): Promise<string> {
+	const { db, mediaId, entityType, entityId } = params;
 	const table = db.getTable<LocalMediaAttachment>("mediaAttachments");
 	const existing = await table.where({ entityType, entityId }).toArray();
 	const position =
@@ -55,12 +56,13 @@ export async function attachMediaToEntity(
 	return id;
 }
 
-export async function detachMediaFromEntity(
-	db: EntityDatabase,
-	mediaId: string,
-	entityType: string,
-	entityId: string,
-): Promise<void> {
+export async function detachMediaFromEntity(params: {
+	db: EntityDatabase;
+	mediaId: string;
+	entityType: string;
+	entityId: string;
+}): Promise<void> {
+	const { db, mediaId, entityType, entityId } = params;
 	const table = db.getTable<LocalMediaAttachment>("mediaAttachments");
 	const records = await table
 		.where({ mediaId })
@@ -193,7 +195,12 @@ export async function processMediaFile(
 	});
 
 	if (target) {
-		await attachMediaToEntity(db, mediaId, target.entityType, target.entityId);
+		await attachMediaToEntity({
+			db,
+			mediaId,
+			entityType: target.entityType,
+			entityId: target.entityId,
+		});
 	}
 
 	await storeFile(mediaId, file);
@@ -221,12 +228,19 @@ export function createDexieMediaActions(db: EntityDatabase): MediaActions {
 	};
 }
 
+export interface ReconcileMediaOptions {
+	db: EntityDatabase;
+	serverMedia: Media[];
+	serverAttachments: MediaAttachment[];
+	entityIds?: string[];
+	scopeWideOpts?: { scopeType: "personal" | "org"; scopeId: string };
+}
+
 export async function reconcileMedia(
-	db: EntityDatabase,
-	serverMedia: Media[],
-	serverAttachments: MediaAttachment[],
-	entityIds?: string[],
+	options: ReconcileMediaOptions,
 ): Promise<void> {
+	const { db, serverMedia, serverAttachments, entityIds, scopeWideOpts } =
+		options;
 	const mediaTable = db.getTable<LocalMedia>("media");
 	const attTable = db.getTable<LocalMediaAttachment>("mediaAttachments");
 
@@ -276,7 +290,26 @@ export async function reconcileMedia(
 	}
 
 	let uploadedMediaNotOnServer: { id: string; attachmentCount: number }[] = [];
-	if (entityIds && entityIds.length > 0) {
+	const isScopeWide = !!scopeWideOpts;
+
+	if (isScopeWide) {
+		// Scope-wide sync: find all uploaded media in the scope not present on server
+		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
+		const localUploaded = await mediaTable
+			.where("status")
+			.equals("uploaded")
+			.toArray();
+		const candidates = localUploaded.filter(
+			(m) =>
+				m.scopeType === scopeWideOpts.scopeType &&
+				m.scopeId === scopeWideOpts.scopeId &&
+				!serverMediaIds.has(m.id),
+		);
+		uploadedMediaNotOnServer = candidates.map((m) => ({
+			id: m.id,
+			attachmentCount: 0,
+		}));
+	} else if (entityIds && entityIds.length > 0) {
 		const serverMediaIds = new Set(serverMedia.map((m) => m.id));
 
 		// Get media IDs scoped to the synced entities
@@ -310,6 +343,7 @@ export async function reconcileMedia(
 		existingAttachmentIds,
 		uploadedMediaNotOnServer,
 		entityIds,
+		scopeWide: isScopeWide,
 	});
 
 	// --- Execute plan ---
