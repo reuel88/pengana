@@ -8,9 +8,9 @@ import { buildReconcilePlan } from "./reconcile-plan";
 
 export async function addMedia(
 	db: EntityDatabase,
-	options: AddMediaOptions,
+	options: AddMediaOptions & { id?: string },
 ): Promise<string> {
-	const id = crypto.randomUUID();
+	const id = options.id ?? crypto.randomUUID();
 	const table = db.getTable<LocalMedia>("media");
 
 	await table.put({
@@ -184,9 +184,17 @@ export async function processMediaFile(
 		enqueueUpload,
 	} = params;
 
-	const mediaId = await addMedia(db, {
+	const mediaId = crypto.randomUUID();
+
+	// Persist file before inserting DB records so a storage failure
+	// (e.g. quota exceeded) does not leave orphaned media rows.
+	await storeFile(mediaId, file);
+	const fileRef = createFileRef(mediaId, file);
+
+	await addMedia(db, {
+		id: mediaId,
 		userId,
-		localUri: "",
+		localUri: fileRef.uri,
 		mimeType: file.type,
 		scopeType,
 		scopeId,
@@ -202,10 +210,6 @@ export async function processMediaFile(
 			entityId: target.entityId,
 		});
 	}
-
-	await storeFile(mediaId, file);
-	const fileRef = createFileRef(mediaId, file);
-	await updateMediaLocalUri(db, mediaId, fileRef.uri);
 
 	enqueueUpload({
 		fileUri: fileRef.uri,

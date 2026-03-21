@@ -1,4 +1,12 @@
-import { and, eq, gte, inArray, sql, count as sqlCount } from "drizzle-orm";
+import {
+	and,
+	eq,
+	gte,
+	inArray,
+	isNull,
+	sql,
+	count as sqlCount,
+} from "drizzle-orm";
 
 import { db } from "./index";
 import { media, mediaAttachments } from "./schema/media";
@@ -14,6 +22,7 @@ export interface MediaRow {
 	scopeId: string;
 	organizationId: string;
 	createdBy: string;
+	deletedAt: Date | null;
 }
 
 export interface MediaAttachmentRow {
@@ -43,13 +52,19 @@ export async function findMediaByEntityIds(
 			scopeId: media.scopeId,
 			organizationId: media.organizationId,
 			createdBy: media.createdBy,
+			deletedAt: media.deletedAt,
 			entityId: mediaAttachments.entityId,
 			entityType: mediaAttachments.entityType,
 			position: mediaAttachments.position,
 		})
 		.from(mediaAttachments)
 		.innerJoin(media, eq(media.id, mediaAttachments.mediaId))
-		.where(inArray(mediaAttachments.entityId, entityIds));
+		.where(
+			and(
+				inArray(mediaAttachments.entityId, entityIds),
+				isNull(media.deletedAt),
+			),
+		);
 	return rows;
 }
 
@@ -86,6 +101,14 @@ export async function findMediaById(id: string): Promise<MediaRow | undefined> {
 }
 
 export async function deleteMedia(id: string): Promise<void> {
+	const now = new Date();
+	await db
+		.update(media)
+		.set({ deletedAt: now, updatedAt: now })
+		.where(eq(media.id, id));
+}
+
+export async function hardDeleteMedia(id: string): Promise<void> {
 	await db.delete(media).where(eq(media.id, id));
 }
 
@@ -105,6 +128,10 @@ export async function attachMedia(
 		})
 		.returning();
 	if (!row) throw new Error("Failed to create media attachment");
+	await db
+		.update(media)
+		.set({ updatedAt: new Date() })
+		.where(eq(media.id, mediaId));
 	return row;
 }
 
@@ -122,6 +149,10 @@ export async function detachMedia(
 				eq(mediaAttachments.entityId, entityId),
 			),
 		);
+	await db
+		.update(media)
+		.set({ updatedAt: new Date() })
+		.where(eq(media.id, mediaId));
 }
 
 export async function findAttachmentsByMedia(
@@ -161,7 +192,11 @@ export async function findMediaByScope(opts: {
 		.select()
 		.from(media)
 		.where(
-			and(eq(media.scopeType, opts.scopeType), eq(media.scopeId, opts.scopeId)),
+			and(
+				eq(media.scopeType, opts.scopeType),
+				eq(media.scopeId, opts.scopeId),
+				isNull(media.deletedAt),
+			),
 		)
 		.orderBy(sql`${media.createdAt} desc`)
 		.limit(opts.limit ?? 50)

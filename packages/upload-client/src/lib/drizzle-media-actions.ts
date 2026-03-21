@@ -238,13 +238,20 @@ export async function processMediaFile(
 		enqueueUpload,
 	} = params;
 
-	const mediaId = await addMedia({
+	const mediaId = generateId();
+
+	// Persist file before inserting DB records so a storage failure
+	// (e.g. quota exceeded) does not leave orphaned media rows.
+	await storeFile(mediaId, file);
+	const fileRef = createFileRef(mediaId, file);
+
+	await addMedia({
 		db,
 		table: mediaTable,
-		generateId,
+		generateId: () => mediaId,
 		options: {
 			userId,
-			localUri: "",
+			localUri: fileRef.uri,
 			mimeType: file.type,
 			scopeType,
 			scopeId,
@@ -263,15 +270,6 @@ export async function processMediaFile(
 			entityId: target.entityId,
 		});
 	}
-
-	await storeFile(mediaId, file);
-	const fileRef = createFileRef(mediaId, file);
-	await updateMediaLocalUri({
-		db,
-		table: mediaTable,
-		mediaId,
-		localUri: fileRef.uri,
-	});
 
 	enqueueUpload({
 		fileUri: fileRef.uri,
