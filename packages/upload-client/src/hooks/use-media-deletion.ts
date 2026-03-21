@@ -1,23 +1,21 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import { useCallback } from "react";
-import { removeMedia } from "../lib/media-actions";
+import type { MediaActions } from "./media-actions";
 
 export interface MediaDeletionDeps {
-	db?: EntityDatabase;
+	removeMedia: MediaActions["removeMedia"];
 	triggerSync: () => void;
 	deleteOnServer?: (mediaId: string) => Promise<unknown>;
 }
 
 export function useMediaDeletion(deps: MediaDeletionDeps) {
-	const { db, triggerSync, deleteOnServer } = deps;
+	const { removeMedia, triggerSync, deleteOnServer } = deps;
 
 	return useCallback(
 		async (mediaId: string) => {
-			if (!db) return;
-			await removeMedia(db, mediaId);
+			await removeMedia(mediaId);
 			await deleteOnServer?.(mediaId);
 			triggerSync();
 		},
-		[db, deleteOnServer, triggerSync],
+		[removeMedia, deleteOnServer, triggerSync],
 	);
 }

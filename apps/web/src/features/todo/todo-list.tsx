@@ -6,11 +6,15 @@ import {
 } from "@pengana/todo-client";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import type { LocalMedia } from "@pengana/upload-client";
+import {
+	createDexieMediaActions,
+	getMediaCountForEntity,
+} from "@pengana/upload-client";
 import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { INDEXEDDB_URI_PREFIX } from "@pengana/upload-queue";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue";
+import { storeFileInDexie } from "@/features/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
@@ -50,13 +54,15 @@ export function TodoList({
 
 	const fileStorage = useMemo(
 		() => ({
-			storeFile: storeFileInIndexedDB,
+			storeFile: storeFileInDexie,
 			createFileRef: (id: string) => ({
 				uri: `${INDEXEDDB_URI_PREFIX}${id}`,
 			}),
 		}),
 		[],
 	);
+
+	const mediaActions = useMemo(() => createDexieMediaActions(appDb), []);
 
 	const {
 		handleToggle,
@@ -74,13 +80,15 @@ export function TodoList({
 		t,
 		deleteAttachment: (attachmentId) =>
 			client.upload.deleteMedia({ mediaId: attachmentId }), // Delete attachment is a direct API call
-		db: appDb,
 		userId,
 		scopeType,
 		scopeId,
 		organizationId,
 		entityType,
 		actions,
+		mediaActions,
+		getMediaCountForEntity: (entityId) =>
+			getMediaCountForEntity(appDb, entityId),
 	});
 
 	return (

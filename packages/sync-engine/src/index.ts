@@ -2,8 +2,10 @@ export { MAX_EVENT_LOG_SIZE } from "./constants/sync";
 export { SyncEngine } from "./core/engine";
 export type { EventEmitter } from "./core/event-emitter";
 export { createEventEmitter } from "./core/event-emitter";
-export { SYNC_INTERVAL_MS, usePeriodicSync } from "./hooks/use-periodic-sync";
-export { useStableSyncRef } from "./hooks/use-stable-sync-ref";
+export {
+	createPeriodicSync,
+	SYNC_INTERVAL_MS,
+} from "./lib/create-periodic-sync";
 export { createSyncTransport } from "./lib/create-sync-transport";
 export {
 	mediaAttachmentSchema,

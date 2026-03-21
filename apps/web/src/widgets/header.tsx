@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { UserMenu } from "@/features/auth/user-menu";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher";
 import { NotificationCenter } from "@/features/notifications/notification-center";
-import { OrgSwitcher } from "@/features/org-management/org-switcher";
+import { OrgSwitcher } from "@/features/org/org-switcher";
 import { ModeToggle } from "@/features/theme/mode-toggle";
 
 export function Header() {

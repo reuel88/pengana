@@ -6,7 +6,7 @@ import {
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/upload-queue";
-import { storeFileInIndexedDB } from "@/features/sync/entities/upload-queue/file-store.web";
+import { storeFileInDexie } from "@/features/upload-queue/file-store.web";
 
 export function useFilePickerBase(deps: {
 	addMedia: (options: {
@@ -78,7 +78,7 @@ export function useFilePickerBase(deps: {
 						createdBy: deps.createdBy,
 					});
 					await deps.attachMedia(mediaId, deps.entityType, todoId);
-					await storeFileInIndexedDB(mediaId, file);
+					await storeFileInDexie(mediaId, file);
 					const localUri = `${INDEXEDDB_URI_PREFIX}${mediaId}`;
 					await deps.updateMediaLocalUri(mediaId, localUri);
 					deps.enqueueUpload({

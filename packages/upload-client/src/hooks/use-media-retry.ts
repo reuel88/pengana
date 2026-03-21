@@ -1,25 +1,24 @@
-import type { EntityDatabase } from "@pengana/entity-store";
 import type { EnqueueUploadParams } from "@pengana/upload-queue";
 import { useCallback } from "react";
-import { getAttachmentForMedia, retryMedia } from "../lib/media-actions";
+import type { MediaActions } from "./media-actions";
 
 export interface MediaRetryDeps {
-	db?: EntityDatabase;
+	retryMedia: MediaActions["retryMedia"];
+	getAttachmentForMedia: MediaActions["getAttachmentForMedia"];
 	enqueueUpload: (params: EnqueueUploadParams) => void;
 	triggerSync: () => void;
 }
 
 export function useMediaRetry(deps: MediaRetryDeps) {
-	const { db, enqueueUpload, triggerSync } = deps;
+	const { retryMedia, getAttachmentForMedia, enqueueUpload, triggerSync } =
+		deps;
 
 	return useCallback(
 		async (mediaId: string) => {
-			if (!db) return;
-
-			const record = await retryMedia(db, mediaId);
+			const record = await retryMedia(mediaId);
 			if (!record?.localUri) return;
 
-			const attachment = await getAttachmentForMedia(db, mediaId);
+			const attachment = await getAttachmentForMedia(mediaId);
 
 			enqueueUpload({
 				fileUri: record.localUri,
@@ -27,10 +26,12 @@ export function useMediaRetry(deps: MediaRetryDeps) {
 				mediaId: record.id,
 				entityType: attachment?.entityType,
 				entityId: attachment?.entityId,
-				scopeType: attachment ? undefined : record.scopeType,
+				scopeType: attachment
+					? undefined
+					: (record.scopeType as "personal" | "org" | undefined),
 			});
 			triggerSync();
 		},
-		[db, enqueueUpload, triggerSync],
+		[retryMedia, getAttachmentForMedia, enqueueUpload, triggerSync],
 	);
 }

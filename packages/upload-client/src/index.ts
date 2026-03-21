@@ -1,19 +1,25 @@
 export {
-	getFileFromIndexedDB,
-	removeFileFromIndexedDB,
-	storeFileInIndexedDB,
+	getFileFromDexie,
+	removeFileFromDexie,
+	storeFileInDexie,
 } from "./adapters/dexie-file-store";
-export { createIndexedDbUploadTransport } from "./adapters/indexeddb-upload-transport";
-export { createWebUploadAdapter } from "./adapters/upload-queue-adapter";
+export { createWebUploadAdapter } from "./adapters/dexie-upload-queue-adapter";
+export { createDexieUploadTransport } from "./adapters/dexie-upload-transport";
+export { createDrizzleUploadAdapter } from "./adapters/drizzle-upload-queue-adapter";
+export { drizzleUploadQueue } from "./adapters/drizzle-upload-queue-schema";
 export {
 	createUploadTransport,
 	type UploadTransportInput,
 } from "./adapters/upload-transport";
+export type {
+	MediaActions,
+	ProcessMediaFileInput,
+} from "./hooks/media-actions";
 export type { FileSelectionDeps } from "./hooks/use-file-selection";
 export { useFileSelection } from "./hooks/use-file-selection";
-export { useMedia } from "./hooks/use-media";
 export type { MediaDeletionDeps } from "./hooks/use-media-deletion";
 export { useMediaDeletion } from "./hooks/use-media-deletion";
+export { useMedia } from "./hooks/use-media-dexie";
 export type {
 	MediaAttachmentTarget,
 	MediaFileStorageStrategy,
@@ -29,11 +35,10 @@ export type {
 	LocalMedia,
 	LocalMediaAttachment,
 } from "./lib/db";
-export * as drizzleMedia from "./lib/drizzle-media-actions";
-export { readFileAsBase64 } from "./lib/file-utils";
 export {
 	addMedia,
 	attachMediaToEntity,
+	createDexieMediaActions,
 	detachMediaFromEntity,
 	getAttachmentForMedia,
 	getMediaCountForEntity,
@@ -46,7 +51,12 @@ export {
 	retryMedia,
 	updateMediaLocalUri,
 	updateMediaUploaded,
-} from "./lib/media-actions";
+} from "./lib/dexie-media-actions";
+export { createUploadLifecycleCallbacks } from "./lib/dexie-upload-lifecycle-callbacks";
+export * as drizzleMedia from "./lib/drizzle-media-actions";
+export { createDrizzleMediaActions } from "./lib/drizzle-media-actions";
+export { createDrizzleUploadLifecycleCallbacks } from "./lib/drizzle-upload-lifecycle-callbacks";
+export { readFileAsBase64 } from "./lib/file-utils";
 export type { MediaConfig } from "./lib/media-config";
 export { orgMediaConfig, personalMediaConfig } from "./lib/media-config";
 export { mediaAttachmentEntity, mediaEntity } from "./lib/media-entity";
@@ -63,6 +73,5 @@ export {
 	createWebStorageHealthProvider,
 	getStorageLevel,
 } from "./lib/storage-health";
-export { createUploadLifecycleCallbacks } from "./lib/upload-lifecycle-callbacks";
 export type { FileDataRecord } from "./lib/upload-queue-stores";
 export { uploadRawStores } from "./lib/upload-queue-stores";

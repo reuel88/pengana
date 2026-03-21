@@ -11,12 +11,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { OrgAppearanceForm } from "@/features/org-management/org-appearance-form";
+import { OrgAppearanceForm } from "@/features/org/org-appearance-form";
 import {
 	OrgLogoField,
 	OrgNameField,
 	OrgSlugField,
-} from "@/features/org-management/org-form-fields";
+} from "@/features/org/org-form-fields";
 import { useOrgDesignPresetPreview } from "@/features/theme/org-design-preset-preview";
 import { useOrgRole } from "@/shared/hooks/use-org-queries";
 import { FormRoot } from "@/shared/ui/form-root";

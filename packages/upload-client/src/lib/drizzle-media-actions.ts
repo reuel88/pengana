@@ -1,4 +1,6 @@
-import { count, eq, max } from "drizzle-orm";
+import type { Media, MediaAttachment } from "@pengana/sync-engine";
+import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import { and, count, eq, inArray, max, notInArray } from "drizzle-orm";
 
 import type {
 	BaseSQLiteDatabase,
@@ -6,11 +8,13 @@ import type {
 	SQLiteTable,
 } from "drizzle-orm/sqlite-core";
 
+import type { MediaActions } from "../hooks/media-actions";
 import type { AddMediaOptions } from "./db";
+import { buildReconcilePlan } from "./reconcile-plan";
 
-type DrizzleDb = BaseSQLiteDatabase<"sync" | "async", unknown>;
+export type DrizzleDb = BaseSQLiteDatabase<"sync" | "async", unknown>;
 
-type MediaTable = SQLiteTable & {
+export type MediaTable = SQLiteTable & {
 	id: SQLiteColumn;
 	userId: SQLiteColumn;
 	url: SQLiteColumn;
@@ -25,7 +29,7 @@ type MediaTable = SQLiteTable & {
 	createdBy: SQLiteColumn;
 };
 
-type MediaAttachmentTable = SQLiteTable & {
+export type MediaAttachmentTable = SQLiteTable & {
 	id: SQLiteColumn;
 	mediaId: SQLiteColumn;
 	entityType: SQLiteColumn;
@@ -153,4 +157,297 @@ export async function getMediaCountForEntity(
 		.from(table)
 		.where(eq(table.entityId, entityId));
 	return row?.value ?? 0;
+}
+
+export async function detachMediaFromEntity(
+	db: DrizzleDb,
+	table: MediaAttachmentTable,
+	mediaId: string,
+	entityType: string,
+	entityId: string,
+): Promise<void> {
+	await db
+		.delete(table)
+		.where(
+			and(
+				eq(table.mediaId, mediaId),
+				eq(table.entityType, entityType),
+				eq(table.entityId, entityId),
+			),
+		);
+}
+
+export async function getAttachmentForMedia(
+	db: DrizzleDb,
+	table: MediaAttachmentTable,
+	mediaId: string,
+) {
+	const [row] = await db
+		.select()
+		.from(table)
+		.where(eq(table.mediaId, mediaId))
+		.limit(1);
+	return row ?? null;
+}
+
+export interface DrizzleProcessMediaFileParams {
+	db: DrizzleDb;
+	mediaTable: MediaTable;
+	mediaAttachmentTable: MediaAttachmentTable;
+	generateId: () => string;
+	file: File;
+	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string;
+	target?: { entityType: string; entityId: string };
+	storeFile: (id: string, file: File) => Promise<void> | void;
+	createFileRef: (
+		id: string,
+		file: File,
+	) => { uri: string; revoke?: () => void };
+	enqueueUpload: (params: EnqueueUploadParams) => void;
+}
+
+export interface DrizzleProcessMediaFileResult {
+	mediaId: string;
+	fileRef: { uri: string; revoke?: () => void };
+}
+
+export async function processMediaFile(
+	params: DrizzleProcessMediaFileParams,
+): Promise<DrizzleProcessMediaFileResult> {
+	const {
+		db,
+		mediaTable,
+		mediaAttachmentTable,
+		generateId,
+		file,
+		userId,
+		scopeType,
+		scopeId,
+		organizationId,
+		target,
+		storeFile,
+		createFileRef,
+		enqueueUpload,
+	} = params;
+
+	const mediaId = await addMedia(db, mediaTable, generateId, {
+		userId,
+		localUri: "",
+		mimeType: file.type,
+		scopeType,
+		scopeId,
+		organizationId,
+		createdBy: userId,
+	});
+
+	if (target) {
+		await attachMediaToEntity(
+			db,
+			mediaAttachmentTable,
+			generateId,
+			mediaId,
+			target.entityType,
+			target.entityId,
+		);
+	}
+
+	await storeFile(mediaId, file);
+	const fileRef = createFileRef(mediaId, file);
+	await updateMediaLocalUri(db, mediaTable, mediaId, fileRef.uri);
+
+	enqueueUpload({
+		fileUri: fileRef.uri,
+		mimeType: file.type,
+		mediaId,
+		entityType: target?.entityType,
+		entityId: target?.entityId,
+		scopeType: target ? undefined : scopeType,
+	});
+
+	return { mediaId, fileRef };
+}
+
+export function createDrizzleMediaActions(
+	db: DrizzleDb,
+	mediaTable: MediaTable,
+	mediaAttachmentTable: MediaAttachmentTable,
+	generateId: () => string,
+): MediaActions {
+	return {
+		processMediaFile: (params) =>
+			processMediaFile({
+				db,
+				mediaTable,
+				mediaAttachmentTable,
+				generateId,
+				...params,
+			}),
+		removeMedia: async (mediaId) => {
+			await removeMedia(db, mediaTable, mediaId);
+			await removeMediaAttachments(db, mediaAttachmentTable, mediaId);
+		},
+		retryMedia: (mediaId) =>
+			retryMedia(db, mediaTable, mediaId) as Promise<{
+				id: string;
+				localUri: string | null;
+				mimeType: string;
+				scopeType?: string;
+			} | null>,
+		getAttachmentForMedia: async (mediaId) => {
+			const row = await getAttachmentForMedia(
+				db,
+				mediaAttachmentTable,
+				mediaId,
+			);
+			return row
+				? {
+						entityType: row.entityType as string,
+						entityId: row.entityId as string,
+					}
+				: undefined;
+		},
+	};
+}
+
+export async function reconcileMedia(
+	db: DrizzleDb,
+	mediaTable: MediaTable,
+	mediaAttachmentTable: MediaAttachmentTable,
+	serverMedia: Media[],
+	serverAttachments: MediaAttachment[],
+	entityIds?: string[],
+): Promise<void> {
+	await db.transaction(async (tx) => {
+		// --- Query local state ---
+		const serverIds = serverMedia.map((m) => m.id);
+		const existingRows =
+			serverIds.length > 0
+				? await tx
+						.select()
+						.from(mediaTable)
+						.where(inArray(mediaTable.id, serverIds))
+				: [];
+		const existingMediaById = new Map(
+			existingRows.map((r) => [r.id, { id: r.id, url: r.url }]),
+		);
+
+		const existingAttachmentsByEntityId = new Map<
+			string,
+			{ id: string; mediaId: string }[]
+		>();
+		const existingAttachmentIds = new Set<string>();
+
+		if (entityIds && entityIds.length > 0) {
+			for (const entityId of entityIds) {
+				const localAtts = await tx
+					.select()
+					.from(mediaAttachmentTable)
+					.where(eq(mediaAttachmentTable.entityId, entityId));
+				const mapped = localAtts.map((a) => ({
+					id: a.id,
+					mediaId: a.mediaId,
+				}));
+				existingAttachmentsByEntityId.set(entityId, mapped);
+				for (const att of localAtts) {
+					existingAttachmentIds.add(att.id);
+				}
+			}
+		}
+
+		const serverAttIds = serverAttachments.map((a) => a.id);
+		if (serverAttIds.length > 0) {
+			const existingAtts = await tx
+				.select()
+				.from(mediaAttachmentTable)
+				.where(inArray(mediaAttachmentTable.id, serverAttIds));
+			for (const att of existingAtts) {
+				existingAttachmentIds.add(att.id);
+			}
+		}
+
+		let uploadedMediaNotOnServer: {
+			id: string;
+			attachmentCount: number;
+		}[] = [];
+		if (entityIds && entityIds.length > 0) {
+			const serverMediaIds = serverMedia.map((m) => m.id);
+
+			const scopedAtts = await tx
+				.select({ mediaId: mediaAttachmentTable.mediaId })
+				.from(mediaAttachmentTable)
+				.where(inArray(mediaAttachmentTable.entityId, entityIds));
+			const scopedMediaIds = [...new Set(scopedAtts.map((a) => a.mediaId))];
+
+			const orphanCandidates =
+				scopedMediaIds.length === 0
+					? []
+					: serverMediaIds.length > 0
+						? await tx
+								.select({ id: mediaTable.id })
+								.from(mediaTable)
+								.where(
+									and(
+										eq(mediaTable.status, "uploaded"),
+										inArray(mediaTable.id, scopedMediaIds),
+										notInArray(mediaTable.id, serverMediaIds),
+									),
+								)
+						: await tx
+								.select({ id: mediaTable.id })
+								.from(mediaTable)
+								.where(
+									and(
+										eq(mediaTable.status, "uploaded"),
+										inArray(mediaTable.id, scopedMediaIds),
+									),
+								);
+
+			uploadedMediaNotOnServer = await Promise.all(
+				orphanCandidates.map(async (c) => {
+					const remaining = await tx
+						.select({ id: mediaAttachmentTable.id })
+						.from(mediaAttachmentTable)
+						.where(eq(mediaAttachmentTable.mediaId, c.id as string))
+						.limit(1);
+					return { id: c.id as string, attachmentCount: remaining.length };
+				}),
+			);
+		}
+
+		// --- Build plan ---
+		const plan = buildReconcilePlan({
+			serverMedia,
+			serverAttachments,
+			existingMediaById,
+			existingAttachmentsByEntityId,
+			existingAttachmentIds,
+			uploadedMediaNotOnServer,
+			entityIds,
+		});
+
+		// --- Execute plan with Drizzle ---
+		if (plan.mediaToInsert.length > 0) {
+			await tx.insert(mediaTable).values(plan.mediaToInsert);
+		}
+		for (const update of plan.mediaToUpdate) {
+			await tx
+				.update(mediaTable)
+				.set({ url: update.url, status: "uploaded" })
+				.where(eq(mediaTable.id, update.id));
+		}
+		if (plan.attachmentsToInsert.length > 0) {
+			await tx.insert(mediaAttachmentTable).values(plan.attachmentsToInsert);
+		}
+		if (plan.attachmentIdsToDelete.length > 0) {
+			await tx
+				.delete(mediaAttachmentTable)
+				.where(inArray(mediaAttachmentTable.id, plan.attachmentIdsToDelete));
+		}
+		for (const mId of plan.mediaIdsToDelete) {
+			await tx.delete(mediaTable).where(eq(mediaTable.id, mId));
+		}
+	});
 }

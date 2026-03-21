@@ -4,7 +4,7 @@ import {
 	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,
 	createUploadTransport,
-} from "@/features/sync/entities/upload-queue";
+} from "@/features/upload-queue";
 import { getServerUrl } from "@/shared/lib/server-url";
 
 function getWsUrl() {

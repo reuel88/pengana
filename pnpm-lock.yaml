@@ -1148,9 +1148,6 @@ importers:
 
   packages/upload-queue:
     dependencies:
-      react:
-        specifier: ^19.0.0
-        version: 19.2.0
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1158,9 +1155,6 @@ importers:
       '@pengana/config':
         specifier: workspace:*
         version: link:../config
-      '@types/react':
-        specifier: ^19.2.14
-        version: 19.2.14
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

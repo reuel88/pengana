@@ -5,9 +5,9 @@ import {
 } from "@pengana/org-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { InviteMemberForm } from "@/features/org-management/invite-member-form";
-import { OrgInvitationsTable } from "@/features/org-management/org-invitations-table";
-import { UserInvitationsTable } from "@/features/org-management/user-invitations-table";
+import { InviteMemberForm } from "@/features/org/invite-member-form";
+import { OrgInvitationsTable } from "@/features/org/org-invitations-table";
+import { UserInvitationsTable } from "@/features/org/user-invitations-table";
 import { useOrgRole, useUserInvitations } from "@/shared/hooks/use-org-queries";
 import { useOrgGuard } from "@/widgets/org-guard";
 

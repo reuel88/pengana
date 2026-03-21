@@ -4,7 +4,7 @@ export default defineConfig({
 	dialect: "sqlite",
 	schema: [
 		"./src/shared/db/schema.ts",
-		"./src/features/sync/entities/upload-queue/schema.ts",
+		"./src/features/upload-queue/schema.ts",
 	],
 	out: "./drizzle",
 	dbCredentials: {

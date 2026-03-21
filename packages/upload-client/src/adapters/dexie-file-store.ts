@@ -4,7 +4,7 @@ import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
 import { readFileAsBase64 } from "../lib/file-utils";
 import type { FileDataRecord } from "../lib/upload-queue-stores";
 
-export async function storeFileInIndexedDB(
+export async function storeFileInDexie(
 	db: EntityDatabase,
 	attachmentId: string,
 	file: File,
@@ -23,14 +23,14 @@ export async function storeFileInIndexedDB(
 	}
 }
 
-export async function getFileFromIndexedDB(
+export async function getFileFromDexie(
 	db: EntityDatabase,
 	attachmentId: string,
 ): Promise<{ base64: string; mimeType: string; fileName: string } | undefined> {
 	return db.getTable<FileDataRecord>("fileData").get(attachmentId);
 }
 
-export async function removeFileFromIndexedDB(
+export async function removeFileFromDexie(
 	db: EntityDatabase,
 	attachmentId: string,
 ): Promise<void> {

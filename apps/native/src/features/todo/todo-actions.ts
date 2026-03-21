@@ -106,11 +106,5 @@ export const retryMedia = (mediaId: string) =>
 export const getMediaCountForEntity = (entityId: string): Promise<number> =>
 	drizzleMedia.getMediaCountForEntity(appDb, mediaAttachments, entityId);
 
-export async function getAttachmentForMedia(mediaId: string) {
-	const [row] = await appDb
-		.select()
-		.from(mediaAttachments)
-		.where(eq(mediaAttachments.mediaId, mediaId))
-		.limit(1);
-	return row ?? null;
-}
+export const getAttachmentForMedia = (mediaId: string) =>
+	drizzleMedia.getAttachmentForMedia(appDb, mediaAttachments, mediaId);
