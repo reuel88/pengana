@@ -6,6 +6,6 @@ pnpm check-types
 pnpm check:i18n
 pnpm build
 pnpm test
-pnpm turbo e2e:web --cache=web
-pnpm turbo e2e:native --cache=native
-pnpm turbo e2e:extension --cache=extension
+pnpm turbo e2e --filter=web
+pnpm turbo e2e --filter=native
+pnpm turbo e2e --filter=extension
