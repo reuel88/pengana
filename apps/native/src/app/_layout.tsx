@@ -20,6 +20,7 @@ import {
 	View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SyncCoordinator } from "@/features/sync/sync-coordinator";
 import { queryClient } from "@/shared/api/orpc";
 import { useLifecycleCheck } from "@/shared/hooks/use-lifecycle-check";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
@@ -174,6 +175,7 @@ function RootLayoutInner() {
 				previewDesignPreset ?? activeOrg?.designPreset,
 			)}
 		>
+			<SyncCoordinator />
 			<StatusBar style={isDarkColorScheme ? "light" : "dark"} />
 			<LifecycleContext.Provider value={lifecycleContextValue}>
 				<GestureHandlerRootView style={styles.container}>

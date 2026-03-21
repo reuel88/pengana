@@ -6,7 +6,7 @@ export default defineConfig({
 	srcDir: "src",
 	modules: ["@wxt-dev/module-react"],
 	manifest: {
-		permissions: ["alarms"],
+		permissions: ["alarms", "storage"],
 		host_permissions: [
 			`${process.env.VITE_SERVER_URL ?? "http://localhost:3000"}/*`,
 		],

@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
+import { SyncCoordinator } from "@/features/sync/sync-coordinator";
 import { OrgDesignPresetPreviewProvider } from "@/features/theme/org-design-preset-preview";
 import { OrgDesignPresetSync } from "@/features/theme/org-design-preset-sync";
 import { ThemeProvider } from "@/features/theme/theme-provider";
@@ -95,6 +96,7 @@ function RootComponent() {
 
 	return (
 		<AuthClientProvider client={authClient}>
+			<SyncCoordinator />
 			<HeadContent />
 			<ThemeProvider
 				attribute="class"

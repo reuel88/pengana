@@ -1,14 +1,22 @@
+import type { SyncDescriptor } from "@pengana/sync-runtime";
 import type { WebTodo } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";
-import { useSync, useSyncDevtools } from "@/features/sync/sync-context";
+import {
+	useSyncDevtoolsEntry,
+	useSyncEntry,
+} from "@/features/sync/use-sync-entry";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
-export function SyncDevtoolsImpl() {
-	const { isOnline, isSyncing, triggerSync } = useSync();
-	const { events, simulateOffline, setSimulateOffline } = useSyncDevtools();
+export function SyncDevtoolsImpl({
+	descriptor,
+}: {
+	descriptor: SyncDescriptor;
+}) {
+	const { isOnline, isSyncing, triggerSync } = useSyncEntry(descriptor);
+	const { events } = useSyncDevtoolsEntry(descriptor);
 	const [isOpen, setIsOpen] = useState(false);
 	const [forceConflictId, setForceConflictId] = useState("");
 
@@ -52,14 +60,6 @@ export function SyncDevtoolsImpl() {
 					</div>
 
 					<div className="flex flex-wrap gap-2">
-						<Button
-							size="xs"
-							variant="outline"
-							onClick={() => setSimulateOffline(!simulateOffline)}
-						>
-							{simulateOffline ? "Go Online" : "Simulate Offline"}
-						</Button>
-
 						<Button
 							size="xs"
 							variant="outline"

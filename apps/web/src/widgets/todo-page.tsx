@@ -1,13 +1,9 @@
 import { useTranslation } from "@pengana/i18n";
+import type { SyncDescriptor } from "@pengana/sync-runtime";
 import { useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
-import {
-	OrgSyncProvider,
-	SyncProvider,
-	useOrgSync,
-	useSync,
-} from "@/features/sync/sync-context";
+import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import * as orgActions from "@/features/todo/org-todo-actions";
 import * as personalActions from "@/features/todo/todo-actions";
@@ -29,7 +25,11 @@ function PersonalTodoContent({
 			t.organizationId === organizationId;
 	}, [organizationId]);
 	const { todos } = useTodos(appDb, userId, orgFilter);
-	const sync = useSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		[userId],
+	);
+	const sync = useSyncEntry(descriptor);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -50,7 +50,7 @@ function PersonalTodoContent({
 				organizationId={organizationId}
 				actions={personalActions}
 			/>
-			<SyncDevtools />
+			<SyncDevtools descriptor={descriptor} />
 		</div>
 	);
 }
@@ -63,7 +63,15 @@ function OrgTodoContent({
 	userId: string;
 }) {
 	const { todos } = useTodos(appDb, organizationId);
-	const sync = useOrgSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({
+			scopeType: "organization",
+			scopeId: organizationId,
+			entityKey: "todo",
+		}),
+		[organizationId],
+	);
+	const sync = useSyncEntry(descriptor);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -84,7 +92,7 @@ function OrgTodoContent({
 				actions={orgActions}
 			/>
 
-			<SyncDevtools />
+			<SyncDevtools descriptor={descriptor} />
 		</div>
 	);
 }
@@ -131,30 +139,22 @@ export function TodoPage({
 			</div>
 
 			{activeTab === "personal" && (
-				<SyncProvider userId={userId} organizationId={organizationId}>
-					<div
-						id="panel-personal"
-						role="tabpanel"
-						aria-labelledby="tab-personal"
-					>
-						<PersonalTodoContent
-							userId={userId}
-							organizationId={organizationId}
-						/>
-					</div>
-				</SyncProvider>
+				<div id="panel-personal" role="tabpanel" aria-labelledby="tab-personal">
+					<PersonalTodoContent
+						userId={userId}
+						organizationId={organizationId}
+					/>
+				</div>
 			)}
 
 			{activeTab === "organization" && (
-				<OrgSyncProvider organizationId={organizationId} userId={userId}>
-					<div
-						id="panel-organization"
-						role="tabpanel"
-						aria-labelledby="tab-organization"
-					>
-						<OrgTodoContent organizationId={organizationId} userId={userId} />
-					</div>
-				</OrgSyncProvider>
+				<div
+					id="panel-organization"
+					role="tabpanel"
+					aria-labelledby="tab-organization"
+				>
+					<OrgTodoContent organizationId={organizationId} userId={userId} />
+				</div>
 			)}
 		</div>
 	);

@@ -1,8 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
+import type { SyncDescriptor } from "@pengana/sync-runtime";
+import { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
-import { useOrgSync, useSync } from "@/features/sync/sync-context";
+import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import {
 	addOrgTodo,
@@ -96,7 +98,11 @@ export function PersonalTodoContent({
 	organizationId: string;
 }) {
 	const { todos } = useTodos(userId, organizationId);
-	const sync = useSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		[userId],
+	);
+	const sync = useSyncEntry(descriptor);
 
 	return (
 		<View style={styles.panel}>
@@ -114,7 +120,7 @@ export function PersonalTodoContent({
 				scopeId={userId}
 				organizationId={organizationId}
 			/>
-			<SyncDevtools />
+			<SyncDevtools descriptor={descriptor} />
 		</View>
 	);
 }
@@ -127,7 +133,15 @@ export function OrganizationTodoContent({
 	userId: string;
 }) {
 	const { todos } = useOrgTodos(organizationId);
-	const sync = useOrgSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({
+			scopeType: "organization",
+			scopeId: organizationId,
+			entityKey: "todo",
+		}),
+		[organizationId],
+	);
+	const sync = useSyncEntry(descriptor);
 
 	return (
 		<View style={styles.panel}>
@@ -145,7 +159,7 @@ export function OrganizationTodoContent({
 				scopeId={organizationId}
 				organizationId={organizationId}
 			/>
-			<SyncDevtools />
+			<SyncDevtools descriptor={descriptor} />
 		</View>
 	);
 }

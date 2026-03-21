@@ -1,4 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
+import type { SyncDescriptor } from "@pengana/sync-runtime";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import {
 	createDexieMediaActions,
@@ -10,13 +11,8 @@ import {
 } from "@pengana/upload-client";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-
-import {
-	OrgSyncProvider,
-	SyncProvider,
-	useOrgSync,
-	useSync,
-} from "@/features/sync/sync-context";
+import type { SyncContextValue } from "@/features/sync/use-sync-entry";
+import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
@@ -43,12 +39,14 @@ function MediaContent({
 	organizationId,
 	scopeType,
 	syncState,
+	descriptor,
 }: {
 	userId: string;
 	scopeId: string;
 	organizationId: string;
 	scopeType: "personal" | "org";
-	syncState: ReturnType<typeof useSync>;
+	syncState: SyncContextValue;
+	descriptor: SyncDescriptor;
 }) {
 	const { t } = useTranslation("media");
 	const { isOnline, isSyncing, enqueueUpload, triggerSync } = syncState;
@@ -93,7 +91,7 @@ function MediaContent({
 				activeLabel={t("dropzone.active")}
 			/>
 			<MediaGrid media={media} t={t} onDelete={handleDelete} />
-			<SyncDevtools />
+			<SyncDevtools descriptor={descriptor} />
 		</div>
 	);
 }
@@ -105,7 +103,11 @@ function PersonalMediaContent({
 	userId: string;
 	organizationId: string;
 }) {
-	const syncState = useSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		[userId],
+	);
+	const syncState = useSyncEntry(descriptor);
 
 	return (
 		<MediaContent
@@ -114,6 +116,7 @@ function PersonalMediaContent({
 			organizationId={organizationId}
 			scopeType="personal"
 			syncState={syncState}
+			descriptor={descriptor}
 		/>
 	);
 }
@@ -125,7 +128,15 @@ function OrgMediaContent({
 	userId: string;
 	organizationId: string;
 }) {
-	const syncState = useOrgSync();
+	const descriptor: SyncDescriptor = useMemo(
+		() => ({
+			scopeType: "organization",
+			scopeId: organizationId,
+			entityKey: "todo",
+		}),
+		[organizationId],
+	);
+	const syncState = useSyncEntry(descriptor);
 
 	return (
 		<MediaContent
@@ -134,6 +145,7 @@ function OrgMediaContent({
 			organizationId={organizationId}
 			scopeType="org"
 			syncState={syncState}
+			descriptor={descriptor}
 		/>
 	);
 }
@@ -178,30 +190,22 @@ export function MediaPage({
 			</div>
 
 			{activeTab === "personal" && (
-				<SyncProvider userId={userId} organizationId={organizationId}>
-					<div
-						id="panel-personal"
-						role="tabpanel"
-						aria-labelledby="tab-personal"
-					>
-						<PersonalMediaContent
-							userId={userId}
-							organizationId={organizationId}
-						/>
-					</div>
-				</SyncProvider>
+				<div id="panel-personal" role="tabpanel" aria-labelledby="tab-personal">
+					<PersonalMediaContent
+						userId={userId}
+						organizationId={organizationId}
+					/>
+				</div>
 			)}
 
 			{activeTab === "organization" && (
-				<OrgSyncProvider organizationId={organizationId} userId={userId}>
-					<div
-						id="panel-organization"
-						role="tabpanel"
-						aria-labelledby="tab-organization"
-					>
-						<OrgMediaContent userId={userId} organizationId={organizationId} />
-					</div>
-				</OrgSyncProvider>
+				<div
+					id="panel-organization"
+					role="tabpanel"
+					aria-labelledby="tab-organization"
+				>
+					<OrgMediaContent userId={userId} organizationId={organizationId} />
+				</div>
 			)}
 		</div>
 	);
