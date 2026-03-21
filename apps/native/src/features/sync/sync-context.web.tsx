@@ -137,6 +137,7 @@ function useComposedSyncEngine(options: {
 			unsubscribe();
 			void engine.shutdown();
 			engineRef.current = null;
+			setIsSyncing(false);
 		};
 	}, [scopeId, createSyncAdapter, createTransport]);
 

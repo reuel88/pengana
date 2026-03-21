@@ -11,7 +11,6 @@ export interface StorageHealthMonitorOptions {
 
 export class StorageHealthMonitor {
 	private level: StorageLevel = "ok";
-	private criticalFired = false;
 	private intervalId: ReturnType<typeof setInterval> | null = null;
 	private listeners = new Set<() => void>();
 	private options: StorageHealthMonitorOptions;
@@ -23,8 +22,11 @@ export class StorageHealthMonitor {
 	/** Start polling. Runs an immediate check, then every 60s. */
 	start(): void {
 		if (this.intervalId !== null) return;
-		void this.check();
-		this.intervalId = setInterval(() => void this.check(), CHECK_INTERVAL_MS);
+		this.check().catch(() => {});
+		this.intervalId = setInterval(
+			() => this.check().catch(() => {}),
+			CHECK_INTERVAL_MS,
+		);
 	}
 
 	/** Stop polling and reset state. */
@@ -34,7 +36,6 @@ export class StorageHealthMonitor {
 			this.intervalId = null;
 		}
 		this.level = "ok";
-		this.criticalFired = false;
 		this.emitChange();
 	}
 
@@ -64,20 +65,17 @@ export class StorageHealthMonitor {
 			newLevel = "warning";
 		}
 
-		this.level = newLevel;
-		this.emitChange();
+		if (newLevel !== this.level) {
+			this.level = newLevel;
+			this.emitChange();
 
-		if (newLevel === "warning" && onStorageWarning) {
-			await onStorageWarning();
-		}
+			if (newLevel === "warning" && onStorageWarning) {
+				await onStorageWarning();
+			}
 
-		if (newLevel === "critical" && !this.criticalFired) {
-			this.criticalFired = true;
-			onStorageCritical?.();
-		}
-
-		if (newLevel !== "critical") {
-			this.criticalFired = false;
+			if (newLevel === "critical") {
+				onStorageCritical?.();
+			}
 		}
 	}
 
