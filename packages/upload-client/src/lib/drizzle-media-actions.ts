@@ -38,12 +38,13 @@ export type MediaAttachmentTable = SQLiteTable & {
 	createdAt: SQLiteColumn;
 };
 
-export async function addMedia(
-	db: DrizzleDb,
-	table: MediaTable,
-	generateId: () => string,
-	options: AddMediaOptions,
-): Promise<string> {
+export async function addMedia(params: {
+	db: DrizzleDb;
+	table: MediaTable;
+	generateId: () => string;
+	options: AddMediaOptions;
+}): Promise<string> {
+	const { db, table, generateId, options } = params;
 	const id = generateId();
 
 	await db.insert(table).values({
@@ -64,14 +65,15 @@ export async function addMedia(
 	return id;
 }
 
-export async function attachMediaToEntity(
-	db: DrizzleDb,
-	table: MediaAttachmentTable,
-	generateId: () => string,
-	mediaId: string,
-	entityType: string,
-	entityId: string,
-): Promise<string> {
+export async function attachMediaToEntity(params: {
+	db: DrizzleDb;
+	table: MediaAttachmentTable;
+	generateId: () => string;
+	mediaId: string;
+	entityType: string;
+	entityId: string;
+}): Promise<string> {
+	const { db, table, generateId, mediaId, entityType, entityId } = params;
 	const [row] = await db
 		.select({ value: max(table.position) })
 		.from(table)
@@ -107,12 +109,13 @@ export async function removeMediaAttachments(
 	await db.delete(table).where(eq(table.mediaId, mediaId));
 }
 
-export async function updateMediaUploaded(
-	db: DrizzleDb,
-	table: MediaTable,
-	mediaId: string,
-	url: string,
-): Promise<void> {
+export async function updateMediaUploaded(params: {
+	db: DrizzleDb;
+	table: MediaTable;
+	mediaId: string;
+	url: string;
+}): Promise<void> {
+	const { db, table, mediaId, url } = params;
 	await db
 		.update(table)
 		.set({ url, status: "uploaded" })
@@ -127,12 +130,13 @@ export async function markMediaFailed(
 	await db.update(table).set({ status: "failed" }).where(eq(table.id, mediaId));
 }
 
-export async function updateMediaLocalUri(
-	db: DrizzleDb,
-	table: MediaTable,
-	mediaId: string,
-	localUri: string,
-): Promise<void> {
+export async function updateMediaLocalUri(params: {
+	db: DrizzleDb;
+	table: MediaTable;
+	mediaId: string;
+	localUri: string;
+}): Promise<void> {
+	const { db, table, mediaId, localUri } = params;
 	await db.update(table).set({ localUri }).where(eq(table.id, mediaId));
 }
 
@@ -159,13 +163,14 @@ export async function getMediaCountForEntity(
 	return row?.value ?? 0;
 }
 
-export async function detachMediaFromEntity(
-	db: DrizzleDb,
-	table: MediaAttachmentTable,
-	mediaId: string,
-	entityType: string,
-	entityId: string,
-): Promise<void> {
+export async function detachMediaFromEntity(params: {
+	db: DrizzleDb;
+	table: MediaAttachmentTable;
+	mediaId: string;
+	entityType: string;
+	entityId: string;
+}): Promise<void> {
+	const { db, table, mediaId, entityType, entityId } = params;
 	await db
 		.delete(table)
 		.where(
@@ -233,30 +238,40 @@ export async function processMediaFile(
 		enqueueUpload,
 	} = params;
 
-	const mediaId = await addMedia(db, mediaTable, generateId, {
-		userId,
-		localUri: "",
-		mimeType: file.type,
-		scopeType,
-		scopeId,
-		organizationId,
-		createdBy: userId,
+	const mediaId = await addMedia({
+		db,
+		table: mediaTable,
+		generateId,
+		options: {
+			userId,
+			localUri: "",
+			mimeType: file.type,
+			scopeType,
+			scopeId,
+			organizationId,
+			createdBy: userId,
+		},
 	});
 
 	if (target) {
-		await attachMediaToEntity(
+		await attachMediaToEntity({
 			db,
-			mediaAttachmentTable,
+			table: mediaAttachmentTable,
 			generateId,
 			mediaId,
-			target.entityType,
-			target.entityId,
-		);
+			entityType: target.entityType,
+			entityId: target.entityId,
+		});
 	}
 
 	await storeFile(mediaId, file);
 	const fileRef = createFileRef(mediaId, file);
-	await updateMediaLocalUri(db, mediaTable, mediaId, fileRef.uri);
+	await updateMediaLocalUri({
+		db,
+		table: mediaTable,
+		mediaId,
+		localUri: fileRef.uri,
+	});
 
 	enqueueUpload({
 		fileUri: fileRef.uri,
@@ -270,12 +285,13 @@ export async function processMediaFile(
 	return { mediaId, fileRef };
 }
 
-export function createDrizzleMediaActions(
-	db: DrizzleDb,
-	mediaTable: MediaTable,
-	mediaAttachmentTable: MediaAttachmentTable,
-	generateId: () => string,
-): MediaActions {
+export function createDrizzleMediaActions(params: {
+	db: DrizzleDb;
+	mediaTable: MediaTable;
+	mediaAttachmentTable: MediaAttachmentTable;
+	generateId: () => string;
+}): MediaActions {
+	const { db, mediaTable, mediaAttachmentTable, generateId } = params;
 	return {
 		processMediaFile: (params) =>
 			processMediaFile({
@@ -312,14 +328,26 @@ export function createDrizzleMediaActions(
 	};
 }
 
+export interface ReconcileDrizzleMediaOptions {
+	db: DrizzleDb;
+	mediaTable: MediaTable;
+	mediaAttachmentTable: MediaAttachmentTable;
+	serverMedia: Media[];
+	serverAttachments: MediaAttachment[];
+	entityIds?: string[];
+}
+
 export async function reconcileMedia(
-	db: DrizzleDb,
-	mediaTable: MediaTable,
-	mediaAttachmentTable: MediaAttachmentTable,
-	serverMedia: Media[],
-	serverAttachments: MediaAttachment[],
-	entityIds?: string[],
+	options: ReconcileDrizzleMediaOptions,
 ): Promise<void> {
+	const {
+		db,
+		mediaTable,
+		mediaAttachmentTable,
+		serverMedia,
+		serverAttachments,
+		entityIds,
+	} = options;
 	await db.transaction(async (tx) => {
 		// --- Query local state ---
 		const serverIds = serverMedia.map((m) => m.id);

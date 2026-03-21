@@ -60,6 +60,11 @@ export { readFileAsBase64 } from "./lib/file-utils";
 export type { MediaConfig } from "./lib/media-config";
 export { orgMediaConfig, personalMediaConfig } from "./lib/media-config";
 export { mediaAttachmentEntity, mediaEntity } from "./lib/media-entity";
+export {
+	MediaSyncer,
+	type MediaSyncerOptions,
+	type MediaSyncTransport,
+} from "./lib/media-syncer";
 export type {
 	MediaListItem,
 	ServerMediaRecord,

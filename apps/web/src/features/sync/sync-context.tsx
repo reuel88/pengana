@@ -19,6 +19,7 @@ import {
 import {
 	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
+	MediaSyncer,
 	reconcileMedia,
 } from "@pengana/upload-client";
 import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
@@ -98,6 +99,7 @@ function useComposedSyncEngine(options: {
 	isForeground?: boolean;
 	createSyncAdapter: (id: string) => ReturnType<typeof createTodoSyncAdapter>;
 	createSyncTransport: () => ReturnType<typeof createSyncTransport>;
+	createMediaSyncer?: (scopeId: string) => MediaSyncer;
 }) {
 	const {
 		scopeId,
@@ -106,6 +108,7 @@ function useComposedSyncEngine(options: {
 		isForeground = true,
 		createSyncAdapter,
 		createSyncTransport: createTransport,
+		createMediaSyncer,
 	} = options;
 
 	// --- State ---
@@ -143,13 +146,31 @@ function useComposedSyncEngine(options: {
 		};
 	}, [scopeId, createSyncAdapter, createTransport]);
 
+	// --- Media Syncer ---
+	const mediaSyncerRef = useRef<MediaSyncer | null>(null);
+
+	useEffect(() => {
+		if (createMediaSyncer) {
+			mediaSyncerRef.current = createMediaSyncer(scopeId);
+			mediaSyncerRef.current.sync();
+		}
+		return () => {
+			mediaSyncerRef.current = null;
+		};
+	}, [scopeId, createMediaSyncer]);
+
+	const triggerAllSyncs = useCallback(() => {
+		engineRef.current?.sync();
+		mediaSyncerRef.current?.sync();
+	}, []);
+
 	// --- Upload Queue ---
 	const managerRef = useRef(
 		new UploadQueueManager({
 			createUploadAdapter: () => createWebUploadAdapter(appDb),
 			createUploadTransport: createDexieUploadTransport,
 			lifecycleCallbacks: uploadLifecycleCallbacks,
-			onSettled: () => engineRef.current?.sync(),
+			onSettled: () => triggerAllSyncs(),
 		}),
 	);
 
@@ -212,9 +233,9 @@ function useComposedSyncEngine(options: {
 			return;
 		}
 		if (effectiveOnline) {
-			engineRef.current?.sync();
+			triggerAllSyncs();
 		}
-	}, [effectiveOnline]);
+	}, [effectiveOnline, triggerAllSyncs]);
 
 	// --- Periodic Sync ---
 	const periodicSyncRef = useRef(createPeriodicSync(() => engineRef.current));
@@ -247,13 +268,13 @@ function useComposedSyncEngine(options: {
 			enabled: true,
 			onNotify: (kind) => {
 				if (kind === "sync") {
-					engineRef.current?.sync();
+					triggerAllSyncs();
 					return;
 				}
 				onRefreshNotify();
 			},
 			onOpen: () => {
-				engineRef.current?.sync();
+				triggerAllSyncs();
 			},
 		});
 
@@ -264,7 +285,7 @@ function useComposedSyncEngine(options: {
 				realtimeSubRef.current = null;
 			}
 		};
-	}, [notifyKey]);
+	}, [notifyKey, triggerAllSyncs]);
 
 	useEffect(() => {
 		realtimeSubRef.current?.setEnabled(effectiveOnline && isForeground);
@@ -274,18 +295,18 @@ function useComposedSyncEngine(options: {
 	useEffect(() => {
 		if (!effectiveOnline) return;
 		const handler = () => {
-			if (document.visibilityState === "visible") engineRef.current?.sync();
+			if (document.visibilityState === "visible") triggerAllSyncs();
 		};
 		document.addEventListener("visibilitychange", handler);
 		return () => document.removeEventListener("visibilitychange", handler);
-	}, [effectiveOnline]);
+	}, [effectiveOnline, triggerAllSyncs]);
 
 	// --- Public API ---
 	const triggerSync = useCallback(() => {
 		if (effectiveOnline) {
-			engineRef.current?.sync();
+			triggerAllSyncs();
 		}
-	}, [effectiveOnline]);
+	}, [effectiveOnline, triggerAllSyncs]);
 
 	return {
 		core: {
@@ -312,8 +333,26 @@ const personalTransportFactory = () =>
 		async (input) =>
 			(await client.todo.sync(input, { signal: input.signal })).data,
 		(media, attachments, entityIds) =>
-			reconcileMedia(appDb, media, attachments, entityIds),
+			reconcileMedia({
+				db: appDb,
+				serverMedia: media,
+				serverAttachments: attachments,
+				entityIds,
+			}),
 	);
+
+const createPersonalMediaSyncer = (scopeId: string) =>
+	new MediaSyncer({
+		db: appDb,
+		scopeId,
+		scopeType: "personal",
+		transport: {
+			async sync(input) {
+				const res = await client.media.sync(input);
+				return res.data;
+			},
+		},
+	});
 
 export function SyncProvider({
 	userId,
@@ -331,7 +370,10 @@ export function SyncProvider({
 
 	const createSyncAdapter = useCallback(
 		(uid: string) =>
-			createTodoSyncAdapter(appDb, uid, personalTodoConfig, {
+			createTodoSyncAdapter({
+				db: appDb,
+				scopeId: uid,
+				config: personalTodoConfig,
 				filter: (todo) => todo.organizationId === organizationId,
 				syncKeySuffix: organizationId,
 			}),
@@ -343,6 +385,7 @@ export function SyncProvider({
 		scopeId: userId,
 		createSyncAdapter,
 		createSyncTransport: personalTransportFactory,
+		createMediaSyncer: createPersonalMediaSyncer,
 	});
 
 	return (
@@ -351,6 +394,19 @@ export function SyncProvider({
 		</SyncContext>
 	);
 }
+
+const createOrgMediaSyncer = (scopeId: string) =>
+	new MediaSyncer({
+		db: appDb,
+		scopeId,
+		scopeType: "org",
+		transport: {
+			async sync(input) {
+				const res = await client.media.orgSync(input);
+				return res.data;
+			},
+		},
+	});
 
 export function OrgSyncProvider({
 	organizationId,
@@ -361,7 +417,12 @@ export function OrgSyncProvider({
 	children: ReactNode;
 }) {
 	const createSyncAdapter = useCallback(
-		(orgId: string) => createTodoSyncAdapter(appDb, orgId, orgTodoConfig),
+		(orgId: string) =>
+			createTodoSyncAdapter({
+				db: appDb,
+				scopeId: orgId,
+				config: orgTodoConfig,
+			}),
 		[],
 	);
 	const createTransport = useCallback(
@@ -372,7 +433,12 @@ export function OrgSyncProvider({
 						.data;
 				},
 				(media, attachments, entityIds) =>
-					reconcileMedia(appDb, media, attachments, entityIds),
+					reconcileMedia({
+						db: appDb,
+						serverMedia: media,
+						serverAttachments: attachments,
+						entityIds,
+					}),
 			),
 		[],
 	);
@@ -386,6 +452,7 @@ export function OrgSyncProvider({
 		isOnline,
 		createSyncAdapter,
 		createSyncTransport: createTransport,
+		createMediaSyncer: createOrgMediaSyncer,
 	});
 
 	return (

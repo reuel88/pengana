@@ -9,12 +9,12 @@ export async function reconcileNativeMedia(
 	serverAttachments: MediaAttachment[],
 	entityIds?: string[],
 ): Promise<void> {
-	return drizzleMedia.reconcileMedia(
-		appDb,
-		media,
-		mediaAttachments,
+	return drizzleMedia.reconcileMedia({
+		db: appDb,
+		mediaTable: media,
+		mediaAttachmentTable: mediaAttachments,
 		serverMedia,
 		serverAttachments,
 		entityIds,
-	);
+	});
 }

@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql, count as sqlCount } from "drizzle-orm";
+import { and, eq, gte, inArray, sql, count as sqlCount } from "drizzle-orm";
 
 import { db } from "./index";
 import { media, mediaAttachments } from "./schema/media";
@@ -176,4 +176,21 @@ export async function findMediaAttachmentsByMediaIds(
 		.select()
 		.from(mediaAttachments)
 		.where(inArray(mediaAttachments.mediaId, mediaIds));
+}
+
+export async function getMediaUpdatedSince(
+	scopeType: "personal" | "org",
+	scopeId: string,
+	since: Date,
+): Promise<MediaRow[]> {
+	return db
+		.select()
+		.from(media)
+		.where(
+			and(
+				eq(media.scopeType, scopeType),
+				eq(media.scopeId, scopeId),
+				gte(media.updatedAt, since),
+			),
+		);
 }

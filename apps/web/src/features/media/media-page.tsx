@@ -4,13 +4,11 @@ import {
 	createDexieMediaActions,
 	orgMediaConfig,
 	personalMediaConfig,
-	type ServerMediaRecord,
 	storeFileInDexie,
 	useMedia,
 	useMediaListWiring,
 } from "@pengana/upload-client";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -20,7 +18,7 @@ import {
 	useSync,
 } from "@/features/sync/sync-context";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
-import { client, queryClient } from "@/shared/api/orpc";
+import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
 import { DropZone } from "./drop-zone";
@@ -55,25 +53,10 @@ function MediaContent({
 	const { t } = useTranslation("media");
 	const { isOnline, isSyncing, enqueueUpload, triggerSync } = syncState;
 
-	const { data: serverMedia } = useQuery({
-		queryKey: ["media", "list", scopeType, scopeId],
-		queryFn: async () => {
-			const res = await client.media.listMedia({ scopeType });
-			return res.data as ServerMediaRecord[];
-		},
-	});
-
-	const invalidateList = useCallback(() => {
-		void queryClient.invalidateQueries({
-			queryKey: ["media", "list", scopeType],
-		});
-	}, [scopeType]);
-
 	const { media } = useMedia({
 		db: appDb,
 		config: scopeType === "org" ? orgMediaConfig : personalMediaConfig,
 		scopeId,
-		serverMedia,
 	});
 
 	const fileStorage = useMemo(() => createIndexedDbFileStrategy(), []);
@@ -96,9 +79,7 @@ function MediaContent({
 		},
 		onDeleteSuccess: () => {
 			toast.success(t("delete.success"));
-			invalidateList();
 		},
-		onUploadEnqueued: invalidateList,
 	});
 
 	return (

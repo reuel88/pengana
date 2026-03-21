@@ -19,7 +19,11 @@ vi.mock("@pengana/entity-store", async (importOriginal) => {
 import { createTodoSyncAdapter } from "./adapter";
 
 function getToLocal() {
-	createTodoSyncAdapter({} as never, "org-1", orgTodoConfig);
+	createTodoSyncAdapter({
+		db: {} as never,
+		scopeId: "org-1",
+		config: orgTodoConfig,
+	});
 	const [, config] = createDexieSyncAdapterMock.mock.lastCall as [
 		string,
 		{
