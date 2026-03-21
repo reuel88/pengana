@@ -41,7 +41,7 @@ const mediaWithAttachmentsSchema = mediaOutputSchema.extend({
 });
 
 const mediaSyncInputSchema = z.object({
-	lastSyncedAt: z.string().nullable(),
+	lastSyncedAt: z.iso.datetime().nullable(),
 });
 
 const mediaSyncOutputSchema = z.object({

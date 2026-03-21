@@ -25,6 +25,7 @@ export const mediaSchema = z.object({
 	scopeId: z.string(),
 	organizationId: z.string(),
 	createdBy: z.string(),
+	deletedAt: z.string().nullable(),
 });
 
 export const mediaAttachmentSchema = z.object({
@@ -38,7 +39,7 @@ export const mediaAttachmentSchema = z.object({
 
 export const syncInputSchema = z.object({
 	changes: z.array(todoSchema),
-	lastSyncedAt: z.string().nullable(),
+	lastSyncedAt: z.iso.datetime().nullable(),
 });
 
 export const syncOutputSchema = z.object({

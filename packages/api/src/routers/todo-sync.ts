@@ -136,6 +136,7 @@ export async function handleTodoSync(
 			scopeId: a.scopeId,
 			organizationId: a.organizationId,
 			createdBy: a.createdBy,
+			deletedAt: a.deletedAt?.toISOString() ?? null,
 		})),
 		mediaAttachments: attachmentRows.map((att) => ({
 			id: att.id,

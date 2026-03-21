@@ -39,6 +39,7 @@ export async function handleMediaSync(
 			scopeId: m.scopeId,
 			organizationId: m.organizationId,
 			createdBy: m.createdBy,
+			deletedAt: m.deletedAt?.toISOString() ?? null,
 		})),
 		mediaAttachments: attachmentRows.map((att) => ({
 			id: att.id,

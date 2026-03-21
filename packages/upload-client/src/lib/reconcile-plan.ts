@@ -32,11 +32,22 @@ export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
 		entityIds,
 	} = input;
 
+	// --- Separate active media from soft-deleted media ---
+	const activeMedia: Media[] = [];
+	const deletedMediaIds = new Set<string>();
+	for (const sa of serverMedia) {
+		if (sa.deletedAt) {
+			deletedMediaIds.add(sa.id);
+		} else {
+			activeMedia.push(sa);
+		}
+	}
+
 	// --- Media: inserts and updates ---
 	const mediaToInsert: LocalMedia[] = [];
 	const mediaToUpdate: { id: string; url: string }[] = [];
 
-	for (const sa of serverMedia) {
+	for (const sa of activeMedia) {
 		const existing = existingMediaById.get(sa.id);
 		if (existing) {
 			if (sa.url && existing.url !== sa.url) {
@@ -60,9 +71,12 @@ export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
 		}
 	}
 
-	// --- Attachments: inserts ---
+	// --- Attachments: inserts (skip attachments for deleted media) ---
 	const attachmentsToInsert: LocalMediaAttachment[] = serverAttachments
-		.filter((sa) => !existingAttachmentIds.has(sa.id))
+		.filter(
+			(sa) =>
+				!existingAttachmentIds.has(sa.id) && !deletedMediaIds.has(sa.mediaId),
+		)
 		.map((sa) => ({
 			id: sa.id,
 			mediaId: sa.mediaId,
@@ -72,9 +86,22 @@ export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
 			createdAt: sa.createdAt,
 		}));
 
-	// --- Attachment and media deletions (only when entityIds are provided) ---
+	// --- Attachment and media deletions ---
 	const attachmentIdsToDelete: string[] = [];
 	const mediaIdsToDelete: string[] = [];
+
+	// Delete media that the server has soft-deleted
+	for (const id of deletedMediaIds) {
+		if (existingMediaById.has(id)) {
+			mediaIdsToDelete.push(id);
+		}
+	}
+	// Delete attachments belonging to soft-deleted media
+	for (const sa of serverAttachments) {
+		if (deletedMediaIds.has(sa.mediaId) && existingAttachmentIds.has(sa.id)) {
+			attachmentIdsToDelete.push(sa.id);
+		}
+	}
 
 	if (input.scopeWide) {
 		// Scope-wide sync: delete uploaded media not present on server

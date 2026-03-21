@@ -21,6 +21,7 @@ export const media = pgTable(
 		createdBy: text("created_by")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
+		deletedAt: timestamp("deleted_at"),
 	},
 	(table) => [
 		index("media_scope_updatedAt_idx").on(
