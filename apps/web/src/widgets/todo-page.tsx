@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { SyncDescriptor } from "@pengana/sync-runtime";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { useTodos } from "@pengana/todo-client";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";

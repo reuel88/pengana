@@ -1,7 +1,7 @@
-import { createNetworkStatusMonitor } from "@pengana/realtime-transport";
-import type { StorageLevel } from "@pengana/storage-health";
-import type { SyncDescriptor } from "@pengana/sync-runtime";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { StorageLevel } from "@pengana/sync/health";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
+import { createNetworkStatusMonitor } from "@pengana/sync/transport";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import { useCallback, useSyncExternalStore } from "react";
 
 // ---------------------------------------------------------------------------

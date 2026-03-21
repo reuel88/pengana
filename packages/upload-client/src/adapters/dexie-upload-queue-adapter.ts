@@ -1,6 +1,6 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { UploadAdapter, UploadItem } from "@pengana/upload-queue";
-import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
+import type { UploadAdapter, UploadItem } from "@pengana/sync/upload";
+import { isQuotaError, StorageFullError } from "@pengana/sync/upload";
 
 export function createWebUploadAdapter(db: EntityDatabase): UploadAdapter {
 	const table = db.getTable<UploadItem>("uploadQueue");

@@ -20,9 +20,7 @@
 	},
 	"dependencies": {
 		"@pengana/entity-store": "workspace:*",
-		"@pengana/storage-health": "workspace:*",
-		"@pengana/sync-engine": "workspace:*",
-		"@pengana/upload-queue": "workspace:*",
+		"@pengana/sync": "workspace:*",
 		"dexie": "^4.0.11",
 		"dexie-react-hooks": "^4.2.0",
 		"drizzle-orm": "^0.45.1"

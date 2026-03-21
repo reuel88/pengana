@@ -1,5 +1,5 @@
 import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/entity-store/drizzle/create-drizzle-sync-adapter";
-import type { SyncAdapter, Todo } from "@pengana/sync-engine";
+import type { SyncAdapter, Todo } from "@pengana/sync/core";
 
 import { appDb, syncMeta, todos } from "@/shared/db";
 

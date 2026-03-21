@@ -1,7 +1,7 @@
-import type { StorageLevel } from "@pengana/storage-health";
-import type { SyncEvent } from "@pengana/sync-engine";
-import type { SyncDescriptor } from "@pengana/sync-runtime";
-import type { EnqueueUploadParams, UploadEvent } from "@pengana/upload-queue";
+import type { SyncEvent } from "@pengana/sync/core";
+import type { StorageLevel } from "@pengana/sync/health";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
+import type { EnqueueUploadParams, UploadEvent } from "@pengana/sync/upload";
 import { useCallback, useSyncExternalStore } from "react";
 import { syncRuntime } from "./sync-runtime-instance";
 

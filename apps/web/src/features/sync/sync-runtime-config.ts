@@ -1,10 +1,11 @@
+import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
+import { StorageHealthMonitor } from "@pengana/sync/health";
+import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
 import {
 	createNetworkStatusMonitor,
 	subscribeToSharedNotifyChannel,
-} from "@pengana/realtime-transport";
-import { StorageHealthMonitor } from "@pengana/storage-health";
-import { createPeriodicSync, createSyncTransport } from "@pengana/sync-engine";
-import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync-runtime";
+} from "@pengana/sync/transport";
+import { cleanupUploaded, UploadQueueManager } from "@pengana/sync/upload";
 import {
 	createTodoSyncAdapter,
 	orgTodoConfig,
@@ -18,7 +19,6 @@ import {
 } from "@pengana/upload-client";
 import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
 import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
-import { cleanupUploaded, UploadQueueManager } from "@pengana/upload-queue";
 import { createDexieUploadTransport } from "@/features/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";

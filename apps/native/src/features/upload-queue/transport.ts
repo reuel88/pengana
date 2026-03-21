@@ -1,5 +1,5 @@
+import type { UploadTransport } from "@pengana/sync/upload";
 import { createUploadTransport } from "@pengana/upload-client";
-import type { UploadTransport } from "@pengana/upload-queue";
 
 import { File } from "expo-file-system";
 

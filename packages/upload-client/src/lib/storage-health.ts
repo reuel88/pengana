@@ -2,12 +2,12 @@ import type {
 	StorageEstimate,
 	StorageHealthProvider,
 	StorageLevel,
-} from "@pengana/storage-health";
+} from "@pengana/sync/health";
 
 import {
 	STORAGE_CRITICAL_RATIO,
 	STORAGE_WARNING_RATIO,
-} from "@pengana/storage-health";
+} from "@pengana/sync/health";
 
 export function createWebStorageHealthProvider(): StorageHealthProvider {
 	return {

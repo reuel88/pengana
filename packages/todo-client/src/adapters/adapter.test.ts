@@ -1,4 +1,4 @@
-import type { Todo } from "@pengana/sync-engine";
+import type { Todo } from "@pengana/sync/core";
 import { describe, expect, it, vi } from "vitest";
 
 import type { WebTodo } from "../lib/db";

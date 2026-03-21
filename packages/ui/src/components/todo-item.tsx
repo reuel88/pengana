@@ -1,10 +1,10 @@
 import { useTranslation } from "@pengana/i18n";
-import type { SyncStatus } from "@pengana/sync-engine";
+import type { SyncStatus } from "@pengana/sync/core";
 import {
 	isAllowedMimeType,
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
-} from "@pengana/upload-queue";
+} from "@pengana/sync/upload";
 import { useRef } from "react";
 import { cn } from "../lib/utils";
 import { type AttachmentItem, AttachmentList } from "./attachment-list";

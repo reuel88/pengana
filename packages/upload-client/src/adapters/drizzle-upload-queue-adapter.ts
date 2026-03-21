@@ -1,5 +1,5 @@
-import type { UploadAdapter, UploadItem } from "@pengana/upload-queue";
-import { isQuotaError, StorageFullError } from "@pengana/upload-queue";
+import type { UploadAdapter, UploadItem } from "@pengana/sync/upload";
+import { isQuotaError, StorageFullError } from "@pengana/sync/upload";
 import { asc, eq } from "drizzle-orm";
 
 import type {

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { SyncDescriptor } from "@pengana/sync-runtime";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 

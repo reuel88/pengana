@@ -10,7 +10,7 @@ import {
 	insertTodo,
 	updateTodo,
 } from "@pengana/db/todo-queries";
-import type { SyncInput } from "@pengana/sync-engine";
+import type { SyncInput } from "@pengana/sync/core";
 
 const logger = getLogger(["app", "sync"]);
 

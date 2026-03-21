@@ -1,4 +1,4 @@
-import type { SyncDescriptor } from "@pengana/sync-runtime";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { lazy, Suspense } from "react";
 
 const SyncDevtoolsImpl = lazy(() =>

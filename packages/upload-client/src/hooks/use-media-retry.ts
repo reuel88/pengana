@@ -1,4 +1,4 @@
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import { useCallback } from "react";
 import type { MediaActions } from "./media-actions";
 

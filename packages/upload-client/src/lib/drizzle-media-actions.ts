@@ -1,5 +1,5 @@
-import type { Media, MediaAttachment } from "@pengana/sync-engine";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
+import type { Media, MediaAttachment } from "@pengana/sync/core";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import { and, count, eq, inArray, max, notInArray } from "drizzle-orm";
 
 import type {

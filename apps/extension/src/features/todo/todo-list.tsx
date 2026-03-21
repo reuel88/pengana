@@ -1,4 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
 import {
 	type TodoActions,
 	useTodoHandlers,
@@ -11,8 +13,6 @@ import {
 	getMediaCountForEntity,
 } from "@pengana/upload-client";
 import { storeFileInDexie } from "@pengana/upload-client/adapters/dexie-file-store";
-import type { EnqueueUploadParams } from "@pengana/upload-queue";
-import { INDEXEDDB_URI_PREFIX } from "@pengana/upload-queue";
 import { useCallback, useMemo, useState } from "react";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";

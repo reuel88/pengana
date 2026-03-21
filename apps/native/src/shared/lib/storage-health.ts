@@ -1,7 +1,7 @@
 import type {
 	StorageEstimate,
 	StorageHealthProvider,
-} from "@pengana/storage-health";
+} from "@pengana/sync/health";
 import { Paths } from "expo-file-system";
 
 const WARNING_FREE_BYTES = 100 * 1024 * 1024; // 100 MB

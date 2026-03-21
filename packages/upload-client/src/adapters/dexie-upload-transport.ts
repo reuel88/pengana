@@ -1,6 +1,6 @@
 import type { EntityDatabase } from "@pengana/entity-store";
-import type { UploadTransport } from "@pengana/upload-queue";
-import { INDEXEDDB_URI_PREFIX } from "@pengana/upload-queue";
+import type { UploadTransport } from "@pengana/sync/upload";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
 
 import { getFileFromDexie } from "./dexie-file-store";
 import { createUploadTransport } from "./upload-transport";

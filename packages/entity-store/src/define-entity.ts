@@ -1,5 +1,5 @@
-import type { SyncStatus } from "@pengana/sync-engine";
-import type { UploadStatus } from "@pengana/upload-queue";
+import type { SyncStatus } from "@pengana/sync/core";
+import type { UploadStatus } from "@pengana/sync/upload";
 
 /** Syncable base fields present on every entity in both Dexie and Drizzle. */
 export interface SyncableBase {

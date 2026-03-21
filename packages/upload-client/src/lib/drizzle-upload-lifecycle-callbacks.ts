@@ -1,4 +1,4 @@
-import type { UploadLifecycleCallbacks } from "@pengana/upload-queue";
+import type { UploadLifecycleCallbacks } from "@pengana/sync/upload";
 
 import type { DrizzleDb, MediaTable } from "./drizzle-media-actions";
 import { markMediaFailed, updateMediaUploaded } from "./drizzle-media-actions";

@@ -1,4 +1,4 @@
-import type { SyncDescriptor } from "@pengana/sync-runtime";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { useEffect, useRef } from "react";
 import { authClient } from "@/shared/lib/auth-client";
 import {

@@ -1,6 +1,6 @@
 import { env } from "@pengana/env/web";
-import type { SyncDescriptor } from "@pengana/sync-runtime";
-import { descriptorKey } from "@pengana/sync-runtime";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
+import { descriptorKey } from "@pengana/sync/runtime";
 import {
 	createOrgTodoEntryConfig,
 	createPersonalTodoEntryConfig,
@@ -148,7 +148,7 @@ export default defineBackground(() => {
 			msg: {
 				type?: string;
 				descriptor?: SyncDescriptor;
-				params?: import("@pengana/upload-queue").EnqueueUploadParams;
+				params?: import("@pengana/sync/upload").EnqueueUploadParams;
 			},
 			_sender,
 			_sendResponse,

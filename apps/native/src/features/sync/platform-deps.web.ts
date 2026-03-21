@@ -1,5 +1,5 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
-import { createWebSocketRealtimeTransport } from "@pengana/realtime-transport";
+import { createWebSocketRealtimeTransport } from "@pengana/sync/transport";
 import {
 	createNativeUploadLifecycleCallbacks,
 	createUploadAdapter,

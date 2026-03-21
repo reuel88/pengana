@@ -1,7 +1,7 @@
 import { parseWsMessage } from "@pengana/api/ws-types";
 import { env } from "@pengana/env/web";
 import { orgQueryKeys } from "@pengana/org-client";
-import { createWebSocketRealtimeTransport } from "@pengana/realtime-transport";
+import { createWebSocketRealtimeTransport } from "@pengana/sync/transport";
 import { notificationQueryKeys } from "@/features/notifications/entities/notification/query-keys";
 import { queryClient } from "@/shared/api/orpc";
 

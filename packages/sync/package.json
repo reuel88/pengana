@@ -1,0 +1,35 @@
+{
+	"name": "@pengana/sync",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./core": {
+			"default": "./src/core/index.ts"
+		},
+		"./runtime": {
+			"default": "./src/runtime/index.ts"
+		},
+		"./transport": {
+			"default": "./src/transport/index.ts"
+		},
+		"./upload": {
+			"default": "./src/upload/index.ts"
+		},
+		"./health": {
+			"default": "./src/health/index.ts"
+		}
+	},
+	"scripts": {
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

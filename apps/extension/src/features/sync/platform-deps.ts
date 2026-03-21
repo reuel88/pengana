@@ -1,4 +1,4 @@
-import type { RealtimeTransport } from "@pengana/realtime-transport";
+import type { RealtimeTransport } from "@pengana/sync/transport";
 
 export function createNoopRealtimeTransport(): RealtimeTransport {
 	return {

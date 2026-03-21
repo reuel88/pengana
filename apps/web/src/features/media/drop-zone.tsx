@@ -1,4 +1,4 @@
-import { ALLOWED_MIME_TYPES } from "@pengana/upload-queue";
+import { ALLOWED_MIME_TYPES } from "@pengana/sync/upload";
 import { type DragEvent, useCallback, useRef, useState } from "react";
 
 interface DropZoneProps {

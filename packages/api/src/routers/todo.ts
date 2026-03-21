@@ -1,5 +1,5 @@
 import { updateTodoForScope } from "@pengana/db/todo-queries";
-import { syncInputSchema, syncOutputSchema } from "@pengana/sync-engine";
+import { syncInputSchema, syncOutputSchema } from "@pengana/sync/core";
 import { z } from "zod";
 
 import { envelope, envelopeOutput, seatedProcedure } from "../index";

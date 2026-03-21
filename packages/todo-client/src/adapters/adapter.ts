@@ -2,7 +2,7 @@ import {
 	createDexieSyncAdapter as createGenericAdapter,
 	type EntityDatabase,
 } from "@pengana/entity-store";
-import type { SyncAdapter, Todo } from "@pengana/sync-engine";
+import type { SyncAdapter, Todo } from "@pengana/sync/core";
 
 import type { WebTodo } from "../lib/db";
 import type { TodoConfig } from "../lib/todo-config";
