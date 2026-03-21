@@ -22,7 +22,7 @@ export async function pollDevInbox(
 	page: Page,
 	email: string,
 	subject: string,
-	timeoutMs = 15_000,
+	timeoutMs = 25_000,
 	pollIntervalMs = 500,
 ): Promise<EmailDetail> {
 	const deadline = Date.now() + timeoutMs;

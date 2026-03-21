@@ -36,8 +36,6 @@ export function useFileSelection(deps: FileSelectionDeps) {
 
 	return useCallback(
 		async (files: File[], target?: MediaAttachmentTarget) => {
-			const refs: Array<{ revoke?: () => void }> = [];
-
 			for (const file of files) {
 				if (!isAllowedMimeType(file.type)) {
 					onError?.(null, t("dropzone.rejected.type"));
@@ -49,7 +47,7 @@ export function useFileSelection(deps: FileSelectionDeps) {
 					continue;
 				}
 
-				const { fileRef } = await processMediaFile({
+				await processMediaFile({
 					file,
 					userId,
 					scopeType,
@@ -60,7 +58,6 @@ export function useFileSelection(deps: FileSelectionDeps) {
 					createFileRef,
 					enqueueUpload,
 				});
-				refs.push(fileRef);
 			}
 
 			triggerSync();
