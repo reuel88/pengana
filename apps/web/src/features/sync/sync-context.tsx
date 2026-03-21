@@ -123,6 +123,10 @@ function useComposedSyncEngine(options: {
 		const engine = new SyncEngine(adapter, transport);
 		engineRef.current = engine;
 
+		// Trigger initial sync so the engine fetches current server state.
+		// The old useSyncEngine did this implicitly via cascading dep changes.
+		engine.sync();
+
 		const unsubscribe = engine.onEvent((event) => {
 			setEvents((prev) => [...prev.slice(-(MAX_EVENT_LOG_SIZE - 1)), event]);
 			if (event.type === "sync:start") setIsSyncing(true);
@@ -199,7 +203,14 @@ function useComposedSyncEngine(options: {
 	}, []);
 
 	// --- Online Reactivity ---
+	// Engine Init already triggers sync on mount/re-init, so skip the
+	// first fire of this effect to avoid a redundant server round-trip.
+	const didMountRef = useRef(false);
 	useEffect(() => {
+		if (!didMountRef.current) {
+			didMountRef.current = true;
+			return;
+		}
 		if (effectiveOnline) {
 			engineRef.current?.sync();
 		}
