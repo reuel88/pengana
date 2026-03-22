@@ -8,7 +8,6 @@ import type {
 	RealtimeSubHandle,
 	RuntimeEntryConfig,
 	StorageMonitorHandle,
-	Syncable,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -25,7 +24,6 @@ export class RuntimeEntry {
 	// --- Infrastructure ---
 	private engine: SyncEngine;
 	private uploadManager: UploadQueueManager | null = null;
-	private mediaSyncer: Syncable | null = null;
 	private periodicSync: PeriodicSyncHandle;
 	private realtimeSub: RealtimeSubHandle | null = null;
 	private storageMonitor: StorageMonitorHandle;
@@ -48,14 +46,11 @@ export class RuntimeEntry {
 	constructor(private config: RuntimeEntryConfig) {
 		const adapter = config.createAdapter();
 		const transport = config.createTransport();
-		this.engine = new SyncEngine(adapter, transport);
+		const secondaryAdapters = config.createSecondaryAdapters?.() ?? {};
+		this.engine = new SyncEngine(adapter, transport, secondaryAdapters);
 
 		if (config.createUploadManager) {
 			this.uploadManager = config.createUploadManager();
-		}
-
-		if (config.createMediaSyncer) {
-			this.mediaSyncer = config.createMediaSyncer();
 		}
 
 		this.periodicSync = config.createPeriodicSync(() => this.engine);
@@ -108,13 +103,10 @@ export class RuntimeEntry {
 				this.updateSnapshot({ isUploading: state.isUploading });
 				// Trigger sync when an upload finishes
 				if (wasUploading && !state.isUploading) {
-					this.triggerAllSyncs();
+					this.triggerSync();
 				}
 			});
 		}
-
-		// Media syncer — initial sync
-		this.mediaSyncer?.sync();
 
 		// Storage monitor
 		this.storageMonitor.start();
@@ -127,7 +119,7 @@ export class RuntimeEntry {
 		// Realtime
 		if (this.config.createRealtimeSub) {
 			this.realtimeSub = this.config.createRealtimeSub({
-				onSync: () => this.triggerAllSyncs(),
+				onSync: () => this.triggerSync(),
 				onRefresh: () => {}, // app-level concern; handled in config factory
 			});
 			this.realtimeSub.setEnabled(online && foreground);
@@ -141,7 +133,7 @@ export class RuntimeEntry {
 		// Update online in snapshot
 		this.updateSnapshot({ isOnline: online });
 
-		// Initial sync
+		// Initial sync (media is included via secondary adapters in the engine)
 		this.engine.sync();
 	}
 
@@ -182,7 +174,7 @@ export class RuntimeEntry {
 		if (online) {
 			this.periodicSync.start();
 			if (wasOffline) {
-				this.triggerAllSyncs();
+				this.triggerSync();
 			}
 		} else {
 			this.periodicSync.stop();
@@ -199,7 +191,7 @@ export class RuntimeEntry {
 
 		// Trigger sync when returning to foreground while online
 		if (foreground && this.online) {
-			this.triggerAllSyncs();
+			this.triggerSync();
 		}
 	}
 
@@ -207,10 +199,9 @@ export class RuntimeEntry {
 	// Actions
 	// ---------------------------------------------------------------------------
 
-	triggerAllSyncs(): void {
+	triggerSync(): void {
 		if (!this.online) return;
 		this.engine.sync();
-		this.mediaSyncer?.sync();
 	}
 
 	enqueueUpload(params: EnqueueUploadParams): void {

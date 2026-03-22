@@ -1,14 +1,18 @@
 import { createDrizzleActions } from "@pengana/entity-store";
+import { HLC, serializeHlc } from "@pengana/sync/core";
 import { drizzleMedia } from "@pengana/upload-client";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
 import { appDb, media, mediaAttachments, todos } from "@/shared/db";
 
+const hlc = new HLC(randomUUID());
+
 export const actions = createDrizzleActions<typeof todos.$inferInsert>(
 	appDb,
 	todos,
 	todos.id,
+	{ hlcNow: () => hlc.now() },
 );
 
 export async function addTodo(
@@ -16,11 +20,14 @@ export async function addTodo(
 	title: string,
 	organizationId: string,
 ): Promise<void> {
+	const ts = serializeHlc(hlc.now());
 	await actions.add({
 		id: randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
+		hlcTimestamp: ts,
+		fieldClocks: JSON.stringify({ title: ts, completed: ts, deleted: ts }),
 		userId,
 		scopeId: userId,
 		organizationId,

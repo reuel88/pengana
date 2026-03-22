@@ -5,6 +5,8 @@ import type { UploadStatus } from "@pengana/sync/upload";
 export interface SyncableBase {
 	id: string;
 	updatedAt: string;
+	hlcTimestamp: string;
+	fieldClocks: Record<string, string> | string;
 	userId: string;
 	scopeId: string;
 	syncStatus: SyncStatus;

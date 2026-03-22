@@ -13,6 +13,8 @@ import { integer, text } from "drizzle-orm/sqlite-core";
 export const syncableColumns = {
 	id: text("id").primaryKey(),
 	updatedAt: text("updated_at").notNull(),
+	hlcTimestamp: text("hlc_timestamp").notNull().default(""),
+	fieldClocks: text("field_clocks").notNull().default("{}"),
 	userId: text("user_id").notNull(),
 	scopeId: text("scope_id").notNull().default(""),
 	syncStatus: text("sync_status", {

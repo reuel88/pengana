@@ -1,6 +1,9 @@
+// Re-use the HLC from todo-actions (same module, same HLC instance)
+import { HLC, serializeHlc } from "@pengana/sync/core";
 import { randomUUID } from "expo-crypto";
-
 import { actions } from "./todo-actions";
+
+const hlc = new HLC(randomUUID());
 
 export {
 	deleteTodo as deleteOrgTodo,
@@ -13,11 +16,14 @@ export async function addOrgTodo(
 	userId: string,
 	title: string,
 ): Promise<void> {
+	const ts = serializeHlc(hlc.now());
 	await actions.add({
 		id: randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
+		hlcTimestamp: ts,
+		fieldClocks: JSON.stringify({ title: ts, completed: ts, deleted: ts }),
 		userId,
 		scopeId: organizationId,
 		organizationId,

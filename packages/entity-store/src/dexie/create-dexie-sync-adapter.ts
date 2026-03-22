@@ -83,7 +83,8 @@ export function createDexieSyncAdapter<TLocal>(
 					const local = await table.get(item.id);
 					if (
 						local &&
-						(local as { updatedAt?: string }).updatedAt === item.updatedAt
+						(local as { hlcTimestamp?: string }).hlcTimestamp ===
+							item.hlcTimestamp
 					) {
 						await doUpdate(item.id, { syncStatus: "synced" });
 					}

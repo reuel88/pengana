@@ -9,6 +9,5 @@ export type {
 	RealtimeSubHandle,
 	RuntimeEntryConfig,
 	StorageMonitorHandle,
-	Syncable,
 	SyncDescriptor,
 } from "./types";

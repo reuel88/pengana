@@ -2,11 +2,15 @@ import { z } from "zod";
 
 export const syncStatusSchema = z.enum(["synced", "pending", "conflict"]);
 
+export const fieldClocksSchema = z.record(z.string(), z.string());
+
 export const todoSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	completed: z.boolean(),
 	updatedAt: z.string(),
+	hlcTimestamp: z.string(),
+	fieldClocks: fieldClocksSchema,
 	userId: z.string(),
 	organizationId: z.string(),
 	createdBy: z.string(),

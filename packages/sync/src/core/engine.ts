@@ -1,9 +1,16 @@
 import { createEventEmitter } from "./event-emitter";
-import type { SyncAdapter, SyncEvent, SyncTransport, Todo } from "./types";
+import type {
+	SecondaryAdapters,
+	SyncAdapter,
+	SyncEvent,
+	SyncTransport,
+	Todo,
+} from "./types";
 
 export class SyncEngine<T extends { id: string } = Todo> {
 	private adapter: SyncAdapter<T>;
 	private transport: SyncTransport<T>;
+	private secondaryAdapters: SecondaryAdapters;
 	private events = createEventEmitter<SyncEvent>();
 	private syncing = false;
 	private syncRequested = false;
@@ -13,9 +20,14 @@ export class SyncEngine<T extends { id: string } = Todo> {
 
 	onEvent = this.events.onEvent;
 
-	constructor(adapter: SyncAdapter<T>, transport: SyncTransport<T>) {
+	constructor(
+		adapter: SyncAdapter<T>,
+		transport: SyncTransport<T>,
+		secondaryAdapters: SecondaryAdapters = {},
+	) {
 		this.adapter = adapter;
 		this.transport = transport;
+		this.secondaryAdapters = secondaryAdapters;
 	}
 
 	get isSyncing() {
@@ -92,6 +104,20 @@ export class SyncEngine<T extends { id: string } = Todo> {
 				await this.adapter.applyServerChanges(
 					result.serverChanges,
 					result.conflicts,
+				);
+				throwIfAborted();
+			}
+
+			// Apply secondary adapters (e.g., media reconciliation)
+			if (
+				this.secondaryAdapters.media &&
+				(result.media?.length || result.mediaAttachments?.length)
+			) {
+				const entityIds = result.serverChanges.map((c) => c.id);
+				await this.secondaryAdapters.media.applyServerChanges(
+					result.media ?? [],
+					result.mediaAttachments ?? [],
+					entityIds,
 				);
 				throwIfAborted();
 			}

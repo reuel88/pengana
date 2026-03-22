@@ -8,6 +8,8 @@ function makeTodo(overrides: Partial<Todo> = {}): Todo {
 		title: "Test todo",
 		completed: false,
 		updatedAt: new Date().toISOString(),
+		hlcTimestamp: "",
+		fieldClocks: {},
 		userId: "user-1",
 		organizationId: "org-1",
 		createdBy: "user-1",

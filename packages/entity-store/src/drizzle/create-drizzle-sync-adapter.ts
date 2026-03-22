@@ -109,7 +109,7 @@ export function createDrizzleSyncAdapter(
 					.where(eq(columns.id, item.id));
 				if (
 					local &&
-					(local as { updatedAt: string }).updatedAt === item.updatedAt
+					(local as { hlcTimestamp: string }).hlcTimestamp === item.hlcTimestamp
 				) {
 					await db
 						.update(table)

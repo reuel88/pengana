@@ -1,4 +1,5 @@
 import { createDexieActions } from "@pengana/entity-store";
+import { HLC, serializeHlc } from "@pengana/sync/core";
 import type { WebTodo } from "@pengana/todo-client";
 import {
 	addMedia as _addMedia,
@@ -12,18 +13,25 @@ import {
 
 import { appDb } from "@/shared/db";
 
-const actions = createDexieActions<WebTodo>(appDb, "todos");
+const hlc = new HLC(crypto.randomUUID());
+
+const actions = createDexieActions<WebTodo>(appDb, "todos", {
+	hlcNow: () => hlc.now(),
+});
 
 export async function addTodo(
 	userId: string,
 	title: string,
 	organizationId: string,
 ): Promise<void> {
+	const ts = serializeHlc(hlc.now());
 	await actions.add({
 		id: crypto.randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
+		hlcTimestamp: ts,
+		fieldClocks: { title: ts, completed: ts, deleted: ts },
 		scopeId: userId,
 		userId,
 		organizationId,
@@ -79,9 +87,5 @@ export async function updateTodoTitle(
 	id: string,
 	title: string,
 ): Promise<void> {
-	await appDb.getTable<WebTodo>("todos").update(id, {
-		title,
-		updatedAt: new Date().toISOString(),
-		syncStatus: "pending",
-	} as never);
+	await actions.update(id, { title } as Partial<WebTodo>);
 }
