@@ -1,4 +1,4 @@
-// Re-use the HLC from todo-actions (same module, same HLC instance)
+// Org-scoped todo actions — own HLC for add; re-exports mutations from todo-actions
 import { HLC, serializeHlc } from "@pengana/sync/core";
 import { randomUUID } from "expo-crypto";
 import { actions } from "./todo-actions";

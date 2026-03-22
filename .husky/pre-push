@@ -6,6 +6,6 @@ pnpm check-types
 pnpm check:i18n
 pnpm build
 pnpm test
-pnpm --filter @pengana/e2e e2e:web
-pnpm --filter @pengana/e2e e2e:native
-pnpm --filter @pengana/e2e e2e:extension
+pnpm turbo --filter @pengana/e2e e2e:web
+pnpm turbo --filter @pengana/e2e e2e:native
+pnpm turbo --filter @pengana/e2e e2e:extension
