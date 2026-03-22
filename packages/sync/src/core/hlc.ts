@@ -64,6 +64,22 @@ export function compareStr(a: string, b: string): number {
  * For each field, the version with the higher HLC wins.
  * Returns { merged fields, merged fieldClocks, changed: true if any field differs from `a` }.
  */
+/**
+ * Safely parse a fieldClocks value that may be a JSON string or already an object.
+ * Falls back to `{}` on parse failure to prevent crashes from corrupted data.
+ */
+export function safeParseFieldClocks(raw: unknown): Record<string, string> {
+	if (raw == null) return {};
+	if (typeof raw === "object") return raw as Record<string, string>;
+	if (typeof raw !== "string") return {};
+	try {
+		return JSON.parse(raw) as Record<string, string>;
+	} catch {
+		console.warn("Failed to parse fieldClocks, falling back to {}:", raw);
+		return {};
+	}
+}
+
 export function mergeFieldClocks<T extends Record<string, unknown>>(
 	a: T,
 	aClock: Record<string, string>,

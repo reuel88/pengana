@@ -1,4 +1,8 @@
-import { type HLCTimestamp, serializeHlc } from "@pengana/sync/core";
+import {
+	type HLCTimestamp,
+	safeParseFieldClocks,
+	serializeHlc,
+} from "@pengana/sync/core";
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase, SQLiteColumn } from "drizzle-orm/sqlite-core";
 
@@ -17,8 +21,12 @@ export interface DrizzleActionsConfig {
 /**
  * Generic CRUD action factory for Drizzle entities.
  *
- * All mutations auto-set `syncStatus: "pending"`, a fresh `updatedAt`,
+ * Mutations that operate on existing records (update, softDelete,
+ * resolveConflict) auto-set `syncStatus: "pending"`, a fresh `updatedAt`,
  * an HLC timestamp, and per-field clocks for changed fields.
+ *
+ * `add()` performs a plain insert — callers must supply `hlcTimestamp`,
+ * `fieldClocks`, `updatedAt`, and `syncStatus` in the record.
  */
 export function createDrizzleActions<TInsert>(
 	db: BaseSQLiteDatabase<"sync" | "async", unknown>,
@@ -32,9 +40,8 @@ export function createDrizzleActions<TInsert>(
 		changedFields: string[],
 	): { hlcTimestamp: string; fieldClocks: string } {
 		const ts = serializeHlc(config.hlcNow());
-		const existing: Record<string, string> = existingFieldClocks
-			? JSON.parse(existingFieldClocks)
-			: {};
+		const existing: Record<string, string> =
+			safeParseFieldClocks(existingFieldClocks);
 		for (const field of changedFields) {
 			existing[field] = ts;
 		}

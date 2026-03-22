@@ -14,6 +14,7 @@ export {
 	deserialize as deserializeHlc,
 	HLC,
 	mergeFieldClocks,
+	safeParseFieldClocks,
 	serialize as serializeHlc,
 } from "./hlc";
 export {

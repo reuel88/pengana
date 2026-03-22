@@ -1,4 +1,8 @@
-import { type HLCTimestamp, serializeHlc } from "@pengana/sync/core";
+import {
+	type HLCTimestamp,
+	safeParseFieldClocks,
+	serializeHlc,
+} from "@pengana/sync/core";
 
 import type { SyncableBase } from "../define-entity";
 import type { EntityDatabase } from "./entity-database";
@@ -39,8 +43,7 @@ export function createDexieActions<TLocal extends SyncableBase>(
 	): { hlcTimestamp: string; fieldClocks: Record<string, string> } {
 		const ts = serializeHlc(config.hlcNow());
 		const raw = existing?.fieldClocks;
-		const existingClocks: Record<string, string> =
-			typeof raw === "string" ? JSON.parse(raw) : (raw ?? {});
+		const existingClocks: Record<string, string> = safeParseFieldClocks(raw);
 		const fieldClocks = { ...existingClocks };
 		for (const field of changedFields) {
 			fieldClocks[field] = ts;

@@ -1,5 +1,6 @@
 import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/entity-store/drizzle/create-drizzle-sync-adapter";
 import type { SyncAdapter, Todo } from "@pengana/sync/core";
+import { safeParseFieldClocks } from "@pengana/sync/core";
 
 import { appDb, syncMeta, todos } from "@/shared/db";
 
@@ -10,7 +11,7 @@ function rowToTodo(row: typeof todos.$inferSelect): Todo {
 		completed: row.completed,
 		updatedAt: row.updatedAt,
 		hlcTimestamp: row.hlcTimestamp ?? "",
-		fieldClocks: row.fieldClocks ? JSON.parse(row.fieldClocks) : {},
+		fieldClocks: safeParseFieldClocks(row.fieldClocks),
 		userId: row.userId,
 		organizationId: row.organizationId,
 		createdBy: row.createdBy,

@@ -1,4 +1,5 @@
 import { useDrizzleEntity } from "@pengana/entity-store/hooks/use-drizzle-entity";
+import { safeParseFieldClocks } from "@pengana/sync/core";
 import { eq, type InferSelectModel, inArray } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
@@ -70,10 +71,7 @@ function useTodosWithAttachments(scopeId: string) {
 
 		return (items ?? []).map((t) => ({
 			...t,
-			fieldClocks:
-				typeof t.fieldClocks === "string"
-					? JSON.parse(t.fieldClocks)
-					: t.fieldClocks,
+			fieldClocks: safeParseFieldClocks(t.fieldClocks),
 			attachments: byTodo.get(t.id) ?? [],
 		}));
 	}, [items, attachmentRecords, mediaRecords]);
