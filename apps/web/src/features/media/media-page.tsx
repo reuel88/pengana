@@ -55,6 +55,7 @@ function MediaContent({
 		db: appDb,
 		config: scopeType === "org" ? orgMediaConfig : personalMediaConfig,
 		scopeId,
+		organizationId,
 	});
 
 	const fileStorage = useMemo(() => createIndexedDbFileStrategy(), []);

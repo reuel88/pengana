@@ -70,6 +70,10 @@ function useTodosWithAttachments(scopeId: string) {
 
 		return (items ?? []).map((t) => ({
 			...t,
+			fieldClocks:
+				typeof t.fieldClocks === "string"
+					? JSON.parse(t.fieldClocks)
+					: t.fieldClocks,
 			attachments: byTodo.get(t.id) ?? [],
 		}));
 	}, [items, attachmentRecords, mediaRecords]);

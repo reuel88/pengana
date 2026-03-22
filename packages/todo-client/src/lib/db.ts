@@ -3,6 +3,8 @@ export interface WebTodo {
 	title: string;
 	completed: boolean;
 	updatedAt: string;
+	hlcTimestamp: string;
+	fieldClocks: Record<string, string>;
 	scopeId: string; // sync engine scope key (userId for personal, organizationId for org)
 	userId: string; // actual user ID (the person who created or owns the todo)
 	organizationId: string;

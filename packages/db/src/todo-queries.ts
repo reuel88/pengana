@@ -11,6 +11,8 @@ export interface TodoRow {
 	completed: boolean;
 	deleted: boolean;
 	updatedAt: Date;
+	hlcTimestamp: string;
+	fieldClocks: Record<string, string>;
 	scopeType: ScopeType;
 	scopeId: string;
 	userId: string;
@@ -37,6 +39,8 @@ export async function insertTodo(values: {
 	completed: boolean;
 	deleted: boolean;
 	updatedAt: Date;
+	hlcTimestamp: string;
+	fieldClocks: Record<string, string>;
 	scopeType: ScopeType;
 	scopeId: string;
 	userId: string;
@@ -53,6 +57,8 @@ export async function updateTodo(
 		completed: boolean;
 		deleted: boolean;
 		updatedAt: Date;
+		hlcTimestamp: string;
+		fieldClocks: Record<string, string>;
 	}>,
 ): Promise<void> {
 	await db.update(todo).set(values).where(eq(todo.id, id));
@@ -67,6 +73,8 @@ export async function updateTodoForScope(
 		completed: boolean;
 		deleted: boolean;
 		updatedAt: Date;
+		hlcTimestamp: string;
+		fieldClocks: Record<string, string>;
 	}>,
 ): Promise<void> {
 	await db

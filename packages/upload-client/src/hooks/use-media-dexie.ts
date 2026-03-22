@@ -10,9 +10,15 @@ export interface UseMediaOptions {
 	db: EntityDatabase;
 	config: MediaConfig;
 	scopeId: string;
+	organizationId?: string;
 }
 
-export function useMedia({ db, config, scopeId }: UseMediaOptions): {
+export function useMedia({
+	db,
+	config,
+	scopeId,
+	organizationId,
+}: UseMediaOptions): {
 	media: MediaListItem[];
 } {
 	const localMedia =
@@ -22,9 +28,13 @@ export function useMedia({ db, config, scopeId }: UseMediaOptions): {
 					.getTable<LocalMedia>("media")
 					.where("scopeId")
 					.equals(scopeId)
-					.and((item) => item.scopeType === config.scopeType)
+					.and(
+						(item) =>
+							item.scopeType === config.scopeType &&
+							(!organizationId || item.organizationId === organizationId),
+					)
 					.toArray(),
-			[db, config.scopeType, scopeId],
+			[db, config.scopeType, scopeId, organizationId],
 			[] as LocalMedia[],
 		) ?? [];
 

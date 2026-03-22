@@ -1,3 +1,4 @@
+import type { PullSyncAdapter } from "@pengana/sync/core";
 import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
 import { StorageHealthMonitor } from "@pengana/sync/health";
 import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
@@ -64,6 +65,23 @@ function createStorageMonitor() {
 }
 
 // ---------------------------------------------------------------------------
+// Media pull adapter factory (replaces MediaSyncer)
+// ---------------------------------------------------------------------------
+
+function createMediaPullAdapter(): PullSyncAdapter {
+	return {
+		async applyServerChanges(media, attachments, entityIds) {
+			await reconcileMedia({
+				db: appDb,
+				serverMedia: media,
+				serverAttachments: attachments,
+				entityIds,
+			});
+		},
+	};
+}
+
+// ---------------------------------------------------------------------------
 // Entry config factories
 // ---------------------------------------------------------------------------
 
@@ -80,16 +98,13 @@ export function createPersonalTodoEntryConfig(
 
 		createTransport: () =>
 			createSyncTransport(
-				async (input) =>
-					(await client.todo.sync(input, { signal: input.signal })).data,
-				(media, attachments, entityIds) =>
-					reconcileMedia({
-						db: appDb,
-						serverMedia: media,
-						serverAttachments: attachments,
-						entityIds,
-					}),
+				async (input, signal) =>
+					(await client.todo.sync(input, { signal })).data,
 			),
+
+		createSecondaryAdapters: () => ({
+			media: createMediaPullAdapter(),
+		}),
 
 		createUploadManager: () =>
 			new UploadQueueManager({
@@ -119,20 +134,13 @@ export function createOrgTodoEntryConfig(
 
 		createTransport: () =>
 			createSyncTransport(
-				async (input) =>
-					(
-						await client.orgTodo.sync(input, {
-							signal: input.signal,
-						})
-					).data,
-				(media, attachments, entityIds) =>
-					reconcileMedia({
-						db: appDb,
-						serverMedia: media,
-						serverAttachments: attachments,
-						entityIds,
-					}),
+				async (input, signal) =>
+					(await client.orgTodo.sync(input, { signal })).data,
 			),
+
+		createSecondaryAdapters: () => ({
+			media: createMediaPullAdapter(),
+		}),
 
 		createUploadManager: () =>
 			new UploadQueueManager({

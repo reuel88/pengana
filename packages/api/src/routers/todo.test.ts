@@ -28,6 +28,8 @@ function makeChange(overrides: Record<string, unknown> = {}) {
 		completed: false,
 		deleted: false,
 		updatedAt: "2025-06-01T00:00:10.000Z",
+		hlcTimestamp: "",
+		fieldClocks: {},
 		userId: "test-user",
 		organizationId: "test-org",
 		createdBy: "test-user",
@@ -43,6 +45,8 @@ function makeServerRow(overrides: Partial<TodoRow> = {}): TodoRow {
 		completed: false,
 		deleted: false,
 		updatedAt: new Date("2025-06-01T00:00:05.000Z"),
+		hlcTimestamp: "",
+		fieldClocks: {},
 		scopeType: "personal",
 		scopeId: "test-user",
 		userId: "test-user",
@@ -103,15 +107,33 @@ describe("handleTodoSync", () => {
 		);
 	});
 
-	it("reports conflict when client timestamp < server (LWW loses)", async () => {
+	it("reports conflict when server field clocks win some fields (per-field LWW)", async () => {
+		const serverHlc = "0000018f3a2b1c00:0001:server";
+		const clientHlc = "0000018f3a2b0000:0001:client";
 		const row = makeServerRow({
 			updatedAt: new Date("2025-06-01T00:00:20.000Z"),
+			hlcTimestamp: serverHlc,
+			fieldClocks: {
+				title: serverHlc,
+				completed: clientHlc,
+				deleted: clientHlc,
+			},
 		});
 		vi.mocked(findTodosByIds).mockResolvedValue(new Map([["todo-1", row]]));
 
 		const result = await handleTodoSync(
 			{
-				changes: [makeChange({ updatedAt: "2025-06-01T00:00:10.000Z" })],
+				changes: [
+					makeChange({
+						updatedAt: "2025-06-01T00:00:10.000Z",
+						hlcTimestamp: clientHlc,
+						fieldClocks: {
+							title: clientHlc,
+							completed: clientHlc,
+							deleted: clientHlc,
+						},
+					}),
+				],
 				lastSyncedAt: null,
 			},
 			"personal",
@@ -120,7 +142,8 @@ describe("handleTodoSync", () => {
 			"test-org",
 		);
 
-		expect(updateTodo).not.toHaveBeenCalled();
+		// Server wins title (higher HLC), client wins completed + deleted
+		expect(updateTodo).toHaveBeenCalled();
 		expect(result.conflicts).toContain("todo-1");
 	});
 
@@ -190,6 +213,8 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
+			hlcTimestamp: "",
+			fieldClocks: {},
 			userId: "test-user",
 			organizationId: "test-org",
 			createdBy: "test-user",
@@ -198,6 +223,8 @@ describe("handleTodoSync", () => {
 	});
 
 	it("handles mixed insert/update/conflict in single sync", async () => {
+		const serverHlc = "0000018f3a2b1c00:0001:server";
+		const clientHlc = "0000018f3a2b0000:0001:client";
 		const row2 = makeServerRow({
 			id: "todo-2",
 			updatedAt: new Date("2025-01-01T00:00:00.000Z"),
@@ -205,6 +232,12 @@ describe("handleTodoSync", () => {
 		const row3 = makeServerRow({
 			id: "todo-3",
 			updatedAt: new Date("2025-12-01T00:00:00.000Z"),
+			hlcTimestamp: serverHlc,
+			fieldClocks: {
+				title: serverHlc,
+				completed: serverHlc,
+				deleted: serverHlc,
+			},
 		});
 		vi.mocked(findTodosByIds).mockResolvedValue(
 			new Map([
@@ -218,7 +251,15 @@ describe("handleTodoSync", () => {
 				changes: [
 					makeChange({ id: "todo-1" }),
 					makeChange({ id: "todo-2" }),
-					makeChange({ id: "todo-3" }),
+					makeChange({
+						id: "todo-3",
+						hlcTimestamp: clientHlc,
+						fieldClocks: {
+							title: clientHlc,
+							completed: clientHlc,
+							deleted: clientHlc,
+						},
+					}),
 				],
 				lastSyncedAt: null,
 			},
@@ -229,7 +270,7 @@ describe("handleTodoSync", () => {
 		);
 
 		expect(insertTodo).toHaveBeenCalledTimes(1);
-		expect(updateTodo).toHaveBeenCalledTimes(1);
+		expect(updateTodo).toHaveBeenCalledTimes(2); // todo-2 (client wins all) + todo-3 (server wins all)
 		expect(result.conflicts).toEqual(["todo-3"]);
 	});
 
@@ -367,6 +408,8 @@ describe("handleTodoSync", () => {
 			completed: false,
 			deleted: false,
 			updatedAt: "2025-06-01T12:00:00.000Z",
+			hlcTimestamp: "",
+			fieldClocks: {},
 			userId: "user-1",
 			organizationId: "org-1",
 			createdBy: "user-1",

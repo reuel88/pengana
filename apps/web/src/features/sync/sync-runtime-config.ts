@@ -1,3 +1,4 @@
+import type { PullSyncAdapter } from "@pengana/sync/core";
 import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
 import { StorageHealthMonitor } from "@pengana/sync/health";
 import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
@@ -14,7 +15,6 @@ import {
 import {
 	createUploadLifecycleCallbacks,
 	createWebUploadAdapter,
-	MediaSyncer,
 	reconcileMedia,
 } from "@pengana/upload-client";
 import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
@@ -66,6 +66,23 @@ function createStorageMonitor() {
 }
 
 // ---------------------------------------------------------------------------
+// Media pull adapter factory (replaces MediaSyncer)
+// ---------------------------------------------------------------------------
+
+function createMediaPullAdapter(): PullSyncAdapter {
+	return {
+		async applyServerChanges(media, attachments, entityIds) {
+			await reconcileMedia({
+				db: appDb,
+				serverMedia: media,
+				serverAttachments: attachments,
+				entityIds,
+			});
+		},
+	};
+}
+
+// ---------------------------------------------------------------------------
 // Entry config factories
 // ---------------------------------------------------------------------------
 
@@ -85,35 +102,19 @@ export function createPersonalTodoEntryConfig(
 
 		createTransport: () =>
 			createSyncTransport(
-				async (input) =>
-					(await client.todo.sync(input, { signal: input.signal })).data,
-				(media, attachments, entityIds) =>
-					reconcileMedia({
-						db: appDb,
-						serverMedia: media,
-						serverAttachments: attachments,
-						entityIds,
-					}),
+				async (input, signal) =>
+					(await client.todo.sync(input, { signal })).data,
 			),
+
+		createSecondaryAdapters: () => ({
+			media: createMediaPullAdapter(),
+		}),
 
 		createUploadManager: () =>
 			new UploadQueueManager({
 				createUploadAdapter: () => createWebUploadAdapter(appDb),
 				createUploadTransport: createDexieUploadTransport,
 				lifecycleCallbacks: uploadLifecycleCallbacks,
-			}),
-
-		createMediaSyncer: () =>
-			new MediaSyncer({
-				db: appDb,
-				scopeId: userId,
-				scopeType: "personal",
-				transport: {
-					async sync(input) {
-						const res = await client.media.sync(input);
-						return res.data;
-					},
-				},
 			}),
 
 		createPeriodicSync,
@@ -151,39 +152,19 @@ export function createOrgTodoEntryConfig(
 
 		createTransport: () =>
 			createSyncTransport(
-				async (input) =>
-					(
-						await client.orgTodo.sync(input, {
-							signal: input.signal,
-						})
-					).data,
-				(media, attachments, entityIds) =>
-					reconcileMedia({
-						db: appDb,
-						serverMedia: media,
-						serverAttachments: attachments,
-						entityIds,
-					}),
+				async (input, signal) =>
+					(await client.orgTodo.sync(input, { signal })).data,
 			),
+
+		createSecondaryAdapters: () => ({
+			media: createMediaPullAdapter(),
+		}),
 
 		createUploadManager: () =>
 			new UploadQueueManager({
 				createUploadAdapter: () => createWebUploadAdapter(appDb),
 				createUploadTransport: createDexieUploadTransport,
 				lifecycleCallbacks: uploadLifecycleCallbacks,
-			}),
-
-		createMediaSyncer: () =>
-			new MediaSyncer({
-				db: appDb,
-				scopeId: organizationId,
-				scopeType: "org",
-				transport: {
-					async sync(input) {
-						const res = await client.media.orgSync(input);
-						return res.data;
-					},
-				},
 			}),
 
 		createPeriodicSync,

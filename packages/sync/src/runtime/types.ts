@@ -1,4 +1,5 @@
 import type {
+	SecondaryAdapters,
 	SyncAdapter,
 	SyncEngine,
 	SyncEvent,
@@ -47,14 +48,6 @@ export interface RealtimeSubHandle {
 	unsubscribe(): void;
 }
 
-/**
- * Object with a `sync()` method. Used for MediaSyncer and similar
- * secondary sync coordinators that piggyback on the main entry.
- */
-export interface Syncable {
-	sync(): Promise<void> | void;
-}
-
 export interface StorageMonitorHandle {
 	start(): void;
 	stop(): void;
@@ -65,8 +58,8 @@ export interface StorageMonitorHandle {
 export interface RuntimeEntryConfig {
 	createAdapter: () => SyncAdapter;
 	createTransport: () => SyncTransport;
+	createSecondaryAdapters?: () => SecondaryAdapters;
 	createUploadManager?: () => UploadQueueManager;
-	createMediaSyncer?: () => Syncable;
 	createPeriodicSync: (
 		getEngine: () => SyncEngine | null,
 	) => PeriodicSyncHandle;

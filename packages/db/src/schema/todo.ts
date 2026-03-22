@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	index,
+	jsonb,
+	pgTable,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 
 import { organization, user } from "./auth";
 
@@ -11,6 +18,11 @@ export const todo = pgTable(
 		completed: boolean("completed").default(false).notNull(),
 		deleted: boolean("deleted").default(false).notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+		hlcTimestamp: text("hlc_timestamp").notNull().default(""),
+		fieldClocks: jsonb("field_clocks")
+			.notNull()
+			.$type<Record<string, string>>()
+			.default({}),
 		scopeType: text("scope_type", { enum: ["personal", "org"] }).notNull(),
 		scopeId: text("scope_id").notNull(),
 		userId: text("user_id")

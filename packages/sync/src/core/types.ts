@@ -45,3 +45,20 @@ export interface SyncEvent {
 	timestamp: string;
 	detail: string;
 }
+
+/**
+ * Pull-only sync adapter for secondary entities (e.g., media).
+ * These entities are received from the server but not pushed by the client.
+ */
+export interface PullSyncAdapter {
+	applyServerChanges(
+		media: Media[],
+		mediaAttachments: MediaAttachment[],
+		entityIds: string[],
+	): Promise<void>;
+}
+
+/** Configuration for secondary (pull-only) adapters attached to the SyncEngine. */
+export interface SecondaryAdapters {
+	media?: PullSyncAdapter;
+}

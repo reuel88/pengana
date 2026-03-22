@@ -117,12 +117,12 @@ export class SyncRuntime {
 
 	triggerSync(descriptor: SyncDescriptor): void {
 		const entry = this.entries.get(descriptorKey(descriptor));
-		entry?.triggerAllSyncs();
+		entry?.triggerSync();
 	}
 
 	triggerSyncAll(): void {
 		for (const entry of this.entries.values()) {
-			entry.triggerAllSyncs();
+			entry.triggerSync();
 		}
 	}
 

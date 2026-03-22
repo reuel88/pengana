@@ -11,8 +11,20 @@ import {
 	updateTodo,
 } from "@pengana/db/todo-queries";
 import type { SyncInput } from "@pengana/sync/core";
+import {
+	compareHlcStr,
+	HLC,
+	mergeFieldClocks,
+	serializeHlc,
+} from "@pengana/sync/core";
 
 const logger = getLogger(["app", "sync"]);
+
+/** Server-side HLC instance. Uses "server" as node ID. */
+const serverHlc = new HLC("server");
+
+/** Fields eligible for per-field LWW merge. */
+const MERGE_FIELDS = ["title", "completed", "deleted"] as const;
 
 export async function handleTodoSync(
 	input: SyncInput,
@@ -44,12 +56,16 @@ export async function handleTodoSync(
 		const existing = existingTodos.get(change.id);
 
 		if (!existing) {
+			// New todo — accept as-is, stamp server HLC
+			const hlcTs = serializeHlc(serverHlc.now());
 			await insertTodo({
 				id: change.id,
 				title: change.title,
 				completed: change.completed,
 				deleted: change.deleted,
 				updatedAt: now,
+				hlcTimestamp: hlcTs,
+				fieldClocks: change.fieldClocks ?? {},
 				scopeType,
 				scopeId,
 				userId: createdBy,
@@ -63,18 +79,51 @@ export async function handleTodoSync(
 				continue;
 			}
 
-			const clientTime = new Date(change.updatedAt).getTime();
-			const serverTime = existing.updatedAt.getTime();
+			// Per-field LWW merge using field clocks
+			const clientFieldClocks = change.fieldClocks ?? {};
+			const serverFieldClocks = existing.fieldClocks ?? {};
 
-			if (clientTime >= serverTime) {
-				await updateTodo(change.id, {
-					title: change.title,
-					completed: change.completed,
-					deleted: change.deleted,
-					updatedAt: now,
-				});
-				appliedCount++;
-			} else {
+			const clientFields = {
+				title: change.title,
+				completed: change.completed,
+				deleted: change.deleted,
+			};
+			const serverFields = {
+				title: existing.title,
+				completed: existing.completed,
+				deleted: existing.deleted,
+			};
+
+			const {
+				merged,
+				fieldClocks: mergedClocks,
+				changed,
+			} = mergeFieldClocks(
+				clientFields,
+				clientFieldClocks,
+				serverFields,
+				serverFieldClocks,
+				[...MERGE_FIELDS],
+			);
+
+			// Determine the overall HLC for the merged record
+			const clientHlc = change.hlcTimestamp ?? "";
+			const existingHlc = existing.hlcTimestamp ?? "";
+			const winnerHlc =
+				compareHlcStr(clientHlc, existingHlc) >= 0 ? clientHlc : existingHlc;
+
+			await updateTodo(change.id, {
+				title: merged.title as string,
+				completed: merged.completed as boolean,
+				deleted: merged.deleted as boolean,
+				updatedAt: now,
+				hlcTimestamp: winnerHlc,
+				fieldClocks: mergedClocks,
+			});
+			appliedCount++;
+
+			// If the merge overrode some of the client's fields, it's a conflict
+			if (changed) {
 				conflicts.push(change.id);
 			}
 		}
@@ -120,6 +169,8 @@ export async function handleTodoSync(
 			completed: t.completed,
 			deleted: t.deleted,
 			updatedAt: t.updatedAt.toISOString(),
+			hlcTimestamp: t.hlcTimestamp ?? "",
+			fieldClocks: (t.fieldClocks ?? {}) as Record<string, string>,
 			userId: t.userId,
 			organizationId: t.organizationId,
 			createdBy: t.createdBy,

@@ -7,7 +7,17 @@ export { createSyncTransport } from "./create-sync-transport";
 export { SyncEngine } from "./engine";
 export type { EventEmitter } from "./event-emitter";
 export { createEventEmitter } from "./event-emitter";
+export type { HLCTimestamp } from "./hlc";
 export {
+	compare as compareHlc,
+	compareStr as compareHlcStr,
+	deserialize as deserializeHlc,
+	HLC,
+	mergeFieldClocks,
+	serialize as serializeHlc,
+} from "./hlc";
+export {
+	fieldClocksSchema,
 	mediaAttachmentSchema,
 	mediaSchema,
 	syncInputSchema,
@@ -18,6 +28,8 @@ export {
 export type {
 	Media,
 	MediaAttachment,
+	PullSyncAdapter,
+	SecondaryAdapters,
 	SyncAdapter,
 	SyncEvent,
 	SyncEventType,

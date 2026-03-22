@@ -1,20 +1,28 @@
 import { createDexieActions } from "@pengana/entity-store";
+import { HLC, serializeHlc } from "@pengana/sync/core";
 import type { WebTodo } from "@pengana/todo-client";
 
 import { appDb } from "@/shared/db";
 
-const actions = createDexieActions<WebTodo>(appDb, "todos");
+const hlc = new HLC(crypto.randomUUID());
+
+const actions = createDexieActions<WebTodo>(appDb, "todos", {
+	hlcNow: () => hlc.now(),
+});
 
 export async function addOrgTodo(
 	organizationId: string,
 	userId: string,
 	title: string,
 ): Promise<void> {
+	const ts = serializeHlc(hlc.now());
 	await actions.add({
 		id: crypto.randomUUID(),
 		title,
 		completed: false,
 		updatedAt: new Date().toISOString(),
+		hlcTimestamp: ts,
+		fieldClocks: { title: ts, completed: ts, deleted: ts },
 		scopeId: organizationId,
 		userId,
 		organizationId,
