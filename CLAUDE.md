@@ -48,16 +48,16 @@ This is handled automatically by the envelope middleware in `packages/api/src/in
 
 # User Lifecycle State Management
 
-## Current: Standalone Onboarding Machine
-- xState machine at `apps/web/src/machines/onboarding-machine.ts` manages onboarding flow
-- Route guard `requireAuthAndOrg()` in `apps/web/src/lib/auth-client.ts` redirects org-less users to `/onboarding`
+## Current: Onboarding Reducer
+- `useReducer` with `onboardingReducer` in `packages/org-client/src/machines/onboarding-machine.ts` manages onboarding flow
+- Route guard `requireAuthAndOrg()` in `apps/web/src/shared/lib/auth-client.ts` redirects org-less users to `/onboarding`
 - Shared data fetching in `packages/org-client/src/lib/user-lifecycle.ts` — single source for lifecycle checks
 - Onboarding components in `apps/web/src/features/onboarding/`
 
-## Future: Long-Lived User Actor
-When a **second lifecycle gate** is added (email verification, KYC, payment setup), migrate to a user actor:
-- Create `apps/web/src/machines/user-actor.ts` — top-level states: `initializing → onboarding → active → suspended`
-- Embed the existing onboarding machine as a sub-state of the actor
+## Future: Long-Lived User Lifecycle Context
+When a **second lifecycle gate** is added (email verification, KYC, payment setup), migrate to a user lifecycle context:
+- Create a `UserLifecycleContext` with status enum: `initializing → onboarding → active → suspended`
+- Embed the existing onboarding reducer as part of the context state
 - Provide via React context from `__root.tsx`
-- Replace `requireAuthAndOrg()` route guards with synchronous `userActor.matches("active")` checks
-- `fetchUserLifecycleData()` becomes the actor's initialization logic
+- Replace `requireAuthAndOrg()` route guards with synchronous status checks
+- `fetchUserLifecycleData()` becomes the context's initialization logic

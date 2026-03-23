@@ -81,4 +81,11 @@ export {
 	teamNameSchema,
 } from "./lib/schemas";
 export { slugify } from "./lib/slugify";
-export { onboardingMachine } from "./machines/onboarding-machine";
+export type {
+	OnboardingEvent,
+	OnboardingStep,
+} from "./machines/onboarding-machine";
+export {
+	getInitialStep,
+	onboardingReducer,
+} from "./machines/onboarding-machine";

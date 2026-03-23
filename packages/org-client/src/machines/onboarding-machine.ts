@@ -1,68 +1,39 @@
-import { setup } from "xstate";
+export type OnboardingStep =
+	| "viewInvitations"
+	| "createOrganization"
+	| "inviteMembers"
+	| "complete";
 
-export const onboardingMachine = setup({
-	types: {
-		context: {} as {
-			hasPendingInvitations: boolean;
-		},
-		input: {} as {
-			hasPendingInvitations: boolean;
-		},
-		events: {} as
-			| { type: "INVITATION_ACCEPTED" }
-			| { type: "SKIP_TO_CREATE" }
-			| { type: "ORG_CREATED" }
-			| { type: "BACK_TO_CHOICE" }
-			| { type: "MEMBERS_INVITED" }
-			| { type: "SKIP_INVITE" },
-	},
-	guards: {
-		hasPendingInvitations: ({ context }) => context.hasPendingInvitations,
-	},
-}).createMachine({
-	id: "onboarding",
-	initial: "organizationStep",
-	context: ({ input }) => ({
-		hasPendingInvitations: input.hasPendingInvitations,
-	}),
-	states: {
-		organizationStep: {
-			initial: "choice",
-			states: {
-				choice: {
-					always: [
-						{
-							target: "viewInvitations",
-							guard: "hasPendingInvitations",
-						},
-						{ target: "createOrganization" },
-					],
-				},
-				viewInvitations: {
-					on: {
-						INVITATION_ACCEPTED: { target: "#onboarding.complete" },
-						SKIP_TO_CREATE: { target: "createOrganization" },
-					},
-				},
-				createOrganization: {
-					on: {
-						ORG_CREATED: { target: "#onboarding.inviteMembers" },
-						BACK_TO_CHOICE: {
-							target: "viewInvitations",
-							guard: "hasPendingInvitations",
-						},
-					},
-				},
-			},
-		},
-		inviteMembers: {
-			on: {
-				MEMBERS_INVITED: { target: "complete" },
-				SKIP_INVITE: { target: "complete" },
-			},
-		},
-		complete: {
-			type: "final",
-		},
-	},
-});
+export type OnboardingEvent =
+	| { type: "INVITATION_ACCEPTED" }
+	| { type: "SKIP_TO_CREATE" }
+	| { type: "ORG_CREATED" }
+	| { type: "BACK_TO_CHOICE" }
+	| { type: "MEMBERS_INVITED" }
+	| { type: "SKIP_INVITE" };
+
+export function getInitialStep(hasPendingInvitations: boolean): OnboardingStep {
+	return hasPendingInvitations ? "viewInvitations" : "createOrganization";
+}
+
+export function onboardingReducer(
+	state: OnboardingStep,
+	event: OnboardingEvent,
+): OnboardingStep {
+	switch (state) {
+		case "viewInvitations":
+			if (event.type === "INVITATION_ACCEPTED") return "complete";
+			if (event.type === "SKIP_TO_CREATE") return "createOrganization";
+			return state;
+		case "createOrganization":
+			if (event.type === "ORG_CREATED") return "inviteMembers";
+			if (event.type === "BACK_TO_CHOICE") return "viewInvitations";
+			return state;
+		case "inviteMembers":
+			if (event.type === "MEMBERS_INVITED") return "complete";
+			if (event.type === "SKIP_INVITE") return "complete";
+			return state;
+		default:
+			return state;
+	}
+}

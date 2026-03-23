@@ -207,13 +207,14 @@ Drop: `org-client` (move to app-level features), `email-dev` (inline into server
 - Notification delivery
 - Keeps request handlers fast and failure-resilient
 
-#### 7. State Management
-**Current**: xState for onboarding + sync coordination, TanStack Query for server state.
+#### 7. State Management ✅
+**Current**: TanStack Query for server state. Onboarding uses `useReducer`. Sync uses event listeners + imperative methods.
 
-**Proposed**: Keep TanStack Query. Replace xState with simpler patterns:
-- Onboarding: route-guard + a simple React context with a `status` enum (no state machine needed for linear flows)
-- Sync coordination: a simple pub/sub event emitter is sufficient for coordinating sync triggers
-- xState adds significant bundle size and cognitive overhead for flows that are essentially linear
+**Done**:
+- Replaced xState onboarding machine with a plain `onboardingReducer` using `useReducer`
+- Removed `xstate` and `@xstate/react` from all packages (~38 KiB bundle reduction)
+- Sync coordination was already event-listener based (no xState) — no changes needed
+- Updated CLAUDE.md lifecycle section to reference `useReducer` instead of xState
 
 #### 8. Mobile Framework
 **Current**: Expo with React Native.

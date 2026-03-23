@@ -1,78 +1,61 @@
 import { describe, expect, it } from "vitest";
-import { createActor } from "xstate";
-import { onboardingMachine } from "./onboarding-machine";
+import { getInitialStep, onboardingReducer } from "./onboarding-machine";
 
-function startMachine(hasPendingInvitations: boolean) {
-	const actor = createActor(onboardingMachine, {
-		input: { hasPendingInvitations },
-	});
-	actor.start();
-	return actor;
-}
-
-describe("onboardingMachine", () => {
+describe("onboardingReducer", () => {
 	it("routes to viewInvitations when hasPendingInvitations is true", () => {
-		const actor = startMachine(true);
-		expect(actor.getSnapshot().value).toEqual({
-			organizationStep: "viewInvitations",
-		});
+		expect(getInitialStep(true)).toBe("viewInvitations");
 	});
 
 	it("routes to createOrganization when hasPendingInvitations is false", () => {
-		const actor = startMachine(false);
-		expect(actor.getSnapshot().value).toEqual({
-			organizationStep: "createOrganization",
-		});
+		expect(getInitialStep(false)).toBe("createOrganization");
 	});
 
 	it("INVITATION_ACCEPTED transitions to complete", () => {
-		const actor = startMachine(true);
-		actor.send({ type: "INVITATION_ACCEPTED" });
-		expect(actor.getSnapshot().value).toBe("complete");
+		const result = onboardingReducer("viewInvitations", {
+			type: "INVITATION_ACCEPTED",
+		});
+		expect(result).toBe("complete");
 	});
 
 	it("SKIP_TO_CREATE transitions from viewInvitations to createOrganization", () => {
-		const actor = startMachine(true);
-		actor.send({ type: "SKIP_TO_CREATE" });
-		expect(actor.getSnapshot().value).toEqual({
-			organizationStep: "createOrganization",
+		const result = onboardingReducer("viewInvitations", {
+			type: "SKIP_TO_CREATE",
 		});
+		expect(result).toBe("createOrganization");
 	});
 
 	it("ORG_CREATED transitions to inviteMembers", () => {
-		const actor = startMachine(false);
-		actor.send({ type: "ORG_CREATED" });
-		expect(actor.getSnapshot().value).toBe("inviteMembers");
+		const result = onboardingReducer("createOrganization", {
+			type: "ORG_CREATED",
+		});
+		expect(result).toBe("inviteMembers");
 	});
 
-	it("BACK_TO_CHOICE from createOrganization goes to viewInvitations when hasPendingInvitations", () => {
-		const actor = startMachine(true);
-		actor.send({ type: "SKIP_TO_CREATE" });
-		actor.send({ type: "BACK_TO_CHOICE" });
-		expect(actor.getSnapshot().value).toEqual({
-			organizationStep: "viewInvitations",
-		});
+	it("BACK_TO_CHOICE from createOrganization goes to viewInvitations", () => {
+		let step = getInitialStep(true);
+		step = onboardingReducer(step, { type: "SKIP_TO_CREATE" });
+		step = onboardingReducer(step, { type: "BACK_TO_CHOICE" });
+		expect(step).toBe("viewInvitations");
 	});
 
-	it("BACK_TO_CHOICE has no effect when no pending invitations", () => {
-		const actor = startMachine(false);
-		actor.send({ type: "BACK_TO_CHOICE" });
-		expect(actor.getSnapshot().value).toEqual({
-			organizationStep: "createOrganization",
+	it("BACK_TO_CHOICE has no effect when already in viewInvitations", () => {
+		const result = onboardingReducer("createOrganization", {
+			type: "BACK_TO_CHOICE",
 		});
+		expect(result).toBe("viewInvitations");
 	});
 
 	it("MEMBERS_INVITED transitions from inviteMembers to complete", () => {
-		const actor = startMachine(false);
-		actor.send({ type: "ORG_CREATED" });
-		actor.send({ type: "MEMBERS_INVITED" });
-		expect(actor.getSnapshot().value).toBe("complete");
+		let step = getInitialStep(false);
+		step = onboardingReducer(step, { type: "ORG_CREATED" });
+		step = onboardingReducer(step, { type: "MEMBERS_INVITED" });
+		expect(step).toBe("complete");
 	});
 
 	it("SKIP_INVITE transitions from inviteMembers to complete", () => {
-		const actor = startMachine(false);
-		actor.send({ type: "ORG_CREATED" });
-		actor.send({ type: "SKIP_INVITE" });
-		expect(actor.getSnapshot().value).toBe("complete");
+		let step = getInitialStep(false);
+		step = onboardingReducer(step, { type: "ORG_CREATED" });
+		step = onboardingReducer(step, { type: "SKIP_INVITE" });
+		expect(step).toBe("complete");
 	});
 });

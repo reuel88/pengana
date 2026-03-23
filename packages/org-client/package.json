@@ -33,7 +33,6 @@
 		"@tanstack/react-form": "^1",
 		"@tanstack/react-query": "^5",
 		"react": "^19.0.0",
-		"xstate": "^5",
 		"zod": "^4"
 	},
 	"devDependencies": {

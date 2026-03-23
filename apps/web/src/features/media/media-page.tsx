@@ -108,7 +108,7 @@ function PersonalMediaContent({
 		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
 		[userId],
 	);
-	const syncState = useSyncEntry(descriptor);
+	const sync = useSyncEntry(descriptor);
 
 	return (
 		<MediaContent
@@ -116,7 +116,7 @@ function PersonalMediaContent({
 			scopeId={userId}
 			organizationId={organizationId}
 			scopeType="personal"
-			syncState={syncState}
+			syncState={sync}
 			descriptor={descriptor}
 		/>
 	);
