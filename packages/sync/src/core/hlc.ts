@@ -123,35 +123,45 @@ export class HLC {
 		this.getNow = getNow;
 	}
 
-	/** Generate the next HLC timestamp for a local event. */
+	/** Generate the next HLC timestamp for a local event.
+	 *  Throws if the counter would exceed MAX_COUNTER without a clock advance. */
 	now(): HLCTimestamp {
 		const physicalNow = this.getNow();
 		if (physicalNow > this.wallMs) {
 			this.wallMs = physicalNow;
 			this.counter = 0;
 		} else {
-			this.counter = Math.min(this.counter + 1, MAX_COUNTER);
+			this.counter += 1;
+			if (this.counter > MAX_COUNTER) {
+				throw new Error(
+					`HLC counter overflow: generated ${MAX_COUNTER + 1} timestamps at wallMs=${this.wallMs} without clock advance`,
+				);
+			}
 		}
 		return { wallMs: this.wallMs, counter: this.counter, node: this.nodeId };
 	}
 
-	/** Update the local clock after receiving a remote timestamp. */
+	/** Update the local clock after receiving a remote timestamp.
+	 *  Throws if the counter would exceed MAX_COUNTER without a clock advance. */
 	receive(remote: HLCTimestamp): void {
 		const physicalNow = this.getNow();
 		const maxWall = Math.max(physicalNow, this.wallMs, remote.wallMs);
 
 		if (maxWall === this.wallMs && maxWall === remote.wallMs) {
-			this.counter = Math.min(
-				Math.max(this.counter, remote.counter) + 1,
-				MAX_COUNTER,
-			);
+			this.counter = Math.max(this.counter, remote.counter) + 1;
 		} else if (maxWall === this.wallMs) {
-			this.counter = Math.min(this.counter + 1, MAX_COUNTER);
+			this.counter = this.counter + 1;
 		} else if (maxWall === remote.wallMs) {
-			this.counter = Math.min(remote.counter + 1, MAX_COUNTER);
+			this.counter = remote.counter + 1;
 		} else {
 			// physicalNow is the max — reset counter
 			this.counter = 0;
+		}
+
+		if (this.counter > MAX_COUNTER) {
+			throw new Error(
+				`HLC counter overflow: counter exceeded ${MAX_COUNTER} at wallMs=${maxWall} during receive`,
+			);
 		}
 
 		this.wallMs = maxWall;
