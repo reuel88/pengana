@@ -1,12 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import type { SyncStatus } from "@pengana/sync/core";
-import {
-	isAllowedMimeType,
-	MAX_ATTACHMENTS,
-	MAX_FILE_SIZE_BYTES,
-} from "@pengana/sync/upload";
 import { useRef } from "react";
 import { cn } from "../lib/utils";
+import type { SyncStatus } from "../types";
 import { type AttachmentItem, AttachmentList } from "./attachment-list";
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
@@ -29,6 +24,8 @@ interface TodoItemProps {
 	onRemoveAttachment: (attachmentId: string) => void;
 	onRetryAttachment?: (attachmentId: string) => void;
 	onValidationError?: (message: string) => void;
+	validateFile?: (file: File) => string | null;
+	maxAttachments?: number;
 	error?: string | null;
 }
 
@@ -41,6 +38,8 @@ export function TodoItem({
 	onRemoveAttachment,
 	onRetryAttachment,
 	onValidationError,
+	validateFile,
+	maxAttachments = Number.POSITIVE_INFINITY,
 	error,
 }: TodoItemProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,13 +58,12 @@ export function TodoItem({
 
 		const valid: File[] = [];
 		for (const file of files) {
-			if (!isAllowedMimeType(file.type)) {
-				onValidationError?.(t("errors:invalidFileType"));
-				continue;
-			}
-			if (file.size > MAX_FILE_SIZE_BYTES) {
-				onValidationError?.(t("errors:fileTooLarge"));
-				continue;
+			if (validateFile) {
+				const error = validateFile(file);
+				if (error) {
+					onValidationError?.(error);
+					continue;
+				}
 			}
 			valid.push(file);
 		}
@@ -75,7 +73,7 @@ export function TodoItem({
 		}
 	};
 
-	const canAttach = todo.attachments.length < MAX_ATTACHMENTS;
+	const canAttach = todo.attachments.length < maxAttachments;
 
 	return (
 		<div

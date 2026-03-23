@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
-import type { MediaListItem } from "@pengana/local-db/media";
 import { Skeleton } from "@pengana/ui/components/skeleton";
 import { SyncDot } from "@pengana/ui/components/sync-dot";
+import type { MediaListItem } from "../types";
 
 export interface MediaGridItemProps {
 	item: MediaListItem;

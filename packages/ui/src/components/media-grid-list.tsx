@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import type { MediaListItem } from "@pengana/local-db/media";
 import { MediaGridItem } from "@pengana/ui/components/media-grid-item";
+import type { MediaListItem } from "../types";
 
 interface MediaGridList {
 	media: MediaListItem[];

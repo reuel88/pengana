@@ -6,18 +6,16 @@
 	"exports": {
 		"./globals.css": "./src/styles/globals.css",
 		"./components/*": "./src/components/*.tsx",
-		"./lib/*": "./src/lib/*.ts"
+		"./lib/*": "./src/lib/*.ts",
+		"./types": "./src/types.ts"
 	},
 	"peerDependencies": {
 		"@pengana/i18n": "workspace:*",
-		"@pengana/sync": "workspace:*",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.3.0",
-		"@pengana/org-client": "workspace:*",
-		"@pengana/local-db": "workspace:*",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.1.1",

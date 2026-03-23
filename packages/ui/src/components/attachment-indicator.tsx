@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UploadStatus } from "@pengana/sync/upload";
+import type { UploadStatus } from "../types";
 
 export function AttachmentIndicator({
 	status,
