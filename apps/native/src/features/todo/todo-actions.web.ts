@@ -1,6 +1,4 @@
-import { createDexieActions } from "@pengana/entity-store";
-import { HLC, serializeHlc } from "@pengana/sync/core";
-import type { WebTodo } from "@pengana/todo-client";
+import { createDexieActions } from "@pengana/local-db/dexie";
 import {
 	addMedia as _addMedia,
 	attachMediaToEntity as _attachMedia,
@@ -9,7 +7,9 @@ import {
 	removeMedia as _removeMedia,
 	updateMediaLocalUri as _updateMediaLocalUri,
 	updateMediaUploaded as _updateMediaUploaded,
-} from "@pengana/upload-client";
+} from "@pengana/local-db/media";
+import type { WebTodo } from "@pengana/local-db/todo";
+import { HLC, serializeHlc } from "@pengana/sync/core";
 
 import { appDb } from "@/shared/db";
 

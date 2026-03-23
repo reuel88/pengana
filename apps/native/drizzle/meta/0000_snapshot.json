@@ -1,7 +1,7 @@
 {
 	"version": "6",
 	"dialect": "sqlite",
-	"id": "f79544b0-7efb-4825-bb09-b455f4df642e",
+	"id": "22e3bcfd-2172-4308-81eb-318caf17e773",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"tables": {
 		"media": {
@@ -192,6 +192,22 @@
 					"primaryKey": false,
 					"notNull": true,
 					"autoincrement": false
+				},
+				"hlc_timestamp": {
+					"name": "hlc_timestamp",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "''"
+				},
+				"field_clocks": {
+					"name": "field_clocks",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'{}'"
 				},
 				"user_id": {
 					"name": "user_id",

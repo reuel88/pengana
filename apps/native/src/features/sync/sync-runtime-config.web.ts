@@ -1,15 +1,15 @@
+import { reconcileMedia } from "@pengana/local-db/media";
+import {
+	createTodoSyncAdapter,
+	orgTodoConfig,
+	personalTodoConfig,
+} from "@pengana/local-db/todo";
 import type { PullSyncAdapter } from "@pengana/sync/core";
 import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
 import { StorageHealthMonitor } from "@pengana/sync/health";
 import type { PlatformDeps, RuntimeEntryConfig } from "@pengana/sync/runtime";
 import { subscribeToSharedNotifyChannel } from "@pengana/sync/transport";
 import { UploadQueueManager } from "@pengana/sync/upload";
-import {
-	createTodoSyncAdapter,
-	orgTodoConfig,
-	personalTodoConfig,
-} from "@pengana/todo-client";
-import { reconcileMedia } from "@pengana/upload-client";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 import {

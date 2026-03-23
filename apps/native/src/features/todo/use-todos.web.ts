@@ -1,4 +1,4 @@
-import { useTodos as useTodosWithAttachments } from "@pengana/todo-client";
+import { useTodos as useTodosWithAttachments } from "@pengana/local-db/todo";
 import { useMemo } from "react";
 
 import { appDb } from "@/shared/db";

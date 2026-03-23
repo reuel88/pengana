@@ -1,0 +1,69 @@
+{
+	"name": "@pengana/local-db",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./core": {
+			"default": "./src/core/index.ts"
+		},
+		"./core/*": {
+			"default": "./src/core/*.ts"
+		},
+		"./dexie": {
+			"default": "./src/dexie/index.ts"
+		},
+		"./dexie/*": {
+			"default": "./src/dexie/*.ts"
+		},
+		"./drizzle": {
+			"default": "./src/drizzle/index.ts"
+		},
+		"./drizzle/*": {
+			"default": "./src/drizzle/*.ts"
+		},
+		"./hooks": {
+			"default": "./src/hooks/index.ts"
+		},
+		"./hooks/*": {
+			"default": "./src/hooks/*.ts"
+		},
+		"./todo": {
+			"default": "./src/todo/index.ts"
+		},
+		"./todo/*": {
+			"default": "./src/todo/*.ts"
+		},
+		"./media": {
+			"default": "./src/media/index.ts"
+		},
+		"./media/adapters/*": {
+			"default": "./src/media/adapters/*.ts"
+		},
+		"./media/hooks/*": {
+			"default": "./src/media/hooks/*.ts"
+		},
+		"./media/lib/*": {
+			"default": "./src/media/lib/*.ts"
+		}
+	},
+	"scripts": {
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@pengana/sync": "workspace:*",
+		"dexie": "^4.0.11",
+		"dexie-react-hooks": "^4.2.0",
+		"drizzle-orm": "^0.45.1"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"@types/react": "^19.2.14",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

@@ -1,6 +1,4 @@
 import { useTranslation } from "@pengana/i18n";
-import type { SyncDescriptor } from "@pengana/sync/runtime";
-import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import {
 	createDexieMediaActions,
 	orgMediaConfig,
@@ -8,7 +6,9 @@ import {
 	storeFileInDexie,
 	useMedia,
 	useMediaListWiring,
-} from "@pengana/upload-client";
+} from "@pengana/local-db/media";
+import type { SyncDescriptor } from "@pengana/sync/runtime";
+import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { SyncContextValue } from "@/features/sync/use-sync-entry";

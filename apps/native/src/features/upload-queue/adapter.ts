@@ -1,4 +1,4 @@
-import { createDrizzleUploadAdapter } from "@pengana/upload-client";
+import { createDrizzleUploadAdapter } from "@pengana/local-db/media";
 
 import { appDb } from "@/shared/db/db";
 import { uploadQueue } from "./schema";

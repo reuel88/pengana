@@ -1,5 +1,5 @@
+import type { MediaListItem } from "@pengana/local-db/media";
 import { MediaGridList } from "@pengana/ui/components/media-grid-list";
-import type { MediaListItem } from "@pengana/upload-client";
 import { useCallback, useState } from "react";
 
 interface MediaGridProps {

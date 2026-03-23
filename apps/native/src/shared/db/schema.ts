@@ -1,4 +1,4 @@
-import { syncableColumns } from "@pengana/entity-store";
+import { syncableColumns } from "@pengana/local-db/drizzle";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const todos = sqliteTable("todos", {

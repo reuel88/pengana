@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useTodos } from "@pengana/todo-client";
+import { useTodos } from "@pengana/local-db/todo";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { useMemo, useState } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";

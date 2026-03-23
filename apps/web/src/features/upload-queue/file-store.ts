@@ -1,4 +1,4 @@
-import { storeFileInDexie as storeFile } from "@pengana/upload-client/adapters/dexie-file-store";
+import { storeFileInDexie as storeFile } from "@pengana/local-db/media/adapters/dexie-file-store";
 
 import { appDb } from "@/shared/db";
 

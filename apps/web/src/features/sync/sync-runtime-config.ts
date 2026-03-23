@@ -1,3 +1,15 @@
+import {
+	createUploadLifecycleCallbacks,
+	createWebUploadAdapter,
+	reconcileMedia,
+	removeFileFromDexie,
+} from "@pengana/local-db/media";
+import { createWebStorageHealthProvider } from "@pengana/local-db/media/lib/storage-health";
+import {
+	createTodoSyncAdapter,
+	orgTodoConfig,
+	personalTodoConfig,
+} from "@pengana/local-db/todo";
 import type { PullSyncAdapter } from "@pengana/sync/core";
 import { createPeriodicSync, createSyncTransport } from "@pengana/sync/core";
 import { StorageHealthMonitor } from "@pengana/sync/health";
@@ -7,18 +19,6 @@ import {
 	subscribeToSharedNotifyChannel,
 } from "@pengana/sync/transport";
 import { cleanupUploaded, UploadQueueManager } from "@pengana/sync/upload";
-import {
-	createTodoSyncAdapter,
-	orgTodoConfig,
-	personalTodoConfig,
-} from "@pengana/todo-client";
-import {
-	createUploadLifecycleCallbacks,
-	createWebUploadAdapter,
-	reconcileMedia,
-} from "@pengana/upload-client";
-import { removeFileFromDexie } from "@pengana/upload-client/adapters/dexie-file-store";
-import { createWebStorageHealthProvider } from "@pengana/upload-client/lib/storage-health";
 import { createDexieUploadTransport } from "@/features/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";

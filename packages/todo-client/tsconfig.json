@@ -1,9 +1,0 @@
-{
-	"extends": "@pengana/config/tsconfig.base.json",
-	"compilerOptions": {
-		"outDir": "dist",
-		"jsx": "react-jsx"
-	},
-	"include": ["src"],
-	"exclude": ["src/**/*.test.ts"]
-}

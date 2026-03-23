@@ -6,6 +6,7 @@ import { isRtlLocale } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org-client";
 import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { getLocales } from "expo-localization";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -22,6 +23,7 @@ import {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SyncCoordinator } from "@/features/sync/sync-coordinator";
 import { queryClient } from "@/shared/api/orpc";
+import { appDb } from "@/shared/db";
 import { useLifecycleCheck } from "@/shared/hooks/use-lifecycle-check";
 import { useActiveOrg } from "@/shared/hooks/use-org-queries";
 import { authClient } from "@/shared/lib/auth-client";
@@ -32,6 +34,7 @@ import {
 } from "@/shared/lib/org-design-preset-preview";
 import { buildNavigationTheme, createThemeColors } from "@/shared/lib/theme";
 import { useColorScheme } from "@/shared/lib/use-color-scheme";
+import migrations from "../../drizzle/migrations";
 
 type RouteTarget = "/(auth)/login" | "/onboarding" | "/(drawer)" | null;
 
@@ -93,6 +96,7 @@ const styles = StyleSheet.create({
 });
 
 function RootLayoutInner() {
+	const { success: dbReady } = useMigrations(appDb, migrations);
 	const { colorScheme, isDarkColorScheme } = useColorScheme();
 	const { t } = useTranslation("common");
 	const { data: session, isPending } = authClient.useSession();
@@ -142,7 +146,8 @@ function RootLayoutInner() {
 		orgError,
 	]);
 
-	if (isPending || (!lifecycleChecked && session && !orgError)) return null;
+	if (!dbReady || isPending || (!lifecycleChecked && session && !orgError))
+		return null;
 
 	if (orgError) {
 		return (

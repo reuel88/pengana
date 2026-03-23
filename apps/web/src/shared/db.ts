@@ -1,10 +1,10 @@
-import { EntityDatabase } from "@pengana/entity-store";
-import { todoEntity } from "@pengana/todo-client";
+import { EntityDatabase } from "@pengana/local-db/dexie";
 import {
 	mediaAttachmentEntity,
 	mediaEntity,
 	uploadRawStores,
-} from "@pengana/upload-client";
+} from "@pengana/local-db/media";
+import { todoEntity } from "@pengana/local-db/todo";
 
 export const appDb = new EntityDatabase("AppDatabase")
 	.applySchema(1, [todoEntity])
