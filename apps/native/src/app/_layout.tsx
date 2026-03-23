@@ -96,7 +96,8 @@ const styles = StyleSheet.create({
 });
 
 function RootLayoutInner() {
-	const { success: dbReady } = useMigrations(appDb, migrations);
+	const { success: nativeDbReady } = useMigrations(appDb, migrations);
+	const dbReady = Platform.OS === "web" || nativeDbReady;
 	const { colorScheme, isDarkColorScheme } = useColorScheme();
 	const { t } = useTranslation("common");
 	const { data: session, isPending } = authClient.useSession();
