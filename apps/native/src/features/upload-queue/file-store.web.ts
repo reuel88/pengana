@@ -2,7 +2,7 @@ import {
 	getFileFromDexie as getFile,
 	removeFileFromDexie as removeFile,
 	storeFileInDexie as storeFile,
-} from "@pengana/upload-client/adapters/dexie-file-store";
+} from "@pengana/local-db/media/adapters/dexie-file-store";
 
 import { appDb } from "@/shared/db/db.web";
 

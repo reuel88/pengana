@@ -1,4 +1,4 @@
-import { useDrizzleEntity } from "@pengana/entity-store/hooks/use-drizzle-entity";
+import { useDrizzleEntity } from "@pengana/local-db/hooks/use-drizzle-entity";
 import { safeParseFieldClocks } from "@pengana/sync/core";
 import { eq, type InferSelectModel, inArray } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";

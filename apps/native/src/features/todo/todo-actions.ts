@@ -1,6 +1,6 @@
-import { createDrizzleActions } from "@pengana/entity-store";
+import { createDrizzleActions } from "@pengana/local-db/drizzle";
+import { drizzleMedia } from "@pengana/local-db/media";
 import { HLC, serializeHlc } from "@pengana/sync/core";
-import { drizzleMedia } from "@pengana/upload-client";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 

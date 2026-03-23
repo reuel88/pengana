@@ -1,17 +1,17 @@
 import { useTranslation } from "@pengana/i18n";
-import type { EnqueueUploadParams } from "@pengana/sync/upload";
-import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
+import {
+	createDexieMediaActions,
+	getMediaCountForEntity,
+	type LocalMedia,
+} from "@pengana/local-db/media";
 import {
 	type TodoActions,
 	useTodoHandlers,
 	type WebTodo,
-} from "@pengana/todo-client";
+} from "@pengana/local-db/todo";
+import type { EnqueueUploadParams } from "@pengana/sync/upload";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
-import type { LocalMedia } from "@pengana/upload-client";
-import {
-	createDexieMediaActions,
-	getMediaCountForEntity,
-} from "@pengana/upload-client";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { storeFileInDexie } from "@/features/upload-queue";

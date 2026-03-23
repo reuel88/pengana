@@ -1,5 +1,5 @@
+import { drizzleMedia } from "@pengana/local-db/media";
 import type { Media, MediaAttachment } from "@pengana/sync/core";
-import { drizzleMedia } from "@pengana/upload-client";
 
 import { appDb } from "@/shared/db/db";
 import { media, mediaAttachments } from "@/shared/db/schema";

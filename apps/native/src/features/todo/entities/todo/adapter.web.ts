@@ -2,7 +2,7 @@ import {
 	createTodoSyncAdapter,
 	orgTodoConfig,
 	personalTodoConfig,
-} from "@pengana/todo-client";
+} from "@pengana/local-db/todo";
 
 import { appDb } from "@/shared/db";
 

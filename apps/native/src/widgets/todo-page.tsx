@@ -1,17 +1,5 @@
-import { useTranslation } from "@pengana/i18n";
-import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useState } from "react";
-import {
-	ActivityIndicator,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
-import { appDb } from "@/shared/db";
-import { useTheme } from "@/shared/lib/theme";
-import { destructiveText } from "@/shared/styles/shared";
-import migrations from "../../drizzle/migrations";
+import { ScrollView, StyleSheet, View } from "react-native";
 import {
 	OrganizationTodoContent,
 	PersonalTodoContent,
@@ -26,30 +14,7 @@ export function TodoPage({
 	userId: string;
 	organizationId: string;
 }) {
-	const { success, error } = useMigrations(appDb, migrations);
-	const { theme } = useTheme();
-	const { t } = useTranslation("errors");
 	const [activeTab, setActiveTab] = useState<TodoTab>("personal");
-
-	if (error) {
-		return (
-			<View style={styles.center}>
-				<Text style={destructiveText(theme)}>
-					{t("migrationError", {
-						message: String(error.message).slice(0, 200),
-					})}
-				</Text>
-			</View>
-		);
-	}
-
-	if (!success) {
-		return (
-			<View style={styles.center}>
-				<ActivityIndicator size="large" color={theme.primary} />
-			</View>
-		);
-	}
 
 	return (
 		<View style={styles.page}>

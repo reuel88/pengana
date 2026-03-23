@@ -1,6 +1,6 @@
-import { createDexieActions } from "@pengana/entity-store";
+import { createDexieActions } from "@pengana/local-db/dexie";
+import type { WebTodo } from "@pengana/local-db/todo";
 import { HLC, serializeHlc } from "@pengana/sync/core";
-import type { WebTodo } from "@pengana/todo-client";
 
 import { appDb } from "@/shared/db";
 

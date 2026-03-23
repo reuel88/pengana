@@ -1,4 +1,4 @@
-import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/entity-store/drizzle/create-drizzle-sync-adapter";
+import { createDrizzleSyncAdapter as createGenericAdapter } from "@pengana/local-db/drizzle/create-drizzle-sync-adapter";
 import type { SyncAdapter, Todo } from "@pengana/sync/core";
 import { safeParseFieldClocks } from "@pengana/sync/core";
 

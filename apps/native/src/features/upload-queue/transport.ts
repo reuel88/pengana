@@ -1,5 +1,5 @@
+import { createUploadTransport } from "@pengana/local-db/media";
 import type { UploadTransport } from "@pengana/sync/upload";
-import { createUploadTransport } from "@pengana/upload-client";
 
 import { File } from "expo-file-system";
 

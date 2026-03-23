@@ -1,5 +1,5 @@
+import type { WebTodo } from "@pengana/local-db/todo";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
-import type { WebTodo } from "@pengana/todo-client";
 import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
 import { useState } from "react";

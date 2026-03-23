@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { MediaAttachmentTarget } from "@pengana/upload-client";
+import type { MediaAttachmentTarget } from "@pengana/local-db/media";
 import { TodoItem, type TodoItemData } from "./todo-item";
 
 interface TodoListProps {
