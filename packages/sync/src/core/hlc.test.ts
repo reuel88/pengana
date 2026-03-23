@@ -133,6 +133,28 @@ describe("HLC", () => {
 			expect(compare(a, b)).not.toBe(0);
 		});
 
+		it("now() throws on counter overflow", () => {
+			const hlc = new HLC("node-1", () => 1000);
+
+			// First call sets wallMs=1000, counter=0. Next 65535 calls increment to MAX_COUNTER.
+			for (let i = 0; i < 0xffff + 1; i++) {
+				hlc.now();
+			}
+
+			// The 65537th call should overflow
+			expect(() => hlc.now()).toThrowError(/HLC counter overflow/);
+		});
+
+		it("receive() throws on counter overflow", () => {
+			const hlc = new HLC("node-1", () => 1000);
+			hlc.now(); // wallMs=1000, counter=0
+
+			// Receive with counter at MAX_COUNTER at same wallMs — max(0, 0xFFFF) + 1 overflows
+			expect(() =>
+				hlc.receive({ wallMs: 1000, counter: 0xffff, node: "node-2" }),
+			).toThrowError(/HLC counter overflow/);
+		});
+
 		it("serializes and restores correctly", () => {
 			const time = 1000;
 			const hlc = new HLC("node-1", () => time);
