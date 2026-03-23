@@ -161,13 +161,13 @@ If rebuilding from scratch with the same feature set, here's what I'd change and
 - Todo and upload logic co-located with their adapters instead of spread across 3 packages
 - Shared React hooks for both platforms in one place
 
-#### 3. Consolidate UI Packages
-**Current**: `@pengana/ui` depends on `@pengana/org-client` and `@pengana/upload-client` — UI components have business logic dependencies.
+#### 3. Consolidate UI Packages ✅
+**Current**: `@pengana/ui` is now a pure presentational component library with zero business logic imports.
 
-**Proposed**:
-- Keep `@pengana/ui` as pure presentational components (no business logic imports)
-- Move org-aware and upload-aware components into feature-level code in each app
-- This makes the UI package truly reusable and prevents circular dependency risks
+**Done**:
+- Defined local UI types in `packages/ui/src/types.ts` replacing imports from `@pengana/sync` and `@pengana/local-db`
+- Moved file validation logic to props (`validateFile`, `maxAttachments`) injected by app-level wrappers
+- Removed `@pengana/org-client`, `@pengana/local-db`, `@pengana/sync` from `packages/ui/package.json`
 
 #### 4. Simplify the Package Graph
 **Current**: 16 packages with deep interdependencies.
