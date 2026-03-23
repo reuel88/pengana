@@ -1,5 +1,5 @@
 {
-	"name": "@pengana/org-client",
+	"name": "@pengana/org",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -16,9 +16,6 @@
 		"./context/*": {
 			"default": "./src/context/*.tsx"
 		},
-		"./machines/*": {
-			"default": "./src/machines/*.ts"
-		},
 		"./hooks/*": {
 			"default": "./src/hooks/*.ts"
 		},
@@ -33,7 +30,6 @@
 		"@tanstack/react-form": "^1",
 		"@tanstack/react-query": "^5",
 		"react": "^19.0.0",
-		"xstate": "^5",
 		"zod": "^4"
 	},
 	"devDependencies": {

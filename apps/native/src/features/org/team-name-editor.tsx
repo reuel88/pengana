@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeTeamNameSchema } from "@pengana/i18n/zod";
-import { useTeamNameEditor, useZodForm } from "@pengana/org-client";
+import { useTeamNameEditor, useZodForm } from "@pengana/org";
 import { useState } from "react";
 import {
 	Alert,

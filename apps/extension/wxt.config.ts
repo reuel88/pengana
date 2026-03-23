@@ -16,9 +16,9 @@ export default defineConfig({
 		resolve: {
 			dedupe: ["react", "react-dom"],
 			alias: {
-				"@pengana/org-client": path.resolve(
+				"@pengana/org": path.resolve(
 					__dirname,
-					"../../packages/org-client/src/index.ts",
+					"../../packages/org/src/index.ts",
 				),
 			},
 		},

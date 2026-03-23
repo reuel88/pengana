@@ -1,46 +1,44 @@
-# Task 7: Dissolve `@pengana/org-client` into App-Level Code
+# Task 7: Dissolve `@pengana/org-client` → Rename to `@pengana/org`
 
-## Status: Not Started
+## Status: Done
 ## Dependencies: Task 6 (state management) — xState removal from org-client must happen first
 ## Difficulty: Low-Medium
 
 ## Why Seventh
-With xState removed (Task 6) and UI decoupled (Task 5), `org-client` has less reason to exist as a shared package. Its hooks, contexts, and utilities can move into app-level feature code, reducing the package count.
+With xState removed (Task 6) and UI decoupled (Task 5), `org-client` could be simplified. The original plan was to dissolve it into app-level code, but audit showed web and native share 90%+ of the same hooks/utilities (31 files each). Full dissolution would duplicate ~30 files.
 
-## Current State
-`@pengana/org-client` contains:
-- React hooks for org/team/invitation queries
-- xState machines (being removed in Task 6)
-- React contexts for org state
-- `user-lifecycle.ts` — shared lifecycle checks
-- Type definitions for org entities
-- TanStack Form utilities for org forms
+## What Was Done
 
-Used by: `apps/web`, `apps/native`, `apps/extension`, `packages/ui`
+Renamed the package from `@pengana/org-client` to `@pengana/org` and cleaned up internal structure:
 
-## Goal
-Move org-client logic into the apps that use it. If web, native, and extension share significant org code, keep a thin shared module — but only if truly needed after the move.
+1. **Renamed** `packages/org-client/` → `packages/org/` with `"name": "@pengana/org"`
+2. **Moved** `machines/onboarding-machine.ts` → `lib/onboarding.ts` (it's a plain reducer since Task 6, not a machine)
+3. **Removed** `./machines/*` export path from package.json (no longer needed)
+4. **Updated 67 import statements** across 63 consumer files in web/native/extension
+5. **Updated** `package.json` deps in all 3 apps (`@pengana/org-client` → `@pengana/org`)
+6. **Fixed** stale path references in `apps/extension/tsconfig.json`, `apps/extension/wxt.config.ts`
+7. **Removed** stale `@pengana/org` path alias from `packages/ui/tsconfig.json` (leftover from Task 5)
 
-## Implementation Steps
-1. Inventory all exports from `@pengana/org-client` and where they're consumed
-2. Move hooks → `apps/web/src/hooks/` (and native/extension equivalents)
-3. Move contexts → `apps/web/src/features/org/` (and equivalents)
-4. Move `user-lifecycle.ts` → `apps/web/src/lib/` (and equivalents)
-5. Move types → `apps/web/src/types/` or inline where used
-6. If significant duplication across apps, create a lightweight `packages/org-shared/` with just the types and pure utility functions (no React, no hooks)
-7. Remove `packages/org-client/`
-8. Update all imports
+### Why Rename Instead of Dissolve
+- Web and native each import from org-client in 31 files with near-identical usage
+- Dissolving would create ~30 duplicate files per app with no code sharing
+- The package is lean after Task 6 (no xState) — just hooks, types, and pure utilities
+- `@pengana/org` is a cleaner name that matches the package graph plan
 
-## Key Files to Modify
-- `packages/org-client/src/` — everything moves out
-- `apps/web/src/hooks/use-org-queries.ts` — already exists, may absorb more
-- `apps/web/src/features/org/` — receives org components and contexts
-- `apps/native/`, `apps/extension/` — receive their copies
-- `packages/ui/package.json` — should already be clean after Task 5
+## Key Files Modified
+- `packages/org-client/` → `packages/org/` (directory rename)
+- `packages/org/package.json` — name + removed machines export
+- `packages/org/src/index.ts` — updated onboarding import path
+- `packages/org/src/lib/onboarding.ts` — moved from machines/
+- `packages/org/src/lib/onboarding.test.ts` — moved from machines/
+- 63 consumer files across apps — import path updates
+- `apps/web/package.json`, `apps/native/package.json`, `apps/extension/package.json` — dep rename
+- `apps/extension/tsconfig.json`, `apps/extension/wxt.config.ts` — path alias updates
+- `packages/ui/tsconfig.json` — removed stale path alias
 
 ## Verification
-- [ ] `@pengana/org-client` package directory removed
-- [ ] No imports from `@pengana/org-client` anywhere
-- [ ] Org switching, member management, invitations all work
-- [ ] `pnpm run build` succeeds
-- [ ] `pnpm run test` passes
+- [x] `packages/org-client/` directory no longer exists
+- [x] No imports from `@pengana/org-client` anywhere in source files
+- [x] `pnpm run check` passes (0 errors)
+- [x] `pnpm run build` succeeds
+- [x] `pnpm run test` passes (all 7 suites)

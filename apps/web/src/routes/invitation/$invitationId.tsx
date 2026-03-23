@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UserInvitation } from "@pengana/org-client";
+import type { UserInvitation } from "@pengana/org";
 import { Button, buttonVariants } from "@pengana/ui/components/button";
 import {
 	Card,

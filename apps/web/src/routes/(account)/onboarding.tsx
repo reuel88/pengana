@@ -1,4 +1,4 @@
-import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
+import { fetchUserLifecycleData } from "@pengana/org/lib/user-lifecycle";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { OnboardingView } from "@/features/onboarding/ui/views/onboarding-view";
 import { authClient, requireAuth } from "@/shared/lib/auth-client";

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
+import type { UserLifecycleData } from "@pengana/org/lib/user-lifecycle";
 import {
 	ActivityIndicator,
 	ScrollView,
@@ -49,7 +49,7 @@ function OnboardingContent({
 	const { t } = useTranslation("onboarding");
 	const { t: tCommon } = useTranslation("common");
 	const { theme } = useTheme();
-	const [state, send] = useOnboarding({
+	const [step, send] = useOnboarding({
 		hasPendingInvitations: lifecycleData.hasPendingInvitations,
 	});
 
@@ -80,14 +80,14 @@ function OnboardingContent({
 				</TouchableOpacity>
 			</View>
 
-			{state.matches({ organizationStep: "viewInvitations" }) && (
+			{step === "viewInvitations" && (
 				<OnboardingInvitations
 					onAccepted={() => send({ type: "INVITATION_ACCEPTED" })}
 					onSkipToCreate={() => send({ type: "SKIP_TO_CREATE" })}
 				/>
 			)}
 
-			{state.matches({ organizationStep: "createOrganization" }) && (
+			{step === "createOrganization" && (
 				<OnboardingCreateOrg
 					onCreated={() => send({ type: "ORG_CREATED" })}
 					onBackToInvitations={
@@ -98,7 +98,7 @@ function OnboardingContent({
 				/>
 			)}
 
-			{state.matches("inviteMembers") && (
+			{step === "inviteMembers" && (
 				<OnboardingInviteMembers
 					onInvited={() => send({ type: "MEMBERS_INVITED" })}
 					onSkip={() => send({ type: "SKIP_INVITE" })}

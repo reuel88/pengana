@@ -12,15 +12,11 @@ export function OnboardingView() {
 	const { session, hasPendingInvitations } = Route.useRouteContext();
 	const { t } = useTranslation("onboarding");
 	const handleSignOut = useSignOut("/login");
-	const [state, send] = useOnboarding({ hasPendingInvitations });
+	const [step, send] = useOnboarding({ hasPendingInvitations });
 
-	const isViewInvitations = state.matches({
-		organizationStep: "viewInvitations",
-	});
-	const isCreateOrg = state.matches({
-		organizationStep: "createOrganization",
-	});
-	const isInviteMembers = state.matches("inviteMembers");
+	const isViewInvitations = step === "viewInvitations";
+	const isCreateOrg = step === "createOrganization";
+	const isInviteMembers = step === "inviteMembers";
 
 	return (
 		<div className="flex min-h-svh flex-col">

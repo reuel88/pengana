@@ -1,7 +1,6 @@
-import { onboardingMachine } from "@pengana/org-client/machines/onboarding-machine";
-import { useMachine } from "@xstate/react";
+import { getInitialStep, onboardingReducer } from "@pengana/org/lib/onboarding";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 
 import { useCompleteOnboarding } from "@/shared/lib/lifecycle-context";
 
@@ -12,16 +11,18 @@ export function useOnboarding({
 }) {
 	const router = useRouter();
 	const completeOnboarding = useCompleteOnboarding();
-	const [state, send] = useMachine(onboardingMachine, {
-		input: { hasPendingInvitations },
-	});
+	const [step, send] = useReducer(
+		onboardingReducer,
+		hasPendingInvitations,
+		getInitialStep,
+	);
 
 	useEffect(() => {
-		if (state.matches("complete")) {
+		if (step === "complete") {
 			completeOnboarding();
 			router.replace("/(drawer)");
 		}
-	}, [state, router, completeOnboarding]);
+	}, [step, router, completeOnboarding]);
 
-	return [state, send] as const;
+	return [step, send] as const;
 }

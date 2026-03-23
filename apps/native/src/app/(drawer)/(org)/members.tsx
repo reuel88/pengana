@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useMemberActions } from "@pengana/org-client";
+import { useMemberActions } from "@pengana/org";
 import { useRouter } from "expo-router";
 import {
 	Alert,

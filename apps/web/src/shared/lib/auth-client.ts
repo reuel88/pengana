@@ -5,7 +5,7 @@ import {
 } from "@pengana/auth/client";
 import { magicLinkClient, polarClient } from "@pengana/auth/client-web";
 import { env } from "@pengana/env/web";
-import { fetchUserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
+import { fetchUserLifecycleData } from "@pengana/org/lib/user-lifecycle";
 import { redirect } from "@tanstack/react-router";
 
 const orgDesignPresetField = {

@@ -6,7 +6,7 @@ import {
 	useTeamMemberAdd,
 	useTeamNameEditor,
 	useZodForm,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { cn } from "@pengana/ui/lib/utils";

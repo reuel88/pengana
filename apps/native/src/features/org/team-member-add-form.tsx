@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeAddMemberSchema } from "@pengana/i18n/zod";
-import { useTeamMemberAdd, useZodForm } from "@pengana/org-client";
+import { useTeamMemberAdd, useZodForm } from "@pengana/org";
 import {
 	ActivityIndicator,
 	Alert,

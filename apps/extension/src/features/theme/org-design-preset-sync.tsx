@@ -2,7 +2,7 @@ import {
 	applyOrgDesignPresetToDocument,
 	DEFAULT_ORG_DESIGN_PRESET,
 	normalizeOrgDesignPreset,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/features/theme/theme-provider";
 import { authClient } from "@/shared/lib/auth-client";

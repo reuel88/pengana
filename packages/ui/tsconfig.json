@@ -10,7 +10,6 @@
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
-			"@pengana/org-client": ["../org-client/src/index.ts"],
 			"@pengana/ui/*": ["./src/*"]
 		}
 	},

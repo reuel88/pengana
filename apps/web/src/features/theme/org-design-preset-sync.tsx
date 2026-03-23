@@ -2,7 +2,7 @@ import {
 	applyOrgDesignPresetToDocument,
 	DEFAULT_ORG_DESIGN_PRESET,
 	normalizeOrgDesignPreset,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { useEffect } from "react";
 import { useOrgDesignPresetPreview } from "@/features/theme/org-design-preset-preview";
 import { useTheme } from "@/features/theme/theme-provider";

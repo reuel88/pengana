@@ -1,7 +1,7 @@
 import { env } from "@pengana/env/web";
 import { useTranslation } from "@pengana/i18n";
 import { makeMagicLinkSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { useNavigate } from "@tanstack/react-router";
 import { authClient } from "@/shared/lib/auth-client";
 import { FormField } from "@/shared/ui/form-field";

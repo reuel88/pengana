@@ -1,7 +1,7 @@
 import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { getDirection } from "@pengana/i18n/rtl";
-import { AuthClientProvider } from "@pengana/org-client";
+import { AuthClientProvider } from "@pengana/org";
 import { Toaster } from "@pengana/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

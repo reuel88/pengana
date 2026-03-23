@@ -5,7 +5,7 @@ import {
 	type OrgDesignPreset,
 	useOrgSettings,
 	useZodForm,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";

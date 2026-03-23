@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import type { OrgMember } from "@pengana/org-client";
-import { useMemberActions } from "@pengana/org-client";
+import type { OrgMember } from "@pengana/org";
+import { useMemberActions } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { NativeSelect } from "@pengana/ui/components/native-select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";

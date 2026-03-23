@@ -1,7 +1,6 @@
-import { onboardingMachine } from "@pengana/org-client/machines/onboarding-machine";
+import { getInitialStep, onboardingReducer } from "@pengana/org/lib/onboarding";
 import { useNavigate } from "@tanstack/react-router";
-import { useMachine } from "@xstate/react";
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 
 export function useOnboarding({
 	hasPendingInvitations,
@@ -10,17 +9,17 @@ export function useOnboarding({
 }) {
 	const navigate = useNavigate();
 
-	const [state, send] = useMachine(onboardingMachine, {
-		input: {
-			hasPendingInvitations,
-		},
-	});
+	const [step, send] = useReducer(
+		onboardingReducer,
+		hasPendingInvitations,
+		getInitialStep,
+	);
 
 	useEffect(() => {
-		if (state.matches("complete")) {
+		if (step === "complete") {
 			navigate({ to: "/" });
 		}
-	}, [state, navigate]);
+	}, [step, navigate]);
 
-	return [state, send] as const;
+	return [step, send] as const;
 }

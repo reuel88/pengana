@@ -1,8 +1,8 @@
 import type {
 	AuthMutationOptions,
 	NotifyFn,
-} from "@pengana/org-client/lib/auth-mutation";
-import { authMutation as coreAuthMutation } from "@pengana/org-client/lib/auth-mutation";
+} from "@pengana/org/lib/auth-mutation";
+import { authMutation as coreAuthMutation } from "@pengana/org/lib/auth-mutation";
 import { toast } from "sonner";
 
 const notify: NotifyFn = {

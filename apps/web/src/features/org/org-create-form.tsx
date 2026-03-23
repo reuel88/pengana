@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { createOrgSchema, useCreateOrg, useZodForm } from "@pengana/org-client";
+import { createOrgSchema, useCreateOrg, useZodForm } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import type { ReactNode } from "react";
 import { toast } from "sonner";

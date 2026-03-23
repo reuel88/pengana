@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeDeleteAccountSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { useNavigate } from "@tanstack/react-router";
 import { CircleAlert } from "lucide-react";

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useTeamActions } from "@pengana/org-client";
+import { useTeamActions } from "@pengana/org";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import {

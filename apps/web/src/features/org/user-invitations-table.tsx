@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UserInvitation } from "@pengana/org-client";
+import type { UserInvitation } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { useInvitationActions } from "@/shared/hooks/use-invitation-actions";
 import type { Column } from "@/shared/ui/data-table";

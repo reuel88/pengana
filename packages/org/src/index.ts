@@ -73,6 +73,14 @@ export type {
 } from "./lib/design-theme";
 export { resolveOrgDesignTokens } from "./lib/design-theme";
 export { filterPendingInvitations } from "./lib/filter-pending-invitations";
+export type {
+	OnboardingEvent,
+	OnboardingStep,
+} from "./lib/onboarding";
+export {
+	getInitialStep,
+	onboardingReducer,
+} from "./lib/onboarding";
 export { applyOrgDesignPresetToDocument } from "./lib/org-design-preset-dom";
 export { orgQueryKeys } from "./lib/org-query-keys";
 export {
@@ -81,4 +89,3 @@ export {
 	teamNameSchema,
 } from "./lib/schemas";
 export { slugify } from "./lib/slugify";
-export { onboardingMachine } from "./machines/onboarding-machine";

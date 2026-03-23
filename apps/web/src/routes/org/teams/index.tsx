@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Dialog,

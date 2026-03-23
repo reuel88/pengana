@@ -1,4 +1,4 @@
-import { slugify, useAuthClient } from "@pengana/org-client";
+import { slugify, useAuthClient } from "@pengana/org";
 import { useState } from "react";
 
 import { useInvalidateOrg } from "./use-org-queries";

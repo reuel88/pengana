@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { filterPendingInvitations } from "@pengana/org-client";
+import { filterPendingInvitations } from "@pengana/org";
 import { toast } from "sonner";
 import {
 	useInvalidateNotifications,

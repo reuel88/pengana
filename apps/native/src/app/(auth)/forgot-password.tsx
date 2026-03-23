@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeForgotPasswordSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
