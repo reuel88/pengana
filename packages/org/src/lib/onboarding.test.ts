@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getInitialStep, onboardingReducer } from "./onboarding-machine";
+import { getInitialStep, onboardingReducer } from "./onboarding";
 
 describe("onboardingReducer", () => {
 	it("routes to viewInvitations when hasPendingInvitations is true", () => {

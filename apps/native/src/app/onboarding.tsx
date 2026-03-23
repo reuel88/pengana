@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UserLifecycleData } from "@pengana/org-client/lib/user-lifecycle";
+import type { UserLifecycleData } from "@pengana/org/lib/user-lifecycle";
 import {
 	ActivityIndicator,
 	ScrollView,

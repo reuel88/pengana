@@ -3,7 +3,7 @@ import type { SupportedLocale } from "@pengana/i18n/config";
 import { initNativeI18n } from "@pengana/i18n/native";
 import { LOCALE_STORAGE_KEY_NATIVE } from "@pengana/i18n/persistence";
 import { isRtlLocale } from "@pengana/i18n/rtl";
-import { AuthClientProvider } from "@pengana/org-client";
+import { AuthClientProvider } from "@pengana/org";
 import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";

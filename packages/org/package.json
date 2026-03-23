@@ -1,5 +1,5 @@
 {
-	"name": "@pengana/org-client",
+	"name": "@pengana/org",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -15,9 +15,6 @@
 		},
 		"./context/*": {
 			"default": "./src/context/*.tsx"
-		},
-		"./machines/*": {
-			"default": "./src/machines/*.ts"
 		},
 		"./hooks/*": {
 			"default": "./src/hooks/*.ts"

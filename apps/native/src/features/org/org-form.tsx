@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeCreateOrgSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";

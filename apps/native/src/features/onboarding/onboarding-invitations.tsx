@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useInvitationActions } from "@pengana/org-client";
+import { useInvitationActions } from "@pengana/org";
 import {
 	ActivityIndicator,
 	Alert,

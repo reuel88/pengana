@@ -5,7 +5,7 @@ import {
 	MaterialCommunityIcons,
 	MaterialIcons,
 } from "@expo/vector-icons";
-import type { AppIconName, OrgIconLibraryId } from "@pengana/org-client";
+import type { AppIconName, OrgIconLibraryId } from "@pengana/org";
 import type { ComponentProps, ComponentType } from "react";
 import { useTheme } from "@/shared/lib/theme";
 

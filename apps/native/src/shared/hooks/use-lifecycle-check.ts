@@ -1,7 +1,7 @@
 import {
 	fetchUserLifecycleData,
 	type UserLifecycleData,
-} from "@pengana/org-client/lib/user-lifecycle";
+} from "@pengana/org/lib/user-lifecycle";
 import { useCallback, useEffect, useReducer } from "react";
 
 import { authClient } from "@/shared/lib/auth-client";

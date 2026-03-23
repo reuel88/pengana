@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignUpSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { authClient } from "@/shared/lib/auth-client";
 import { persistPendingInvitation } from "@/shared/lib/auth-flow";

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useCancelInvitation, useInvitationActions } from "@pengana/org-client";
+import { useCancelInvitation, useInvitationActions } from "@pengana/org";
 import { Alert, ScrollView } from "react-native";
 import { InviteForm } from "@/features/org/invite-form";
 import { OrgInvitationsList } from "@/features/org/org-invitations-list";

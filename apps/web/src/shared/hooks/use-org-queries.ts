@@ -10,4 +10,4 @@ export {
 	useTeamMembers,
 	useTeams,
 	useUserInvitations,
-} from "@pengana/org-client";
+} from "@pengana/org";

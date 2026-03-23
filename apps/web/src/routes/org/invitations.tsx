@@ -1,8 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import {
-	filterPendingInvitations,
-	useCancelInvitation,
-} from "@pengana/org-client";
+import { filterPendingInvitations, useCancelInvitation } from "@pengana/org";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { InviteMemberForm } from "@/features/org/invite-member-form";

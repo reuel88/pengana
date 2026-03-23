@@ -21,7 +21,7 @@
 		"@pengana/api": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/env": "workspace:*",
-		"@pengana/org-client": "workspace:*",
+		"@pengana/org": "workspace:*",
 		"@pengana/sync": "workspace:*",
 		"@pengana/local-db": "workspace:*",
 		"@pengana/ui": "workspace:*",

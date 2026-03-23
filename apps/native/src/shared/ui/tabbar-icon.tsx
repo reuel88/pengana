@@ -1,4 +1,4 @@
-import type { AppIconName } from "@pengana/org-client";
+import type { AppIconName } from "@pengana/org";
 import { AppIcon } from "@/shared/ui/app-icon";
 
 export const TabBarIcon = (props: { name: AppIconName; color: string }) => {

@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { filterPendingInvitations } from "@pengana/org-client";
+import { filterPendingInvitations } from "@pengana/org";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useUserInvitations } from "@/shared/hooks/use-org-queries";

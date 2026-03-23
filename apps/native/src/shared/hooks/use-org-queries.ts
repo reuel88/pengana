@@ -3,7 +3,7 @@ import {
 	useAuthClient,
 	useOrgRole,
 	useOrgSettings,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 

@@ -3,7 +3,7 @@ import {
 	normalizeOrgDesignPreset,
 	type ResolvedAppThemeTokens,
 	resolveOrgDesignTokens,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import type { Theme as NavigationTheme } from "@react-navigation/native";
 import { useTheme as useNavigationTheme } from "@react-navigation/native";
 import { Platform } from "react-native";

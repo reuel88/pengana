@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeSignInSchema } from "@pengana/i18n/zod";
-import { useZodForm } from "@pengana/org-client";
+import { useZodForm } from "@pengana/org";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";

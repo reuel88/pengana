@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useInvitationActions as useInvitationActionsBase } from "@pengana/org-client";
+import { useInvitationActions as useInvitationActionsBase } from "@pengana/org";
 import { toast } from "sonner";
 
 export function useInvitationActions({

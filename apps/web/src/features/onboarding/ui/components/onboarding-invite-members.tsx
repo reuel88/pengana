@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useBatchInvite, useZodForm } from "@pengana/org-client";
+import { useBatchInvite, useZodForm } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import {
 	Card,

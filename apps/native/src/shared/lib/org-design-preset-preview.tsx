@@ -1,4 +1,4 @@
-import type { OrgDesignPreset } from "@pengana/org-client";
+import type { OrgDesignPreset } from "@pengana/org";
 import { createContext, type ReactNode, useContext, useState } from "react";
 
 type OrgDesignPresetPreviewContextValue = {

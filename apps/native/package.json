@@ -25,7 +25,7 @@
 		"@pengana/env": "workspace:*",
 		"@pengana/i18n": "workspace:*",
 		"@pengana/local-db": "workspace:*",
-		"@pengana/org-client": "workspace:*",
+		"@pengana/org": "workspace:*",
 		"@pengana/sync": "workspace:*",
 		"@react-navigation/bottom-tabs": "^7.2.0",
 		"@react-navigation/drawer": "^7.1.1",

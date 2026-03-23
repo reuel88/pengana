@@ -1,7 +1,4 @@
-import {
-	getInitialStep,
-	onboardingReducer,
-} from "@pengana/org-client/machines/onboarding-machine";
+import { getInitialStep, onboardingReducer } from "@pengana/org/lib/onboarding";
 import { useRouter } from "expo-router";
 import { useEffect, useReducer } from "react";
 

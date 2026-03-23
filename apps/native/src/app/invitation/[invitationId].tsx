@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
-import type { UserInvitation } from "@pengana/org-client";
-import { useInvitationActions } from "@pengana/org-client";
+import type { UserInvitation } from "@pengana/org";
+import { useInvitationActions } from "@pengana/org";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";

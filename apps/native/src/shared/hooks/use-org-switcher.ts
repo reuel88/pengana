@@ -1,4 +1,4 @@
-import { authMutation, useAuthClient } from "@pengana/org-client";
+import { authMutation, useAuthClient } from "@pengana/org";
 import { useState } from "react";
 
 import { useInvalidateOrg } from "./use-org-queries";

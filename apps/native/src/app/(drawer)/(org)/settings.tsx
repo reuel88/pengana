@@ -12,7 +12,7 @@ import {
 	ORG_STYLE_OPTIONS,
 	type OrgDesignPreset,
 	useOrgSettings,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {

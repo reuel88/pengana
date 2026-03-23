@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useOrgSwitcher } from "@pengana/org-client";
+import { useOrgSwitcher } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import {
 	DropdownMenu,

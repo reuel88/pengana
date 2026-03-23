@@ -167,25 +167,25 @@ If rebuilding from scratch with the same feature set, here's what I'd change and
 **Done**:
 - Defined local UI types in `packages/ui/src/types.ts` replacing imports from `@pengana/sync` and `@pengana/local-db`
 - Moved file validation logic to props (`validateFile`, `maxAttachments`) injected by app-level wrappers
-- Removed `@pengana/org-client`, `@pengana/local-db`, `@pengana/sync` from `packages/ui/package.json`
+- Removed `@pengana/org`, `@pengana/local-db`, `@pengana/sync` from `packages/ui/package.json`
 
-#### 4. Simplify the Package Graph
-**Current**: 16 packages with deep interdependencies.
+#### 4. Simplify the Package Graph ✅
+**Before**: 16 packages with deep interdependencies.
+**After**: 11 packages.
 
-**Proposed** (~8 packages):
-| Package | Replaces | Purpose |
-|---------|----------|---------|
-| `@pengana/db` | same | Drizzle schema + queries (server) |
-| `@pengana/local-db` | `entity-store`, `todo-client`, `upload-client` | SQLite schema + queries (client, via WASM/expo) |
-| `@pengana/api` | same | oRPC procedures |
-| `@pengana/auth` | same | Better-Auth config |
-| `@pengana/sync` | `sync-engine`, `sync-runtime`, `realtime-transport`, `storage-health`, `upload-queue` | Custom sync engine + real-time transport + upload queue |
-| `@pengana/ui` | same, minus business deps | Pure presentational components |
-| `@pengana/i18n` | same | i18n setup |
-| `@pengana/env` | same | Env validation |
-| `@pengana/config` | same | Shared TS/build config |
-
-Drop: `org-client` (move to app-level features), `email-dev` (inline into server dev mode).
+| Package | Status | Purpose |
+|---------|--------|---------|
+| `@pengana/db` | Kept | Drizzle schema + queries (server) |
+| `@pengana/local-db` | Consolidated (was `entity-store` + `todo-client` + `upload-client`) | Client-side data layer (Dexie + SQLite) |
+| `@pengana/api` | Kept | oRPC procedures |
+| `@pengana/auth` | Kept | Better-Auth config |
+| `@pengana/sync` | Consolidated (was `sync-engine` + `sync-runtime` + `realtime-transport` + `storage-health` + `upload-queue`) | Custom sync engine + real-time transport + upload queue |
+| `@pengana/org` | Renamed from `org-client` | Shared org hooks, types, utilities (web + native) |
+| `@pengana/ui` | Cleaned (business deps removed) | Pure presentational components |
+| `@pengana/i18n` | Kept | i18n setup |
+| `@pengana/env` | Kept | Env validation |
+| `@pengana/config` | Kept | Shared TS/build config |
+| `@pengana/email-dev` | Kept | Email dev inbox for local testing |
 
 #### 5. File Storage
 **Current**: Local filesystem (`./uploads/`).

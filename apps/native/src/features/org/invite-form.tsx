@@ -1,6 +1,6 @@
 import { useTranslation } from "@pengana/i18n";
 import { makeNativeInviteSchema } from "@pengana/i18n/zod";
-import { useInviteMember, useZodForm } from "@pengana/org-client";
+import { useInviteMember, useZodForm } from "@pengana/org";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/shared/lib/theme";
 import { withLanguageKey } from "@/shared/lib/with-language-key";

@@ -1,4 +1,4 @@
-import { useAuthClient } from "@pengana/org-client";
+import { useAuthClient } from "@pengana/org";
 import { useState } from "react";
 
 import type {

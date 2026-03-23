@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useInviteMember, useZodForm } from "@pengana/org-client";
+import { useInviteMember, useZodForm } from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { Input } from "@pengana/ui/components/input";
 import { Label } from "@pengana/ui/components/label";

@@ -14,7 +14,7 @@ With the client data layer consolidated (Task 4), we can now cleanly remove busi
 2. **Replaced all business package imports** in the 6 affected components (`todo-item`, `todo-list`, `attachment-indicator`, `attachment-list`, `media-grid-item`, `media-grid-list`) with imports from the local types file
 3. **Moved file validation to props** — `todo-item.tsx` now accepts `validateFile` (callback) and `maxAttachments` (number) props instead of importing `isAllowedMimeType`, `MAX_FILE_SIZE_BYTES`, `MAX_ATTACHMENTS` from `@pengana/sync/upload`
 4. **Updated app-level wrappers** in `apps/web/src/features/todo/todo-list.tsx` and `apps/extension/src/features/todo/todo-list.tsx` to pass `validateFile` and `maxAttachments` props
-5. **Removed all business deps from `packages/ui/package.json`**: `@pengana/org-client` (was unused/dead dep), `@pengana/local-db` (dependency), `@pengana/sync` (peerDependency)
+5. **Removed all business deps from `packages/ui/package.json`**: `@pengana/org` (was unused/dead dep), `@pengana/local-db` (dependency), `@pengana/sync` (peerDependency)
 6. **Added `"./types"` export** to `packages/ui/package.json` for apps that need the shared types
 
 ## Key Files Modified

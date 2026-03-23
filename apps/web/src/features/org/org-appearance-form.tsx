@@ -9,7 +9,7 @@ import {
 	ORG_RADIUS_OPTIONS,
 	ORG_STYLE_OPTIONS,
 	type OrgDesignPreset,
-} from "@pengana/org-client";
+} from "@pengana/org";
 import { Button } from "@pengana/ui/components/button";
 import { useMemo } from "react";
 

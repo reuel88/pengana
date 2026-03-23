@@ -1,4 +1,4 @@
-import type { AppIconName } from "@pengana/org-client";
+import type { AppIconName } from "@pengana/org";
 import {
 	Bell as PhosphorBell,
 	CaretDown as PhosphorCaretDown,
