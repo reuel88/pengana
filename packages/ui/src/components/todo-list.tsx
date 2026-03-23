@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import type { MediaAttachmentTarget } from "@pengana/local-db/media";
+import type { MediaAttachmentTarget } from "../types";
 import { TodoItem, type TodoItemData } from "./todo-item";
 
 interface TodoListProps {
@@ -11,6 +11,8 @@ interface TodoListProps {
 	onRemoveAttachment?: (id: string, attachmentId: string) => void;
 	onRetryAttachment?: (id: string, attachmentId: string) => void;
 	onValidationError?: (id: string, message: string) => void;
+	validateFile?: (file: File) => string | null;
+	maxAttachments?: number;
 	errors?: Record<string, string | null>;
 }
 
@@ -23,6 +25,8 @@ export function TodoList({
 	onRemoveAttachment,
 	onRetryAttachment,
 	onValidationError,
+	validateFile,
+	maxAttachments,
 	errors,
 }: TodoListProps) {
 	const { t } = useTranslation("todos");
@@ -64,6 +68,8 @@ export function TodoList({
 							? (msg) => onValidationError(todo.id, msg)
 							: undefined
 					}
+					validateFile={validateFile}
+					maxAttachments={maxAttachments}
 					error={errors?.[todo.id]}
 				/>
 			))}

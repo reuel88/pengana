@@ -1,6 +1,6 @@
 # Task 4: Consolidate Client Data Packages into `@pengana/local-db`
 
-## Status: Not Started
+## Status: Complete
 ## Dependencies: Task 3 (sync consolidation) — sync adapter interfaces must be settled first
 ## Difficulty: High
 
@@ -68,11 +68,11 @@ packages/local-db/
 - `packages/ui/package.json` (currently depends on `upload-client`)
 
 ## Verification
-- [ ] All old package imports replaced with `@pengana/local-db` imports
-- [ ] Dexie database works on web/extension (todos, uploads, entities)
-- [ ] Drizzle/SQLite works on native (todos, uploads, entities)
-- [ ] React hooks work on all platforms
-- [ ] Sync adapters connect properly to `@pengana/sync`
-- [ ] `pnpm run build` succeeds
-- [ ] `pnpm run test` passes
+- [x] All old package imports replaced with `@pengana/local-db` imports
+- [x] Dexie database works on web/extension (todos, uploads, entities)
+- [x] Drizzle/SQLite works on native (todos, uploads, entities)
+- [x] React hooks work on all platforms
+- [x] Sync adapters connect properly to `@pengana/sync`
+- [x] `pnpm run build` succeeds
+- [x] `pnpm run test` passes
 - [ ] E2E tests pass on web and native

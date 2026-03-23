@@ -10,7 +10,12 @@ import {
 	type WebTodo,
 } from "@pengana/local-db/todo";
 import type { EnqueueUploadParams } from "@pengana/sync/upload";
-import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
+import {
+	INDEXEDDB_URI_PREFIX,
+	isAllowedMimeType,
+	MAX_ATTACHMENTS,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync/upload";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
@@ -101,6 +106,12 @@ export function TodoList({
 			onRemoveAttachment={handleRemoveAttachment}
 			onRetryAttachment={(_todoId, attachmentId) => handleRetry(attachmentId)}
 			onValidationError={handleToastError}
+			validateFile={(file) => {
+				if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
+				if (file.size > MAX_FILE_SIZE_BYTES) return t("errors:fileTooLarge");
+				return null;
+			}}
+			maxAttachments={MAX_ATTACHMENTS}
 		/>
 	);
 }
