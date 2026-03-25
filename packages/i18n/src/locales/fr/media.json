@@ -3,6 +3,7 @@
 	"dropzone": {
 		"idle": "Glissez-déposez des fichiers ici, ou cliquez pour parcourir",
 		"active": "Déposez les fichiers ici...",
+		"processing": "Traitement des fichiers...",
 		"rejected": {
 			"type": "Type de fichier non pris en charge. Veuillez utiliser JPEG, PNG, HEIC ou PDF.",
 			"size": "Le fichier est trop volumineux. La taille maximale est de 10 Mo."

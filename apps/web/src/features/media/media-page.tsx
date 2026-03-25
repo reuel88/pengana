@@ -8,17 +8,17 @@ import {
 	useMediaListWiring,
 } from "@pengana/local-db/media";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
+import { ALLOWED_MIME_TYPES } from "@pengana/sync/upload";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
-import { useMemo, useState } from "react";
+import { DropZone } from "@pengana/ui/components/drop-zone";
+import { MediaGridList } from "@pengana/ui/components/media-grid-list";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { SyncContextValue } from "@/features/sync/use-sync-entry";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
-
-import { DropZone } from "./drop-zone";
-import { MediaGrid } from "./media-grid";
 
 type Tab = "personal" | "organization";
 
@@ -61,10 +61,8 @@ function MediaContent({
 	const fileStorage = useMemo(() => createIndexedDbFileStrategy(), []);
 	const actions = useMemo(() => createDexieMediaActions(appDb), []);
 
-	const { handleDelete, handleFilesSelected } = useMediaListWiring({
+	const { handleDelete, handleFileSelected } = useMediaListWiring({
 		actions,
-		triggerSync,
-		enqueueUpload,
 		userId,
 		scopeId,
 		organizationId,
@@ -81,17 +79,49 @@ function MediaContent({
 		},
 	});
 
+	const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+
+	const onDelete = useCallback(
+		async (mediaId: string) => {
+			setDeletingIds((prev) => new Set(prev).add(mediaId));
+			try {
+				await handleDelete(mediaId);
+				triggerSync();
+			} finally {
+				setDeletingIds((prev) => {
+					const next = new Set(prev);
+					next.delete(mediaId);
+					return next;
+				});
+			}
+		},
+		[handleDelete, triggerSync],
+	);
+
+	const visibleMedia = media.filter((item) => !deletingIds.has(item.id));
+
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
 			<DropZone
-				onFiles={(files) => {
-					void handleFilesSelected(files);
+				accept={[...ALLOWED_MIME_TYPES]}
+				onFiles={async (files) => {
+					for (const file of files) {
+						const params = await handleFileSelected(file);
+						if (params) {
+							enqueueUpload(params);
+						}
+					}
+					triggerSync();
 				}}
-				idleLabel={t("dropzone.idle")}
-				activeLabel={t("dropzone.active")}
+				onError={(error) => {
+					console.error("File processing error:", error);
+					toast.error(t("upload.error"));
+				}}
 			/>
-			<MediaGrid media={media} t={t} onDelete={handleDelete} />
+
+			<MediaGridList media={visibleMedia} onDelete={onDelete} />
+
 			<SyncDevtools descriptor={descriptor} />
 		</div>
 	);

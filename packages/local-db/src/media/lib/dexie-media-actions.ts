@@ -159,12 +159,12 @@ export interface ProcessMediaFileParams {
 		id: string,
 		file: File,
 	) => { uri: string; revoke?: () => void };
-	enqueueUpload: (params: EnqueueUploadParams) => void;
 }
 
 export interface ProcessMediaFileResult {
 	mediaId: string;
 	fileRef: { uri: string; revoke?: () => void };
+	enqueueParams: EnqueueUploadParams;
 }
 
 export async function processMediaFile(
@@ -180,7 +180,6 @@ export async function processMediaFile(
 		target,
 		storeFile,
 		createFileRef,
-		enqueueUpload,
 	} = params;
 
 	const mediaId = crypto.randomUUID();
@@ -210,16 +209,18 @@ export async function processMediaFile(
 		});
 	}
 
-	enqueueUpload({
-		fileUri: fileRef.uri,
-		mimeType: file.type,
+	return {
 		mediaId,
-		entityType: target?.entityType,
-		entityId: target?.entityId,
-		scopeType: target ? undefined : scopeType,
-	});
-
-	return { mediaId, fileRef };
+		fileRef,
+		enqueueParams: {
+			fileUri: fileRef.uri,
+			mimeType: file.type,
+			mediaId,
+			entityType: target?.entityType,
+			entityId: target?.entityId,
+			scopeType: target ? undefined : scopeType,
+		},
+	};
 }
 
 export function createDexieMediaActions(db: EntityDatabase): MediaActions {

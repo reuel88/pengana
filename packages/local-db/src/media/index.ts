@@ -15,10 +15,6 @@ export type {
 	MediaActions,
 	ProcessMediaFileInput,
 } from "./hooks/media-actions";
-export type { FileSelectionDeps } from "./hooks/use-file-selection";
-export { useFileSelection } from "./hooks/use-file-selection";
-export type { MediaDeletionDeps } from "./hooks/use-media-deletion";
-export { useMediaDeletion } from "./hooks/use-media-deletion";
 export { useMedia } from "./hooks/use-media-dexie";
 export type {
 	MediaAttachmentTarget,
@@ -28,8 +24,6 @@ export type {
 export { useMediaHandlers } from "./hooks/use-media-handlers";
 export type { UseMediaListWiringConfig } from "./hooks/use-media-list-wiring";
 export { useMediaListWiring } from "./hooks/use-media-list-wiring";
-export type { MediaRetryDeps } from "./hooks/use-media-retry";
-export { useMediaRetry } from "./hooks/use-media-retry";
 export type {
 	AddMediaOptions,
 	LocalMedia,

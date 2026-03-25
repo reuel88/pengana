@@ -3,6 +3,7 @@
 	"dropzone": {
 		"idle": "I-drag at i-drop ang mga file dito, o mag-click para mag-browse",
 		"active": "I-drop ang mga file dito...",
+		"processing": "Pinoproseso ang mga file...",
 		"rejected": {
 			"type": "Hindi suportado ang uri ng file. Gumamit ng JPEG, PNG, HEIC, o PDF.",
 			"size": "Masyadong malaki ang file. Ang maximum na laki ay 10MB."

@@ -3,6 +3,7 @@
 	"dropzone": {
 		"idle": "Arrastra y suelta archivos aquí, o haz clic para buscar",
 		"active": "Suelta los archivos aquí...",
+		"processing": "Procesando archivos...",
 		"rejected": {
 			"type": "Tipo de archivo no compatible. Usa JPEG, PNG, HEIC o PDF.",
 			"size": "El archivo es demasiado grande. El tamaño máximo es 10MB."

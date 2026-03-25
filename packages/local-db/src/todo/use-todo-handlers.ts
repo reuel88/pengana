@@ -1,13 +1,11 @@
 import type { EnqueueUploadParams } from "@pengana/sync/upload";
-import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync/upload";
-import { useCallback, useMemo } from "react";
 import {
-	type MediaActions,
-	type MediaAttachmentTarget,
-	useFileSelection,
-	useMediaDeletion,
-	useMediaRetry,
-} from "../media";
+	isAllowedMimeType,
+	isQuotaError,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync/upload";
+import { useCallback, useMemo } from "react";
+import type { MediaActions, MediaAttachmentTarget } from "../media";
 
 export interface FileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
@@ -27,8 +25,6 @@ export interface TodoActions {
 }
 
 export interface TodoHandlerDeps {
-	triggerSync: () => void;
-	enqueueUpload: (params: EnqueueUploadParams) => void;
 	entityType?: string;
 	userId: string;
 	scopeType: "personal" | "org";
@@ -42,13 +38,10 @@ export interface TodoHandlerDeps {
 	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	actions: TodoActions;
 	mediaActions: MediaActions;
-	getMediaCountForEntity: (entityId: string) => Promise<number>;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {
 	const {
-		triggerSync,
-		enqueueUpload,
 		userId,
 		scopeId,
 		organizationId,
@@ -61,41 +54,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 		scopeType,
 		actions,
 		mediaActions,
-		getMediaCountForEntity,
 	} = deps;
-
-	const selectFiles = useFileSelection({
-		processMediaFile: mediaActions.processMediaFile,
-		userId,
-		scopeType,
-		scopeId,
-		organizationId,
-		fileStorage,
-		enqueueUpload,
-		triggerSync,
-		onError: (id, msg) => onError(id ?? "", msg),
-		t,
-	});
-
-	const deleteAttachment = useMediaDeletion({
-		removeMedia: mediaActions.removeMedia,
-		triggerSync,
-		deleteOnServer: deleteAttachmentOnServer,
-	});
-
-	const retryUpload = useMediaRetry({
-		retryMedia: mediaActions.retryMedia,
-		getAttachmentForMedia: mediaActions.getAttachmentForMedia,
-		enqueueUpload,
-		triggerSync,
-	});
 
 	const handleToggle = useCallback(
 		async (id: string) => {
 			try {
 				clearError(id);
 				await actions.toggleTodo(id);
-				triggerSync();
 			} catch (e) {
 				onError(
 					id,
@@ -105,7 +70,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, actions, triggerSync, onError, t],
+		[clearError, actions, onError, t],
 	);
 
 	const handleDelete = useCallback(
@@ -114,7 +79,6 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				clearError(id);
 				await actions.deleteTodo(id);
 				onDeleteSuccess?.(id);
-				triggerSync();
 			} catch (e) {
 				onError(
 					id,
@@ -124,7 +88,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, actions, triggerSync, onError, onDeleteSuccess, t],
+		[clearError, actions, onError, onDeleteSuccess, t],
 	);
 
 	const handleResolve = useCallback(
@@ -132,7 +96,6 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			try {
 				clearError(id);
 				await actions.resolveConflict(id, resolution);
-				triggerSync();
 			} catch (e) {
 				onError(
 					id,
@@ -142,16 +105,35 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				);
 			}
 		},
-		[clearError, actions, triggerSync, onError, t],
+		[clearError, actions, onError, t],
 	);
 
-	const handleFilesSelected = useCallback(
-		async (files: File[], target: MediaAttachmentTarget) => {
+	const handleFileSelected = useCallback(
+		async (
+			file: File,
+			target: MediaAttachmentTarget,
+		): Promise<EnqueueUploadParams | null> => {
+			if (!isAllowedMimeType(file.type)) {
+				onError(target.entityId, t("dropzone.rejected.type"));
+				return null;
+			}
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				onError(target.entityId, t("dropzone.rejected.size"));
+				return null;
+			}
 			try {
 				clearError(target.entityId);
-				const currentCount = await getMediaCountForEntity(target.entityId);
-				const available = MAX_ATTACHMENTS - currentCount;
-				await selectFiles(files.slice(0, available), target);
+				const result = await mediaActions.processMediaFile({
+					file,
+					userId,
+					scopeType,
+					scopeId,
+					organizationId,
+					target,
+					storeFile: fileStorage.storeFile,
+					createFileRef: fileStorage.createFileRef,
+				});
+				return result.enqueueParams;
 			} catch (e) {
 				onError(
 					target.entityId,
@@ -159,35 +141,62 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 						? t("errors:storageFull")
 						: t("errors:failedToStoreFile"),
 				);
+				return null;
 			}
 		},
-		[clearError, selectFiles, onError, t, getMediaCountForEntity],
+		[
+			clearError,
+			mediaActions,
+			userId,
+			scopeType,
+			scopeId,
+			organizationId,
+			fileStorage,
+			onError,
+			t,
+		],
 	);
 
 	const handleRemoveAttachment = useCallback(
 		async (todoId: string, attachmentId: string) => {
 			try {
 				clearError(todoId);
-				await deleteAttachment(attachmentId);
+				await mediaActions.removeMedia(attachmentId);
+				await deleteAttachmentOnServer?.(attachmentId);
 			} catch {
 				onError(todoId, t("errors:failedToDeleteAttachment"));
 			}
 		},
-		[clearError, deleteAttachment, onError, t],
+		[clearError, mediaActions, deleteAttachmentOnServer, onError, t],
 	);
 
 	const handleRetry = useCallback(
-		async (mediaId: string) => {
+		async (mediaId: string): Promise<EnqueueUploadParams | null> => {
 			try {
-				await retryUpload(mediaId);
+				const record = await mediaActions.retryMedia(mediaId);
+				if (!record?.localUri) return null;
+
+				const attachment = await mediaActions.getAttachmentForMedia(mediaId);
+
+				return {
+					fileUri: record.localUri,
+					mimeType: record.mimeType,
+					mediaId: record.id,
+					entityType: attachment?.entityType,
+					entityId: attachment?.entityId,
+					scopeType: attachment
+						? undefined
+						: (record.scopeType as "personal" | "org" | undefined),
+				};
 			} catch (error) {
 				onError(
 					mediaId,
 					isQuotaError(error) ? t("errors:storageFull") : t("upload.error"),
 				);
+				return null;
 			}
 		},
-		[retryUpload, onError, t],
+		[mediaActions, onError, t],
 	);
 
 	return useMemo(
@@ -196,7 +205,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			handleDelete,
 			handleResolve,
 			handleRemoveAttachment,
-			handleFilesSelected,
+			handleFileSelected,
 			handleRetry,
 		}),
 		[
@@ -204,7 +213,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 			handleDelete,
 			handleResolve,
 			handleRemoveAttachment,
-			handleFilesSelected,
+			handleFileSelected,
 			handleRetry,
 		],
 	);

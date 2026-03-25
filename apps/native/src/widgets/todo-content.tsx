@@ -18,7 +18,7 @@ import {
 	resolveConflict,
 	toggleTodo,
 } from "@/features/todo/todo-actions";
-import { TodoInput } from "@/features/todo/todo-input";
+import { TodoInputBase } from "@/features/todo/todo-input-base";
 import { TodoList } from "@/features/todo/todo-list";
 import type { TodoListActions } from "@/features/todo/todo-list-base";
 import { useOrgTodos, useTodos } from "@/features/todo/use-todos";
@@ -107,7 +107,7 @@ export function PersonalTodoContent({
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInput
+			<TodoInputBase
 				onAdd={(title) => addTodo(userId, title, organizationId)}
 				triggerSync={sync.triggerSync}
 			/>
@@ -146,7 +146,7 @@ export function OrganizationTodoContent({
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInput
+			<TodoInputBase
 				onAdd={(title) => addOrgTodo(organizationId, userId, title)}
 				triggerSync={sync.triggerSync}
 			/>

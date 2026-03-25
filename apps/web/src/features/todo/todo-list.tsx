@@ -74,17 +74,15 @@ export function TodoList({
 		handleDelete,
 		handleResolve,
 		handleRemoveAttachment,
-		handleFilesSelected,
+		handleFileSelected,
 		handleRetry,
 	} = useTodoHandlers({
-		triggerSync: syncHook.triggerSync,
-		enqueueUpload: syncHook.enqueueUpload,
 		onError: handleToastError,
 		clearError: () => {}, // no-op: errors are sent to toast, not local state
 		fileStorage,
 		t,
 		deleteAttachment: (attachmentId) =>
-			client.upload.deleteMedia({ mediaId: attachmentId }), // Delete attachment is a direct API call
+			client.upload.deleteMedia({ mediaId: attachmentId }),
 		userId,
 		scopeType,
 		scopeId,
@@ -92,19 +90,55 @@ export function TodoList({
 		entityType,
 		actions,
 		mediaActions,
-		getMediaCountForEntity: (entityId) =>
-			getMediaCountForEntity(appDb, entityId),
 	});
+
+	const { triggerSync, enqueueUpload } = syncHook;
 
 	return (
 		<TodoListBase
 			todos={todos}
-			onToggle={handleToggle}
-			onDelete={handleDelete}
-			onResolve={handleResolve}
-			onFilesSelected={handleFilesSelected}
-			onRemoveAttachment={handleRemoveAttachment}
-			onRetryAttachment={(_todoId, attachmentId) => handleRetry(attachmentId)}
+			onToggle={async (id) => {
+				await handleToggle(id);
+				triggerSync();
+			}}
+			onDelete={async (id) => {
+				await handleDelete(id);
+				triggerSync();
+			}}
+			onResolve={async (id, resolution) => {
+				await handleResolve(id, resolution);
+				triggerSync();
+			}}
+			onFilesSelected={async (files, target) => {
+				const currentCount = await getMediaCountForEntity(
+					appDb,
+					target.entityId,
+				);
+				const available = MAX_ATTACHMENTS - currentCount;
+				const sliced = files.slice(0, available);
+				let enqueued = false;
+				for (const file of sliced) {
+					const params = await handleFileSelected(file, target);
+					if (params) {
+						enqueueUpload(params);
+						enqueued = true;
+					}
+				}
+				if (enqueued) {
+					triggerSync();
+				}
+			}}
+			onRemoveAttachment={async (todoId, attachmentId) => {
+				await handleRemoveAttachment(todoId, attachmentId);
+				triggerSync();
+			}}
+			onRetryAttachment={async (_todoId, attachmentId) => {
+				const params = await handleRetry(attachmentId);
+				if (params) {
+					enqueueUpload(params);
+					triggerSync();
+				}
+			}}
 			onValidationError={handleToastError}
 			validateFile={(file) => {
 				if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");

@@ -3,6 +3,7 @@
 	"dropzone": {
 		"idle": "将文件拖放到此处，或点击浏览",
 		"active": "将文件放到这里...",
+		"processing": "正在处理文件...",
 		"rejected": {
 			"type": "不支持该文件类型。请使用 JPEG、PNG、HEIC 或 PDF。",
 			"size": "文件太大。最大大小为 10MB。"

@@ -6,8 +6,6 @@ import { useTodoHandlers } from "./use-todo-handlers";
 export function useTodoListWiring(config: TodoHandlerDeps) {
 	const deps: TodoHandlerDeps = useMemo(
 		() => ({
-			triggerSync: config.triggerSync,
-			enqueueUpload: config.enqueueUpload,
 			userId: config.userId,
 			scopeId: config.scopeId,
 			organizationId: config.organizationId,
@@ -21,7 +19,6 @@ export function useTodoListWiring(config: TodoHandlerDeps) {
 			entityType: config.entityType,
 			scopeType: config.scopeType,
 			mediaActions: config.mediaActions,
-			getMediaCountForEntity: config.getMediaCountForEntity,
 		}),
 		[config],
 	);

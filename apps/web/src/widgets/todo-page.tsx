@@ -2,12 +2,13 @@ import { useTranslation } from "@pengana/i18n";
 import { useTodos } from "@pengana/local-db/todo";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
+import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
 import * as orgActions from "@/features/todo/org-todo-actions";
 import * as personalActions from "@/features/todo/todo-actions";
-import { TodoInput } from "@/features/todo/todo-input";
 import { TodoList } from "@/features/todo/todo-list";
 import { appDb } from "@/shared/db";
 
@@ -20,6 +21,8 @@ function PersonalTodoContent({
 	userId: string;
 	organizationId: string;
 }) {
+	const { t } = useTranslation();
+
 	const orgFilter = useMemo(() => {
 		return (t: { organizationId: string }) =>
 			t.organizationId === organizationId;
@@ -34,12 +37,17 @@ function PersonalTodoContent({
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInput
-				onAdd={(title) =>
-					personalActions.addTodo(userId, title, organizationId)
-				}
-				triggerSync={sync.triggerSync}
+			<TodoInputBase
+				onSubmit={async (title) => {
+					await personalActions.addTodo(userId, title, organizationId);
+					sync.triggerSync();
+				}}
+				onError={(error) => {
+					console.error("[TodoInput] failed to add todo:", error);
+					toast.error(t("errors:failedToAddTodo"));
+				}}
 			/>
+
 			<TodoList
 				todos={todos}
 				syncHook={sync}
@@ -50,6 +58,7 @@ function PersonalTodoContent({
 				organizationId={organizationId}
 				actions={personalActions}
 			/>
+
 			<SyncDevtools descriptor={descriptor} />
 		</div>
 	);
@@ -62,6 +71,7 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
+	const { t } = useTranslation();
 	const { todos } = useTodos(appDb, organizationId);
 	const descriptor: SyncDescriptor = useMemo(
 		() => ({
@@ -76,9 +86,16 @@ function OrgTodoContent({
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInput
-				onAdd={(title) => orgActions.addOrgTodo(organizationId, userId, title)}
-				triggerSync={sync.triggerSync}
+			<TodoInputBase
+				onSubmit={async (title) => {
+					try {
+						await orgActions.addOrgTodo(organizationId, userId, title);
+						sync.triggerSync();
+					} catch (err) {
+						console.error("[TodoInput] failed to add todo:", err);
+					}
+				}}
+				onError={() => toast.error(t("errors:failedToAddTodo"))}
 			/>
 
 			<TodoList
