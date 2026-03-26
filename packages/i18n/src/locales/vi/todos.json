@@ -36,5 +36,8 @@
 		"cancel": "Hủy",
 		"chooseOption": "Chọn một tùy chọn"
 	},
+	"delete": {
+		"success": "Đã xóa công việc"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

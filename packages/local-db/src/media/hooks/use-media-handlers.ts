@@ -61,9 +61,9 @@ export function useMediaHandlers(deps: MediaHandlerDeps) {
 				const result = await actions.processMediaFile({
 					file,
 					userId,
-					scopeType,
 					scopeId,
 					organizationId,
+					scopeType,
 					target,
 					storeFile: fileStorage.storeFile,
 					createFileRef: fileStorage.createFileRef,

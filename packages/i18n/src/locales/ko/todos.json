@@ -36,5 +36,8 @@
 		"cancel": "취소",
 		"chooseOption": "옵션 선택"
 	},
+	"delete": {
+		"success": "할 일이 삭제되었습니다"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

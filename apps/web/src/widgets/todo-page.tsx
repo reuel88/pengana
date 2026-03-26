@@ -5,7 +5,6 @@ import {
 } from "@pengana/local-db/media";
 import {
 	createDexieTodoActions,
-	type TodoActions,
 	useTodoHandlers,
 	useTodos,
 } from "@pengana/local-db/todo";
@@ -36,7 +35,6 @@ function TodoContent({
 	organizationId,
 	syncState,
 	descriptor,
-	actions,
 }: {
 	userId: string;
 	scopeType: "personal" | "org";
@@ -44,9 +42,8 @@ function TodoContent({
 	organizationId: string;
 	syncState: SyncContextValue;
 	descriptor: SyncDescriptor;
-	actions: TodoActions;
 }) {
-	const { t } = useTranslation();
+	const { t } = useTranslation("todos");
 	const { triggerSync, enqueueUpload } = syncState;
 
 	const orgFilter = useMemo(() => {
@@ -54,12 +51,14 @@ function TodoContent({
 			t.scopeType === scopeType &&
 			(!organizationId || t.organizationId === organizationId);
 	}, [organizationId, scopeType]);
-	const { todos } = useTodos({ db: appDb, scopeId: userId, filter: orgFilter });
+	const { todos } = useTodos({ db: appDb, scopeId, filter: orgFilter });
 
 	const handleToastError = useCallback((id: string, message: string) => {
 		console.log(id, message);
 		toast.error(message);
 	}, []);
+
+	const actions = useMemo(() => createDexieTodoActions(appDb), []);
 
 	const fileStorage = useMemo(() => createIndexedDbFileStrategy(appDb), []);
 	const mediaActions = useMemo(() => createDexieMediaActions(appDb), []);
@@ -93,14 +92,12 @@ function TodoContent({
 			<TodoInputBase
 				onSubmit={async (title) => {
 					const result = await handleAdd(title);
-					if (result.success) {
-						triggerSync();
-					} else {
-						toast.error(result.error);
-					}
+					if (!result.success) toast.error(result.error);
+					triggerSync();
 				}}
 				onError={(error) => {
-					console.error("Error occured", error);
+					console.error("Error occurred", error);
+					toast.error(t("error"));
 				}}
 			/>
 
@@ -195,17 +192,6 @@ function PersonalTodoContent({
 	);
 	const sync = useSyncEntry(descriptor);
 
-	const actions = useMemo(
-		() =>
-			createDexieTodoActions(appDb, {
-				userId,
-				scopeId: userId,
-				organizationId,
-				scopeType: "personal",
-			}),
-		[userId, organizationId],
-	);
-
 	return (
 		<TodoContent
 			userId={userId}
@@ -214,7 +200,6 @@ function PersonalTodoContent({
 			scopeType="personal"
 			syncState={sync}
 			descriptor={descriptor}
-			actions={actions}
 		/>
 	);
 }
@@ -236,17 +221,6 @@ function OrgTodoContent({
 	);
 	const sync = useSyncEntry(descriptor);
 
-	const actions = useMemo(
-		() =>
-			createDexieTodoActions(appDb, {
-				userId,
-				scopeId: organizationId,
-				organizationId,
-				scopeType: "org",
-			}),
-		[organizationId, userId],
-	);
-
 	return (
 		<TodoContent
 			userId={userId}
@@ -255,7 +229,6 @@ function OrgTodoContent({
 			scopeType="org"
 			syncState={sync}
 			descriptor={descriptor}
-			actions={actions}
 		/>
 	);
 }
@@ -316,7 +289,7 @@ export function TodoPage({
 					role="tabpanel"
 					aria-labelledby="tab-organization"
 				>
-					<OrgTodoContent organizationId={organizationId} userId={userId} />
+					<OrgTodoContent userId={userId} organizationId={organizationId} />
 				</div>
 			)}
 		</div>

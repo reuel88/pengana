@@ -8,18 +8,18 @@ import {
 	updateMediaLocalUri as _updateMediaLocalUri,
 	updateMediaUploaded as _updateMediaUploaded,
 } from "@pengana/local-db/media";
-import type { DexieTodoScope, WebTodo } from "@pengana/local-db/todo";
+import type { LocalTodo } from "@pengana/local-db/todo";
 import { createDexieTodoActions } from "@pengana/local-db/todo";
 import { HLC } from "@pengana/sync/core";
 
 import { appDb } from "@/shared/db";
 
-export function createTodoActions(scope: DexieTodoScope) {
-	return createDexieTodoActions(appDb, scope);
+export function createTodoActions() {
+	return createDexieTodoActions(appDb);
 }
 
 const hlc = new HLC(crypto.randomUUID());
-const actions = createDexieActions<WebTodo>(appDb, "todos", {
+const actions = createDexieActions<LocalTodo>(appDb, "todos", {
 	hlcNow: () => hlc.now(),
 });
 
@@ -51,5 +51,5 @@ export async function updateTodoTitle(
 	id: string,
 	title: string,
 ): Promise<void> {
-	await actions.update(id, { title } as Partial<WebTodo>);
+	await actions.update(id, { title } as Partial<LocalTodo>);
 }

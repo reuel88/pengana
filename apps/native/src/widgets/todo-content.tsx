@@ -81,22 +81,21 @@ export function PersonalTodoContent({
 	);
 	const sync = useSyncEntry(descriptor);
 
-	const actions = useMemo(
-		() =>
-			createTodoActions({
-				userId,
-				scopeId: userId,
-				organizationId,
-				scopeType: "personal",
-			}),
-		[userId, organizationId],
-	);
+	const actions = useMemo(() => createTodoActions(), []);
 
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInputBase
-				onAdd={(title) => actions.addTodo(title)}
+				onAdd={(title) =>
+					actions.addTodo({
+						title,
+						userId,
+						scopeId: userId,
+						organizationId,
+						scopeType: "personal",
+					})
+				}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList
@@ -131,22 +130,21 @@ export function OrganizationTodoContent({
 	);
 	const sync = useSyncEntry(descriptor);
 
-	const actions = useMemo(
-		() =>
-			createTodoActions({
-				userId,
-				scopeId: organizationId,
-				organizationId,
-				scopeType: "org",
-			}),
-		[organizationId, userId],
-	);
+	const actions = useMemo(() => createTodoActions(), []);
 
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInputBase
-				onAdd={(title) => actions.addTodo(title)}
+				onAdd={(title) =>
+					actions.addTodo({
+						title,
+						userId,
+						scopeId: organizationId,
+						organizationId,
+						scopeType: "org",
+					})
+				}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList

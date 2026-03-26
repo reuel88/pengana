@@ -5,34 +5,99 @@ import type { MediaActions } from "../hooks/media-actions";
 import type { AddMediaOptions, LocalMedia, LocalMediaAttachment } from "./db";
 import { buildReconcilePlan } from "./reconcile-plan";
 
+// ---------------------------------------------------------------------------
+// Media CRUD
+// ---------------------------------------------------------------------------
+
 export async function addMedia(
 	db: EntityDatabase,
-	options: AddMediaOptions & { id?: string },
+	record: AddMediaOptions & { id?: string },
 ): Promise<string> {
-	const id = options.id ?? crypto.randomUUID();
+	const id = record.id ?? crypto.randomUUID();
 	const table = db.getTable<LocalMedia>("media");
 
 	await table.put({
 		id,
-		userId: options.userId,
+
+		localUri: record.localUri,
+		mimeType: record.mimeType,
 		url: null,
-		localUri: options.localUri,
-		status: "queued",
-		mimeType: options.mimeType,
+
+		userId: record.userId,
+		scopeId: record.scopeId,
+		organizationId: record.organizationId,
+		scopeType: record.scopeType,
+
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
-		scopeType: options.scopeType,
-		scopeId: options.scopeId,
-		organizationId: options.organizationId,
-		createdBy: options.createdBy,
+		createdBy: record.createdBy,
 		hlcTimestamp: "",
 		fieldClocks: "{}",
+
+		status: "queued",
 		syncStatus: "synced",
 		deleted: false,
 	});
 
 	return id;
 }
+
+export async function updateMediaUploaded(
+	db: EntityDatabase,
+	mediaId: string,
+	url: string,
+): Promise<void> {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
+		url,
+		status: "uploaded",
+	} as never);
+}
+
+export async function updateMediaLocalUri(
+	db: EntityDatabase,
+	mediaId: string,
+	localUri: string,
+): Promise<void> {
+	await db.getTable<LocalMedia>("media").update(mediaId, { localUri } as never);
+}
+
+export async function markMediaFailed(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<void> {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
+		status: "failed",
+	} as never);
+}
+
+export async function retryMedia(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<LocalMedia | null> {
+	await db.getTable<LocalMedia>("media").update(mediaId, {
+		status: "queued",
+	} as never);
+
+	const record = await db.getTable<LocalMedia>("media").get(mediaId);
+	return record ?? null;
+}
+
+export async function removeMedia(
+	db: EntityDatabase,
+	mediaId: string,
+): Promise<void> {
+	await db.getTable<LocalMedia>("media").delete(mediaId);
+	// Also remove all attachment records for this media
+	const attTable = db.getTable<LocalMediaAttachment>("mediaAttachments");
+	const attachments = await attTable.where({ mediaId }).toArray();
+	if (attachments.length > 0) {
+		await attTable.bulkDelete(attachments.map((a) => a.id));
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Attachment operations
+// ---------------------------------------------------------------------------
 
 export async function attachMediaToEntity(params: {
 	db: EntityDatabase;
@@ -76,47 +141,6 @@ export async function detachMediaFromEntity(params: {
 	}
 }
 
-export async function removeMedia(
-	db: EntityDatabase,
-	mediaId: string,
-): Promise<void> {
-	await db.getTable<LocalMedia>("media").delete(mediaId);
-	// Also remove all attachment records for this media
-	const attTable = db.getTable<LocalMediaAttachment>("mediaAttachments");
-	const attachments = await attTable.where({ mediaId }).toArray();
-	if (attachments.length > 0) {
-		await attTable.bulkDelete(attachments.map((a) => a.id));
-	}
-}
-
-export async function updateMediaUploaded(
-	db: EntityDatabase,
-	mediaId: string,
-	url: string,
-): Promise<void> {
-	await db.getTable<LocalMedia>("media").update(mediaId, {
-		url,
-		status: "uploaded",
-	} as never);
-}
-
-export async function updateMediaLocalUri(
-	db: EntityDatabase,
-	mediaId: string,
-	localUri: string,
-): Promise<void> {
-	await db.getTable<LocalMedia>("media").update(mediaId, { localUri } as never);
-}
-
-export async function markMediaFailed(
-	db: EntityDatabase,
-	mediaId: string,
-): Promise<void> {
-	await db.getTable<LocalMedia>("media").update(mediaId, {
-		status: "failed",
-	} as never);
-}
-
 export async function getAttachmentForMedia(
 	db: EntityDatabase,
 	mediaId: string,
@@ -126,18 +150,6 @@ export async function getAttachmentForMedia(
 		.where({ mediaId })
 		.sortBy("position");
 	return attachments[0];
-}
-
-export async function retryMedia(
-	db: EntityDatabase,
-	mediaId: string,
-): Promise<LocalMedia | null> {
-	await db.getTable<LocalMedia>("media").update(mediaId, {
-		status: "queued",
-	} as never);
-
-	const record = await db.getTable<LocalMedia>("media").get(mediaId);
-	return record ?? null;
 }
 
 export async function getMediaCountForEntity(
@@ -150,13 +162,17 @@ export async function getMediaCountForEntity(
 		.count();
 }
 
+// ---------------------------------------------------------------------------
+// Orchestration
+// ---------------------------------------------------------------------------
+
 export interface ProcessMediaFileParams {
 	db: EntityDatabase;
 	file: File;
 	userId: string;
-	scopeType: "personal" | "org";
 	scopeId: string;
 	organizationId: string;
+	scopeType: "personal" | "org";
 	target?: { entityType: string; entityId: string };
 	storeFile: (id: string, file: File) => Promise<void> | void;
 	createFileRef: (
@@ -195,12 +211,12 @@ export async function processMediaFile(
 
 	await addMedia(db, {
 		id: mediaId,
-		userId,
-		localUri: fileRef.uri,
 		mimeType: file.type,
-		scopeType,
+		localUri: fileRef.uri,
+		userId,
 		scopeId,
 		organizationId,
+		scopeType,
 		createdBy: userId,
 	});
 
@@ -227,14 +243,9 @@ export async function processMediaFile(
 	};
 }
 
-export function createDexieMediaActions(db: EntityDatabase): MediaActions {
-	return {
-		processMediaFile: (params) => processMediaFile({ db, ...params }),
-		removeMedia: (mediaId) => removeMedia(db, mediaId),
-		retryMedia: (mediaId) => retryMedia(db, mediaId),
-		getAttachmentForMedia: (mediaId) => getAttachmentForMedia(db, mediaId),
-	};
-}
+// ---------------------------------------------------------------------------
+// Reconciliation
+// ---------------------------------------------------------------------------
 
 export interface ReconcileMediaOptions {
 	db: EntityDatabase;
@@ -373,4 +384,17 @@ export async function reconcileMedia(
 	for (const mId of plan.mediaIdsToDelete) {
 		await mediaTable.delete(mId);
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Factory
+// ---------------------------------------------------------------------------
+
+export function createDexieMediaActions(db: EntityDatabase): MediaActions {
+	return {
+		processMediaFile: (params) => processMediaFile({ db, ...params }),
+		removeMedia: (mediaId) => removeMedia(db, mediaId),
+		retryMedia: (mediaId) => retryMedia(db, mediaId),
+		getAttachmentForMedia: (mediaId) => getAttachmentForMedia(db, mediaId),
+	};
 }

@@ -4,21 +4,21 @@ import type { EntityDatabase } from "../dexie";
 import { useDexieEntity } from "../hooks/use-dexie-entity";
 import type { LocalMedia, LocalMediaAttachment } from "../media/lib/db";
 
-import type { WebTodo } from "./db";
+import type { LocalTodo } from "./db";
 
-export interface WebTodoWithAttachments extends WebTodo {
+export interface WebTodoWithAttachments extends LocalTodo {
 	attachments: LocalMedia[];
 }
 
 export interface UseTodosOptions {
 	db: EntityDatabase;
 	scopeId: string;
-	filter?: (item: WebTodo) => boolean;
+	filter?: (item: LocalTodo) => boolean;
 }
 
 export function useTodos({ db, scopeId, filter }: UseTodosOptions) {
 	// 1. Query scoped 2do records from local DB
-	const { items, conflicts } = useDexieEntity<WebTodo>(
+	const { items, conflicts } = useDexieEntity<LocalTodo>(
 		db,
 		"todos",
 		scopeId,

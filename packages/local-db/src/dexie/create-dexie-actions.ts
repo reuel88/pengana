@@ -19,6 +19,141 @@ export interface DexieActionsConfig {
 	hlcNow: () => HLCTimestamp;
 }
 
+export interface DexieActionContext {
+	db: EntityDatabase;
+	tableName: string;
+	config: DexieActionsConfig;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+export function stampFields<TLocal extends SyncableBase>(
+	options: {
+		tableName: string;
+		id: string;
+		hlcNow: () => HLCTimestamp;
+	},
+	existing: TLocal | undefined,
+	changedFields: string[],
+): { hlcTimestamp: string; fieldClocks: Record<string, string> } {
+	const ts = serializeHlc(options.hlcNow());
+	const raw = existing?.fieldClocks;
+	const existingClocks: Record<string, string> = safeParseFieldClocks(raw);
+	const fieldClocks = { ...existingClocks };
+	for (const field of changedFields) {
+		fieldClocks[field] = ts;
+	}
+	return { hlcTimestamp: ts, fieldClocks };
+}
+
+// ---------------------------------------------------------------------------
+// Generic CRUD
+// ---------------------------------------------------------------------------
+
+export async function dexieAdd<TLocal extends SyncableBase>(
+	db: EntityDatabase,
+	tableName: string,
+	record: TLocal,
+): Promise<void> {
+	await db.getTable<TLocal>(tableName).add(record);
+}
+
+export async function dexieUpdate<TLocal extends SyncableBase>(
+	db: EntityDatabase,
+	options: {
+		tableName: string;
+		id: string;
+		hlcNow: () => HLCTimestamp;
+	},
+	changes: Partial<TLocal>,
+): Promise<void> {
+	const table = db.getTable<TLocal>(options.tableName);
+
+	const existing = await table.get(options.id);
+
+	const changedFields = Object.keys(changes).filter(
+		(k) =>
+			k !== "syncStatus" &&
+			k !== "updatedAt" &&
+			k !== "hlcTimestamp" &&
+			k !== "fieldClocks",
+	);
+	const { hlcTimestamp, fieldClocks } = stampFields(
+		options,
+		existing,
+		changedFields,
+	);
+	// Dexie's UpdateSpec is strict about known keys on generic types.
+	// We know these fields exist on SyncableBase, so the cast is safe.
+	await table.update(options.id, {
+		...changes,
+		updatedAt: new Date().toISOString(),
+		hlcTimestamp,
+		fieldClocks,
+		syncStatus: "pending",
+	} as never);
+}
+
+export async function dexieSoftDelete<TLocal extends SyncableBase>(
+	db: EntityDatabase,
+	options: {
+		tableName: string;
+		id: string;
+		hlcNow: () => HLCTimestamp;
+	},
+): Promise<void> {
+	const table = db.getTable<TLocal>(options.tableName);
+
+	const existing = await table.get(options.id);
+
+	const { hlcTimestamp, fieldClocks } = stampFields(options, existing, [
+		"deleted",
+	]);
+
+	await table.update(options.id, {
+		deleted: true,
+		updatedAt: new Date().toISOString(),
+		hlcTimestamp,
+		fieldClocks,
+		syncStatus: "pending",
+	} as never);
+}
+
+export async function dexieResolveConflict<TLocal extends SyncableBase>(
+	db: EntityDatabase,
+	options: {
+		tableName: string;
+		id: string;
+		hlcNow: () => HLCTimestamp;
+		resolution: "local" | "server";
+	},
+): Promise<void> {
+	const table = db.getTable<TLocal>(options.tableName);
+
+	if (options.resolution === "local") {
+		const existing = await table.get(options.id);
+
+		const { hlcTimestamp, fieldClocks } = stampFields(options, existing, []);
+
+		await table.update(options.id, {
+			updatedAt: new Date().toISOString(),
+			hlcTimestamp,
+			fieldClocks,
+			syncStatus: "pending",
+		} as never);
+	} else {
+		await table.update(options.id, {
+			syncStatus: "synced",
+		} as never);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Factory
+// ---------------------------------------------------------------------------
+
 /**
  * Generic CRUD action factory for Dexie entities.
  *
@@ -30,84 +165,30 @@ export function createDexieActions<TLocal extends SyncableBase>(
 	tableName: string,
 	config: DexieActionsConfig,
 ): DexieActions<TLocal> {
-	const table = db.getTable<TLocal>(tableName);
-
-	// Dexie's UpdateSpec is strict about known keys on generic types.
-	// We know these fields exist on SyncableBase, so the cast is safe.
-	const doUpdate = (id: string, changes: Record<string, unknown>) =>
-		table.update(id, changes as never);
-
-	function stampFields(
-		existing: TLocal | undefined,
-		changedFields: string[],
-	): { hlcTimestamp: string; fieldClocks: Record<string, string> } {
-		const ts = serializeHlc(config.hlcNow());
-		const raw = existing?.fieldClocks;
-		const existingClocks: Record<string, string> = safeParseFieldClocks(raw);
-		const fieldClocks = { ...existingClocks };
-		for (const field of changedFields) {
-			fieldClocks[field] = ts;
-		}
-		return { hlcTimestamp: ts, fieldClocks };
-	}
-
 	return {
-		async add(record: TLocal): Promise<void> {
-			await table.add(record);
-		},
-
-		async update(id: string, changes: Partial<TLocal>): Promise<void> {
-			const existing = await table.get(id);
-			const changedFields = Object.keys(changes).filter(
-				(k) =>
-					k !== "syncStatus" &&
-					k !== "updatedAt" &&
-					k !== "hlcTimestamp" &&
-					k !== "fieldClocks",
-			);
-			const { hlcTimestamp, fieldClocks } = stampFields(
-				existing,
-				changedFields,
-			);
-			await doUpdate(id, {
-				...changes,
-				updatedAt: new Date().toISOString(),
-				hlcTimestamp,
-				fieldClocks,
-				syncStatus: "pending",
-			});
-		},
-
-		async softDelete(id: string): Promise<void> {
-			const existing = await table.get(id);
-			const { hlcTimestamp, fieldClocks } = stampFields(existing, ["deleted"]);
-			await doUpdate(id, {
-				deleted: true,
-				updatedAt: new Date().toISOString(),
-				hlcTimestamp,
-				fieldClocks,
-				syncStatus: "pending",
-			});
-		},
-
-		async resolveConflict(
-			id: string,
-			resolution: "local" | "server",
-		): Promise<void> {
-			if (resolution === "local") {
-				const existing = await table.get(id);
-				const { hlcTimestamp, fieldClocks } = stampFields(existing, []);
-				await doUpdate(id, {
-					updatedAt: new Date().toISOString(),
-					hlcTimestamp,
-					fieldClocks,
-					syncStatus: "pending",
-				});
-			} else {
-				await doUpdate(id, {
-					syncStatus: "synced",
-				});
-			}
-		},
+		add: (record) => dexieAdd(db, tableName, record),
+		update: (id, changes) =>
+			dexieUpdate(
+				db,
+				{
+					id,
+					tableName,
+					...config,
+				},
+				changes,
+			),
+		softDelete: (id) =>
+			dexieSoftDelete(db, {
+				id,
+				tableName,
+				...config,
+			}),
+		resolveConflict: (id, resolution) =>
+			dexieResolveConflict(db, {
+				id,
+				tableName,
+				resolution,
+				...config,
+			}),
 	};
 }

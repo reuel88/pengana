@@ -110,6 +110,7 @@ function MediaContent({
 							toast.error(result.error);
 						}
 					}
+
 					triggerSync();
 				}}
 				onError={(error) => {

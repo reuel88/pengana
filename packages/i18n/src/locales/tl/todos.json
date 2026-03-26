@@ -36,5 +36,8 @@
 		"cancel": "Kanselahin",
 		"chooseOption": "Pumili ng opsyon"
 	},
+	"delete": {
+		"success": "Natanggal ang gawain"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

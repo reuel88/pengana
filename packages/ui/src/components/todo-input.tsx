@@ -26,7 +26,7 @@ export function TodoInput({ onSubmit, onError }: TodoInputProps) {
 				onError?.(error);
 			}
 		},
-		[onSubmit, onError, title.trim],
+		[onSubmit, onError, title],
 	);
 
 	return (

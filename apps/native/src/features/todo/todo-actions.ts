@@ -1,19 +1,17 @@
 import { createDrizzleActions } from "@pengana/local-db/drizzle";
 import { drizzleMedia } from "@pengana/local-db/media";
-import type { DrizzleTodoScope } from "@pengana/local-db/todo";
 import { createDrizzleTodoActions } from "@pengana/local-db/todo";
 import { HLC } from "@pengana/sync/core";
 import { randomUUID } from "expo-crypto";
 
 import { appDb, media, mediaAttachments, todos } from "@/shared/db";
 
-export function createTodoActions(scope: DrizzleTodoScope) {
+export function createTodoActions() {
 	return createDrizzleTodoActions({
 		db: appDb,
 		todosTable: todos,
 		idColumn: todos.id,
 		generateId: randomUUID,
-		scope,
 	});
 }
 

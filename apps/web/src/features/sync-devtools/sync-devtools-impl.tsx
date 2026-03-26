@@ -1,4 +1,4 @@
-import type { WebTodo } from "@pengana/local-db/todo";
+import type { LocalTodo } from "@pengana/local-db/todo";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { Button } from "@pengana/ui/components/button";
 import { cn } from "@pengana/ui/lib/utils";
@@ -25,7 +25,7 @@ export function SyncDevtoolsImpl({
 			const trimmed = forceConflictId.trim();
 			if (!trimmed) {
 				const firstTodo = await appDb
-					.getTable<WebTodo>("todos")
+					.getTable<LocalTodo>("todos")
 					.toCollection()
 					.first();
 				if (!firstTodo) return;

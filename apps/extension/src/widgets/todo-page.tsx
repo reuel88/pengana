@@ -20,8 +20,8 @@ function PersonalTodoContent({
 	organizationId: string;
 }) {
 	const orgFilter = useMemo(() => {
-		return (t: { organizationId: string }) =>
-			t.organizationId === organizationId;
+		return (t: { organizationId: string; scopeType: "personal" | "org" }) =>
+			t.scopeType === "personal" && t.organizationId === organizationId;
 	}, [organizationId]);
 	const { todos } = useTodos({ db: appDb, scopeId: userId, filter: orgFilter });
 	const sync = useSyncEntry({
@@ -30,16 +30,7 @@ function PersonalTodoContent({
 		entityKey: "sync",
 	});
 
-	const actions = useMemo(
-		() =>
-			createDexieTodoActions(appDb, {
-				userId,
-				scopeId: userId,
-				organizationId,
-				scopeType: "personal",
-			}),
-		[userId, organizationId],
-	);
+	const actions = useMemo(() => createDexieTodoActions(appDb), []);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -71,16 +62,7 @@ function OrgTodoContent({
 		entityKey: "sync",
 	});
 
-	const actions = useMemo(
-		() =>
-			createDexieTodoActions(appDb, {
-				userId,
-				scopeId: organizationId,
-				organizationId,
-				scopeType: "org",
-			}),
-		[organizationId, userId],
-	);
+	const actions = useMemo(() => createDexieTodoActions(appDb), []);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -90,7 +72,7 @@ function OrgTodoContent({
 				syncHook={sync}
 				userId={userId}
 				scopeType="org"
-				scopeId={userId}
+				scopeId={organizationId}
 				organizationId={organizationId}
 				actions={actions}
 			/>

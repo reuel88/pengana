@@ -1,6 +1,13 @@
 export {
 	createDexieActions,
+	type DexieActionContext,
 	type DexieActions,
+	type DexieActionsConfig,
+	dexieAdd,
+	dexieResolveConflict,
+	dexieSoftDelete,
+	dexieUpdate,
+	stampFields,
 } from "./create-dexie-actions";
 export {
 	createDexieSyncAdapter,

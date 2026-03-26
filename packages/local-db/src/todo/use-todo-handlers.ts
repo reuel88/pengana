@@ -20,7 +20,13 @@ export interface FileStorageStrategy {
 }
 
 export interface TodoActions {
-	addTodo: (title: string) => Promise<void>;
+	addTodo: (params: {
+		title: string;
+		userId: string;
+		scopeId: string;
+		organizationId: string;
+		scopeType: "personal" | "org";
+	}) => Promise<void>;
 	toggleTodo: (id: string) => Promise<void>;
 	deleteTodo: (id: string) => Promise<void>;
 	resolveConflict: (
@@ -55,7 +61,13 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 	const handleAdd = useCallback(
 		async (title: string): Promise<TodoHandlerResult> => {
 			try {
-				await actions.addTodo(title);
+				await actions.addTodo({
+					title,
+					userId,
+					scopeId,
+					organizationId,
+					scopeType,
+				});
 				return { success: true, data: undefined };
 			} catch (e) {
 				return {
@@ -66,7 +78,7 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 				};
 			}
 		},
-		[actions, t],
+		[actions, t, scopeId, userId, organizationId, scopeType],
 	);
 
 	const handleToggle = useCallback(
@@ -87,9 +99,9 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 	);
 
 	const handleDelete = useCallback(
-		async (id: string): Promise<TodoHandlerResult> => {
+		async (todoId: string): Promise<TodoHandlerResult> => {
 			try {
-				await actions.deleteTodo(id);
+				await actions.deleteTodo(todoId);
 				return { success: true, data: undefined };
 			} catch (e) {
 				return {
@@ -105,11 +117,11 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 
 	const handleResolve = useCallback(
 		async (
-			id: string,
+			todoId: string,
 			resolution: "local" | "server",
 		): Promise<TodoHandlerResult> => {
 			try {
-				await actions.resolveConflict(id, resolution);
+				await actions.resolveConflict(todoId, resolution);
 				return { success: true, data: undefined };
 			} catch (e) {
 				return {

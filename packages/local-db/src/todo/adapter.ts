@@ -4,24 +4,24 @@ import {
 	type EntityDatabase,
 } from "../dexie";
 
-import type { WebTodo } from "./db";
+import type { LocalTodo } from "./db";
 import type { TodoConfig } from "./todo-config";
 
 export function createTodoSyncAdapter(params: {
 	db: EntityDatabase;
 	scopeId: string;
 	config: TodoConfig;
-	filter?: (item: WebTodo) => boolean;
+	filter?: (item: LocalTodo) => boolean;
 	syncKeySuffix?: string;
 }): SyncAdapter {
 	const { db, scopeId, config, filter, syncKeySuffix } = params;
-	return createGenericAdapter<WebTodo>(scopeId, {
+	return createGenericAdapter<LocalTodo>(scopeId, {
 		db,
 		tableName: config.entity.name,
 		syncKeyPrefix: config.syncKeyPrefix,
 		filter,
 		syncKeySuffix,
-		toWire: (local: WebTodo): Todo => ({
+		toWire: (local: LocalTodo): Todo => ({
 			id: local.id,
 			title: local.title,
 			completed: local.completed,
@@ -36,10 +36,10 @@ export function createTodoSyncAdapter(params: {
 		}),
 		toLocal: (
 			wire: Todo,
-			existing: WebTodo | undefined,
+			existing: LocalTodo | undefined,
 			syncStatus: "synced" | "conflict",
-		): WebTodo => {
-			const base: WebTodo = {
+		): LocalTodo => {
+			const base: LocalTodo = {
 				id: wire.id,
 				title: wire.title,
 				completed: wire.completed,

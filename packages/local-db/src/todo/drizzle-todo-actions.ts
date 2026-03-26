@@ -4,22 +4,14 @@ import type { BaseSQLiteDatabase, SQLiteColumn } from "drizzle-orm/sqlite-core";
 import { createDrizzleActions } from "../drizzle";
 import type { TodoActions } from "./use-todo-handlers";
 
-export interface DrizzleTodoScope {
-	userId: string;
-	scopeId: string;
-	organizationId: string;
-	scopeType: "personal" | "org";
-}
-
 export function createDrizzleTodoActions(params: {
 	db: BaseSQLiteDatabase<"sync" | "async", unknown>;
 	// biome-ignore lint/suspicious/noExplicitAny: Must accept any Drizzle table shape
 	todosTable: any;
 	idColumn: SQLiteColumn;
 	generateId: () => string;
-	scope: DrizzleTodoScope;
 }): TodoActions {
-	const { db, todosTable, idColumn, generateId, scope } = params;
+	const { db, todosTable, idColumn, generateId } = params;
 	const hlc = new HLC(generateId());
 	const actions = createDrizzleActions<Record<string, unknown>>(
 		db,
@@ -29,7 +21,8 @@ export function createDrizzleTodoActions(params: {
 	);
 
 	return {
-		async addTodo(title: string): Promise<void> {
+		async addTodo(addParams): Promise<void> {
+			const { title, userId, scopeId, organizationId, scopeType } = addParams;
 			const ts = serializeHlc(hlc.now());
 			await actions.add({
 				id: generateId(),
@@ -38,11 +31,11 @@ export function createDrizzleTodoActions(params: {
 				updatedAt: new Date().toISOString(),
 				hlcTimestamp: ts,
 				fieldClocks: JSON.stringify({ title: ts, completed: ts, deleted: ts }),
-				userId: scope.userId,
-				scopeId: scope.scopeId,
-				organizationId: scope.organizationId,
-				createdBy: scope.userId,
-				scopeType: scope.scopeType,
+				userId,
+				scopeId,
+				organizationId,
+				createdBy: userId,
+				scopeType,
 				syncStatus: "pending",
 				deleted: false,
 			});

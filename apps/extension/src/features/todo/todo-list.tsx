@@ -6,9 +6,9 @@ import {
 	storeFileInDexie,
 } from "@pengana/local-db/media";
 import {
+	type LocalTodo,
 	type TodoActions,
 	useTodoHandlers,
-	type WebTodo,
 } from "@pengana/local-db/todo";
 import type { EnqueueUploadParams } from "@pengana/sync/upload";
 import {
@@ -23,7 +23,7 @@ import { useCallback, useMemo, useState } from "react";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
-type TodoWithAttachments = WebTodo & {
+type TodoWithAttachments = LocalTodo & {
 	attachments: LocalMedia[];
 };
 

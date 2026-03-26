@@ -1,53 +1,49 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useDrizzleEntity } from "../../hooks/use-drizzle-entity";
 import type { LocalMedia, LocalMediaAttachment } from "../lib/db";
 import type {
 	MediaAttachmentTable,
 	MediaTable,
 } from "../lib/drizzle-media-actions";
-import type { MediaListItem, ServerMediaRecord } from "../lib/merge-media";
-import { mergeMediaRecords } from "../lib/merge-media";
+import type { MediaListItem } from "../lib/merge-media";
 
 export interface UseDrizzleMediaOptions {
 	db: ExpoSQLiteDatabase;
 	mediaTable: MediaTable;
 	mediaAttachmentTable: MediaAttachmentTable;
-	scopeType: "personal" | "org";
 	scopeId: string;
-	serverMedia?: ServerMediaRecord[];
+	filter?: (item: LocalMedia) => boolean;
 }
 
-export function useDrizzleMedia({
+export function useMedia({
 	db,
 	mediaTable,
 	mediaAttachmentTable,
-	scopeType,
 	scopeId,
-	serverMedia = [],
+	filter,
 }: UseDrizzleMediaOptions): { media: MediaListItem[] } {
 	// 1. Query scoped media records from local DB
-	const { data: localMediaRaw } = useLiveQuery(
-		db
-			.select()
-			.from(mediaTable)
-			.where(
-				and(
-					eq(mediaTable.scopeId, scopeId),
-					eq(mediaTable.scopeType, scopeType),
-				),
-			),
-		[scopeId, scopeType],
+	const { items: localMedia } = useDrizzleEntity<LocalMedia>(
+		db,
+		mediaTable,
+		scopeId,
+		filter,
 	);
-
-	const localMedia = (localMediaRaw ?? []) as LocalMedia[];
 
 	// 2. Derive deduplicated media IDs for the attachment query
-	const mediaIds = useMemo(
-		() => [...new Set(localMedia.map((item) => item.id))],
-		[localMedia],
-	);
+	const mediaIdsRef = useRef<string[]>([]);
+	const mediaIds = useMemo(() => {
+		const next = localMedia.map((item) => item.id);
+		const prev = mediaIdsRef.current;
+		if (next.length === prev.length && next.every((id, i) => id === prev[i])) {
+			return prev;
+		}
+		mediaIdsRef.current = next;
+		return next;
+	}, [localMedia]);
 
 	// 3. Query attachments linked to those media IDs
 	const { data: localAttachmentsRaw } = useLiveQuery(
@@ -66,15 +62,43 @@ export function useDrizzleMedia({
 	const localAttachments = (localAttachmentsRaw ??
 		[]) as LocalMediaAttachment[];
 
-	// 4. Merge local media + attachments with server records into a unified list
+	// 4. Group attachments by media ID
+	const attachmentsByMediaId = useMemo(() => {
+		const map = new Map<string, LocalMediaAttachment[]>();
+		for (const att of localAttachments) {
+			const list = map.get(att.mediaId) ?? [];
+			list.push(att);
+			map.set(att.mediaId, list);
+		}
+		return map;
+	}, [localAttachments]);
+
+	// 5. Merge media + attachments into a unified list
 	const media = useMemo(
 		() =>
-			mergeMediaRecords({
-				localMedia,
-				localAttachments,
-				serverMedia,
-			}),
-		[localAttachments, localMedia, serverMedia],
+			localMedia
+				.map(
+					(m): MediaListItem => ({
+						id: m.id,
+						userId: m.userId,
+						url: m.url,
+						localUri: m.localUri,
+						mimeType: m.mimeType,
+						status: m.status,
+						createdAt: m.createdAt,
+						updatedAt: m.updatedAt,
+						scopeType: m.scopeType,
+						scopeId: m.scopeId,
+						organizationId: m.organizationId,
+						createdBy: m.createdBy,
+						attachments: (attachmentsByMediaId.get(m.id) ?? []).sort(
+							(a, b) => a.position - b.position,
+						),
+						isLocalOnly: m.status !== "uploaded",
+					}),
+				)
+				.sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+		[localMedia, attachmentsByMediaId],
 	);
 
 	return { media };

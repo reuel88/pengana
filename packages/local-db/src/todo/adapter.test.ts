@@ -1,7 +1,7 @@
 import type { Todo } from "@pengana/sync/core";
 import { describe, expect, it, vi } from "vitest";
 
-import type { WebTodo } from "./db";
+import type { LocalTodo } from "./db";
 import { orgTodoConfig } from "./todo-config";
 
 const { createDexieSyncAdapterMock } = vi.hoisted(() => ({
@@ -29,9 +29,9 @@ function getToLocal() {
 		{
 			toLocal: (
 				wire: Todo,
-				existing: WebTodo | undefined,
+				existing: LocalTodo | undefined,
 				syncStatus: "synced" | "conflict",
-			) => WebTodo;
+			) => LocalTodo;
 		},
 	];
 	return config.toLocal;
@@ -67,7 +67,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			scopeType: "org",
 			syncStatus: "pending",
 			deleted: true,
-		} satisfies WebTodo;
+		} satisfies LocalTodo;
 
 		expect(toLocal(wire, existing, "synced")).toEqual({
 			id: "todo-1",
@@ -115,7 +115,7 @@ describe("createTodoSyncAdapter (org config)", () => {
 			scopeType: "org",
 			syncStatus: "pending",
 			deleted: true,
-		} satisfies WebTodo;
+		} satisfies LocalTodo;
 
 		expect(toLocal(wire, existing, "conflict")).toEqual({
 			id: "todo-1",

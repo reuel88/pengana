@@ -36,5 +36,8 @@
 		"cancel": "إلغاء",
 		"chooseOption": "اختر خياراً"
 	},
+	"delete": {
+		"success": "تم حذف المهمة"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

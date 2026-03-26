@@ -36,5 +36,8 @@
 		"cancel": "Cancelar",
 		"chooseOption": "Elige una opción"
 	},
+	"delete": {
+		"success": "Tarea eliminada"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }
