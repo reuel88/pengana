@@ -11,8 +11,7 @@ export const todos = sqliteTable("todos", {
 });
 
 export const media = sqliteTable("media", {
-	id: text("id").primaryKey(),
-	userId: text("user_id").notNull(),
+	...syncableColumns,
 	url: text("url"),
 	localUri: text("local_uri"),
 	status: text("status", {
@@ -20,9 +19,7 @@ export const media = sqliteTable("media", {
 	}),
 	mimeType: text("mime_type").notNull(),
 	createdAt: text("created_at").notNull(),
-	updatedAt: text("updated_at").notNull(),
 	scopeType: text("scope_type").notNull().default("personal"),
-	scopeId: text("scope_id").notNull().default(""),
 	organizationId: text("organization_id").notNull(),
 	createdBy: text("created_by").notNull(),
 });

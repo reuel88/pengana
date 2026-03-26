@@ -17,6 +17,7 @@ import {
 	MAX_ATTACHMENTS,
 	MAX_FILE_SIZE_BYTES,
 } from "@pengana/sync/upload";
+import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
 import { useCallback, useMemo, useState } from "react";
 import { client } from "@/shared/api/orpc";
@@ -33,7 +34,6 @@ interface TodoListProps {
 		enqueueUpload: (params: EnqueueUploadParams) => void;
 	};
 	actions: TodoActions;
-	entityType?: string;
 	userId: string;
 	scopeType: "personal" | "org";
 	scopeId: string;
@@ -44,7 +44,6 @@ export function TodoList({
 	todos,
 	syncHook,
 	actions,
-	entityType,
 	userId,
 	scopeType,
 	scopeId,
@@ -77,24 +76,19 @@ export function TodoList({
 	const mediaActions = useMemo(() => createDexieMediaActions(appDb), []);
 
 	const {
+		handleAdd,
 		handleToggle,
 		handleDelete,
 		handleResolve,
 		handleRemoveAttachment,
 		handleFileSelected,
 	} = useTodoHandlers({
-		onError,
-		clearError,
 		fileStorage,
 		t,
-		onDeleteSuccess: clearError,
-		deleteAttachment: (attachmentId) =>
-			client.upload.deleteMedia({ mediaId: attachmentId }),
 		userId,
 		scopeType,
 		scopeId,
 		organizationId,
-		entityType,
 		actions,
 		mediaActions,
 	});
@@ -102,51 +96,82 @@ export function TodoList({
 	const { triggerSync, enqueueUpload } = syncHook;
 
 	return (
-		<TodoListBase
-			todos={todos}
-			onToggle={async (id) => {
-				await handleToggle(id);
-				triggerSync();
-			}}
-			onDelete={async (id) => {
-				await handleDelete(id);
-				triggerSync();
-			}}
-			onResolve={async (id, resolution) => {
-				await handleResolve(id, resolution);
-				triggerSync();
-			}}
-			onFilesSelected={async (files, target) => {
-				const currentCount = await getMediaCountForEntity(
-					appDb,
-					target.entityId,
-				);
-				const available = MAX_ATTACHMENTS - currentCount;
-				const sliced = files.slice(0, available);
-				let enqueued = false;
-				for (const file of sliced) {
-					const params = await handleFileSelected(file, target);
-					if (params) {
-						enqueueUpload(params);
-						enqueued = true;
+		<div className="flex flex-col gap-4">
+			<TodoInputBase
+				onSubmit={async (title) => {
+					const result = await handleAdd(title);
+					if (result.success) {
+						triggerSync();
+					} else {
+						onError("add-todo", result.error);
 					}
-				}
-				if (enqueued) {
+				}}
+			/>
+			<TodoListBase
+				todos={todos}
+				onToggle={async (id) => {
+					clearError(id);
+					const result = await handleToggle(id);
+					if (!result.success) onError(id, result.error);
 					triggerSync();
-				}
-			}}
-			onRemoveAttachment={async (todoId, attachmentId) => {
-				await handleRemoveAttachment(todoId, attachmentId);
-				triggerSync();
-			}}
-			onValidationError={onError}
-			validateFile={(file) => {
-				if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
-				if (file.size > MAX_FILE_SIZE_BYTES) return t("errors:fileTooLarge");
-				return null;
-			}}
-			maxAttachments={MAX_ATTACHMENTS}
-			errors={errors}
-		/>
+				}}
+				onDelete={async (id) => {
+					clearError(id);
+					const result = await handleDelete(id);
+					if (!result.success) onError(id, result.error);
+					triggerSync();
+				}}
+				onResolve={async (id, resolution) => {
+					clearError(id);
+					const result = await handleResolve(id, resolution);
+					if (!result.success) onError(id, result.error);
+					triggerSync();
+				}}
+				onFilesSelected={async (files, target) => {
+					clearError(target.entityId);
+					const currentCount = await getMediaCountForEntity(
+						appDb,
+						target.entityId,
+					);
+					const available = MAX_ATTACHMENTS - currentCount;
+					const sliced = files.slice(0, available);
+					let enqueued = false;
+					for (const file of sliced) {
+						const result = await handleFileSelected(file, target);
+						if (result.success) {
+							enqueueUpload(result.data);
+							enqueued = true;
+						} else {
+							onError(target.entityId, result.error);
+						}
+					}
+					if (enqueued) {
+						triggerSync();
+					}
+				}}
+				onRemoveAttachment={async (todoId, attachmentId) => {
+					clearError(todoId);
+					const result = await handleRemoveAttachment(todoId, attachmentId);
+					if (result.success) {
+						try {
+							await client.upload.deleteMedia({ mediaId: attachmentId });
+						} catch {
+							// server-side cleanup failed; local removal already succeeded
+						}
+					} else {
+						onError(todoId, result.error);
+					}
+					triggerSync();
+				}}
+				onValidationError={onError}
+				validateFile={(file) => {
+					if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
+					if (file.size > MAX_FILE_SIZE_BYTES) return t("errors:fileTooLarge");
+					return null;
+				}}
+				maxAttachments={MAX_ATTACHMENTS}
+				errors={errors}
+			/>
+		</div>
 	);
 }

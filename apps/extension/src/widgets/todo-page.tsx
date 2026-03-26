@@ -1,14 +1,11 @@
 import { useTranslation } from "@pengana/i18n";
-import { useTodos } from "@pengana/local-db/todo";
+import { createDexieTodoActions, useTodos } from "@pengana/local-db/todo";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
-import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
 import { useMemo, useState } from "react";
 import { LanguageSwitcher } from "@/features/i18n/language-switcher.tsx";
 import { useBackgroundPort } from "@/features/sync/use-background-port";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { ModeToggle } from "@/features/theme/mode-toggle";
-import * as orgActions from "@/features/todo/org-todo-actions";
-import * as personalActions from "@/features/todo/todo-actions";
 import { TodoList } from "@/features/todo/todo-list";
 import type { SyncScope } from "@/shared/api/background-messages";
 import { appDb } from "@/shared/db";
@@ -22,41 +19,39 @@ function PersonalTodoContent({
 	userId: string;
 	organizationId: string;
 }) {
-	const { t } = useTranslation();
 	const orgFilter = useMemo(() => {
 		return (t: { organizationId: string }) =>
 			t.organizationId === organizationId;
 	}, [organizationId]);
-	const { todos } = useTodos(appDb, userId, orgFilter);
+	const { todos } = useTodos({ db: appDb, scopeId: userId, filter: orgFilter });
 	const sync = useSyncEntry({
 		scopeType: "personal",
 		scopeId: userId,
-		entityKey: "todo",
+		entityKey: "sync",
 	});
+
+	const actions = useMemo(
+		() =>
+			createDexieTodoActions(appDb, {
+				userId,
+				scopeId: userId,
+				organizationId,
+				scopeType: "personal",
+			}),
+		[userId, organizationId],
+	);
 
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInputBase
-				onSubmit={async (title) => {
-					try {
-						await personalActions.addTodo(userId, title, organizationId);
-						sync.triggerSync();
-					} catch (err) {
-						console.error("[TodoInput] failed to add todo:", err);
-					}
-				}}
-				onError={() => console.error(t("errors:failedToAddTodo"))}
-			/>
 			<TodoList
 				todos={todos}
 				syncHook={sync}
-				entityType="todo"
 				userId={userId}
 				scopeType="personal"
 				scopeId={userId}
 				organizationId={organizationId}
-				actions={personalActions}
+				actions={actions}
 			/>
 		</div>
 	);
@@ -69,37 +64,35 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
-	const { t } = useTranslation();
-	const { todos } = useTodos(appDb, organizationId);
+	const { todos } = useTodos({ db: appDb, scopeId: organizationId });
 	const sync = useSyncEntry({
 		scopeType: "organization",
 		scopeId: organizationId,
-		entityKey: "todo",
+		entityKey: "sync",
 	});
+
+	const actions = useMemo(
+		() =>
+			createDexieTodoActions(appDb, {
+				userId,
+				scopeId: organizationId,
+				organizationId,
+				scopeType: "org",
+			}),
+		[organizationId, userId],
+	);
 
 	return (
 		<div className="flex flex-col gap-4">
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInputBase
-				onSubmit={async (title) => {
-					try {
-						await orgActions.addOrgTodo(organizationId, userId, title);
-						sync.triggerSync();
-					} catch (err) {
-						console.error("[TodoInput] failed to add todo:", err);
-					}
-				}}
-				onError={() => console.error(t("errors:failedToAddTodo"))}
-			/>
 			<TodoList
 				todos={todos}
 				syncHook={sync}
-				entityType="todo"
 				userId={userId}
 				scopeType="org"
 				scopeId={userId}
 				organizationId={organizationId}
-				actions={orgActions}
+				actions={actions}
 			/>
 		</div>
 	);

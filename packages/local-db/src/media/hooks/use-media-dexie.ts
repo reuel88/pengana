@@ -1,48 +1,41 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { EntityDatabase } from "../../dexie";
+import { useDexieEntity } from "../../hooks/use-dexie-entity";
 
 import type { LocalMedia, LocalMediaAttachment } from "../lib/db";
-import type { MediaConfig } from "../lib/media-config";
 import type { MediaListItem } from "../lib/merge-media";
 
 export interface UseMediaOptions {
 	db: EntityDatabase;
-	config: MediaConfig;
 	scopeId: string;
-	organizationId?: string;
+	filter?: (item: LocalMedia) => boolean;
 }
 
-export function useMedia({
-	db,
-	config,
-	scopeId,
-	organizationId,
-}: UseMediaOptions): {
+export function useMedia({ db, scopeId, filter }: UseMediaOptions): {
 	media: MediaListItem[];
 } {
-	const localMedia =
-		useLiveQuery(
-			(): Promise<LocalMedia[]> =>
-				db
-					.getTable<LocalMedia>("media")
-					.where("scopeId")
-					.equals(scopeId)
-					.and(
-						(item) =>
-							item.scopeType === config.scopeType &&
-							(!organizationId || item.organizationId === organizationId),
-					)
-					.toArray(),
-			[db, config.scopeType, scopeId, organizationId],
-			[] as LocalMedia[],
-		) ?? [];
-
-	const mediaIds = useMemo(
-		() => [...new Set(localMedia.map((item) => item.id))],
-		[localMedia],
+	// 1. Query scoped media records from local DB
+	const { items: localMedia } = useDexieEntity<LocalMedia>(
+		db,
+		"media",
+		scopeId,
+		filter,
 	);
 
+	// 2. Derive deduplicated media IDs for the attachment query
+	const mediaIdsRef = useRef<string[]>([]);
+	const mediaIds = useMemo(() => {
+		const next = localMedia.map((item) => item.id);
+		const prev = mediaIdsRef.current;
+		if (next.length === prev.length && next.every((id, i) => id === prev[i])) {
+			return prev;
+		}
+		mediaIdsRef.current = next;
+		return next;
+	}, [localMedia]);
+
+	// 3. Query attachments linked to those media IDs
 	const localAttachments =
 		useLiveQuery(
 			(): Promise<LocalMediaAttachment[]> => {
@@ -57,6 +50,7 @@ export function useMedia({
 			[] as LocalMediaAttachment[],
 		) ?? [];
 
+	// 4. Group attachments by media ID
 	const attachmentsByMediaId = useMemo(() => {
 		const map = new Map<string, LocalMediaAttachment[]>();
 		for (const att of localAttachments) {
@@ -67,6 +61,7 @@ export function useMedia({
 		return map;
 	}, [localAttachments]);
 
+	// 5. Merge media + attachments into a unified list
 	const media = useMemo(
 		() =>
 			localMedia

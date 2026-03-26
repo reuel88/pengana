@@ -13,7 +13,7 @@ export function useFilePicker(userId: string, organizationId: string) {
 	const { enqueueUpload } = useSyncEntry({
 		scopeType: "personal",
 		scopeId: userId,
-		entityKey: "todo",
+		entityKey: "sync",
 	});
 	return useFilePickerBase({
 		addMedia,

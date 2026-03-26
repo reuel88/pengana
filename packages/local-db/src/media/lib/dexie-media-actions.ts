@@ -25,6 +25,10 @@ export async function addMedia(
 		scopeId: options.scopeId,
 		organizationId: options.organizationId,
 		createdBy: options.createdBy,
+		hlcTimestamp: "",
+		fieldClocks: "{}",
+		syncStatus: "synced",
+		deleted: false,
 	});
 
 	return id;

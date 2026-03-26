@@ -1,3 +1,4 @@
+import type { SyncStatus } from "@pengana/sync/core";
 import type { UploadStatus } from "@pengana/sync/upload";
 
 export interface AddMediaOptions {
@@ -23,6 +24,10 @@ export interface LocalMedia {
 	scopeId: string;
 	organizationId: string;
 	createdBy: string;
+	hlcTimestamp: string;
+	fieldClocks: Record<string, string> | string;
+	syncStatus: SyncStatus;
+	deleted: boolean;
 }
 
 export interface LocalMediaAttachment {

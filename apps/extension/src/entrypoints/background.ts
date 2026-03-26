@@ -36,7 +36,7 @@ function scopeToDescriptor(scope: SyncScope): SyncDescriptor {
 	return {
 		scopeType: scope.scopeType,
 		scopeId: scope.scopeId,
-		entityKey: "todo",
+		entityKey: "sync",
 	};
 }
 

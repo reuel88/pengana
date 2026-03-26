@@ -27,6 +27,10 @@ export type MediaTable = SQLiteTable & {
 	scopeId: SQLiteColumn;
 	organizationId: SQLiteColumn;
 	createdBy: SQLiteColumn;
+	hlcTimestamp: SQLiteColumn;
+	fieldClocks: SQLiteColumn;
+	syncStatus: SQLiteColumn;
+	deleted: SQLiteColumn;
 };
 
 export type MediaAttachmentTable = SQLiteTable & {
@@ -60,6 +64,10 @@ export async function addMedia(params: {
 		scopeId: options.scopeId,
 		organizationId: options.organizationId,
 		createdBy: options.createdBy,
+		hlcTimestamp: "",
+		fieldClocks: "{}",
+		syncStatus: "synced",
+		deleted: false,
 	});
 
 	return id;

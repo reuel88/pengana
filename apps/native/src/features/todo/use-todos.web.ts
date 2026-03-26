@@ -8,9 +8,13 @@ export function useTodos(userId: string, organizationId?: string) {
 		return (t: { organizationId: string }) =>
 			t.organizationId === organizationId;
 	}, [organizationId]);
-	return useTodosWithAttachments(appDb, userId, orgFilter);
+	return useTodosWithAttachments({
+		db: appDb,
+		scopeId: userId,
+		filter: orgFilter,
+	});
 }
 
 export function useOrgTodos(organizationId: string) {
-	return useTodosWithAttachments(appDb, organizationId);
+	return useTodosWithAttachments({ db: appDb, scopeId: organizationId });
 }

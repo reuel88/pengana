@@ -1,18 +1,186 @@
 import { useTranslation } from "@pengana/i18n";
-import { useTodos } from "@pengana/local-db/todo";
+import {
+	createDexieMediaActions,
+	getMediaCountForEntity,
+} from "@pengana/local-db/media";
+import {
+	createDexieTodoActions,
+	type TodoActions,
+	useTodoHandlers,
+	useTodos,
+} from "@pengana/local-db/todo";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
+import {
+	isAllowedMimeType,
+	MAX_ATTACHMENTS,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync/upload";
 import { ConnectivityBanner } from "@pengana/ui/components/connectivity-banner";
 import { TodoInput as TodoInputBase } from "@pengana/ui/components/todo-input";
-import { useMemo, useState } from "react";
+import { TodoList as TodoListBase } from "@pengana/ui/components/todo-list";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import type { SyncContextValue } from "@/features/sync/use-sync-entry";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
-import * as orgActions from "@/features/todo/org-todo-actions";
-import * as personalActions from "@/features/todo/todo-actions";
-import { TodoList } from "@/features/todo/todo-list";
+import { createIndexedDbFileStrategy } from "@/features/upload-queue";
+import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
 type Tab = "personal" | "organization";
+
+function TodoContent({
+	userId,
+	scopeType,
+	scopeId,
+	organizationId,
+	syncState,
+	descriptor,
+	actions,
+}: {
+	userId: string;
+	scopeType: "personal" | "org";
+	scopeId: string;
+	organizationId: string;
+	syncState: SyncContextValue;
+	descriptor: SyncDescriptor;
+	actions: TodoActions;
+}) {
+	const { t } = useTranslation();
+	const { triggerSync, enqueueUpload } = syncState;
+
+	const orgFilter = useMemo(() => {
+		return (t: { organizationId: string; scopeType: "personal" | "org" }) =>
+			t.scopeType === scopeType &&
+			(!organizationId || t.organizationId === organizationId);
+	}, [organizationId, scopeType]);
+	const { todos } = useTodos({ db: appDb, scopeId: userId, filter: orgFilter });
+
+	const handleToastError = useCallback((id: string, message: string) => {
+		console.log(id, message);
+		toast.error(message);
+	}, []);
+
+	const fileStorage = useMemo(() => createIndexedDbFileStrategy(appDb), []);
+	const mediaActions = useMemo(() => createDexieMediaActions(appDb), []);
+
+	const {
+		handleAdd,
+		handleToggle,
+		handleResolve,
+		handleDelete,
+
+		handleFileSelected,
+		handleRemoveAttachment,
+		handleRetryAttachment,
+	} = useTodoHandlers({
+		t,
+		actions,
+		mediaActions,
+		userId,
+		scopeId,
+		organizationId,
+		scopeType,
+		fileStorage,
+	});
+
+	return (
+		<div className="flex flex-col gap-4">
+			<ConnectivityBanner
+				isOnline={syncState.isOnline}
+				isSyncing={syncState.isSyncing}
+			/>
+			<TodoInputBase
+				onSubmit={async (title) => {
+					const result = await handleAdd(title);
+					if (result.success) {
+						triggerSync();
+					} else {
+						toast.error(result.error);
+					}
+				}}
+				onError={(error) => {
+					console.error("Error occured", error);
+				}}
+			/>
+
+			<TodoListBase
+				todos={todos}
+				onToggle={async (id) => {
+					const result = await handleToggle(id);
+					if (!result.success) toast.error(result.error);
+					triggerSync();
+				}}
+				onDelete={async (id) => {
+					const result = await handleDelete(id);
+					if (result.success) {
+						toast.success(t("delete.success"));
+					} else {
+						toast.error(result.error);
+					}
+					triggerSync();
+				}}
+				onResolve={async (id, resolution) => {
+					const result = await handleResolve(id, resolution);
+					if (!result.success) toast.error(result.error);
+					triggerSync();
+				}}
+				onFilesSelected={async (files, target) => {
+					const currentCount = await getMediaCountForEntity(
+						appDb,
+						target.entityId,
+					);
+					const available = MAX_ATTACHMENTS - currentCount;
+					const sliced = files.slice(0, available);
+					let enqueued = false;
+					for (const file of sliced) {
+						const result = await handleFileSelected(file, target);
+						if (result.success) {
+							enqueueUpload(result.data);
+							enqueued = true;
+						} else {
+							toast.error(result.error);
+						}
+					}
+					if (enqueued) {
+						triggerSync();
+					}
+				}}
+				onRemoveAttachment={async (todoId, attachmentId) => {
+					const result = await handleRemoveAttachment(todoId, attachmentId);
+					if (result.success) {
+						try {
+							await client.upload.deleteMedia({ mediaId: attachmentId });
+						} catch {
+							// server-side cleanup failed; local removal already succeeded
+						}
+					} else {
+						toast.error(result.error);
+					}
+					triggerSync();
+				}}
+				onRetryAttachment={async (_todoId, attachmentId) => {
+					const result = await handleRetryAttachment(attachmentId);
+					if (result.success && result.data) {
+						enqueueUpload(result.data);
+						triggerSync();
+					} else if (!result.success) {
+						toast.error(result.error);
+					}
+				}}
+				onValidationError={handleToastError}
+				validateFile={(file) => {
+					if (!isAllowedMimeType(file.type)) return t("errors:invalidFileType");
+					if (file.size > MAX_FILE_SIZE_BYTES) return t("errors:fileTooLarge");
+					return null;
+				}}
+				maxAttachments={MAX_ATTACHMENTS}
+			/>
+
+			<SyncDevtools descriptor={descriptor} />
+		</div>
+	);
+}
 
 function PersonalTodoContent({
 	userId,
@@ -21,46 +189,33 @@ function PersonalTodoContent({
 	userId: string;
 	organizationId: string;
 }) {
-	const { t } = useTranslation();
-
-	const orgFilter = useMemo(() => {
-		return (t: { organizationId: string }) =>
-			t.organizationId === organizationId;
-	}, [organizationId]);
-	const { todos } = useTodos(appDb, userId, orgFilter);
 	const descriptor: SyncDescriptor = useMemo(
-		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "sync" }),
 		[userId],
 	);
 	const sync = useSyncEntry(descriptor);
 
+	const actions = useMemo(
+		() =>
+			createDexieTodoActions(appDb, {
+				userId,
+				scopeId: userId,
+				organizationId,
+				scopeType: "personal",
+			}),
+		[userId, organizationId],
+	);
+
 	return (
-		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInputBase
-				onSubmit={async (title) => {
-					await personalActions.addTodo(userId, title, organizationId);
-					sync.triggerSync();
-				}}
-				onError={(error) => {
-					console.error("[TodoInput] failed to add todo:", error);
-					toast.error(t("errors:failedToAddTodo"));
-				}}
-			/>
-
-			<TodoList
-				todos={todos}
-				syncHook={sync}
-				entityType="todo"
-				userId={userId}
-				scopeType="personal"
-				scopeId={userId}
-				organizationId={organizationId}
-				actions={personalActions}
-			/>
-
-			<SyncDevtools descriptor={descriptor} />
-		</div>
+		<TodoContent
+			userId={userId}
+			scopeId={userId}
+			organizationId={organizationId}
+			scopeType="personal"
+			syncState={sync}
+			descriptor={descriptor}
+			actions={actions}
+		/>
 	);
 }
 
@@ -71,46 +226,37 @@ function OrgTodoContent({
 	organizationId: string;
 	userId: string;
 }) {
-	const { t } = useTranslation();
-	const { todos } = useTodos(appDb, organizationId);
 	const descriptor: SyncDescriptor = useMemo(
 		() => ({
 			scopeType: "organization",
 			scopeId: organizationId,
-			entityKey: "todo",
+			entityKey: "sync",
 		}),
 		[organizationId],
 	);
 	const sync = useSyncEntry(descriptor);
 
+	const actions = useMemo(
+		() =>
+			createDexieTodoActions(appDb, {
+				userId,
+				scopeId: organizationId,
+				organizationId,
+				scopeType: "org",
+			}),
+		[organizationId, userId],
+	);
+
 	return (
-		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
-			<TodoInputBase
-				onSubmit={async (title) => {
-					try {
-						await orgActions.addOrgTodo(organizationId, userId, title);
-						sync.triggerSync();
-					} catch (err) {
-						console.error("[TodoInput] failed to add todo:", err);
-					}
-				}}
-				onError={() => toast.error(t("errors:failedToAddTodo"))}
-			/>
-
-			<TodoList
-				todos={todos}
-				syncHook={sync}
-				entityType="todo"
-				userId={userId}
-				scopeType="org"
-				scopeId={organizationId}
-				organizationId={organizationId}
-				actions={orgActions}
-			/>
-
-			<SyncDevtools descriptor={descriptor} />
-		</div>
+		<TodoContent
+			userId={userId}
+			scopeId={organizationId}
+			organizationId={organizationId}
+			scopeType="org"
+			syncState={sync}
+			descriptor={descriptor}
+			actions={actions}
+		/>
 	);
 }
 

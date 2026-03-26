@@ -1,11 +1,8 @@
 import { useTranslation } from "@pengana/i18n";
 import {
 	createDexieMediaActions,
-	orgMediaConfig,
-	personalMediaConfig,
-	storeFileInDexie,
 	useMedia,
-	useMediaListWiring,
+	useMediaHandlers,
 } from "@pengana/local-db/media";
 import type { SyncDescriptor } from "@pengana/sync/runtime";
 import { ALLOWED_MIME_TYPES } from "@pengana/sync/upload";
@@ -17,27 +14,17 @@ import { toast } from "sonner";
 import type { SyncContextValue } from "@/features/sync/use-sync-entry";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
+import { createIndexedDbFileStrategy } from "@/features/upload-queue";
 import { client } from "@/shared/api/orpc";
 import { appDb } from "@/shared/db";
 
 type Tab = "personal" | "organization";
 
-function createIndexedDbFileStrategy() {
-	return {
-		async storeFile(id: string, file: File) {
-			await storeFileInDexie(appDb, id, file);
-		},
-		createFileRef(id: string, _file: File) {
-			return { uri: `indexeddb://${id}` };
-		},
-	};
-}
-
 function MediaContent({
 	userId,
+	scopeType,
 	scopeId,
 	organizationId,
-	scopeType,
 	syncState,
 	descriptor,
 }: {
@@ -49,34 +36,30 @@ function MediaContent({
 	descriptor: SyncDescriptor;
 }) {
 	const { t } = useTranslation("media");
-	const { isOnline, isSyncing, enqueueUpload, triggerSync } = syncState;
+	const { enqueueUpload, triggerSync } = syncState;
 
+	const orgFilter = useMemo(() => {
+		return (t: { organizationId: string; scopeType: "personal" | "org" }) =>
+			t.scopeType === scopeType &&
+			(!organizationId || t.organizationId === organizationId);
+	}, [organizationId, scopeType]);
 	const { media } = useMedia({
 		db: appDb,
-		config: scopeType === "org" ? orgMediaConfig : personalMediaConfig,
 		scopeId,
-		organizationId,
+		filter: orgFilter,
 	});
 
-	const fileStorage = useMemo(() => createIndexedDbFileStrategy(), []);
+	const fileStorage = useMemo(() => createIndexedDbFileStrategy(appDb), []);
 	const actions = useMemo(() => createDexieMediaActions(appDb), []);
 
-	const { handleDelete, handleFileSelected } = useMediaListWiring({
+	const { handleFileSelected, handleDelete } = useMediaHandlers({
+		t,
 		actions,
 		userId,
 		scopeId,
 		organizationId,
-		config: scopeType === "org" ? orgMediaConfig : personalMediaConfig,
+		scopeType,
 		fileStorage,
-		t,
-		deleteMedia: (mediaId) => client.upload.deleteMedia({ mediaId }),
-		onError: (id, message) => {
-			console.log(id, message);
-			toast.error(message);
-		},
-		onDeleteSuccess: () => {
-			toast.success(t("delete.success"));
-		},
 	});
 
 	const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -85,7 +68,17 @@ function MediaContent({
 		async (mediaId: string) => {
 			setDeletingIds((prev) => new Set(prev).add(mediaId));
 			try {
-				await handleDelete(mediaId);
+				const result = await handleDelete(mediaId);
+				if (result.success) {
+					toast.success(t("delete.success"));
+					try {
+						await client.upload.deleteMedia({ mediaId });
+					} catch {
+						// server-side cleanup failed; local removal already succeeded
+					}
+				} else {
+					toast.error(result.error);
+				}
 				triggerSync();
 			} finally {
 				setDeletingIds((prev) => {
@@ -95,21 +88,26 @@ function MediaContent({
 				});
 			}
 		},
-		[handleDelete, triggerSync],
+		[handleDelete, triggerSync, t],
 	);
 
 	const visibleMedia = media.filter((item) => !deletingIds.has(item.id));
 
 	return (
 		<div className="flex flex-col gap-4">
-			<ConnectivityBanner isOnline={isOnline} isSyncing={isSyncing} />
+			<ConnectivityBanner
+				isOnline={syncState.isOnline}
+				isSyncing={syncState.isSyncing}
+			/>
 			<DropZone
 				accept={[...ALLOWED_MIME_TYPES]}
 				onFiles={async (files) => {
 					for (const file of files) {
-						const params = await handleFileSelected(file);
-						if (params) {
-							enqueueUpload(params);
+						const result = await handleFileSelected(file);
+						if (result.success) {
+							enqueueUpload(result.data);
+						} else {
+							toast.error(result.error);
 						}
 					}
 					triggerSync();
@@ -135,7 +133,7 @@ function PersonalMediaContent({
 	organizationId: string;
 }) {
 	const descriptor: SyncDescriptor = useMemo(
-		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "sync" }),
 		[userId],
 	);
 	const sync = useSyncEntry(descriptor);
@@ -163,7 +161,7 @@ function OrgMediaContent({
 		() => ({
 			scopeType: "organization",
 			scopeId: organizationId,
-			entityKey: "todo",
+			entityKey: "sync",
 		}),
 		[organizationId],
 	);

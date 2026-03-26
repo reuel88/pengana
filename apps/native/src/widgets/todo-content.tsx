@@ -6,35 +6,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ConnectivityBanner } from "@/features/sync/connectivity-banner";
 import { useSyncEntry } from "@/features/sync/use-sync-entry";
 import { SyncDevtools } from "@/features/sync-devtools/sync-devtools";
-import {
-	addOrgTodo,
-	deleteOrgTodo,
-	resolveOrgConflict,
-	toggleOrgTodo,
-} from "@/features/todo/org-todo-actions";
-import {
-	addTodo,
-	deleteTodo,
-	resolveConflict,
-	toggleTodo,
-} from "@/features/todo/todo-actions";
+import { createTodoActions } from "@/features/todo/todo-actions";
 import { TodoInputBase } from "@/features/todo/todo-input-base";
 import { TodoList } from "@/features/todo/todo-list";
-import type { TodoListActions } from "@/features/todo/todo-list-base";
 import { useOrgTodos, useTodos } from "@/features/todo/use-todos";
 import { useTheme } from "@/shared/lib/theme";
 import { themedText } from "@/shared/styles/shared";
-
-const personalActions: TodoListActions = {
-	toggleTodo,
-	deleteTodo,
-	resolveConflict,
-};
-const orgActions: TodoListActions = {
-	toggleTodo: toggleOrgTodo,
-	deleteTodo: deleteOrgTodo,
-	resolveConflict: resolveOrgConflict,
-};
 
 export type TodoTab = "personal" | "organization";
 
@@ -99,22 +76,33 @@ export function PersonalTodoContent({
 }) {
 	const { todos } = useTodos(userId, organizationId);
 	const descriptor: SyncDescriptor = useMemo(
-		() => ({ scopeType: "personal", scopeId: userId, entityKey: "todo" }),
+		() => ({ scopeType: "personal", scopeId: userId, entityKey: "sync" }),
 		[userId],
 	);
 	const sync = useSyncEntry(descriptor);
+
+	const actions = useMemo(
+		() =>
+			createTodoActions({
+				userId,
+				scopeId: userId,
+				organizationId,
+				scopeType: "personal",
+			}),
+		[userId, organizationId],
+	);
 
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInputBase
-				onAdd={(title) => addTodo(userId, title, organizationId)}
+				onAdd={(title) => actions.addTodo(title)}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList
 				todos={todos}
 				syncHook={sync}
-				actions={personalActions}
+				actions={actions}
 				userId={userId}
 				scopeType="personal"
 				scopeId={userId}
@@ -137,23 +125,34 @@ export function OrganizationTodoContent({
 		() => ({
 			scopeType: "organization",
 			scopeId: organizationId,
-			entityKey: "todo",
+			entityKey: "sync",
 		}),
 		[organizationId],
 	);
 	const sync = useSyncEntry(descriptor);
 
+	const actions = useMemo(
+		() =>
+			createTodoActions({
+				userId,
+				scopeId: organizationId,
+				organizationId,
+				scopeType: "org",
+			}),
+		[organizationId, userId],
+	);
+
 	return (
 		<View style={styles.panel}>
 			<ConnectivityBanner isOnline={sync.isOnline} isSyncing={sync.isSyncing} />
 			<TodoInputBase
-				onAdd={(title) => addOrgTodo(organizationId, userId, title)}
+				onAdd={(title) => actions.addTodo(title)}
 				triggerSync={sync.triggerSync}
 			/>
 			<TodoList
 				todos={todos}
 				syncHook={sync}
-				actions={orgActions}
+				actions={actions}
 				userId={userId}
 				scopeType="org"
 				scopeId={organizationId}

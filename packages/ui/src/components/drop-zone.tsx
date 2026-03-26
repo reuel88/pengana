@@ -44,6 +44,7 @@ export function DropZone({ onFiles, onError, accept }: DropZoneProps) {
 			setIsDragOver(false);
 			const files = Array.from(e.dataTransfer.files);
 			if (files.length === 0) return;
+
 			try {
 				await onFiles(files);
 			} catch (error) {
@@ -62,6 +63,7 @@ export function DropZone({ onFiles, onError, accept }: DropZoneProps) {
 			const files = Array.from(e.target.files ?? []);
 			e.target.value = "";
 			if (files.length === 0) return;
+
 			try {
 				await onFiles(files);
 			} catch (error) {

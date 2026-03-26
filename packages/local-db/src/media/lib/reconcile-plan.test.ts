@@ -12,8 +12,9 @@ function makeMedia(overrides: Partial<Media> & { id: string }): Media {
 		updatedAt: "2024-01-01T00:00:00Z",
 		scopeType: "personal",
 		scopeId: "user-1",
-		organizationId: null,
+		organizationId: "",
 		createdBy: "user-1",
+		deletedAt: null,
 		...overrides,
 	};
 }

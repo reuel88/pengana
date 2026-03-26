@@ -20,10 +20,9 @@ export type {
 	MediaAttachmentTarget,
 	MediaFileStorageStrategy,
 	MediaHandlerDeps,
+	MediaHandlerResult,
 } from "./hooks/use-media-handlers";
 export { useMediaHandlers } from "./hooks/use-media-handlers";
-export type { UseMediaListWiringConfig } from "./hooks/use-media-list-wiring";
-export { useMediaListWiring } from "./hooks/use-media-list-wiring";
 export type {
 	AddMediaOptions,
 	LocalMedia,
@@ -51,8 +50,6 @@ export * as drizzleMedia from "./lib/drizzle-media-actions";
 export { createDrizzleMediaActions } from "./lib/drizzle-media-actions";
 export { createDrizzleUploadLifecycleCallbacks } from "./lib/drizzle-upload-lifecycle-callbacks";
 export { readFileAsBase64 } from "./lib/file-utils";
-export type { MediaConfig } from "./lib/media-config";
-export { orgMediaConfig, personalMediaConfig } from "./lib/media-config";
 export { mediaAttachmentEntity, mediaEntity } from "./lib/media-entity";
 export type { MediaSyncTransport } from "./lib/media-syncer";
 export type {
