@@ -82,6 +82,7 @@ export function TodoList({
 		handleResolve,
 		handleRemoveAttachment,
 		handleFileSelected,
+		handleRetryAttachment,
 	} = useTodoHandlers({
 		fileStorage,
 		t,
@@ -133,7 +134,7 @@ export function TodoList({
 						appDb,
 						target.entityId,
 					);
-					const available = MAX_ATTACHMENTS - currentCount;
+					const available = Math.max(0, MAX_ATTACHMENTS - currentCount);
 					const sliced = files.slice(0, available);
 					let enqueued = false;
 					for (const file of sliced) {
@@ -162,6 +163,16 @@ export function TodoList({
 						onError(todoId, result.error);
 					}
 					triggerSync();
+				}}
+				onRetryAttachment={async (_todoId, attachmentId) => {
+					clearError(attachmentId);
+					const result = await handleRetryAttachment(attachmentId);
+					if (result.success && result.data) {
+						enqueueUpload(result.data);
+						triggerSync();
+					} else if (!result.success) {
+						onError(attachmentId, result.error);
+					}
 				}}
 				onValidationError={onError}
 				validateFile={(file) => {

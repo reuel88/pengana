@@ -127,7 +127,7 @@ function TodoContent({
 						appDb,
 						target.entityId,
 					);
-					const available = MAX_ATTACHMENTS - currentCount;
+					const available = Math.max(0, MAX_ATTACHMENTS - currentCount);
 					const sliced = files.slice(0, available);
 					let enqueued = false;
 					for (const file of sliced) {

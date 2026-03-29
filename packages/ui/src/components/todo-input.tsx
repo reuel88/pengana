@@ -12,21 +12,25 @@ export function TodoInput({ onSubmit, onError }: TodoInputProps) {
 	const { t } = useTranslation("todos");
 
 	const [title, setTitle] = useState("");
+	const [submitting, setSubmitting] = useState(false);
 
 	const handleSubmit = useCallback(
 		async (e: SyntheticEvent) => {
 			e.preventDefault();
 			const trimmed = title.trim();
-			if (!trimmed) return;
+			if (!trimmed || submitting) return;
 
+			setSubmitting(true);
 			try {
 				await onSubmit(trimmed);
 				setTitle("");
 			} catch (error) {
 				onError?.(error);
+			} finally {
+				setSubmitting(false);
 			}
 		},
-		[onSubmit, onError, title],
+		[onSubmit, onError, title, submitting],
 	);
 
 	return (
@@ -42,7 +46,11 @@ export function TodoInput({ onSubmit, onError }: TodoInputProps) {
 				className="flex-1"
 				data-testid="todo-input"
 			/>
-			<Button type="submit" disabled={!title.trim()} data-testid="todo-submit">
+			<Button
+				type="submit"
+				disabled={!title.trim() || submitting}
+				data-testid="todo-submit"
+			>
 				{t("addButton")}
 			</Button>
 		</form>
