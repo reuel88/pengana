@@ -67,6 +67,10 @@ export function buildReconcilePlan(input: ReconcilePlanInput): ReconcilePlan {
 				scopeId: sa.scopeId,
 				organizationId: sa.organizationId,
 				createdBy: sa.createdBy,
+				hlcTimestamp: "",
+				fieldClocks: "{}",
+				syncStatus: "synced",
+				deleted: false,
 			});
 		}
 	}

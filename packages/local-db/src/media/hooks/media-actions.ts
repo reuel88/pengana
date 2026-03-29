@@ -12,13 +12,13 @@ export interface ProcessMediaFileInput {
 		id: string,
 		file: File,
 	) => { uri: string; revoke?: () => void };
-	enqueueUpload: (params: EnqueueUploadParams) => void;
 }
 
 export interface MediaActions {
-	processMediaFile: (
-		params: ProcessMediaFileInput,
-	) => Promise<{ fileRef: { revoke?: () => void } }>;
+	processMediaFile: (params: ProcessMediaFileInput) => Promise<{
+		fileRef: { revoke?: () => void };
+		enqueueParams: EnqueueUploadParams;
+	}>;
 	removeMedia: (mediaId: string) => Promise<void>;
 	retryMedia: (mediaId: string) => Promise<{
 		id: string;

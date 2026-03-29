@@ -1,11 +1,15 @@
 import type { EnqueueUploadParams } from "@pengana/sync/upload";
-import { isQuotaError } from "@pengana/sync/upload";
+import {
+	isAllowedMimeType,
+	isQuotaError,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync/upload";
 import { useCallback, useMemo } from "react";
-import type { MediaConfig } from "../lib/media-config";
 import type { MediaActions } from "./media-actions";
-import { useFileSelection } from "./use-file-selection";
-import { useMediaDeletion } from "./use-media-deletion";
-import { useMediaRetry } from "./use-media-retry";
+
+export type MediaHandlerResult<T = void> =
+	| { success: true; data: T }
+	| { success: false; error: string };
 
 export interface MediaFileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
@@ -21,114 +25,120 @@ export interface MediaAttachmentTarget {
 }
 
 export interface MediaHandlerDeps {
+	t: (key: string) => string;
 	actions: MediaActions;
-	triggerSync: () => void;
-	enqueueUpload: (params: EnqueueUploadParams) => void;
 	userId: string;
 	scopeId: string;
 	organizationId: string;
-	config: MediaConfig;
+	scopeType: "personal" | "org";
 	fileStorage: MediaFileStorageStrategy;
-	t: (key: string) => string;
-	deleteMedia?: (mediaId: string) => Promise<unknown>;
-	onError?: (id: string | null, message: string) => void;
-	onDeleteSuccess?: (mediaId: string) => void;
-	onUploadEnqueued?: () => void;
 }
 
 export function useMediaHandlers(deps: MediaHandlerDeps) {
 	const {
+		t,
 		actions,
-		triggerSync,
-		enqueueUpload,
 		userId,
 		scopeId,
 		organizationId,
-		config,
+		scopeType,
 		fileStorage,
-		t,
-		deleteMedia: deleteMediaOnServer,
-		onError,
-		onDeleteSuccess,
-		onUploadEnqueued,
 	} = deps;
 
-	const selectFiles = useFileSelection({
-		processMediaFile: actions.processMediaFile,
-		userId,
-		scopeType: config.scopeType,
-		scopeId,
-		organizationId,
-		fileStorage,
-		enqueueUpload,
-		triggerSync,
-		onError,
-		t,
-	});
+	const handleFileSelected = useCallback(
+		async (
+			file: File,
+			target?: MediaAttachmentTarget,
+		): Promise<MediaHandlerResult<EnqueueUploadParams>> => {
+			if (!isAllowedMimeType(file.type)) {
+				return { success: false, error: t("dropzone.rejected.type") };
+			}
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				return { success: false, error: t("dropzone.rejected.size") };
+			}
 
-	const deleteMedia = useMediaDeletion({
-		removeMedia: actions.removeMedia,
-		triggerSync,
-		deleteOnServer: deleteMediaOnServer,
-	});
-
-	const retryUpload = useMediaRetry({
-		retryMedia: actions.retryMedia,
-		getAttachmentForMedia: actions.getAttachmentForMedia,
-		enqueueUpload,
-		triggerSync,
-	});
-
-	const handleFilesSelected = useCallback(
-		async (files: File[], target?: MediaAttachmentTarget) => {
 			try {
-				await selectFiles(files, target);
-				onUploadEnqueued?.();
+				const result = await actions.processMediaFile({
+					file,
+					userId,
+					scopeId,
+					organizationId,
+					scopeType,
+					target,
+					storeFile: fileStorage.storeFile,
+					createFileRef: fileStorage.createFileRef,
+				});
+				return { success: true, data: result.enqueueParams };
 			} catch (error) {
-				onError?.(
-					target?.entityId ?? null,
-					isQuotaError(error) ? t("errors:storageFull") : t("upload.error"),
-				);
+				return {
+					success: false,
+					error: isQuotaError(error)
+						? t("errors:storageFull")
+						: t("upload.error"),
+				};
 			}
 		},
-		[selectFiles, onError, onUploadEnqueued, t],
+		[actions, userId, scopeType, scopeId, organizationId, fileStorage, t],
 	);
 
 	const handleDelete = useCallback(
-		async (mediaId: string) => {
+		async (mediaId: string): Promise<MediaHandlerResult> => {
 			try {
-				await deleteMedia(mediaId);
-				onDeleteSuccess?.(mediaId);
+				await actions.removeMedia(mediaId);
+				return { success: true, data: undefined };
 			} catch (error) {
-				onError?.(
-					mediaId,
-					isQuotaError(error) ? t("errors:storageFull") : t("upload.error"),
-				);
+				return {
+					success: false,
+					error: isQuotaError(error)
+						? t("errors:storageFull")
+						: t("upload.error"),
+				};
 			}
 		},
-		[deleteMedia, onDeleteSuccess, onError, t],
+		[actions, t],
 	);
 
 	const handleRetry = useCallback(
-		async (mediaId: string) => {
+		async (
+			mediaId: string,
+		): Promise<MediaHandlerResult<EnqueueUploadParams | null>> => {
 			try {
-				await retryUpload(mediaId);
+				const record = await actions.retryMedia(mediaId);
+				if (!record?.localUri) return { success: true, data: null };
+
+				const attachment = await actions.getAttachmentForMedia(mediaId);
+
+				return {
+					success: true,
+					data: {
+						fileUri: record.localUri,
+						mimeType: record.mimeType,
+						mediaId: record.id,
+						entityType: attachment?.entityType,
+						entityId: attachment?.entityId,
+						scopeType: attachment
+							? undefined
+							: (record.scopeType as "personal" | "org" | undefined),
+					},
+				};
 			} catch (error) {
-				onError?.(
-					mediaId,
-					isQuotaError(error) ? t("errors:storageFull") : t("upload.error"),
-				);
+				return {
+					success: false,
+					error: isQuotaError(error)
+						? t("errors:storageFull")
+						: t("upload.error"),
+				};
 			}
 		},
-		[retryUpload, onError, t],
+		[actions, t],
 	);
 
 	return useMemo(
 		() => ({
 			handleDelete,
-			handleFilesSelected,
+			handleFileSelected,
 			handleRetry,
 		}),
-		[handleDelete, handleFilesSelected, handleRetry],
+		[handleDelete, handleFileSelected, handleRetry],
 	);
 }

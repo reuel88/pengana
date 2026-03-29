@@ -4,26 +4,28 @@ import type { EntityDatabase } from "../dexie";
 import { useDexieEntity } from "../hooks/use-dexie-entity";
 import type { LocalMedia, LocalMediaAttachment } from "../media/lib/db";
 
-import type { WebTodo } from "./db";
+import type { LocalTodo } from "./db";
 
-export interface WebTodoWithAttachments extends WebTodo {
+export interface WebTodoWithAttachments extends LocalTodo {
 	attachments: LocalMedia[];
 }
 
-export function useTodos(
-	db: EntityDatabase,
-	scopeId: string,
-	filter?: (item: WebTodo) => boolean,
-) {
-	// Get todos
-	const { items, conflicts } = useDexieEntity<WebTodo>(
+export interface UseTodosOptions {
+	db: EntityDatabase;
+	scopeId: string;
+	filter?: (item: LocalTodo) => boolean;
+}
+
+export function useTodos({ db, scopeId, filter }: UseTodosOptions) {
+	// 1. Query scoped 2do records from local DB
+	const { items, conflicts } = useDexieEntity<LocalTodo>(
 		db,
 		"todos",
 		scopeId,
 		filter,
 	);
 
-	// All 2do ids
+	// 2. Derive deduplicated 2do IDs for the attachment query
 	const todoIdsRef = useRef<string[]>([]);
 	const todoIds = useMemo(() => {
 		const next = items.map((t) => t.id);
@@ -35,7 +37,7 @@ export function useTodos(
 		return next;
 	}, [items]);
 
-	// Get attachments for the todos
+	// 3. Query attachments linked to those 2do IDs
 	const attachmentRecords = useLiveQuery(
 		(): Promise<LocalMediaAttachment[]> => {
 			if (todoIds.length === 0) return Promise.resolve([]);
@@ -49,12 +51,12 @@ export function useTodos(
 		[] as LocalMediaAttachment[],
 	);
 
-	// All media ids for the attachments
+	// 4. Derive deduplicated media IDs from the attachments
 	const mediaIds = useMemo(() => {
 		return [...new Set(attachmentRecords.map((a) => a.mediaId))];
 	}, [attachmentRecords]);
 
-	// Get media records for the attachments
+	// 5. Query media records for those attachment media IDs
 	const mediaRecords = useLiveQuery(
 		(): Promise<LocalMedia[]> => {
 			if (mediaIds.length === 0) return Promise.resolve([]);
@@ -68,6 +70,7 @@ export function useTodos(
 		[] as LocalMedia[],
 	);
 
+	// 6. Merge todos + attachments + media into a unified list
 	const todosWithAttachments: WebTodoWithAttachments[] = useMemo(() => {
 		const mediaById = new Map<string, LocalMedia>();
 		for (const m of mediaRecords) {

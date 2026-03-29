@@ -11,8 +11,8 @@ export interface AttachmentItem {
 
 interface AttachmentListProps {
 	attachments: AttachmentItem[];
-	onRemove: (attachmentId: string) => void;
-	onRetry?: (attachmentId: string) => void;
+	onRemove?: (mediaId: string) => void;
+	onRetry?: (mediaId: string) => void;
 }
 
 function mimeLabel(mimeType: string): string {
@@ -62,14 +62,16 @@ export function AttachmentList({
 							{t("actions.retry")}
 						</button>
 					)}
-					<button
-						type="button"
-						className="ml-0.5 opacity-60 hover:opacity-100"
-						onClick={() => onRemove(a.id)}
-						aria-label={t("actions.removeAttachment")}
-					>
-						&times;
-					</button>
+					{onRemove && (
+						<button
+							type="button"
+							className="ml-0.5 opacity-60 hover:opacity-100"
+							onClick={() => onRemove(a.id)}
+							aria-label={t("actions.removeAttachment")}
+						>
+							&times;
+						</button>
+					)}
 				</span>
 			))}
 		</div>

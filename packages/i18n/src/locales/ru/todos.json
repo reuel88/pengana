@@ -36,5 +36,8 @@
 		"cancel": "Отмена",
 		"chooseOption": "Выберите вариант"
 	},
+	"delete": {
+		"success": "Задача удалена"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

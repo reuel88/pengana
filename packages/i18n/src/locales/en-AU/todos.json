@@ -36,5 +36,8 @@
 		"cancel": "Cancel",
 		"chooseOption": "Choose an option"
 	},
+	"delete": {
+		"success": "Todo deleted"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

@@ -29,4 +29,9 @@ export const appDb = new EntityDatabase("AppDatabase")
 		11,
 		[todoEntity, mediaEntity, mediaAttachmentEntity],
 		uploadRawStores,
+	)
+	.applySchema(
+		12,
+		[todoEntity, mediaEntity, mediaAttachmentEntity],
+		uploadRawStores,
 	);

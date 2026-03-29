@@ -36,5 +36,8 @@
 		"cancel": "取消",
 		"chooseOption": "选择一个选项"
 	},
+	"delete": {
+		"success": "待办事项已删除"
+	},
 	"addInputHint": "Enter a todo and press return to add"
 }

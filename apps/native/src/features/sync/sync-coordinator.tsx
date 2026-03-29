@@ -30,13 +30,13 @@ export function SyncCoordinator() {
 		const personalDescriptor: SyncDescriptor = {
 			scopeType: "personal",
 			scopeId: userId,
-			entityKey: "todo",
+			entityKey: "sync",
 		};
 
 		const orgDescriptor: SyncDescriptor = {
 			scopeType: "organization",
 			scopeId: organizationId,
-			entityKey: "todo",
+			entityKey: "sync",
 		};
 
 		const nextDescriptors = [personalDescriptor, orgDescriptor];

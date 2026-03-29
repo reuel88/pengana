@@ -1,66 +1,33 @@
 import { createDrizzleActions } from "@pengana/local-db/drizzle";
 import { drizzleMedia } from "@pengana/local-db/media";
-import { HLC, serializeHlc } from "@pengana/sync/core";
-import { eq } from "drizzle-orm";
+import { createDrizzleTodoActions } from "@pengana/local-db/todo";
+import { HLC } from "@pengana/sync/core";
 import { randomUUID } from "expo-crypto";
 
 import { appDb, media, mediaAttachments, todos } from "@/shared/db";
 
-const hlc = new HLC(randomUUID());
+export function createTodoActions() {
+	return createDrizzleTodoActions({
+		db: appDb,
+		todosTable: todos,
+		idColumn: todos.id,
+		generateId: randomUUID,
+	});
+}
 
-export const actions = createDrizzleActions<typeof todos.$inferInsert>(
+const hlc = new HLC(randomUUID());
+const drizzleActions = createDrizzleActions<typeof todos.$inferInsert>(
 	appDb,
 	todos,
 	todos.id,
 	{ hlcNow: () => hlc.now() },
 );
 
-export async function addTodo(
-	userId: string,
-	title: string,
-	organizationId: string,
-): Promise<void> {
-	const ts = serializeHlc(hlc.now());
-	await actions.add({
-		id: randomUUID(),
-		title,
-		completed: false,
-		updatedAt: new Date().toISOString(),
-		hlcTimestamp: ts,
-		fieldClocks: JSON.stringify({ title: ts, completed: ts, deleted: ts }),
-		userId,
-		scopeId: userId,
-		organizationId,
-		createdBy: userId,
-		scopeType: "personal",
-		syncStatus: "pending",
-		deleted: false,
-	});
-}
-
-export async function toggleTodo(id: string): Promise<void> {
-	const [todo] = await appDb.select().from(todos).where(eq(todos.id, id));
-	if (!todo) throw new Error(`Todo not found: ${id}`);
-
-	await actions.update(id, { completed: !todo.completed });
-}
-
 export async function updateTodoTitle(
 	id: string,
 	title: string,
 ): Promise<void> {
-	await actions.update(id, { title });
-}
-
-export async function deleteTodo(id: string): Promise<void> {
-	await actions.softDelete(id);
-}
-
-export async function resolveConflict(
-	id: string,
-	resolution: "local" | "server",
-): Promise<void> {
-	await actions.resolveConflict(id, resolution);
+	await drizzleActions.update(id, { title });
 }
 
 export const addMedia = (options: {

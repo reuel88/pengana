@@ -1,5 +1,5 @@
 import { useTranslation } from "@pengana/i18n";
-import { useState } from "react";
+import { type SyntheticEvent, useCallback, useState } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 
@@ -9,25 +9,29 @@ interface TodoInputProps {
 }
 
 export function TodoInput({ onSubmit, onError }: TodoInputProps) {
-	const [title, setTitle] = useState("");
-	const [submitting, setSubmitting] = useState(false);
 	const { t } = useTranslation("todos");
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const trimmed = title.trim();
-		if (!trimmed || submitting) return;
+	const [title, setTitle] = useState("");
+	const [submitting, setSubmitting] = useState(false);
 
-		setSubmitting(true);
-		try {
-			await onSubmit(trimmed);
-			setTitle("");
-		} catch (error) {
-			onError?.(error);
-		} finally {
-			setSubmitting(false);
-		}
-	};
+	const handleSubmit = useCallback(
+		async (e: SyntheticEvent) => {
+			e.preventDefault();
+			const trimmed = title.trim();
+			if (!trimmed || submitting) return;
+
+			setSubmitting(true);
+			try {
+				await onSubmit(trimmed);
+				setTitle("");
+			} catch (error) {
+				onError?.(error);
+			} finally {
+				setSubmitting(false);
+			}
+		},
+		[onSubmit, onError, title, submitting],
+	);
 
 	return (
 		<form

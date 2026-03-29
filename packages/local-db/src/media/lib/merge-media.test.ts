@@ -14,8 +14,12 @@ const localMediaRecord: LocalMedia = {
 	updatedAt: "2026-03-18T10:00:00.000Z",
 	scopeType: "personal",
 	scopeId: "user-1",
-	organizationId: null,
+	organizationId: "",
 	createdBy: "user-1",
+	hlcTimestamp: "",
+	fieldClocks: "{}",
+	syncStatus: "synced",
+	deleted: false,
 };
 
 const attachment: LocalMediaAttachment = {
@@ -59,7 +63,7 @@ describe("mergeMediaRecords", () => {
 					updatedAt: "2026-03-18T10:01:00.000Z",
 					scopeType: "personal",
 					scopeId: "user-1",
-					organizationId: null,
+					organizationId: "",
 					createdBy: "user-1",
 					attachments: [attachment],
 				},

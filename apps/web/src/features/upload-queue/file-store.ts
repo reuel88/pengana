@@ -1,10 +1,13 @@
-import { storeFileInDexie as storeFile } from "@pengana/local-db/media/adapters/dexie-file-store";
+import type { EntityDatabase } from "@pengana/local-db/dexie";
+import { storeFileInDexie } from "@pengana/local-db/media/adapters/dexie-file-store";
+import { INDEXEDDB_URI_PREFIX } from "@pengana/sync/upload";
 
-import { appDb } from "@/shared/db";
-
-export async function storeFileInDexie(
-	entityId: string,
-	file: File,
-): Promise<void> {
-	return storeFile(appDb, entityId, file);
+export function createIndexedDbFileStrategy(db: EntityDatabase) {
+	return {
+		storeFile: async (entityId: string, file: File) =>
+			storeFileInDexie(db, entityId, file),
+		createFileRef: (id: string) => ({
+			uri: `${INDEXEDDB_URI_PREFIX}${id}`,
+		}),
+	};
 }

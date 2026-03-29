@@ -1,6 +1,6 @@
 import type { EntityDefinition } from "../core";
 
-import type { WebTodo } from "./db";
+import type { LocalTodo } from "./db";
 import { todoEntity } from "./todo-entity";
 
 export interface TodoConfig {
@@ -13,7 +13,7 @@ export interface TodoConfig {
 		organizationId: string;
 		title: string;
 		hlcTimestamp: string;
-	}) => Omit<WebTodo, "id">;
+	}) => Omit<LocalTodo, "id">;
 }
 
 export const personalTodoConfig: TodoConfig = {

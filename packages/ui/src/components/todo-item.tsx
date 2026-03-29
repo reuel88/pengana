@@ -21,8 +21,8 @@ interface TodoItemProps {
 	onDelete: () => void;
 	onResolve: (resolution: "local" | "server") => void;
 	onFilesSelected: (files: File[]) => void;
-	onRemoveAttachment: (attachmentId: string) => void;
-	onRetryAttachment?: (attachmentId: string) => void;
+	onRemoveAttachment?: (mediaId: string) => void;
+	onRetryAttachment?: (mediaId: string) => void;
 	onValidationError?: (message: string) => void;
 	validateFile?: (file: File) => string | null;
 	maxAttachments?: number;

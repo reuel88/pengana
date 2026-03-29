@@ -3,6 +3,7 @@
 	"dropzone": {
 		"idle": "Drag and drop files here, or click to browse",
 		"active": "Drop files here...",
+		"processing": "Processing files...",
 		"rejected": {
 			"type": "File type not supported. Please use JPEG, PNG, HEIC, or PDF.",
 			"size": "File is too large. Maximum size is 10MB."

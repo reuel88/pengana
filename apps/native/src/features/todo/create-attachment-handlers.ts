@@ -8,21 +8,21 @@ import { client } from "@/shared/api/orpc";
 import { getAttachmentForMedia, retryMedia } from "./todo-actions";
 
 export function useAttachmentHandlers(
-	removeMediaFn: (attachmentId: string) => Promise<void>,
+	removeMediaFn: (mediaId: string) => Promise<void>,
 	triggerSync: () => void,
 	enqueueUpload: (params: EnqueueUploadParams) => void,
 ) {
 	const { t } = useTranslation("todos");
 
 	const handleRemoveAttachment = useCallback(
-		async (attachmentId: string) => {
+		async (mediaId: string) => {
 			try {
-				await removeMediaFn(attachmentId);
-				client.upload.deleteMedia({ mediaId: attachmentId }).catch((err) => {
+				await removeMediaFn(mediaId);
+				client.upload.deleteMedia({ mediaId }).catch((err) => {
 					if (__DEV__)
 						console.warn(
 							"Failed to delete attachment on server:",
-							attachmentId,
+							mediaId,
 							err,
 						);
 				});
@@ -35,11 +35,11 @@ export function useAttachmentHandlers(
 	);
 
 	const handleRetryAttachment = useCallback(
-		async (attachmentId: string) => {
+		async (mediaId: string) => {
 			try {
-				const record = await retryMedia(attachmentId);
+				const record = await retryMedia(mediaId);
 				if (record?.localUri) {
-					const att = await getAttachmentForMedia(attachmentId);
+					const att = await getAttachmentForMedia(mediaId);
 					enqueueUpload({
 						fileUri: record.localUri,
 						mimeType: record.mimeType,

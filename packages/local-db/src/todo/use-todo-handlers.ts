@@ -1,13 +1,15 @@
 import type { EnqueueUploadParams } from "@pengana/sync/upload";
-import { isQuotaError, MAX_ATTACHMENTS } from "@pengana/sync/upload";
-import { useCallback, useMemo } from "react";
 import {
-	type MediaActions,
-	type MediaAttachmentTarget,
-	useFileSelection,
-	useMediaDeletion,
-	useMediaRetry,
-} from "../media";
+	isAllowedMimeType,
+	isQuotaError,
+	MAX_FILE_SIZE_BYTES,
+} from "@pengana/sync/upload";
+import { useCallback, useMemo } from "react";
+import type { MediaActions, MediaAttachmentTarget } from "../media";
+
+export type TodoHandlerResult<T = void> =
+	| { success: true; data: T }
+	| { success: false; error: string };
 
 export interface FileStorageStrategy {
 	storeFile: (id: string, file: File) => Promise<void> | void;
@@ -18,6 +20,13 @@ export interface FileStorageStrategy {
 }
 
 export interface TodoActions {
+	addTodo: (params: {
+		title: string;
+		userId: string;
+		scopeId: string;
+		organizationId: string;
+		scopeType: "personal" | "org";
+	}) => Promise<void>;
 	toggleTodo: (id: string) => Promise<void>;
 	deleteTodo: (id: string) => Promise<void>;
 	resolveConflict: (
@@ -27,185 +36,205 @@ export interface TodoActions {
 }
 
 export interface TodoHandlerDeps {
-	triggerSync: () => void;
-	enqueueUpload: (params: EnqueueUploadParams) => void;
-	entityType?: string;
-	userId: string;
-	scopeType: "personal" | "org";
-	scopeId: string;
-	organizationId: string;
-	onError: (id: string, message: string) => void;
-	clearError: (id: string) => void;
-	fileStorage: FileStorageStrategy;
 	t: (key: string) => string;
-	onDeleteSuccess?: (id: string) => void;
-	deleteAttachment?: (attachmentId: string) => Promise<unknown>;
 	actions: TodoActions;
 	mediaActions: MediaActions;
-	getMediaCountForEntity: (entityId: string) => Promise<number>;
+	userId: string;
+	scopeId: string;
+	organizationId: string;
+	scopeType: "personal" | "org";
+	fileStorage: FileStorageStrategy;
 }
 
 export function useTodoHandlers(deps: TodoHandlerDeps) {
 	const {
-		triggerSync,
-		enqueueUpload,
-		userId,
-		scopeId,
-		organizationId,
-		fileStorage,
 		t,
-		deleteAttachment: deleteAttachmentOnServer,
-		onError,
-		clearError,
-		onDeleteSuccess,
-		scopeType,
 		actions,
 		mediaActions,
-		getMediaCountForEntity,
-	} = deps;
-
-	const selectFiles = useFileSelection({
-		processMediaFile: mediaActions.processMediaFile,
 		userId,
-		scopeType,
 		scopeId,
 		organizationId,
+		scopeType,
 		fileStorage,
-		enqueueUpload,
-		triggerSync,
-		onError: (id, msg) => onError(id ?? "", msg),
-		t,
-	});
+	} = deps;
 
-	const deleteAttachment = useMediaDeletion({
-		removeMedia: mediaActions.removeMedia,
-		triggerSync,
-		deleteOnServer: deleteAttachmentOnServer,
-	});
-
-	const retryUpload = useMediaRetry({
-		retryMedia: mediaActions.retryMedia,
-		getAttachmentForMedia: mediaActions.getAttachmentForMedia,
-		enqueueUpload,
-		triggerSync,
-	});
-
-	const handleToggle = useCallback(
-		async (id: string) => {
+	const handleAdd = useCallback(
+		async (title: string): Promise<TodoHandlerResult> => {
 			try {
-				clearError(id);
-				await actions.toggleTodo(id);
-				triggerSync();
+				await actions.addTodo({
+					title,
+					userId,
+					scopeId,
+					organizationId,
+					scopeType,
+				});
+				return { success: true, data: undefined };
 			} catch (e) {
-				onError(
-					id,
-					isQuotaError(e)
+				return {
+					success: false,
+					error: isQuotaError(e)
 						? t("errors:storageFull")
-						: t("errors:failedToToggleTodo"),
-				);
+						: t("errors:failedToAddTodo"),
+				};
 			}
 		},
-		[clearError, actions, triggerSync, onError, t],
+		[actions, t, scopeId, userId, organizationId, scopeType],
+	);
+
+	const handleToggle = useCallback(
+		async (id: string): Promise<TodoHandlerResult> => {
+			try {
+				await actions.toggleTodo(id);
+				return { success: true, data: undefined };
+			} catch (e) {
+				return {
+					success: false,
+					error: isQuotaError(e)
+						? t("errors:storageFull")
+						: t("errors:failedToToggleTodo"),
+				};
+			}
+		},
+		[actions, t],
 	);
 
 	const handleDelete = useCallback(
-		async (id: string) => {
+		async (todoId: string): Promise<TodoHandlerResult> => {
 			try {
-				clearError(id);
-				await actions.deleteTodo(id);
-				onDeleteSuccess?.(id);
-				triggerSync();
+				await actions.deleteTodo(todoId);
+				return { success: true, data: undefined };
 			} catch (e) {
-				onError(
-					id,
-					isQuotaError(e)
+				return {
+					success: false,
+					error: isQuotaError(e)
 						? t("errors:storageFull")
 						: t("errors:failedToDeleteTodo"),
-				);
+				};
 			}
 		},
-		[clearError, actions, triggerSync, onError, onDeleteSuccess, t],
+		[actions, t],
 	);
 
 	const handleResolve = useCallback(
-		async (id: string, resolution: "local" | "server") => {
+		async (
+			todoId: string,
+			resolution: "local" | "server",
+		): Promise<TodoHandlerResult> => {
 			try {
-				clearError(id);
-				await actions.resolveConflict(id, resolution);
-				triggerSync();
+				await actions.resolveConflict(todoId, resolution);
+				return { success: true, data: undefined };
 			} catch (e) {
-				onError(
-					id,
-					isQuotaError(e)
+				return {
+					success: false,
+					error: isQuotaError(e)
 						? t("errors:storageFull")
 						: t("errors:failedToResolveConflict"),
-				);
+				};
 			}
 		},
-		[clearError, actions, triggerSync, onError, t],
+		[actions, t],
 	);
 
-	const handleFilesSelected = useCallback(
-		async (files: File[], target: MediaAttachmentTarget) => {
+	const handleFileSelected = useCallback(
+		async (
+			file: File,
+			target: MediaAttachmentTarget,
+		): Promise<TodoHandlerResult<EnqueueUploadParams>> => {
+			if (!isAllowedMimeType(file.type)) {
+				return { success: false, error: t("dropzone.rejected.type") };
+			}
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				return { success: false, error: t("dropzone.rejected.size") };
+			}
 			try {
-				clearError(target.entityId);
-				const currentCount = await getMediaCountForEntity(target.entityId);
-				const available = MAX_ATTACHMENTS - currentCount;
-				await selectFiles(files.slice(0, available), target);
+				const result = await mediaActions.processMediaFile({
+					file,
+					userId,
+					scopeType,
+					scopeId,
+					organizationId,
+					target,
+					storeFile: fileStorage.storeFile,
+					createFileRef: fileStorage.createFileRef,
+				});
+				return { success: true, data: result.enqueueParams };
 			} catch (e) {
-				onError(
-					target.entityId,
-					isQuotaError(e)
+				return {
+					success: false,
+					error: isQuotaError(e)
 						? t("errors:storageFull")
 						: t("errors:failedToStoreFile"),
-				);
+				};
 			}
 		},
-		[clearError, selectFiles, onError, t, getMediaCountForEntity],
+		[mediaActions, userId, scopeType, scopeId, organizationId, fileStorage, t],
 	);
 
 	const handleRemoveAttachment = useCallback(
-		async (todoId: string, attachmentId: string) => {
+		async (_todoId: string, mediaId: string): Promise<TodoHandlerResult> => {
 			try {
-				clearError(todoId);
-				await deleteAttachment(attachmentId);
+				await mediaActions.removeMedia(mediaId);
+				return { success: true, data: undefined };
 			} catch {
-				onError(todoId, t("errors:failedToDeleteAttachment"));
+				return { success: false, error: t("errors:failedToDeleteAttachment") };
 			}
 		},
-		[clearError, deleteAttachment, onError, t],
+		[mediaActions, t],
 	);
 
-	const handleRetry = useCallback(
-		async (mediaId: string) => {
+	const handleRetryAttachment = useCallback(
+		async (
+			mediaId: string,
+		): Promise<TodoHandlerResult<EnqueueUploadParams | null>> => {
 			try {
-				await retryUpload(mediaId);
+				const record = await mediaActions.retryMedia(mediaId);
+				if (!record?.localUri) return { success: true, data: null };
+
+				const attachment = await mediaActions.getAttachmentForMedia(mediaId);
+
+				return {
+					success: true,
+					data: {
+						fileUri: record.localUri,
+						mimeType: record.mimeType,
+						mediaId: record.id,
+						entityType: attachment?.entityType,
+						entityId: attachment?.entityId,
+						scopeType: attachment
+							? undefined
+							: (record.scopeType as "personal" | "org" | undefined),
+					},
+				};
 			} catch (error) {
-				onError(
-					mediaId,
-					isQuotaError(error) ? t("errors:storageFull") : t("upload.error"),
-				);
+				return {
+					success: false,
+					error: isQuotaError(error)
+						? t("errors:storageFull")
+						: t("upload.error"),
+				};
 			}
 		},
-		[retryUpload, onError, t],
+		[mediaActions, t],
 	);
 
 	return useMemo(
 		() => ({
+			handleAdd,
 			handleToggle,
 			handleDelete,
 			handleResolve,
 			handleRemoveAttachment,
-			handleFilesSelected,
-			handleRetry,
+			handleFileSelected,
+			handleRetryAttachment,
 		}),
 		[
+			handleAdd,
 			handleToggle,
 			handleDelete,
 			handleResolve,
 			handleRemoveAttachment,
-			handleFilesSelected,
-			handleRetry,
+			handleFileSelected,
+			handleRetryAttachment,
 		],
 	);
 }

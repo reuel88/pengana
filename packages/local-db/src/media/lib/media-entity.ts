@@ -2,7 +2,8 @@ import { defineEntity } from "../../core";
 
 export const mediaEntity = defineEntity({
 	name: "media",
-	indexes: "id, userId, scopeType, scopeId, organizationId, status",
+	indexes:
+		"id, userId, scopeType, scopeId, organizationId, status, syncStatus, deleted",
 	scoping: "both",
 });
 

@@ -27,8 +27,8 @@ export interface TodoItemHandlers {
 	onDelete: (id: string) => void;
 	onResolve: (id: string, resolution: "local" | "server") => void;
 	onAttach: (id: string) => void;
-	onRemoveAttachment?: (attachmentId: string) => void;
-	onRetryAttachment?: (attachmentId: string) => void;
+	onRemoveAttachment?: (mediaId: string) => void;
+	onRetryAttachment?: (mediaId: string) => void;
 }
 
 function mimeLabel(mimeType: string): string {
