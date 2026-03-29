@@ -113,20 +113,29 @@ export function TodoList({
 				onToggle={async (id) => {
 					clearError(id);
 					const result = await handleToggle(id);
-					if (!result.success) onError(id, result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						onError(id, result.error);
+					}
 				}}
 				onDelete={async (id) => {
 					clearError(id);
 					const result = await handleDelete(id);
-					if (!result.success) onError(id, result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						onError(id, result.error);
+					}
 				}}
 				onResolve={async (id, resolution) => {
 					clearError(id);
 					const result = await handleResolve(id, resolution);
-					if (!result.success) onError(id, result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						onError(id, result.error);
+					}
 				}}
 				onFilesSelected={async (files, target) => {
 					clearError(target.entityId);
@@ -159,10 +168,10 @@ export function TodoList({
 						} catch {
 							// server-side cleanup failed; local removal already succeeded
 						}
+						triggerSync();
 					} else {
 						onError(todoId, result.error);
 					}
-					triggerSync();
 				}}
 				onRetryAttachment={async (_todoId, mediaId) => {
 					clearError(mediaId);

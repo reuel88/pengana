@@ -55,8 +55,10 @@ export function TodoList({
 					onFilesSelected={(files) =>
 						onFilesSelected(files, { entityId: todo.id, entityType: "todo" })
 					}
-					onRemoveAttachment={(mediaId) =>
-						onRemoveAttachment?.(todo.id, mediaId)
+					onRemoveAttachment={
+						onRemoveAttachment
+							? (mediaId) => onRemoveAttachment(todo.id, mediaId)
+							: undefined
 					}
 					onRetryAttachment={
 						onRetryAttachment

@@ -92,8 +92,11 @@ function TodoContent({
 			<TodoInputBase
 				onSubmit={async (title) => {
 					const result = await handleAdd(title);
-					if (!result.success) toast.error(result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						toast.error(result.error);
+					}
 				}}
 				onError={(error) => {
 					console.error("Error occurred", error);
@@ -105,22 +108,28 @@ function TodoContent({
 				todos={todos}
 				onToggle={async (id) => {
 					const result = await handleToggle(id);
-					if (!result.success) toast.error(result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						toast.error(result.error);
+					}
 				}}
 				onDelete={async (id) => {
 					const result = await handleDelete(id);
 					if (result.success) {
 						toast.success(t("delete.success"));
+						triggerSync();
 					} else {
 						toast.error(result.error);
 					}
-					triggerSync();
 				}}
 				onResolve={async (id, resolution) => {
 					const result = await handleResolve(id, resolution);
-					if (!result.success) toast.error(result.error);
-					triggerSync();
+					if (result.success) {
+						triggerSync();
+					} else {
+						toast.error(result.error);
+					}
 				}}
 				onFilesSelected={async (files, target) => {
 					const currentCount = await getMediaCountForEntity(
@@ -151,10 +160,10 @@ function TodoContent({
 						} catch {
 							// server-side cleanup failed; local removal already succeeded
 						}
+						triggerSync();
 					} else {
 						toast.error(result.error);
 					}
-					triggerSync();
 				}}
 				onRetryAttachment={async (_todoId, mediaId) => {
 					const result = await handleRetryAttachment(mediaId);
