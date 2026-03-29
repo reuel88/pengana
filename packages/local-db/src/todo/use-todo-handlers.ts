@@ -171,12 +171,9 @@ export function useTodoHandlers(deps: TodoHandlerDeps) {
 	);
 
 	const handleRemoveAttachment = useCallback(
-		async (
-			_todoId: string,
-			attachmentId: string,
-		): Promise<TodoHandlerResult> => {
+		async (_todoId: string, mediaId: string): Promise<TodoHandlerResult> => {
 			try {
-				await mediaActions.removeMedia(attachmentId);
+				await mediaActions.removeMedia(mediaId);
 				return { success: true, data: undefined };
 			} catch {
 				return { success: false, error: t("errors:failedToDeleteAttachment") };

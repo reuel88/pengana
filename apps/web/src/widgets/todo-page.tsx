@@ -143,11 +143,11 @@ function TodoContent({
 						triggerSync();
 					}
 				}}
-				onRemoveAttachment={async (todoId, attachmentId) => {
-					const result = await handleRemoveAttachment(todoId, attachmentId);
+				onRemoveAttachment={async (todoId, mediaId) => {
+					const result = await handleRemoveAttachment(todoId, mediaId);
 					if (result.success) {
 						try {
-							await client.upload.deleteMedia({ mediaId: attachmentId });
+							await client.upload.deleteMedia({ mediaId });
 						} catch {
 							// server-side cleanup failed; local removal already succeeded
 						}
@@ -156,8 +156,8 @@ function TodoContent({
 					}
 					triggerSync();
 				}}
-				onRetryAttachment={async (_todoId, attachmentId) => {
-					const result = await handleRetryAttachment(attachmentId);
+				onRetryAttachment={async (_todoId, mediaId) => {
+					const result = await handleRetryAttachment(mediaId);
 					if (result.success && result.data) {
 						enqueueUpload(result.data);
 						triggerSync();

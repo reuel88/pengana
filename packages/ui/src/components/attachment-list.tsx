@@ -11,8 +11,8 @@ export interface AttachmentItem {
 
 interface AttachmentListProps {
 	attachments: AttachmentItem[];
-	onRemove: (attachmentId: string) => void;
-	onRetry?: (attachmentId: string) => void;
+	onRemove: (mediaId: string) => void;
+	onRetry?: (mediaId: string) => void;
 }
 
 function mimeLabel(mimeType: string): string {

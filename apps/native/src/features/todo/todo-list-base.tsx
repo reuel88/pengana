@@ -31,8 +31,8 @@ export function TodoListBase({
 	triggerSync: () => void;
 	showPickerForTodo: (todoId: string) => void;
 	actions: TodoListActions;
-	onRemoveAttachment?: (attachmentId: string) => void;
-	onRetryAttachment?: (attachmentId: string) => void;
+	onRemoveAttachment?: (mediaId: string) => void;
+	onRetryAttachment?: (mediaId: string) => void;
 }) {
 	const { theme } = useTheme();
 	const { t } = useTranslation("todos");

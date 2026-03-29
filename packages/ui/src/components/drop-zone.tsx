@@ -106,7 +106,11 @@ export function DropZone({ onFiles, onError, accept }: DropZoneProps) {
 			onClick={handleClick}
 		>
 			<span className="text-sm opacity-70">
-				{isDragOver ? t("dropzone.active") : t("dropzone.idle")}
+				{isProcessing
+					? t("dropzone.processing")
+					: isDragOver
+						? t("dropzone.active")
+						: t("dropzone.idle")}
 			</span>
 			<input
 				ref={fileInputRef}

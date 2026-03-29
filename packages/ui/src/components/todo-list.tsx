@@ -8,8 +8,8 @@ interface TodoListProps {
 	onDelete: (id: string) => void;
 	onResolve: (id: string, resolution: "local" | "server") => void;
 	onFilesSelected: (files: File[], target: MediaAttachmentTarget) => void;
-	onRemoveAttachment?: (id: string, attachmentId: string) => void;
-	onRetryAttachment?: (id: string, attachmentId: string) => void;
+	onRemoveAttachment?: (id: string, mediaId: string) => void;
+	onRetryAttachment?: (id: string, mediaId: string) => void;
 	onValidationError?: (id: string, message: string) => void;
 	validateFile?: (file: File) => string | null;
 	maxAttachments?: number;
@@ -55,12 +55,12 @@ export function TodoList({
 					onFilesSelected={(files) =>
 						onFilesSelected(files, { entityId: todo.id, entityType: "todo" })
 					}
-					onRemoveAttachment={(attachmentId) =>
-						onRemoveAttachment?.(todo.id, attachmentId)
+					onRemoveAttachment={(mediaId) =>
+						onRemoveAttachment?.(todo.id, mediaId)
 					}
 					onRetryAttachment={
 						onRetryAttachment
-							? (attachmentId) => onRetryAttachment(todo.id, attachmentId)
+							? (mediaId) => onRetryAttachment(todo.id, mediaId)
 							: undefined
 					}
 					onValidationError={
