@@ -11,6 +11,7 @@ import {
 import { billingRouter } from "./billing";
 import { mediaRouter } from "./media";
 import { notificationRouter } from "./notification";
+import { ocrRouter } from "./ocr";
 import { orgTodoRouter } from "./org-todo";
 import { teamRouter } from "./team";
 import { todoRouter } from "./todo";
@@ -96,6 +97,7 @@ export const appRouter = {
 	billing: billingRouter,
 	media: mediaRouter,
 	notification: notificationRouter,
+	ocr: ocrRouter,
 	orgTodo: orgTodoRouter,
 	team: teamRouter,
 	todo: todoRouter,

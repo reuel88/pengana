@@ -15,6 +15,7 @@ import { handleOrpcRoutes, wireNotifications } from "./orpc";
 import {
 	authLimiter,
 	globalLimiter,
+	ocrLimiter,
 	syncLimiter,
 	uploadLimiter,
 } from "./rate-limit";
@@ -83,6 +84,7 @@ for (const path of rateLimitedAuthPaths) {
 }
 
 app.use("/rpc/upload.*", uploadLimiter);
+app.use("/rpc/ocr.*", ocrLimiter);
 app.use("/rpc/todo.*", syncLimiter);
 
 app.on(

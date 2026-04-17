@@ -22,6 +22,7 @@ export const env = createEnv({
 		POLAR_SUCCESS_URL: z.url(),
 		POLAR_WEBHOOK_SECRET: z.string().min(1),
 		FREE_TIER_SEATS: z.coerce.number().int().nonnegative().default(2),
+		ANTHROPIC_API_KEY: z.string().min(1).optional(),
 		CORS_ORIGIN: z.string().min(1),
 		WEB_URL: z.url().optional(),
 		APP_URL: z.url().optional(),

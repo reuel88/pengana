@@ -2,6 +2,7 @@ export const ALLOWED_MIME_TYPES = [
 	"image/jpeg",
 	"image/png",
 	"image/heic",
+	"image/tiff",
 	"application/pdf",
 ] as const;
 
@@ -19,6 +20,7 @@ export const MIME_TO_EXT: Record<string, string> = {
 	"image/jpeg": "jpg",
 	"image/png": "png",
 	"image/heic": "heic",
+	"image/tiff": "tiff",
 	"application/pdf": "pdf",
 };
 

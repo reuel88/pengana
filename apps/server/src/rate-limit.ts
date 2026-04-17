@@ -50,6 +50,10 @@ export const authLimiter = createLimiter(15 * 60 * 1000, 20);
 // Prevents upload abuse and controls storage/bandwidth usage.
 export const uploadLimiter = createLimiter(60 * 1000, 10);
 
+// Applied to OCR routes (/rpc/ocr.*). 5 requests per minute per IP.
+// OCR is CPU-intensive; prevents abuse and controls server load.
+export const ocrLimiter = createLimiter(60 * 1000, 5);
+
 // Applied to todo sync routes (/rpc/todo.*). 60 requests per minute per IP.
 // Prevents excessive sync polling while allowing reasonable real-time usage.
 export const syncLimiter = createLimiter(60 * 1000, 60);

@@ -18,6 +18,8 @@
 		"@pengana/i18n": "workspace:*",
 		"@pengana/db": "workspace:*",
 		"@pengana/env": "workspace:*",
+		"@pengana/extraction": "workspace:*",
+		"@pengana/ocr": "workspace:*",
 		"@pengana/sync": "workspace:*",
 		"@orpc/client": "catalog:",
 		"@orpc/openapi": "catalog:",

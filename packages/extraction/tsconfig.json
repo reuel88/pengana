@@ -1,0 +1,3 @@
+{
+	"extends": "@pengana/config/tsconfig.base.json"
+}

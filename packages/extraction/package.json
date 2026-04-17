@@ -1,0 +1,22 @@
+{
+	"name": "@pengana/extraction",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./types": {
+			"default": "./src/types.ts"
+		}
+	},
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.52.0",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@pengana/config": "workspace:*",
+		"typescript": "catalog:"
+	}
+}

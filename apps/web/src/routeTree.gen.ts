@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
+import { Route as OcrRouteImport } from './routes/ocr'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as OrgRouteRouteImport } from './routes/org/route'
@@ -43,6 +44,11 @@ import { Route as authMagicLinkPendingRouteImport } from './routes/(auth)/magic-
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
   path: '/todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OcrRoute = OcrRouteImport.update({
+  id: '/ocr',
+  path: '/ocr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MediaRoute = MediaRouteImport.update({
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/org': typeof OrgRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/media': typeof MediaRoute
+  '/ocr': typeof OcrRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
   '/onboarding': typeof accountOnboardingRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/settings': typeof SettingsRouteRouteWithChildren
   '/media': typeof MediaRoute
+  '/ocr': typeof OcrRoute
   '/todos': typeof TodosRoute
   '/onboarding': typeof accountOnboardingRoute
   '/success': typeof accountSuccessRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/org': typeof OrgRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/media': typeof MediaRoute
+  '/ocr': typeof OcrRoute
   '/todos': typeof TodosRoute
   '/org/teams': typeof OrgTeamsRouteRouteWithChildren
   '/(account)/onboarding': typeof accountOnboardingRoute
@@ -290,6 +299,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/settings'
     | '/media'
+    | '/ocr'
     | '/todos'
     | '/org/teams'
     | '/onboarding'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/media'
+    | '/ocr'
     | '/todos'
     | '/onboarding'
     | '/success'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/org'
     | '/settings'
     | '/media'
+    | '/ocr'
     | '/todos'
     | '/org/teams'
     | '/(account)/onboarding'
@@ -384,6 +396,7 @@ export interface RootRouteChildren {
   OrgRouteRoute: typeof OrgRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   MediaRoute: typeof MediaRoute
+  OcrRoute: typeof OcrRoute
   TodosRoute: typeof TodosRoute
   accountOnboardingRoute: typeof accountOnboardingRoute
   accountSuccessRoute: typeof accountSuccessRoute
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       path: '/todos'
       fullPath: '/todos'
       preLoaderRoute: typeof TodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ocr': {
+      id: '/ocr'
+      path: '/ocr'
+      fullPath: '/ocr'
+      preLoaderRoute: typeof OcrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/media': {
@@ -693,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgRouteRoute: OrgRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   MediaRoute: MediaRoute,
+  OcrRoute: OcrRoute,
   TodosRoute: TodosRoute,
   accountOnboardingRoute: accountOnboardingRoute,
   accountSuccessRoute: accountSuccessRoute,

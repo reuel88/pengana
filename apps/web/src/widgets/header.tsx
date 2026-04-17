@@ -13,6 +13,7 @@ export function Header() {
 		{ to: "/", label: t("nav.dashboard") },
 		{ to: "/todos", label: t("nav.todos") },
 		{ to: "/media", label: t("nav.media") },
+		{ to: "/ocr", label: "OCR" },
 	] as const;
 
 	return (

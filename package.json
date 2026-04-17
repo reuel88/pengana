@@ -60,6 +60,9 @@
 			"@babel/types": "^7.29.0",
 			"@vitejs/plugin-react": "^5.2.0",
 			"vite-node": "^6.0.0"
-		}
+		},
+		"onlyBuiltDependencies": [
+			"tesseract.js"
+		]
 	}
 }

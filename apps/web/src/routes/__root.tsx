@@ -2,6 +2,15 @@ import { useTranslation } from "@pengana/i18n";
 import type { SupportedLocale } from "@pengana/i18n/config";
 import { getDirection } from "@pengana/i18n/rtl";
 import { AuthClientProvider } from "@pengana/org";
+import {
+	DashboardContent,
+	DashboardHeader,
+	DashboardInset,
+	DashboardProvider,
+	DashboardSidebar,
+	DashboardSidebarContent,
+	DashboardSidebarHeader,
+} from "@pengana/ui/components/dashboard";
 import { Toaster } from "@pengana/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -106,13 +115,30 @@ function RootComponent() {
 			>
 				<OrgDesignPresetPreviewProvider>
 					<OrgDesignPresetSync />
-					<div className={hideHeader ? "" : "grid h-svh grid-rows-[auto_1fr]"}>
-						{!hideHeader && <Header />}
+
+					{hideHeader ? (
 						<Outlet />
-					</div>
+					) : (
+						<DashboardProvider>
+							<DashboardSidebar>
+								<DashboardSidebarHeader>header</DashboardSidebarHeader>
+								<DashboardSidebarContent>content</DashboardSidebarContent>
+							</DashboardSidebar>
+							<DashboardInset>
+								<DashboardHeader>
+									<Header />
+								</DashboardHeader>
+								<DashboardContent>
+									<Outlet />
+								</DashboardContent>
+							</DashboardInset>
+						</DashboardProvider>
+					)}
+
 					<Toaster richColors />
 				</OrgDesignPresetPreviewProvider>
 			</ThemeProvider>
+
 			<TanStackRouterDevtools position="bottom-left" />
 			<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
 		</AuthClientProvider>
