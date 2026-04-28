@@ -45,6 +45,6 @@
 		"typescript": "^5.9.3",
 		"vite": "catalog:",
 		"vitest": "catalog:",
-		"wxt": "^0.20.20"
+		"wxt": "^0.20.25"
 	}
 }
