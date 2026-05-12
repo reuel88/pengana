@@ -21,9 +21,9 @@
 		"@pengana/config": "workspace:*",
 		"server": "workspace:*",
 		"web": "workspace:*",
-		"@playwright/test": "^1.52.0",
+		"@playwright/test": "^1.60.0",
 		"@types/node": "catalog:",
-		"@types/pg": "^8.16.0",
+		"@types/pg": "^8.20.0",
 		"typescript": "catalog:"
 	}
 }
