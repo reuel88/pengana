@@ -15,7 +15,7 @@
 		"desktop:build": "tauri build"
 	},
 	"dependencies": {
-		"@base-ui/react": "^1.3.0",
+		"@base-ui/react": "^1.4.1",
 		"@hookform/resolvers": "^5.1.1",
 		"@orpc/client": "catalog:",
 		"@orpc/server": "catalog:",
@@ -30,8 +30,8 @@
 		"@pengana/ui": "workspace:*",
 		"@phosphor-icons/react": "^2.1.10",
 		"@remixicon/react": "^4.9.0",
-		"@tabler/icons-react": "^3.40.0",
-		"@tailwindcss/vite": "^4.0.15",
+		"@tabler/icons-react": "^3.44.0",
+		"@tailwindcss/vite": "^4.3.0",
 		"@tanstack/react-form": "catalog:",
 		"@tanstack/react-query": "catalog:",
 		"@tanstack/react-router": "^1.167.4",
@@ -43,7 +43,7 @@
 		"next-themes": "^0.4.6",
 		"react": "catalog:",
 		"react-dom": "catalog:",
-		"shadcn": "^4.0.8",
+		"shadcn": "^4.7.0",
 		"sonner": "^2.0.5",
 		"tw-animate-css": "^1.2.5",
 		"vite-plugin-pwa": "^1.3.0",
@@ -61,7 +61,7 @@
 		"@vite-pwa/assets-generator": "^1.0.0",
 		"@vitejs/plugin-react": "^5.2.0",
 		"postcss": "^8.5.14",
-		"tailwindcss": "^4.0.15",
+		"tailwindcss": "^4.3.0",
 		"typescript": "catalog:",
 		"vite": "catalog:"
 	}

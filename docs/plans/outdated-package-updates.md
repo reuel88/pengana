@@ -23,7 +23,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 3** — Security: `@hono/node-server` 2.x major (CVE-2026-39406)
 - [x] **Phase 4** — Expo SDK patches
 - [x] **Phase 5** — Frontend build tooling minor
-- [ ] Phase 6 — UI / Tailwind minor
+- [x] **Phase 6** — UI / Tailwind minor
 - [ ] Phase 7 — Core library minors (data layer)
 - [ ] Phase 8 — TanStack ecosystem minor
 - [ ] Phase 9 — React Native ecosystem minor
@@ -155,17 +155,17 @@ Verification: cold boot the native app, exercise login + a synced todo write (sy
 
 Also aligned `apps/web/package.json` `vite` from direct `^8.0.0` pin to `catalog:` (matches `apps/extension`); `vite-plugin-pwa` 1.3.0 added vite 8 to its peer range, clearing the long-standing `unmet peer vite` warning. Residual warning on transitive `workbox-build`/`workbox-window` 7.4.0 (peer wants ^7.4.1) is left as noise — pnpm won't re-resolve a deeply transitive dep without an override and the patch drift is functionally irrelevant.
 
-### Phase 6 — UI / Tailwind minor
+### Phase 6 — UI / Tailwind minor ✅ Done
 
-- `@base-ui/react` 1.3.0 → 1.4.1 *(packages/ui, web, extension)*
-- `@tabler/icons-react` 3.40.0 → 3.44.0 *(apps/web)*
-- `@tailwindcss/vite` 4.2.1 → 4.3.0 *(apps/web, extension)*
-- `tailwindcss` 4.2.1 → 4.3.0 *(packages/ui + apps/web, extension)*
-- `tailwind-merge` 3.5.0 → 3.6.0 *(packages/ui)*
-- `shadcn` 4.0.8 → 4.7.0 *(packages/ui, web, extension)*
-- `react-resizable-panels` 4.7.3 → 4.11.0 *(packages/ui)*
+- `@base-ui/react` ^1.3.0 → ^1.4.1 *(packages/ui, web, extension)*
+- `@tabler/icons-react` ^3.40.0 → ^3.44.0 *(apps/web)*
+- `@tailwindcss/vite` ^4.0.15 → ^4.3.0 *(apps/web, extension)*
+- `tailwindcss` ^4.0.15 / ^4.2.1 → ^4.3.0 *(packages/ui + apps/web, extension)* — drift closed
+- `tailwind-merge` ^3.3.1 → ^3.6.0 *(packages/ui)*
+- `shadcn` ^4.0.8 → ^4.7.0 *(packages/ui, web, extension)* — CLI only, no runtime change
+- `react-resizable-panels` ^4.7.3 → ^4.11.0 *(packages/ui)*
 
-Smoke-test: open a few primary screens in web app; check resizable panel still drags.
+Side benefit: the long-standing `@tailwindcss/vite → unmet peer vite` warning is gone (Tailwind 4.3 added vite 8 to its peer range).
 
 ### Phase 7 — Core library minors (data layer)
 
