@@ -16,6 +16,23 @@ The goal is to land these updates in small, independently testable phases so tha
 
 Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.yaml`; package-local overrides live in the relevant `package.json`.
 
+## Progress
+
+- [x] **Phase 1** — Patch bumps
+- [x] **Phase 2** — Security: ORPC stack minor (CVE-2026-33331)
+- [x] **Phase 3** — Security: `@hono/node-server` 2.x major (CVE-2026-39406)
+- [x] **Phase 4** — Expo SDK patches
+- [ ] Phase 5 — Frontend build tooling minor
+- [ ] Phase 6 — UI / Tailwind minor
+- [ ] Phase 7 — Core library minors (data layer)
+- [ ] Phase 8 — TanStack ecosystem minor
+- [ ] Phase 9 — React Native ecosystem minor
+- [ ] Phase 10 — better-auth ecosystem
+- [ ] Phase 11 — Major: `@vitejs/plugin-react` 6
+- [ ] Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
+- [ ] Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
+- [ ] Phase 14 — Major: React Native 0.85 + worklets
+
 ---
 
 ## Versions Centralised in Catalog
@@ -57,7 +74,7 @@ Commit per phase using the existing `chore(deps):` prefix style. Push and let CI
 
 ## Phases
 
-### Phase 1 — Patch bumps (low-risk batch)
+### Phase 1 — Patch bumps (low-risk batch) ✅ Done
 
 Single batched commit; all are patch-level upgrades with negligible breaking-change risk.
 
@@ -71,7 +88,7 @@ Single batched commit; all are patch-level upgrades with negligible breaking-cha
 - `recharts` 3.8.0 → 3.8.1 *(packages/ui)*
 - `ws` 8.19.0 → 8.20.0 *(apps/server)*
 
-### Phase 2 — Security: ORPC stack minor (CVE-2026-33331)
+### Phase 2 — Security: ORPC stack minor (CVE-2026-33331) ✅ Done
 
 **CVE-2026-33331** (CVSS 8.2, High) on `@orpc/openapi@1.13.7`. Fix lands in 1.14.x. Catalog edit propagates to all consumers.
 
@@ -79,9 +96,11 @@ Single batched commit; all are patch-level upgrades with negligible breaking-cha
 
 ORPC versions must remain matched across all packages — catalog handles this. Hit `/rpc` and `/api-reference` after bump.
 
-### Phase 3 — Security: `@hono/node-server` 2.x major (CVE-2026-39406)
+### Phase 3 — Security: `@hono/node-server` 2.x major (CVE-2026-39406) ✅ Done
 
 **CVE-2026-39406** (CVSS 5.3, Medium) on `@hono/node-server@1.19.11` — middleware bypass via repeated slashes in `serveStatic`. Directly affects `apps/server/src/index.ts:113` which mounts `/uploads/*` via `serveStatic({ root: "./" })`.
+
+v2.0 release notes confirmed public API unchanged; breaks are Node 18 EOL (we're on Node 22 per `.nvmrc`) and Vercel adapter removal (unused). All four callsites (`serve`, `serveStatic`, `ServerType`, `getConnInfo` from `/conninfo`) work without code changes.
 
 - `@hono/node-server` 1.19.11 → 2.0.2 *(apps/server only)*
 
@@ -92,9 +111,16 @@ Read the 2.0 release notes for handler signature changes. API surface used in `a
 
 Verification: server boots, `/rpc` + `/api-reference` respond, websocket route still upgrades, rate limiter still attaches client IP. Additionally test `/uploads//<known-file>` (double-slash) to confirm CVE fix applies.
 
-### Phase 4 — Expo SDK patches (all together)
+### Phase 4 — Expo SDK patches (all together) ✅ Done
 
 Expo expects matched versions within an SDK release. Bump together and run `npx expo-doctor` in `apps/native`.
+
+**SDK-coherence cleanup also performed in this phase:**
+- Reverted native `react` / `react-dom` from 19.2.6 (Phase 1) to `19.2.0` to match Expo SDK 55's expected version (catalog stays at 19.2.6 for web/extension).
+- Bumped `react-native` 0.83.2 → `0.83.6` and `react-native-worklets` 0.7.2 → `0.7.4` (still within 0.83.x / 0.7.x — the 0.85 major remains in Phase 14).
+- Added explicit native deps `@expo/metro-runtime ~55.0.11` and `@expo/dom-webview ~55.0.6` because pnpm was holding stale transitive versions (55.0.6 / 55.0.3) that failed `expo-router` and `@expo/log-box` peer ranges.
+
+`expo-doctor` ends with 17/18 checks passing; the remaining failure is unrelated duplicate `react`/`react-dom` copies pinned by third-party deps (`@polar-sh/checkout`, `@polar-sh/ui`, `@tanstack/react-store`).
 
 ```
 expo 55.0.6 → 55.0.23
