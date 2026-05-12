@@ -28,7 +28,7 @@
 		"@pengana/env": "workspace:*",
 		"pg": "^8.17.1",
 		"dotenv": "catalog:",
-		"drizzle-orm": "^0.45.1",
+		"drizzle-orm": "^0.45.2",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
