@@ -22,7 +22,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 2** — Security: ORPC stack minor (CVE-2026-33331)
 - [x] **Phase 3** — Security: `@hono/node-server` 2.x major (CVE-2026-39406)
 - [x] **Phase 4** — Expo SDK patches
-- [ ] Phase 5 — Frontend build tooling minor
+- [x] **Phase 5** — Frontend build tooling minor
 - [ ] Phase 6 — UI / Tailwind minor
 - [ ] Phase 7 — Core library minors (data layer)
 - [ ] Phase 8 — TanStack ecosystem minor
@@ -32,6 +32,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [ ] Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
 - [ ] Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
 - [ ] Phase 14 — Major: React Native 0.85 + worklets
+- [ ] Phase 15 — Catalog audit / expansion
 
 ---
 
@@ -144,13 +145,15 @@ expo-web-browser 55.0.10 → 55.0.15
 
 Verification: cold boot the native app, exercise login + a synced todo write (sync engine relies on `expo-sqlite`).
 
-### Phase 5 — Frontend build tooling minor
+### Phase 5 — Frontend build tooling minor ✅ Done
 
 - `vite` 8.0.0 → 8.0.12 *(catalog)*
 - `vitest` 4.1.0 → 4.1.6 *(catalog)*
-- `vite-plugin-pwa` 1.2.0 → 1.3.0 *(apps/web)*
+- `vite-plugin-pwa` 1.0.1 → 1.3.0 *(apps/web)*
 - `dotenv` 17.3.1 → 17.4.2 *(catalog)*
 - `@types/node` 25.5.0 → 25.7.0 *(catalog)*
+
+Also aligned `apps/web/package.json` `vite` from direct `^8.0.0` pin to `catalog:` (matches `apps/extension`); `vite-plugin-pwa` 1.3.0 added vite 8 to its peer range, clearing the long-standing `unmet peer vite` warning. Residual warning on transitive `workbox-build`/`workbox-window` 7.4.0 (peer wants ^7.4.1) is left as noise — pnpm won't re-resolve a deeply transitive dep without an override and the patch drift is functionally irrelevant.
 
 ### Phase 6 — UI / Tailwind minor
 
@@ -243,6 +246,45 @@ Confirm Expo SDK 55 supports RN 0.85 (check Expo SDK release notes — if not, d
 4. Full simulator boot + login + sync round-trip
 
 If Expo SDK 55 caps RN at 0.83, **skip this phase** and open a follow-up tracking ticket for SDK 56.
+
+### Phase 15 — Catalog audit / expansion
+
+Consolidate every dep used in **2+ workspaces** into `pnpm-workspace.yaml` `catalog:` so future bumps stay single-edit. Closes existing version drift (e.g. `tailwindcss` `^4.0.15` in extension/web vs `^4.2.1` in ui).
+
+**Drift policy:** Resolve drift by choosing the highest existing range (no implicit npm-latest bump in this phase).
+
+**Candidates to add to catalog**
+
+| Dep | Resolved catalog version | Workspaces |
+|---|---|---|
+| `tailwindcss` | `^4.2.1` (highest of `^4.0.15` / `^4.2.1`) | extension, web, @pengana/ui |
+| `@types/react` | `^19.2.14` (style normalised) | native, web, extension, local-db, org, ui |
+| `@types/react-dom` | `^19.2.3` | extension, web |
+| `dexie` | `^4.0.11` | local-db, native, web, extension |
+| `dexie-react-hooks` | `^4.2.0` | local-db, native, web, extension |
+| `drizzle-orm` | `^0.45.2` | db, local-db, email-dev, native |
+| `shadcn` | `^4.0.8` | ui, web, extension |
+| `@base-ui/react` | `^1.3.0` | ui, web, extension |
+| `lucide-react` | `^0.577.0` | ui, web, extension |
+| `tw-animate-css` | `^1.2.5` | ui, web, extension |
+| `@logtape/logtape` | `^2.0.7` | server, @pengana/auth |
+| `@tailwindcss/vite` | `^4.0.15` | extension, web |
+| `i18next` | `^25.8.18` | web, @pengana/i18n |
+| `drizzle-kit` | `^0.31.10` | db, native |
+| `next-themes` | `^0.4.6` | ui, web |
+| `sonner` | `^2.0.5` | ui, web |
+| `pg` | `^8.17.1` | db, e2e |
+| `@types/pg` | `^8.20.0` | db, e2e |
+
+**Explicitly excluded:** Expo SDK packages (`expo-*`, `@expo/*`), React Native (`react-native`, `react-native-*`), Tauri/WXT, single-workspace deps, and deps already in catalog.
+
+**Steps:**
+1. Add the 18 entries above to `pnpm-workspace.yaml` `catalog:`.
+2. Replace every direct pin in each consumer `package.json` with `"catalog:"`.
+3. `pnpm install` — confirm no new peer warnings beyond the pre-existing set.
+4. Verification: `pnpm check-types`, `pnpm test`, `pnpm e2e`, `pnpm build`.
+
+**Smoke test:** None needed — this is a pure pin-consolidation; resolved versions don't change (drift cases resolve up only).
 
 ---
 
