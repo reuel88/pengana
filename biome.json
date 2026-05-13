@@ -20,6 +20,7 @@
 			"!**/.nuxt",
 			"!**/.expo",
 			"!**/expo-env.d.ts",
+			"!**/.claude/settings.local.json",
 			"!**/.wrangler",
 			"!**/.alchemy",
 			"!**/.svelte-kit",
