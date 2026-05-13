@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@better-auth/expo": "catalog:",
-		"@better-auth/i18n": "^1.5.4",
+		"@better-auth/i18n": "1.6.10",
 		"@logtape/logtape": "^2.0.7",
 		"@pengana/db": "workspace:*",
 		"@pengana/email-dev": "workspace:*",

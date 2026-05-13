@@ -27,7 +27,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [~] **Phase 7** — Core library minors (data layer) — zod deferred (TS2589, persists with TanStack form 1.32)
 - [x] **Phase 8** — TanStack ecosystem minor
 - [~] **Phase 9** — React Native ecosystem minor — reanimated 4.3.1 deferred (needs worklets 0.8 from Phase 14)
-- [ ] Phase 10 — better-auth ecosystem
+- [x] **Phase 10** — better-auth ecosystem
 - [ ] Phase 11 — Major: `@vitejs/plugin-react` 6
 - [ ] Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
 - [ ] Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
@@ -205,18 +205,19 @@ Phase 7's deferred `zod` 4.4 bump was retried under this phase's TanStack form 1
 
 All `native` only. Smoke-test: drawer + tab navigation; reanimated screen transitions.
 
-### Phase 10 — better-auth ecosystem (1.5.5 → 1.6.10)
+### Phase 10 — better-auth ecosystem (1.5.5 → 1.6.10) ✅ Done
 
-Three packages must move together (they share an internal protocol):
+Three packages bumped together (shared internal protocol):
 
-- `better-auth` 1.5.5 → 1.6.10 *(catalog — change exact pin to `1.6.10` or convert to caret)*
-- `@better-auth/expo` 1.5.5 → 1.6.10 *(catalog)*
-- `@better-auth/i18n` 1.5.5 → 1.6.10 *(packages/auth)*
+- `better-auth` 1.5.5 → 1.6.10 *(catalog, exact pin retained)*
+- `@better-auth/expo` 1.5.5 → 1.6.10 *(catalog, exact pin retained)*
+- `@better-auth/i18n` ^1.5.4 → 1.6.10 *(packages/auth, switched from caret to exact pin to match catalog and avoid an `@better-auth/core ^1.6.11` peer-warning when caret resolved up to 1.6.11)*
 
-Read 1.6 changelog before committing. Focus on `packages/auth/src/` and `apps/web/src/shared/lib/auth-client.ts` (referenced in CLAUDE.md). Verification:
-- Web: email/password sign-in, magic link, session list/revoke
-- Native: sign-in via Expo client
-- Server: `/api/auth/*` endpoints
+Changelog scan for 1.6.0–1.6.10 surfaced no breaking changes affecting our config surface — the 1.6 line is security/patch only (device-auth binding, magic-link race fix, OIDC provider hardening, invitation-takeover guard). `oidc-provider` deprecation in favor of `@better-auth/oauth-provider` does not affect us (not used). Drizzle adapter import path `better-auth/adapters/drizzle` still works in 1.6.
+
+`@polar-sh/better-auth@1.8.4` peer range (`better-auth: ^1.4.12`) covers 1.6.10 — no need to bump.
+
+Verification: all five checks (`check`, `check-types`, `test`, `e2e`, `build`) green; 83/83 e2e tests pass including the org sign-in/invitation flows that exercise the `organization` plugin hooks. `expo-doctor` baseline unchanged at 16/18 from Phase 9.
 
 ### Phase 11 — Major: `@vitejs/plugin-react` 6
 

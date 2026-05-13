@@ -21,7 +21,7 @@
 
 		"db:push": "turbo -F @pengana/db db:push",
 		"db:studio": "turbo -F @pengana/db db:studio",
-		"db:generate": "turbo -F @pengana/db db:generate",
+		"db:generate": "turbo -F @pengana/db -F native db:generate",
 		"db:migrate": "turbo -F @pengana/db db:migrate",
 		"db:start": "turbo -F @pengana/db db:start",
 		"db:watch": "turbo -F @pengana/db db:watch",
