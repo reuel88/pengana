@@ -30,7 +30,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 10** — better-auth ecosystem
 - [x] **Phase 11** — Major: `@vitejs/plugin-react` 6
 - [x] **Phase 12** — Major: i18n stack (i18next 26 + react-i18next 17)
-- [ ] Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
+- [x] **Phase 13** — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
 - [ ] Phase 14 — Major: React Native 0.85 + worklets
 - [ ] Phase 15 — Catalog audit / expansion
 
@@ -248,14 +248,25 @@ Side effect: web `i18n-*.js` chunk dropped from 62.83 kB → 62.53 kB (i18next 2
 
 Verification: all five checks plus `pnpm check:i18n` green (no missing keys, no invalid translations across 11 locales × 10 namespaces); 83/83 e2e tests pass; forced `pnpm turbo build --filter=web --force` rebuilt cleanly against the new versions; no deprecation warnings in install output.
 
-### Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
+### Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1) ✅ Done
 
-These are independent but small enough to bundle into one UI-focused phase.
+Two independent UI library majors bumped together:
 
-- `react-day-picker` 9.14.0 → 10.0.0 *(packages/ui)*
-- `lucide-react` 0.577.0 → 1.14.0 *(packages/ui, web, extension)*
+- `react-day-picker` `^9.14.0` → `^10.0.0` *(packages/ui)*
+- `lucide-react` `^0.577.0` → `^1.14.0` *(packages/ui, apps/web, apps/extension)*
 
-`lucide-react` 1.x has renamed and removed some icons — grep `lucide-react` imports across the repo and verify each is still exported.
+**react-day-picker v10 was a no-op for our codebase** — `packages/ui/src/components/calendar.tsx` (the only callsite, also unused by any app) doesn't touch any of the removed v9 aliases (`fromMonth`/`toMonth`, `initialFocus`, `formatMonthCaption`, `isMatch`, `components.Button`, etc.). It uses `DayPicker`, `getDefaultClassNames`, type `DayButton`, type `Locale` — all preserved in v10. lucide-react was the same story for icon names — the 0.577 → 1.14 jump preserved all 19 distinct icons we import (including the un-suffixed `Bell`/`CircleAlert`/`Globe`/`Loader2`/`Mail`/`Moon`/`Sun` style).
+
+**Real friction came from the v1.14 ESM layout change**, surfaced by `apps/web/src/shared/lib/lucide-react-adapter.tsx`. That file uses a deep import path (`lucide-react/dist/esm/...`) on purpose: `apps/web/vite.config.ts:55` aliases bare `^lucide-react$` to this adapter file, so the adapter itself must bypass the alias to get at the real package without an infinite loop. v1.14 renamed the ESM bundle from `dist/esm/lucide-react.js` → `dist/esm/lucide-react.mjs` and dropped the `.d.mts` type sibling. Fix landed in this phase:
+
+- Updated both import lines in `lucide-react-adapter.tsx` from `lucide-react/dist/esm/lucide-react.js` → `lucide-react/dist/esm/lucide-react.mjs`.
+- Added `apps/web/src/shared/lib/lucide-react-deep-path.d.ts` — a one-line module shim (`declare module "lucide-react/dist/esm/lucide-react.mjs" { export * from "lucide-react"; }`) so TypeScript sees the same exports for the deep path as for the bare specifier. Without it, tsc emits TS7016 because v1.14 ships type declarations only at the top-level entry.
+
+Side notes:
+- The diagnostic path took two false turns first — production build said "rolldown failed to resolve" the old `.js` path; the fix to bare `"lucide-react"` looked clean at type-check but produced a blank page in e2e because of the alias loop. The deep `.mjs` path + type shim is the durable solution.
+- Web prod bundle stable (122 entries / 1456.30 KiB); extension prod bundle stable at 1.29 MB.
+
+Verification: all five checks green; 83/83 e2e pass; forced web rebuild clean. No code changes needed in `packages/ui/src/components/calendar.tsx` for react-day-picker v10.
 
 ### Phase 14 — Major: React Native 0.85 + worklets
 

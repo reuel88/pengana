@@ -59,7 +59,7 @@ import {
 	IconWorld,
 	IconX,
 } from "@tabler/icons-react";
-import type { LucideProps } from "lucide-react/dist/esm/lucide-react.js";
+import type { LucideProps } from "lucide-react/dist/esm/lucide-react.mjs";
 import {
 	Bell as LucideBell,
 	CheckIcon as LucideCheckIcon,
@@ -84,7 +84,7 @@ import {
 	Sun as LucideSun,
 	TriangleAlertIcon as LucideTriangleAlertIcon,
 	XIcon as LucideXIcon,
-} from "lucide-react/dist/esm/lucide-react.js";
+} from "lucide-react/dist/esm/lucide-react.mjs";
 import type { ComponentProps, ComponentType } from "react";
 import { useSyncExternalStore } from "react";
 
