@@ -26,7 +26,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 6** — UI / Tailwind minor
 - [~] **Phase 7** — Core library minors (data layer) — zod deferred (TS2589, persists with TanStack form 1.32)
 - [x] **Phase 8** — TanStack ecosystem minor
-- [ ] Phase 9 — React Native ecosystem minor
+- [~] **Phase 9** — React Native ecosystem minor — reanimated 4.3.1 deferred (needs worklets 0.8 from Phase 14)
 - [ ] Phase 10 — better-auth ecosystem
 - [ ] Phase 11 — Major: `@vitejs/plugin-react` 6
 - [ ] Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
@@ -189,15 +189,19 @@ Side benefit: cleared three pre-existing peer warnings (`@tanstack/react-query-d
 
 Phase 7's deferred `zod` 4.4 bump was retried under this phase's TanStack form 1.32 — same OOM/TS2589, so the deferral stands (see Phase 7 notes).
 
-### Phase 9 — React Native ecosystem minor
+### Phase 9 — React Native ecosystem minor ⚠️ Partial
 
-- `@react-navigation/bottom-tabs` 7.15.5 → 7.16.0
-- `@react-navigation/drawer` 7.9.4 → 7.10.0
-- `@react-navigation/native` 7.1.33 → 7.2.4
-- `react-native-gesture-handler` 2.30.0 → 2.31.2
-- `react-native-reanimated` 4.2.1 → 4.3.1
-- `react-native-safe-area-context` 5.6.2 → 5.7.0
-- `react-native-screens` 4.23.0 → 4.25.0
+- `@react-navigation/bottom-tabs` 7.15.5 → 7.16.0 ✅
+- `@react-navigation/drawer` 7.9.4 → 7.10.0 ✅
+- `@react-navigation/native` 7.1.33 → 7.2.4 ✅
+- `react-native-gesture-handler` 2.30.0 → 2.31.2 ✅
+- `react-native-reanimated` 4.2.1 → 4.3.1 ❌ **Deferred to Phase 14**
+- `react-native-safe-area-context` 5.6.2 → 5.7.0 ✅
+- `react-native-screens` 4.23.0 → 4.25.0 ✅
+
+**Reanimated deferral:** `react-native-reanimated@4.3.1` requires `react-native-worklets@0.8.x` (peer dep), but we're on worklets 0.7.4 (paired with RN 0.83.x from Phase 4). Bumping reanimated alone produces an unmet peer warning. Coupling it with the worklets 0.8 + RN 0.85 bump in Phase 14 keeps the matched-version constraint clean. Phase 14 should now also include `react-native-reanimated 4.3.1`.
+
+**Expo-doctor regression:** Drops from 17/18 (Phase 4) → 16/18. The new failure is the "packages match versions required by installed Expo SDK" check — Expo SDK 55's recommended pins (`~2.30.0` / `~5.6.2` / `~4.23.0`, etc.) lag the bumped versions. The drift is minor-only and all five verification checks (`check`, `check-types`, `test`, `e2e`, `build`) pass. Expo SDK 56 is expected to widen the recommended ranges; until then this warning is acceptable.
 
 All `native` only. Smoke-test: drawer + tab navigation; reanimated screen transitions.
 
@@ -244,6 +248,7 @@ These are independent but small enough to bundle into one UI-focused phase.
 
 - `react-native` 0.83.2 → 0.85.3 *(apps/native)*
 - `react-native-worklets` 0.7.2 → 0.8.3 *(apps/native)*
+- `react-native-reanimated` 4.2.1 → 4.3.1 *(apps/native)* — deferred from Phase 9; needs worklets 0.8 as peer
 
 Confirm Expo SDK 55 supports RN 0.85 (check Expo SDK release notes — if not, defer until SDK 56). Required steps after bump:
 1. `cd apps/native && npx expo-doctor`
