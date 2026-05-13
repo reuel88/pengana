@@ -24,8 +24,8 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 4** — Expo SDK patches
 - [x] **Phase 5** — Frontend build tooling minor
 - [x] **Phase 6** — UI / Tailwind minor
-- [ ] Phase 7 — Core library minors (data layer)
-- [ ] Phase 8 — TanStack ecosystem minor
+- [~] **Phase 7** — Core library minors (data layer) — zod deferred (TS2589, persists with TanStack form 1.32)
+- [x] **Phase 8** — TanStack ecosystem minor
 - [ ] Phase 9 — React Native ecosystem minor
 - [ ] Phase 10 — better-auth ecosystem
 - [ ] Phase 11 — Major: `@vitejs/plugin-react` 6
@@ -167,21 +167,27 @@ Also aligned `apps/web/package.json` `vite` from direct `^8.0.0` pin to `catalog
 
 Side benefit: the long-standing `@tailwindcss/vite → unmet peer vite` warning is gone (Tailwind 4.3 added vite 8 to its peer range).
 
-### Phase 7 — Core library minors (data layer)
+### Phase 7 — Core library minors (data layer) ⚠️ Partial
 
-ORPC was pulled into Phase 2; this phase now covers only the remaining data-layer minors.
+ORPC was pulled into Phase 2; this phase covers the remaining data-layer minors.
 
-- `dexie` 4.3.0 → 4.4.2 *(packages/local-db + consumers)*
-- `dexie-react-hooks` 4.2.0 → 4.4.0
-- `zod` 4.3.6 → 4.4.3 *(catalog)*
+- `dexie` ^4.0.11 → ^4.4.2 *(packages/local-db + extension, native, web)* ✅
+- `dexie-react-hooks` ^4.2.0 → ^4.4.0 ✅
+- `zod` ^4.3.6 → ^4.4.3 *(catalog)* ❌ **Deferred**
 
-### Phase 8 — TanStack ecosystem minor
+**zod 4.4 deferred:** Bumping `zod` to 4.4.3 with the current `@tanstack/react-form` 1.28.5 caused `TS2589: Type instantiation is excessively deep and possibly infinite` across every TanStack-form schema callsite (9 files in `apps/native`, similar in `apps/web`), which made `tsc` OOM (>8GB heap). Catalog now uses `zod: ~4.3.6` (tilde) so transitive consumers (`better-auth`, `@orpc/zod`, `@polar-sh/sdk`) can't pull 4.4.x in either.
 
-- `@tanstack/react-form` 1.28.5 → 1.32.0 *(catalog)*
-- `@tanstack/react-query` 5.90.21 → 5.100.10 *(catalog)*
-- `@tanstack/react-router` 1.167.4 → 1.169.2 *(apps/web)*
+**Retry after Phase 8 result:** Retried with `@tanstack/react-form` 1.32.0 — same OOM/TS2589. Confirmed the root cause is in `zod` 4.4 itself, not the form bridge. Defer until zod publishes a fix or TanStack form ships a 4.4-compatible adapter. Track upstream and revisit before Phase 14.
 
-Smoke-test: web app navigation + a form submit (e.g. org creation in `apps/web/src/features/onboarding/`).
+### Phase 8 — TanStack ecosystem minor ✅ Done
+
+- `@tanstack/react-form` ^1.28.5 → ^1.32.0 *(catalog)*
+- `@tanstack/react-query` ^5.90.21 → ^5.100.10 *(catalog)*
+- `@tanstack/react-router` ^1.167.4 → ^1.169.2 *(apps/web)*
+
+Side benefit: cleared three pre-existing peer warnings (`@tanstack/react-query-devtools`, `@tanstack/react-router-devtools`, `@tanstack/router-plugin`) that all wanted newer query/router versions.
+
+Phase 7's deferred `zod` 4.4 bump was retried under this phase's TanStack form 1.32 — same OOM/TS2589, so the deferral stands (see Phase 7 notes).
 
 ### Phase 9 — React Native ecosystem minor
 
