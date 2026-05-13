@@ -19,6 +19,7 @@
 			"!**/src-tauri",
 			"!**/.nuxt",
 			"!**/.expo",
+			"!**/expo-env.d.ts",
 			"!**/.wrangler",
 			"!**/.alchemy",
 			"!**/.svelte-kit",

@@ -28,7 +28,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 8** — TanStack ecosystem minor
 - [~] **Phase 9** — React Native ecosystem minor — reanimated 4.3.1 deferred (needs worklets 0.8 from Phase 14)
 - [x] **Phase 10** — better-auth ecosystem
-- [ ] Phase 11 — Major: `@vitejs/plugin-react` 6
+- [x] **Phase 11** — Major: `@vitejs/plugin-react` 6
 - [ ] Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
 - [ ] Phase 13 — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
 - [ ] Phase 14 — Major: React Native 0.85 + worklets
@@ -219,13 +219,19 @@ Changelog scan for 1.6.0–1.6.10 surfaced no breaking changes affecting our con
 
 Verification: all five checks (`check`, `check-types`, `test`, `e2e`, `build`) green; 83/83 e2e tests pass including the org sign-in/invitation flows that exercise the `organization` plugin hooks. `expo-doctor` baseline unchanged at 16/18 from Phase 9.
 
-### Phase 11 — Major: `@vitejs/plugin-react` 6
+### Phase 11 — Major: `@vitejs/plugin-react` 6 ✅ Done
 
-Two edits required:
-1. Bump `pnpm.overrides["@vitejs/plugin-react"]` in root `package.json:60` from `^5.2.0` to `^6.0.0`.
-2. Bump the dep in `apps/web/package.json` and `apps/extension/package.json`.
+Two edits landed:
+1. `pnpm.overrides["@vitejs/plugin-react"]` in root `package.json` bumped `^5.2.0` → `^6.0.0`.
+2. `apps/web/package.json` devDep bumped `^5.2.0` → `^6.0.0`.
 
-Verification: `pnpm dev:web`, `pnpm dev` for extension, both production builds.
+`apps/extension` did **not** need a direct-dep edit — it relies on `@wxt-dev/module-react@1.2.2` to auto-wire the React plugin, and that module's peer range (`^4.4.1 || ^5.0.0 || ^6.0.0`) already accepts v6. The root override forces v6 across the transitive graph.
+
+**v6 changelog impact:** Babel removed from the plugin (use `@rolldown/plugin-babel` if needed). We call `react()` with no options in `apps/web/vite.config.ts`, so the babel-option removal is a no-op. Vite 8+ requirement already satisfied. Node engine `^20.19.0 || >=22.12.0` satisfied (running 24.x locally).
+
+**Tooling tweak:** Added `!**/expo-env.d.ts` to `biome.json` `files.includes`. The Expo-CLI-regenerated `apps/native/expo-env.d.ts` (gitignored) was emitted without a trailing newline by the post-Phase-9 `expo-doctor` run and started failing `pnpm check`. Ignoring this managed artifact prevents future drift from blocking the lint gate.
+
+Verification: all five checks (`check`, `check-types`, `test`, `e2e`, `build`) green; 83/83 e2e tests pass; forced `pnpm turbo build --filter=web --force` rebuilt cleanly against v6 (PWA generates, chunks emit, no transform errors). Extension prod build stable at 1.29 MB.
 
 ### Phase 12 — Major: i18n stack (i18next 26 + react-i18next 17)
 
