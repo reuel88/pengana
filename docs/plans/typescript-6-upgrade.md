@@ -18,7 +18,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 
 - [x] **Phase 0** — Branch setup
 - [x] **Phase 1** — Baseline pin & extension drift fix
-- [ ] **Phase 2** — TS 6 recon (doc commit, no code change)
+- [x] **Phase 2** — TS 6 recon (doc commit, no code change)
 - [ ] **Phase 3** — Pre-emptive type fixes on 5.9.3 (skip if Phase 2 shows zero errors)
 - [ ] **Phase 4** — Catalog bump to ~6.0.3
 - [ ] **Phase 5** — Peer-warning cleanup
@@ -144,21 +144,40 @@ Original Phase 1 spec (for reference):
 
 Verification: full loop. Expected diff: 2 lines + lockfile churn.
 
-### Phase 2 — TS 6 recon (doc commit, no code change)
+### Phase 2 — TS 6 recon ✅ Done
 
-Goal: convert unknown-unknown into a triage table without committing the bump.
+Trial-bumped TypeScript via a root `pnpm.overrides` entry pinning `typescript: ~6.0.3` (npm `latest` dist-tag at 2026-05-15). Ran the full verification loop, captured errors, then reverted the override; lockfile and working tree returned to the post-Phase-1 state.
 
-1. **Locally only** (do not commit): add `"typescript": "~6.0.3"` to root `package.json` `pnpm.overrides`. Run `pnpm install`, then `pnpm check-types`, `pnpm build`, `pnpm test`, `pnpm e2e`.
-2. Capture failures per-workspace and per-error-code (TS2589 depth, TS2322 widening, TS2769 overload mismatch, TS6133 unused-import-after-stricter-erasure, etc.). Note any new peer warnings from `pnpm install`.
-3. Revert the override locally (do not commit). Re-run `pnpm install` to restore TS 5.9.3.
-4. Update this plan file's Phase 2 section inline with the inventory (table: workspace × error-count × representative errors × backportable-to-5.9 Y/N).
+**Error inventory (full surface area):**
 
-Commit: only the plan-file update. Code state unchanged. Phases 3 and 4 execute against this inventory.
+| Workspace | check-types | Error | Backportable to 5.9.3? |
+|---|---|---|---|
+| `apps/server` | ❌ 1 | `TS5101` — `tsconfig.json:6` — `Option 'baseUrl' is deprecated and will stop functioning in TypeScript 7.0` | **Yes** — `baseUrl: "."` is unnecessary under `moduleResolution: bundler`; removing it is valid on 5.9 too |
+| `apps/web` | ❌ 1 | `TS5101` — `tsconfig.json:13` — same deprecation | **Yes** — same fix |
+| `apps/native` | ✅ 0 | — | — |
+| `apps/extension` | ✅ 0 | — | — |
+| `apps/e2e` | ✅ 0 | — | — |
 
-**Red-flag tripwires** (revisit phasing if any surface):
-- TS2589 in `apps/native` or `apps/web` (TanStack form callsites — same shape as the prior zod 4.4 issue; would indicate TS 6's depth limits compound rather than relieve the problem).
-- `apps/server` `tsc -b` failing to invalidate dependents cleanly.
-- `.expo/`, `.wxt/`, or `apps/native/expo-env.d.ts` regenerating with a diff biome rejects (extend `biome.json` `files.includes` ignore list per the Phase 11/12 pattern from outdated-package-updates).
+That's the entire TS 6 error surface — **two identical TS5101 deprecation errors in two tsconfig files.** Zero source-code type errors. None of the red-flag tripwires (TS2589 in TanStack form callsites, `tsc -b` dependent-invalidation, `.expo`/`.wxt` regeneration drift) materialised.
+
+**Other recon signals under TS 6.0.3:**
+
+- `pnpm test` — 7/7 tasks ✅ (155+ tests). Vitest sidesteps tsc, so this primarily validates that nothing about TS 6's emit shape changes runtime semantics.
+- `pnpm build` — 3/3 tasks ✅. `tsc -b` deprecation only affects `check-types`; the build path uses `tsdown` (server), Vite (web), and wxt (extension) which all bypass the tsc CLI deprecation gate. Bundle sizes unchanged: web PWA 122 entries / 1456.30 KiB, server tsdown 12 files / 2.03 MB, extension 1.29 MB — matching the Phase 11/12/13 baselines exactly.
+- `pnpm e2e` — 81 passed + 2 flaky (`web/attachment-org-isolation` personal-todo isolation, `web/auth-flows` verify-email invalid-token). Both flakies passed on retry and match pre-existing patterns; not TS-related.
+
+**Peer-warning delta** (pnpm install under TS 6 vs 5.9.3):
+
+- **Cleared:** `tsdown → rolldown-plugin-dts → typescript@^6.0.0` (the pre-existing warning from outdated-package-updates Phase 15). Confirms the Phase 5 prediction.
+- **Unchanged:** `vite-plugin-pwa → workbox-build/window 7.4.1`, `local-db → react-dom 19.2.6` (both TS-unrelated, pre-existing).
+- **No new warnings** introduced by the bump.
+
+**Implication for Phases 3–6:**
+
+- **Phase 3** collapses to a single trivial commit removing `baseUrl: "."` from both `apps/server/tsconfig.json:6` and `apps/web/tsconfig.json:13` (the original "one commit per workspace" rule was written for a heavier error surface; for two identical 1-line tsconfig edits a single combined commit is more idiomatic and matches the prior plan's bundling style for related fixes).
+- **Phase 4** (catalog bump) becomes a near-pure version edit — no bundled type fixes needed, since Phase 3 absorbs the only required source change.
+- **Phase 5** has one expected warning-resolution event (`tsdown` peer satisfied); no new warnings to chase.
+- **Phase 6** (zod 4.4 retry) remains worthwhile but is now a clean A/B test against TS 6, isolated from any other change.
 
 ### Phase 3 — Pre-emptive type fixes on 5.9.3
 
