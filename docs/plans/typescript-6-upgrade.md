@@ -17,7 +17,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 ## Progress
 
 - [x] **Phase 0** — Branch setup
-- [ ] **Phase 1** — Baseline pin & extension drift fix
+- [x] **Phase 1** — Baseline pin & extension drift fix
 - [ ] **Phase 2** — TS 6 recon (doc commit, no code change)
 - [ ] **Phase 3** — Pre-emptive type fixes on 5.9.3 (skip if Phase 2 shows zero errors)
 - [ ] **Phase 4** — Catalog bump to ~6.0.3
@@ -120,9 +120,24 @@ pnpm check && pnpm check-types && pnpm test && pnpm build
 
 All five checks must be green on the branch tip with zero changes applied. If anything fails here, fix on `main` first (separate PR) — the TS upgrade plan assumes a green starting state. No commit in this phase.
 
-### Phase 1 — Baseline pin & extension drift fix
+### Phase 1 — Baseline pin & extension drift fix ✅ Done
 
-Two edits, single commit:
+Two edits applied:
+
+1. `pnpm-workspace.yaml:39` — catalog `typescript: ^5` → `~5.9.3`.
+2. `apps/extension/package.json:45` — direct pin `"^5.9.3"` → `"catalog:"`.
+
+Lockfile unchanged (`pnpm install` reported "Already up to date"), confirming the resolution is a true no-op (5.9.3 in, 5.9.3 out). The catalog now matches the resolved version exactly and the extension is no longer the sole drift point — Phase 4's single catalog edit will propagate to all 14 workspaces.
+
+**Verification:** all six checks green.
+- `pnpm install` — lockfile up to date; 3 pre-existing peer warnings (`tsdown → typescript@^6`, `vite-plugin-pwa → workbox 7.4.1`, `local-db → react-dom 19.2.6`), no new ones.
+- `pnpm check` — 767 files, no fixes.
+- `pnpm check-types` — 5/5 tasks (4 cached, 1 fresh — extension's tsc invalidated by the pin-form swap).
+- `pnpm test` — 7/7 tasks.
+- `pnpm build` — 3/3 tasks (2 cached + extension rebuilt; bundle stable at 1.29 MB matching Phase 11/12/13 baseline).
+- `pnpm e2e` — 83/83 tests (1m21s), matching the post-Phase-13 baseline.
+
+Original Phase 1 spec (for reference):
 
 1. `pnpm-workspace.yaml` — tighten catalog `typescript: ^5` → `~5.9.3`. Locks the baseline to the version currently resolved so Phase 4's diff is a pure version bump rather than a "loose-caret-also-collapses-to-tilde" combined change.
 2. `apps/extension/package.json:45` — replace direct pin `"typescript": "^5.9.3"` with `"typescript": "catalog:"`. No-op resolution change today (catalog now resolves to the same range), but eliminates the only drift point so Phase 4's single catalog edit propagates everywhere.
