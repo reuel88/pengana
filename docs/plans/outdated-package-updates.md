@@ -40,7 +40,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 
 Several deps are managed via `pnpm-workspace.yaml` `catalog:`. Updating these in catalog updates every workspace consumer at once:
 
-```
+```text
 @better-auth/expo, @logtape/logtape, @orpc/*, @polar-sh/better-auth,
 @tanstack/react-form, @tanstack/react-query, react, react-dom,
 @types/node, better-auth, dotenv, hono, typescript, vite, vitest, zod
@@ -123,7 +123,7 @@ Expo expects matched versions within an SDK release. Bump together and run `npx 
 
 `expo-doctor` ends with 17/18 checks passing; the remaining failure is unrelated duplicate `react`/`react-dom` copies pinned by third-party deps (`@polar-sh/checkout`, `@polar-sh/ui`, `@tanstack/react-store`).
 
-```
+```text
 expo 55.0.6 → 55.0.23
 expo-constants 55.0.9 → 55.0.16
 expo-crypto 55.0.10 → 55.0.14

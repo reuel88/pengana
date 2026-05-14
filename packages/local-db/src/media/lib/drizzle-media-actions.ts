@@ -66,7 +66,7 @@ export async function addMedia(params: {
 		createdBy: options.createdBy,
 		hlcTimestamp: "",
 		fieldClocks: "{}",
-		syncStatus: "synced",
+		syncStatus: "pending",
 		deleted: false,
 	});
 
