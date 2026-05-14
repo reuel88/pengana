@@ -35,7 +35,7 @@ export async function addMedia(
 		fieldClocks: "{}",
 
 		status: "queued",
-		syncStatus: "synced",
+		syncStatus: "pending",
 		deleted: false,
 	});
 

@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"dotenv": "catalog:",
-		"pg": "^8.17.1"
+		"pg": "catalog:"
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
@@ -23,7 +23,7 @@
 		"web": "workspace:*",
 		"@playwright/test": "^1.60.0",
 		"@types/node": "catalog:",
-		"@types/pg": "^8.20.0",
+		"@types/pg": "catalog:",
 		"typescript": "catalog:"
 	}
 }

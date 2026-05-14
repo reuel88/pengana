@@ -21,7 +21,7 @@
 
 		"db:push": "turbo -F @pengana/db db:push",
 		"db:studio": "turbo -F @pengana/db db:studio",
-		"db:generate": "turbo -F @pengana/db db:generate",
+		"db:generate": "turbo -F @pengana/db -F native db:generate",
 		"db:migrate": "turbo -F @pengana/db db:migrate",
 		"db:start": "turbo -F @pengana/db db:start",
 		"db:watch": "turbo -F @pengana/db db:watch",
@@ -58,7 +58,7 @@
 	"pnpm": {
 		"overrides": {
 			"@babel/types": "^7.29.0",
-			"@vitejs/plugin-react": "^5.2.0",
+			"@vitejs/plugin-react": "^6.0.0",
 			"vite-node": "^6.0.0"
 		}
 	}

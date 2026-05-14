@@ -2,11 +2,14 @@
 // Do not edit it manually.
 // @ts-expect-error - inline-import babel plugin handles .sql imports
 import m0000 from "./0000_superb_cargill.sql";
+// @ts-expect-error - inline-import babel plugin handles .sql imports
+import m0001 from "./0001_public_mentor.sql";
 import journal from "./meta/_journal.json";
 
 export default {
 	journal,
 	migrations: {
 		m0000: m0000,
+		m0001: m0001,
 	},
 };

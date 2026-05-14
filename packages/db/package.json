@@ -26,15 +26,15 @@
 	"dependencies": {
 		"@pengana/email-dev": "workspace:*",
 		"@pengana/env": "workspace:*",
-		"pg": "^8.17.1",
+		"pg": "catalog:",
 		"dotenv": "catalog:",
-		"drizzle-orm": "^0.45.1",
+		"drizzle-orm": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@pengana/config": "workspace:*",
-		"@types/pg": "^8.20.0",
-		"drizzle-kit": "^0.31.10",
+		"@types/pg": "catalog:",
+		"drizzle-kit": "catalog:",
 		"typescript": "catalog:"
 	}
 }
