@@ -34,10 +34,10 @@
 		"@react-navigation/native": "^7.2.4",
 		"@tanstack/react-form": "catalog:",
 		"@tanstack/react-query": "catalog:",
-		"dexie": "^4.4.2",
-		"dexie-react-hooks": "^4.4.0",
+		"dexie": "catalog:",
+		"dexie-react-hooks": "catalog:",
 		"dotenv": "catalog:",
-		"drizzle-orm": "^0.45.2",
+		"drizzle-orm": "catalog:",
 		"expo": "^55.0.23",
 		"expo-constants": "~55.0.16",
 		"expo-crypto": "~55.0.14",
@@ -69,9 +69,9 @@
 	"devDependencies": {
 		"@babel/core": "^7.26.10",
 		"@pengana/config": "workspace:*",
-		"@types/react": "~19.2.14",
+		"@types/react": "catalog:",
 		"babel-plugin-inline-import": "^3.0.0",
-		"drizzle-kit": "^0.31.10",
+		"drizzle-kit": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

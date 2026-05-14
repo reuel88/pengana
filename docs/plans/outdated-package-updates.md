@@ -31,8 +31,8 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 11** — Major: `@vitejs/plugin-react` 6
 - [x] **Phase 12** — Major: i18n stack (i18next 26 + react-i18next 17)
 - [x] **Phase 13** — Major: UI surface (`react-day-picker` 10 + `lucide-react` 1)
-- [ ] Phase 14 — Major: React Native 0.85 + worklets
-- [ ] Phase 15 — Catalog audit / expansion
+- [ ] **Phase 14** — Major: React Native 0.85 + worklets — fully deferred to 14b (worklets 0.8 + reanimated 4.3 trial landed then reverted, see notes)
+- [x] **Phase 15** — Catalog audit / expansion
 
 ---
 
@@ -268,58 +268,66 @@ Side notes:
 
 Verification: all five checks green; 83/83 e2e pass; forced web rebuild clean. No code changes needed in `packages/ui/src/components/calendar.tsx` for react-day-picker v10.
 
-### Phase 14 — Major: React Native 0.85 + worklets
+### Phase 14 — Major: React Native 0.85 + worklets ❌ Fully Deferred to 14b
 
-- `react-native` 0.83.2 → 0.85.3 *(apps/native)*
-- `react-native-worklets` 0.7.2 → 0.8.3 *(apps/native)*
-- `react-native-reanimated` 4.2.1 → 4.3.1 *(apps/native)* — deferred from Phase 9; needs worklets 0.8 as peer
+**Status:** Worklets 0.8.3 + reanimated 4.3.1 were landed as a "partial Phase 14" then **reverted** in the same branch after the simulator-boot smoke test surfaced the regression that purely-JS verification (`check`/`check-types`/`test`/`e2e`/`build`) couldn't catch.
 
-Confirm Expo SDK 55 supports RN 0.85 (check Expo SDK release notes — if not, defer until SDK 56). Required steps after bump:
-1. `cd apps/native && npx expo-doctor`
-2. Clean native artifacts: `rm -rf ios/build android/.gradle android/build`
-3. Reinstall pods if iOS local build: `cd ios && pod install`
-4. Full simulator boot + login + sync round-trip
+**Final state of `apps/native/package.json`:**
+- `react-native-worklets` stays at `0.7.4` (matches Expo Go SDK 55's bundled native ABI)
+- `react-native-reanimated` stays at `4.2.1`
+- `react-native` stays at `0.83.6`
+- `react` / `react-dom` stay at `19.2.0`
 
-If Expo SDK 55 caps RN at 0.83, **skip this phase** and open a follow-up tracking ticket for SDK 56.
+**Why the partial attempt was reverted:** Booting on Expo Go (`exp://…` URL on a simulator) crashed at module-load time with `[Error: Exception in HostFunction: <unknown>]` repeated three times, followed by "missing default export" warnings on every drawer-layout route (`(drawer)/_layout.tsx`, `(drawer)/(org)/_layout.tsx`, `(drawer)/settings/_layout.tsx`) and a final `[Layout children]: No route named "(drawer)" exists in nested children` failure. Diagnosis: **Expo Go for SDK 55 ships a pre-compiled native worklets 0.7.x**; loading worklets 0.8.3 JS against that older C++ ABI fails on the first worklet declaration, which cascades into reanimated, which cascades into `@react-navigation/drawer`, which cascades into the layouts losing their default export. There is no JS-only fix — the only paths forward would be (a) build a custom dev client with `expo run:ios` / `run:android` so worklets 0.8.3 native code gets compiled in, or (b) revert. We chose (b) to preserve the Expo Go dev loop until the SDK 56 cohort upgrade lands.
 
-### Phase 15 — Catalog audit / expansion
+**Lesson for future native bumps:** purely-JS verification (`pnpm e2e` here is web-only Playwright) misses native-ABI regressions. Any phase touching `react-native`, `react-native-worklets`, `react-native-reanimated`, or `react-native-gesture-handler` needs an explicit simulator-boot gate before merging, even if `apps/native/src/` has zero direct callsites for the bumped package.
 
-Consolidate every dep used in **2+ workspaces** into `pnpm-workspace.yaml` `catalog:` so future bumps stay single-edit. Closes existing version drift (e.g. `tailwindcss` `^4.0.15` in extension/web vs `^4.2.1` in ui).
+**Side note on the noisy peer warning:** The `react-native-reanimated 4.3.1 / unmet peer react-native-worklets@0.8.x` warning that has appeared on every install since Phase 9 went **silent** after the revert too. pnpm appears to resolve the transitive 4.3.1 from `@react-navigation/drawer@7.10` differently when our direct pin is back at reanimated 4.2.1. Watch for it on future installs.
 
-**Drift policy:** Resolve drift by choosing the highest existing range (no implicit npm-latest bump in this phase).
+**Phase 14b (deferred):** see "Out-of-Scope (deferred)" section below.
 
-**Candidates to add to catalog**
+### Phase 15 — Catalog audit / expansion ✅ Done
 
-| Dep | Resolved catalog version | Workspaces |
-|---|---|---|
-| `tailwindcss` | `^4.2.1` (highest of `^4.0.15` / `^4.2.1`) | extension, web, @pengana/ui |
-| `@types/react` | `^19.2.14` (style normalised) | native, web, extension, local-db, org, ui |
-| `@types/react-dom` | `^19.2.3` | extension, web |
-| `dexie` | `^4.0.11` | local-db, native, web, extension |
-| `dexie-react-hooks` | `^4.2.0` | local-db, native, web, extension |
-| `drizzle-orm` | `^0.45.2` | db, local-db, email-dev, native |
-| `shadcn` | `^4.0.8` | ui, web, extension |
-| `@base-ui/react` | `^1.3.0` | ui, web, extension |
-| `lucide-react` | `^0.577.0` | ui, web, extension |
-| `tw-animate-css` | `^1.2.5` | ui, web, extension |
-| `@logtape/logtape` | `^2.0.7` | server, @pengana/auth |
-| `@tailwindcss/vite` | `^4.0.15` | extension, web |
-| `i18next` | `^25.8.18` | web, @pengana/i18n |
-| `drizzle-kit` | `^0.31.10` | db, native |
-| `next-themes` | `^0.4.6` | ui, web |
-| `sonner` | `^2.0.5` | ui, web |
-| `pg` | `^8.17.1` | db, e2e |
-| `@types/pg` | `^8.20.0` | db, e2e |
+Consolidated every cross-workspace dep into `pnpm-workspace.yaml` `catalog:`. Future bumps for any of these now require a single edit in the workspace yaml instead of 2–6 lockstep `package.json` edits.
 
-**Explicitly excluded:** Expo SDK packages (`expo-*`, `@expo/*`), React Native (`react-native`, `react-native-*`), Tauri/WXT, single-workspace deps, and deps already in catalog.
+**17 new catalog entries added** (versions reflect resolved state post Phase 13):
 
-**Steps:**
-1. Add the 18 entries above to `pnpm-workspace.yaml` `catalog:`.
-2. Replace every direct pin in each consumer `package.json` with `"catalog:"`.
-3. `pnpm install` — confirm no new peer warnings beyond the pre-existing set.
-4. Verification: `pnpm check-types`, `pnpm test`, `pnpm e2e`, `pnpm build`.
+```yaml
+'@base-ui/react': ^1.4.1
+'@tailwindcss/vite': ^4.3.0
+'@types/pg': ^8.20.0
+'@types/react': ^19.2.14
+'@types/react-dom': ^19.2.3
+dexie: ^4.4.2
+dexie-react-hooks: ^4.4.0
+drizzle-kit: ^0.31.10
+drizzle-orm: ^0.45.2
+i18next: ^26.1.0
+lucide-react: ^1.14.0
+next-themes: ^0.4.6
+pg: ^8.17.1
+shadcn: ^4.7.0
+sonner: ^2.0.5
+tailwindcss: ^4.3.0
+tw-animate-css: ^1.2.5
+```
 
-**Smoke test:** None needed — this is a pure pin-consolidation; resolved versions don't change (drift cases resolve up only).
+`@logtape/logtape` was already cataloged from Phase 1 — no work.
+
+**Three intentional pin-style drift-ups** (all `@types/*`, all resolved version unchanged today):
+- `apps/web` `@types/react`: exact `19.2.14` → catalog caret `^19.2.14`
+- `apps/web` `@types/react-dom`: exact `19.2.3` → catalog caret `^19.2.3`
+- `apps/native` `@types/react`: tilde `~19.2.14` → catalog caret `^19.2.14`
+
+These align all consumers to the same caret style so a future single catalog edit propagates everywhere. Current resolved versions identical.
+
+**Consumer swaps applied:** ~36 direct pins across 10 `package.json` files replaced with `"catalog:"` (`packages/ui`, `apps/web`, `apps/extension`, `apps/native`, `apps/e2e`, `packages/db`, `packages/local-db`, `packages/email-dev`, `packages/i18n`, `packages/org`). The `react` / `react-dom` pins in `apps/native` were **intentionally NOT moved** — they stay at exact `19.2.0` because Phase 4 deliberately diverged from the catalog to match Expo SDK 55's expected version.
+
+**Lockfile diff:** 1665 lines changed (1061 insertions / 604 deletions) but the resolved-version numbers (left side of `version:` colons) are byte-identical for every catalog entry. The diff is entirely peer-disambiguation hash recompute — pnpm rebuilt the peer graph and added `@react-native/metro-config@0.85.3` to some peer-disambiguation suffixes. No new direct version, no new peer warning.
+
+**Verification:** all five checks green; 83/83 e2e pass; pre-existing peer warnings unchanged (tsdown→typescript@^6, vite-plugin-pwa→workbox@^7.4.1 chain, local-db→react-dom@19.2.6 chain — three pre-existing entries, no new ones).
+
+**Out of scope (correctly excluded):** Expo SDK (`expo`, `expo-*`, `@expo/*`), React Native (`react-native`, `react-native-*`), Tauri (`@tauri-apps/cli`), WXT (`wxt`, `@wxt-dev/*`), and the single-workspace deps `@phosphor-icons/react`, `@tabler/icons-react`, `@remixicon/react`, `postcss`.
 
 ---
 
@@ -337,6 +345,7 @@ Consolidate every dep used in **2+ workspaces** into `pnpm-workspace.yaml` `cata
 ## Out-of-Scope (deferred)
 
 - **TypeScript 5.9.3 → 6.0.3** — affects every workspace via catalog; warrants its own plan with separate type-error triage.
+- **Phase 14b — RN 0.85 + React 19.2.3 + Expo SDK 56 cohort** (split out of Phase 14 on 2026-05-14, then partial-Phase-14 worklets/reanimated bumps reverted same day). Trigger: Expo SDK 56 stable release. Currently only `expo@56.0.0-preview.X` exists. Items to land together: `react-native` → 0.85.3, `react-native-worklets` → 0.8.x, `react-native-reanimated` → 4.3.x, `react` / `react-dom` → 19.2.3+ (RN 0.85's peer), `expo` + `expo-*` + `@expo/*` → SDK 56 cohort. The worklets bump must happen inside this cohort so the new native ABI lands at the same time as the dev-client switch — Expo Go for SDK 55 ships worklets 0.7.x natively and crashes (`Exception in HostFunction`) on a worklets 0.8 JS bundle. Steps after bump: stop using Expo Go for this app (switch to a custom dev client built via `expo run:ios` / `run:android`), `cd apps/native && npx expo-doctor`, `rm -rf ios/build android/.gradle android/build`, full simulator boot + login + sync round-trip.
 
 ## Rollback
 
