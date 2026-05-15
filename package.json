@@ -54,12 +54,5 @@
 			"biome check --write ."
 		]
 	},
-	"packageManager": "pnpm@10.30.3",
-	"pnpm": {
-		"overrides": {
-			"@babel/types": "^7.29.0",
-			"@vitejs/plugin-react": "^6.0.0",
-			"vite-node": "^6.0.0"
-		}
-	}
+	"packageManager": "pnpm@11.1.2"
 }

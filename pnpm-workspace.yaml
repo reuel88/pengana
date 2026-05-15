@@ -2,6 +2,21 @@ packages:
   - apps/*
   - packages/*
 
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude: []
+blockExoticSubdeps: true
+
+overrides:
+  '@babel/types': ^7.29.0
+  '@vitejs/plugin-react': ^6.0.0
+  vite-node: ^6.0.0
+
+allowBuilds:
+  esbuild: true
+  msw: true
+  sharp: true
+  spawn-sync: true
+
 catalog:
   '@base-ui/react': ^1.4.1
   '@better-auth/expo': 1.6.10
