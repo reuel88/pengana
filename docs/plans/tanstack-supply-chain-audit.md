@@ -59,34 +59,51 @@ The repo currently pins `"packageManager": "pnpm@10.30.3"` in the root `package.
 
 ### Migration steps
 
+> **Important:** pnpm 11 no longer reads the `pnpm` field in `package.json` ([release notes](https://pnpm.io/blog/releases/11.0)). All pnpm-specific settings — `overrides`, `minimumReleaseAge`, `blockExoticSubdeps`, `allowBuilds`, etc. — must live in `pnpm-workspace.yaml`. Any pre-existing `pnpm.overrides` in `package.json` will be **silently ignored** on upgrade until migrated.
+
 1. Bump `packageManager` in root `package.json`:
    ```diff
    - "packageManager": "pnpm@10.30.3",
-   + "packageManager": "pnpm@11.0.x",   // pin to latest 11.0.x
+   + "packageManager": "pnpm@11.1.2",
    ```
-2. Update Corepack / shell pnpm to 11: `corepack prepare pnpm@11.0.x --activate` (or update via Volta/asdf).
-3. Run `pnpm install` — this rebuilds the global store in pnpm 11's new SQLite format and regenerates `pnpm-lock.yaml`. Commit the lockfile changes.
-4. Configure security defaults explicitly in root `package.json` (defensive — doesn't rely on future defaults staying the same):
-   ```jsonc
-   "pnpm": {
-     "minimumReleaseAge": 1440,           // already default in v11
-     "minimumReleaseAgeExclude": [],      // populate only if a specific dep needs hotfix-speed
-     "blockExoticSubdeps": true,          // already default in v11
-     "allowBuilds": [                     // explicit allowlist for postinstall scripts
-       // populate after `pnpm install` reports which deps need build scripts
-     ],
-     "overrides": { /* existing overrides */ }
-   }
+2. Update Corepack / shell pnpm to 11: `corepack prepare pnpm@11.1.2 --activate` (or update via Volta/asdf).
+3. Move any pre-existing `"pnpm": { ... }` block out of `package.json` and into `pnpm-workspace.yaml`, then add the v11 security defaults. The full result for this repo looks like:
+   ```yaml
+   # pnpm-workspace.yaml
+   packages:
+     - apps/*
+     - packages/*
+
+   minimumReleaseAge: 1440          # 24h quarantine on freshly-published versions
+   minimumReleaseAgeExclude: []     # populate only if a specific dep needs hotfix-speed
+   blockExoticSubdeps: true         # block transitive deps from Git/tarball URLs
+
+   overrides:                       # migrated from package.json "pnpm.overrides"
+     '@babel/types': ^7.29.0
+     '@vitejs/plugin-react': ^6.0.0
+     vite-node: ^6.0.0
+
+   allowBuilds:                     # explicit allowlist for postinstall scripts
+     esbuild: true                  # pnpm 11 writes a stub here on first install
+     msw: true                      # and prompts you to set true/false per package
+     sharp: true
+     spawn-sync: true
+
+   catalog:
+     # ... existing catalog entries
    ```
-5. Update CI workflows to install pnpm 11 (most use Corepack via `packageManager`, so step 1 covers them; verify GitHub Actions setup steps that hardcode pnpm version).
+   Tabs are invalid YAML — keep `pnpm-workspace.yaml` on 2-space indentation regardless of the JS/TS tab rule from `AGENTS.md`.
+4. Run `CI=true pnpm install --no-frozen-lockfile` — rebuilds the global store in pnpm 11's new SQLite format, regenerates `pnpm-lock.yaml`, and re-applies overrides. `CI=true` bypasses pnpm 11's interactive modules-purge prompt; `--no-frozen-lockfile` is needed because the lockfile config hash changes when settings move.
+5. Update CI workflows to install pnpm 11 (most use Corepack via `packageManager`, so step 1 covers them; verify GitHub Actions setup steps that hardcode a pnpm version).
 6. Sanity-check the repo: `pnpm install --frozen-lockfile && pnpm check && pnpm check-types && pnpm test && pnpm build`.
 
 ### Migration risks / gotchas
 
-- **`allowBuilds` migration** — pnpm 11 removes `onlyBuiltDependencies`, etc. This repo has no such config today (only `overrides`), so no migration work. But the first `pnpm install` will report packages needing build scripts (e.g. `esbuild`, `sharp`, native modules from `apps/native`) and prompt to allowlist them.
-- **SQLite store format** — first install will rebuild the global pnpm store. Slow on first run; transparent after.
-- **`minimumReleaseAge` for legitimate hotfixes** — if a critical patched release (e.g. for this very TanStack incident) needs to land within 24h, add the specific package to `minimumReleaseAgeExclude`.
-- **Coordination with collaborators** — anyone else on the project needs to bump their local pnpm to 11. The `packageManager` field + Corepack handles this automatically.
+- **`pnpm` field in `package.json` is dead** — pnpm 11 silently ignores it. The single biggest gotcha: a pre-existing `pnpm.overrides` block left in `package.json` will resolve without overrides applied, with no warning. Always grep for `"pnpm":` in `package.json` before upgrading and migrate every key to `pnpm-workspace.yaml`.
+- **`allowBuilds` migration** — pnpm 11 removes `onlyBuiltDependencies` / `neverBuiltDependencies` / `ignoreDepScripts`. The first `pnpm install` writes stub entries for each package that requests a build script (e.g. `esbuild`, `sharp`, `msw`, `spawn-sync`) and prompts you to set `true`/`false`.
+- **SQLite store format** — first install rebuilds the global pnpm store. Slow on first run; transparent after.
+- **`minimumReleaseAge` for legitimate hotfixes** — if a critical patched release (e.g. for this very TanStack incident) needs to land within 24h, add the specific package name to `minimumReleaseAgeExclude`.
+- **Coordination with collaborators** — anyone else on the project needs `corepack enable` so Corepack respects the new `packageManager` field. Otherwise their local pnpm 10 will mismatch.
 
 ## Files Referenced
 
