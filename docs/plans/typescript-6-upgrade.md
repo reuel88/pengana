@@ -22,7 +22,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 - [x] **Phase 3** — Pre-emptive type fixes on 5.9.3
 - [x] **Phase 4** — Catalog bump to ~6.0.3
 - [x] **Phase 5** — Peer-warning cleanup
-- [ ] **Phase 6** — Optional: retry zod 4.4.3
+- [x] **Phase 6** — Optional: retry zod 4.4.3 (Rung 1+2 paired, plus i18n peer-resolution dedup)
 
 ---
 
@@ -233,14 +233,79 @@ Audit of `pnpm install` warnings post-Phase-4 (captured from the catalog-bump in
 
 **No code changes in this phase.** Commit is plan-doc-only.
 
-### Phase 6 — Optional: retry zod 4.4.3
+### Phase 6 — Optional: retry zod 4.4.3 ✅ Done (Rung 1 + Rung 2 paired)
 
-`outdated-package-updates.md` Phase 7 deferred zod `^4.3.6` → `^4.4.3` because TanStack form 1.28/1.32 + zod 4.4 hit TS2589 depth on TS 5.9. Retry the same bump on TS 6:
+**Outcome:** Rung 1 alone OOM'd on `native:check-types` (exit 137, V8 heap exhaustion — the same TS2589-class depth blow-up that originally deferred the bump). Dropped to Rung 2 paired with Rung 1, which produced a second, *different* failure: 13 cross-version assignability errors (`zod@4.3.6 vs zod@4.4.3`) because `@pengana/i18n` declares zod only as a peer (`>=3`) and pnpm's auto-install-peers stuck on the previously-resolved 4.3.6 even after the catalog bump. Adding `zod: catalog:` to `packages/i18n/package.json` `devDependencies` forced i18n to align with the workspace's resolved 4.4.3 — public peer contract unchanged. Third attempt all green.
 
-1. Edit `pnpm-workspace.yaml` catalog: `zod: ~4.3.6` → `^4.4.3`.
-2. Run full verification loop.
-3. **If green:** ship the bump as a single commit and update the deferral note in `outdated-package-updates.md` Phase 7.
-4. **If still TS2589 / OOM:** revert, leave the tilde pin in place, re-defer to whenever zod or TanStack form publishes a fix. Document the result here.
+**Three edits land together as a single commit:**
+
+1. `pnpm-workspace.yaml:42` — `zod: ~4.3.6` → `^4.4.3` (Rung 1).
+2. `packages/org/src/hooks/use-zod-form.ts:6` — `schema: z.ZodType<T, any, any>` → `z.ZodType<any, any, any>` (Rung 2). Updated the biome-ignore comment to record *why* the constraint is `any` rather than `T` (depth dodge — `T` still pins via `defaultValues` and `onSubmit`'s `value: T`, so callsite ergonomics are unchanged).
+3. `packages/i18n/package.json:53` — added `"zod": "catalog:"` to `devDependencies` so i18n participates in workspace dedup instead of leaving its zod resolution to pnpm's auto-install-peers heuristic (which kept 4.3.6 across the bump).
+
+**Verification (all six checks green):**
+- `pnpm check` — 767 files, no fixes.
+- `pnpm turbo check-types --force` — 5/5 tasks fresh, **5.0s wall time** (Phase 4 cold baseline was ~6.5s — *faster*, no depth-pressure signal).
+- `pnpm test` — 7/7 tasks; 155+ tests across api/local-db/org/sync.
+- `pnpm build` — 3/3 tasks. Server tsdown 2.03 MB unchanged. **Web PWA 122 entries / 1459.20 KiB (+2.9 KiB / +0.2% vs Phase 4 baseline 1456.30 KiB)** — expected drift from zod 4.4's slightly heavier emit; negligible.
+- `pnpm e2e` — 83/83 in 1m17s, no flakies.
+- Callsite smoke-check: `apps/web/src/features/auth/sign-in-form.tsx` and `apps/native/src/features/auth/sign-in.tsx` still type-check against `value.email`/`value.password` inside `onSubmit`, confirming `T` still pins through `defaultValues` even after the constraint widened to `any`.
+
+**Peer-warning delta:** unchanged from Phase 4 — Expo SDK 55's `@expo/require-utils` strict-TS-5 peer is still present (accepted in Phase 5), workbox 7.4.1 and react-dom 19.2.6 unchanged. **No new warnings** introduced by the zod bump or the i18n edit. The `node_modules/.pnpm/zod@4.3.6` directory is orphan residue from the pre-edit install (no workspace consumer points at it; `pnpm why zod@4.3.6 -r` returns empty) — it'll be cleaned up by the next `pnpm store prune`.
+
+**Why this matters as a Phase 6 outcome, not a Rung-1-only ship:** the original plan envisioned Rung 1 standing alone if TS 6's checker absorbed the depth on its own. It did not. But Rung 2's relaxation is so cheap (one-line, well-justified by the depth-dodge reason, and `T` still pins through `defaultValues`) that the original "stop at the first green rung" rule is honored — we stop at Rung 2 and don't escalate to Standard Schema V1 (Rung 3) or re-deferral (Rung 4). The i18n peer fix is mechanical (mirror the catalog version everyone else uses) and would have been needed regardless of which rung landed; it's an artifact of pnpm's peer-resolution caching, not of zod or TS.
+
+---
+
+#### Original planning material (kept for traceability)
+
+`outdated-package-updates.md` Phase 7 deferred zod `^4.3.6` → `^4.4.3` because TanStack form 1.28/1.32 + zod 4.4 hit TS2589 depth on TS 5.9. Now that TS 6 is in catalog (Phase 4), retry the bump — but with a refined diagnosis from the v4.4.0 release notes.
+
+#### Diagnosis (revised against the v4.4.0 release notes)
+
+The [zod v4.4.0 release notes](https://github.com/colinhacks/zod/releases/tag/v4.4.0) describe a series of **runtime** soundness fixes: tuple defaults materialize correctly, `z.undefined()` keys are now required-by-default, `.merge()` throws on receiver refinements, stricter base64/CUID/httpUrl validators, record key transforms run, etc. None of those runtime changes touch our schema definitions in `packages/i18n/src/zod.ts` — every schema we ship uses only `z.object`, `z.string`, `z.email`, `z.enum`, `z.array`, `z.union`, `z.literal`. We have **zero callsites** of the reworked APIs (`.partial()`, `.default()`, `.merge()`, `z.undefined()`, `.prefault()`) in `apps/` or `packages/i18n/`.
+
+That narrows the root cause of the TS2589 explosion: it's **not** a specific reworked API biting us — it's that zod 4.4's *internal* optionality machinery (rewritten to support those reworked APIs) produces heavier-to-resolve type structures even for plain `z.object({ ... })` schemas. The expensive types only bite when many consumers unfold them at the same compilation unit, which is exactly what happens via `useZodForm`:
+
+- The centralized bridge is `packages/org/src/hooks/use-zod-form.ts:11` — accepts `schema: z.ZodType<T, any, any>` and casts to `any` when handing the schema to `useForm`'s validators.
+- 20 callsites consume the hook: ~9 in `apps/native/src/{features,app}` (sign-in, sign-up, forgot-password, delete-account, org-form, invite-form, team-name-editor, team-member-add-form, onboarding-invite-members), ~11 in `apps/web/src/{features,routes}` (auth forms × 7, org-create, invite-member, onboarding-invite-members, org settings route).
+- Each callsite re-instantiates `z.ZodType<T, any, any>` and TS must check assignability of the actual schema against that constraint. Under 4.4 the assignability check unfolds zod's internal mapped types — multiplied across 20 callsites, hits the depth limit.
+
+The hook is *already* structured as a partial firewall (the `any` generics + `as any` cast), but the *constraint position* `z.ZodType<T, any, any>` still forces TS to walk the schema's output type against `T`. **That's the lever for the cheapest fix below.**
+
+#### Mitigation ladder (cheapest first; stop at the first one that lands green)
+
+Each rung is its own commit so any one of them can ship independently if the next fails.
+
+**Rung 1 — Naive retry under TS 6.** Edit `pnpm-workspace.yaml` catalog: `zod: ~4.3.6` → `^4.4.3`. Run the full verification loop with the same forced cache bust as Phase 4 (`rm -rf apps/server/dist apps/server/*.tsbuildinfo && pnpm turbo check-types --force`). TS 6's improved checker may absorb the increased depth on its own (the recon in Phase 2 ran clean under TS 6 with TS 5.9-compatible deps — depth budget on TS 6 is empirically larger). **If green: ship as a single commit.**
+
+**Rung 2 — Relax the constraint position in `useZodForm`.** If Rung 1 fires TS2589, change `packages/org/src/hooks/use-zod-form.ts:6`:
+
+```diff
+-  schema: z.ZodType<T, any, any>;
++  schema: z.ZodType<any, any, any>;
+```
+
+`T` is still pinned by `defaultValues` (line 4) and re-asserted by `onSubmit`'s `value: T` (line 8), so the public contract for callsites is unchanged — the cast just stops TS from walking the schema's output type against `T` at every callsite. Diff is one line; expected to be the single fix for ~20 callsites. **If green: ship Rung 1 + Rung 2 as one combined commit (zod bump + hook tweak).**
+
+**Rung 3 — Switch the hook to Standard Schema V1.** If Rung 2 still fires TS2589 (unlikely given the existing firewall, but possible if the depth is at TanStack form's `DeepValue<TFormData, TName>` rather than zod), rewrite the hook to accept `StandardSchemaV1<unknown, T>` (TanStack form 1.32 natively supports the Standard Schema V1 interface). Standard Schema V1 is a flat interface with no zod-specific mapped types — bypasses zod's machinery entirely at the bridge. zod 4.x objects satisfy `StandardSchemaV1` natively via the `~standard` property. Diff is the hook signature only; callsites unchanged. **If green: ship as a single combined commit.**
+
+**Rung 4 — Re-defer.** If Rung 3 fails, the depth is upstream of our control. Roll back, leave the tilde pin in place, document the failure mode (which rung failed and the exact `tsc` output), and track upstream: either zod publishing optimized type-perf fixes (search the issue tracker for "TS2589" — none open as of 2026-05-15), or TanStack form publishing a `DeepValue` rewrite that avoids unfolding the schema's output type.
+
+#### Verification
+
+Same as Phase 4's loop, plus:
+
+- After Rung 1's install, **time** `pnpm turbo check-types --force` and compare against the Phase 4 baseline (~3s with cache busted, ~6.5s for the first cold run). A 2-3× slowdown without errors is a yellow flag worth investigating before merge, even if the build is "technically green" — it signals zod 4.4 is pushing close to the depth limit and a future feature addition could tip it.
+- Confirm `apps/web/src/features/auth/sign-in-form.tsx` and `apps/native/src/features/auth/sign-in.tsx` (representative callsites for both apps) compile without inferring `value: any` in `onSubmit` — i.e., the `T` pinning still works after any hook tweak.
+
+#### Critical files
+
+- `pnpm-workspace.yaml` — Rung 1 catalog edit
+- `packages/org/src/hooks/use-zod-form.ts` — Rung 2 or Rung 3 hook edit
+- No changes expected in callsite files (~20 form components) — they treat the hook as a black box
+- `docs/plans/outdated-package-updates.md` — update Phase 7 deferral note on success
+- `docs/plans/typescript-6-upgrade.md` — record which rung landed and any timing observation
 
 ---
 

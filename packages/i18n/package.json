@@ -49,6 +49,7 @@
 	"devDependencies": {
 		"@lingual/i18n-check": "^0.9.5",
 		"@pengana/config": "workspace:*",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"zod": "catalog:"
 	}
 }

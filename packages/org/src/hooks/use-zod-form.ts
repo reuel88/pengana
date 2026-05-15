@@ -2,8 +2,8 @@ import { useForm } from "@tanstack/react-form";
 import type { z } from "zod";
 
 export interface UseZodFormOptions<T extends Record<string, unknown>> {
-	// biome-ignore lint/suspicious/noExplicitAny: schema validator accepts a complex generic type
-	schema: z.ZodType<T, any, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: relax constraint position to keep tsc from unfolding zod's mapped types per callsite (TS2589 with zod 4.4 + tanstack-form). T stays pinned via defaultValues and onSubmit value.
+	schema: z.ZodType<any, any, any>;
 	defaultValues?: T;
 	onSubmit?: (props: { value: T }) => Promise<void> | void;
 }

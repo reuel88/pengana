@@ -24,7 +24,7 @@ Branch: `chore/update-outdated-packages`. Catalog edits live in `pnpm-workspace.
 - [x] **Phase 4** — Expo SDK patches
 - [x] **Phase 5** — Frontend build tooling minor
 - [x] **Phase 6** — UI / Tailwind minor
-- [~] **Phase 7** — Core library minors (data layer) — zod deferred (TS2589, persists with TanStack form 1.32)
+- [x] **Phase 7** — Core library minors (data layer) — zod 4.4.3 landed under `typescript-6-upgrade.md` Phase 6 (Rung 1 + Rung 2 paired, plus i18n peer-resolution dedup)
 - [x] **Phase 8** — TanStack ecosystem minor
 - [~] **Phase 9** — React Native ecosystem minor — reanimated 4.3.1 deferred (needs worklets 0.8 from Phase 14)
 - [x] **Phase 10** — better-auth ecosystem
@@ -167,17 +167,17 @@ Also aligned `apps/web/package.json` `vite` from direct `^8.0.0` pin to `catalog
 
 Side benefit: the long-standing `@tailwindcss/vite → unmet peer vite` warning is gone (Tailwind 4.3 added vite 8 to its peer range).
 
-### Phase 7 — Core library minors (data layer) ⚠️ Partial
+### Phase 7 — Core library minors (data layer) ✅ Done
 
 ORPC was pulled into Phase 2; this phase covers the remaining data-layer minors.
 
 - `dexie` ^4.0.11 → ^4.4.2 *(packages/local-db + extension, native, web)* ✅
 - `dexie-react-hooks` ^4.2.0 → ^4.4.0 ✅
-- `zod` ^4.3.6 → ^4.4.3 *(catalog)* ❌ **Deferred**
+- `zod` ^4.3.6 → ^4.4.3 *(catalog)* ✅ — landed under `typescript-6-upgrade.md` Phase 6
 
-**zod 4.4 deferred:** Bumping `zod` to 4.4.3 with the current `@tanstack/react-form` 1.28.5 caused `TS2589: Type instantiation is excessively deep and possibly infinite` across every TanStack-form schema callsite (9 files in `apps/native`, similar in `apps/web`), which made `tsc` OOM (>8GB heap). Catalog now uses `zod: ~4.3.6` (tilde) so transitive consumers (`better-auth`, `@orpc/zod`, `@polar-sh/sdk`) can't pull 4.4.x in either.
+**zod 4.4 history:** Initially deferred because `@tanstack/react-form` 1.28.5 + zod 4.4 hit `TS2589: Type instantiation is excessively deep and possibly infinite` across every TanStack-form schema callsite and OOM'd `tsc` (>8GB heap). Retry under `@tanstack/react-form` 1.32 reproduced the same blow-up, confirming the root cause was in zod's 4.4 type machinery (rewritten internal optionality machinery produces heavier-to-resolve types even for plain `z.object({ ... })` schemas, multiplied across ~20 `useZodForm` callsites).
 
-**Retry after Phase 8 result:** Retried with `@tanstack/react-form` 1.32.0 — same OOM/TS2589. Confirmed the root cause is in `zod` 4.4 itself, not the form bridge. Defer until zod publishes a fix or TanStack form ships a 4.4-compatible adapter. Track upstream and revisit before Phase 14.
+**Resolution:** Landed under the TS 6 plan's Phase 6, where Rung 1 (catalog bump alone) reproduced the OOM under TS 6 as well, so Rung 2 was paired in: `packages/org/src/hooks/use-zod-form.ts` widened the schema constraint from `z.ZodType<T, any, any>` to `z.ZodType<any, any, any>` (`T` still pins through `defaultValues` and `onSubmit`'s `value`, so callsite ergonomics are unchanged). A third edit aligned `packages/i18n`'s zod resolution with the catalog to dedupe a pnpm peer-resolution holdover at 4.3.6. See `docs/plans/typescript-6-upgrade.md` Phase 6 for the full diagnosis and verification trail.
 
 ### Phase 8 — TanStack ecosystem minor ✅ Done
 
@@ -187,7 +187,7 @@ ORPC was pulled into Phase 2; this phase covers the remaining data-layer minors.
 
 Side benefit: cleared three pre-existing peer warnings (`@tanstack/react-query-devtools`, `@tanstack/react-router-devtools`, `@tanstack/router-plugin`) that all wanted newer query/router versions.
 
-Phase 7's deferred `zod` 4.4 bump was retried under this phase's TanStack form 1.32 — same OOM/TS2589, so the deferral stands (see Phase 7 notes).
+Phase 7's deferred `zod` 4.4 bump was retried under this phase's TanStack form 1.32 — same OOM/TS2589, so the deferral stood at the time. It eventually landed under `typescript-6-upgrade.md` Phase 6 with a paired `useZodForm` constraint relaxation (see Phase 7 above).
 
 ### Phase 9 — React Native ecosystem minor ⚠️ Partial
 
