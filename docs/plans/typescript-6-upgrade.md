@@ -21,7 +21,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 - [x] **Phase 2** — TS 6 recon (doc commit, no code change)
 - [x] **Phase 3** — Pre-emptive type fixes on 5.9.3
 - [x] **Phase 4** — Catalog bump to ~6.0.3
-- [ ] **Phase 5** — Peer-warning cleanup
+- [x] **Phase 5** — Peer-warning cleanup
 - [ ] **Phase 6** — Optional: retry zod 4.4.3
 
 ---
@@ -218,15 +218,20 @@ Forced cache bust ran cleanly: `rm -rf apps/server/dist apps/server/tsconfig.tsb
 - **New warning:** `apps/native → expo → @expo/config → @expo/require-utils → ✕ unmet peer typescript@"^5.0.0 || ^5.0.0-0": found 6.0.3`. Expo SDK 55's internal `@expo/require-utils` has a strict TS 5 peer; functionally fine (expo-doctor + e2e + tests + build all pass), but flagged for Phase 5 documentation.
 - **Unchanged pre-existing:** `vite-plugin-pwa → workbox-build/workbox-window 7.4.1`, `local-db → react-dom 19.2.6`.
 
-### Phase 5 — Peer-warning cleanup
+### Phase 5 — Peer-warning cleanup ✅ Done
 
-After Phase 4 install, audit `pnpm install` output:
+Audit of `pnpm install` warnings post-Phase-4 (captured from the catalog-bump install, not from a no-op re-install which doesn't replay the warning block):
 
-- **Expected to clear:** `tsdown → typescript@^6` warning noted in `outdated-package-updates.md` Phase 15 verification.
-- **Expected to remain noisy:** `workbox-build` / `workbox-window` chain (TS-unrelated, pre-existing) and `local-db → react-dom@19.2.6` chain.
-- **New warnings:** any dep with a strict `typescript: ^5` peer needs a bump or a `pnpm.overrides` shim — handle case-by-case.
+| Status | Warning | Action |
+|---|---|---|
+| ✅ **Cleared** | `apps/server → tsdown 0.22.0 → rolldown-plugin-dts 0.25.0 → ✕ unmet peer typescript@^6.0.0: found 5.9.3` | Resolved automatically by the catalog bump — predicted in Phase 5 spec. |
+| ⚠️ **New — accepted** | `apps/native → expo 55.0.23 → @expo/config → @expo/require-utils 55.0.5 → ✕ unmet peer typescript@"^5.0.0 \|\| ^5.0.0-0": found 6.0.3` | **No upstream fix available.** Verified via `npm view @expo/require-utils@latest peerDependencies` — even 56.1.0 (the latest SDK 56 release at audit time) still pins `typescript: ^5.0.0 \|\| ^5.0.0-0`. Expo has not widened the TS peer range across any 55.x or 56.x release. Functionally inert: e2e (83/83), build (3/3 with bundle sizes unchanged), and expo-doctor (16/18 baseline) all pass with TS 6.0.3. **Accepted and documented**, matching the workbox-chain acceptance pattern from `outdated-package-updates.md` Phase 5/15. |
+| 🟡 **Unchanged pre-existing** | `apps/web → vite-plugin-pwa 1.3.0 → ✕ unmet peer workbox-build@^7.4.1: found 7.4.0` and `workbox-window@^7.4.1: found 7.4.0` | TS-unrelated. Documented in `outdated-package-updates.md` Phase 5/15. No change. |
+| 🟡 **Unchanged pre-existing** | `packages/local-db → react-dom 19.2.6 → ✕ unmet peer react@^19.2.6: found 19.2.4` | TS-unrelated. Documented in `outdated-package-updates.md` Phase 15. No change. |
 
-Land any required dep bumps as a single commit. If a dep has no TS 6-compatible release, document it in this plan and accept the warning.
+**No `pnpm.overrides` shim added.** Considered using `pnpm.peerDependencyRules.allowedVersions` to silence the Expo warning explicitly, but rejected as over-engineering — the project's established pattern is to accept transitive peer warnings as noise when no clean upstream fix exists. The audit trail in this plan provides the same intent without machinery. When Expo eventually publishes a TS-6-aware patch (likely tied to the SDK 56 cohort upgrade tracked as Phase 14b in `outdated-package-updates.md`), the warning will clear automatically.
+
+**No code changes in this phase.** Commit is plan-doc-only.
 
 ### Phase 6 — Optional: retry zod 4.4.3
 
