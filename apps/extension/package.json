@@ -42,7 +42,7 @@
 		"@types/react-dom": "catalog:",
 		"@wxt-dev/module-react": "^1.2.2",
 		"tailwindcss": "catalog:",
-		"typescript": "^5.9.3",
+		"typescript": "catalog:",
 		"vite": "catalog:",
 		"vitest": "catalog:",
 		"wxt": "^0.20.26"
