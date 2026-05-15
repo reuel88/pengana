@@ -20,7 +20,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 - [x] **Phase 1** — Baseline pin & extension drift fix
 - [x] **Phase 2** — TS 6 recon (doc commit, no code change)
 - [x] **Phase 3** — Pre-emptive type fixes on 5.9.3
-- [ ] **Phase 4** — Catalog bump to ~6.0.3
+- [x] **Phase 4** — Catalog bump to ~6.0.3
 - [ ] **Phase 5** — Peer-warning cleanup
 - [ ] **Phase 6** — Optional: retry zod 4.4.3
 
@@ -199,22 +199,24 @@ Phase 2's inventory came back with a single error pattern across two files, so t
 
 The two TS5101 errors Phase 2 surfaced are now structurally impossible under TS 6 — Phase 4's catalog bump should be a pure version edit with no bundled type fixes needed.
 
-### Phase 4 — Catalog bump to TS 6
+### Phase 4 — Catalog bump to TS 6 ✅ Done
 
-Single edit: `pnpm-workspace.yaml` `typescript: ~5.9.3` → `~6.0.3`.
+Single catalog edit: `pnpm-workspace.yaml:39` `typescript: ~5.9.3` → `~6.0.3`. `pnpm install` swapped the resolved version cleanly (`devDependencies: - typescript 5.9.3 + typescript 6.0.3`). Phase 3's `baseUrl` removal absorbed the only required source change, so no bundled type fixes were needed in this commit.
 
-If Phase 2 surfaced errors that could *not* be backported (TS 6-only syntax, type-utility changes, etc.), bundle those fixes into this same commit.
+Forced cache bust ran cleanly: `rm -rf apps/server/dist apps/server/tsconfig.tsbuildinfo` followed by `pnpm turbo check-types --force` rebuilt server's composite from scratch alongside the four other type-check tasks — all 5 green.
 
-After `pnpm install`, force-bust turbo's check-types cache once:
+**Verification:** all six checks plus the native gate.
+- `pnpm check` — 767 files, no fixes.
+- `pnpm turbo check-types --force` — 5/5 tasks fresh (no cache); zero TS errors anywhere.
+- `pnpm test` — 7/7 tasks; 155+ tests across api/local-db/org/sync.
+- `pnpm build` — 3/3 tasks; web PWA 122 entries / 1456.30 KiB unchanged, extension 1.29 MB unchanged, server tsdown 12 files / 2.03 MB unchanged.
+- `pnpm e2e` — 83/83 tests in 1m21s, no flakies.
+- `npx expo-doctor` (in `apps/native`) — **16/18 baseline holds.** Both failures are pre-existing: `duplicate dependencies` (third-party react/react-dom copies from `@polar-sh/*` and `@tanstack/react-store`, per outdated-package-updates Phase 4) and `Expo SDK package versions` (minor patch drift introduced by Phase 9 of outdated-package-updates). **Zero new failures attributable to TS 6.**
 
-```bash
-rm -rf apps/server/dist apps/server/*.tsbuildinfo
-pnpm turbo check-types --force
-```
-
-The `tsc -b` composite cache in `apps/server` stamps the producing TS version in `.tsbuildinfo`; a stale entry can mask real regressions or trigger phantom rebuilds. Subsequent runs use the normal cache.
-
-Verification: full loop **plus** `pnpm dev:server` + `/rpc` + `/api-reference` smoke, `pnpm dev:web` golden-path smoke, and `cd apps/native && npx expo-doctor` (must stay at the 16/18 baseline — drops indicate Expo SDK 55 dislikes TS 6 transitively and may need a holding patch).
+**Peer-warning delta** (handover to Phase 5):
+- **Cleared as predicted:** `tsdown → rolldown-plugin-dts → typescript@^6.0.0` (was the only TS-related warning under 5.9.3).
+- **New warning:** `apps/native → expo → @expo/config → @expo/require-utils → ✕ unmet peer typescript@"^5.0.0 || ^5.0.0-0": found 6.0.3`. Expo SDK 55's internal `@expo/require-utils` has a strict TS 5 peer; functionally fine (expo-doctor + e2e + tests + build all pass), but flagged for Phase 5 documentation.
+- **Unchanged pre-existing:** `vite-plugin-pwa → workbox-build/workbox-window 7.4.1`, `local-db → react-dom 19.2.6`.
 
 ### Phase 5 — Peer-warning cleanup
 
