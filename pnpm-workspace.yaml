@@ -2,6 +2,12 @@ packages:
   - apps/*
   - packages/*
 
+allowBuilds:
+  esbuild: true
+  msw: true
+  sharp: true
+  spawn-sync: true
+
 catalog:
   '@base-ui/react': ^1.4.1
   '@better-auth/expo': 1.6.10
