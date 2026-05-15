@@ -19,7 +19,7 @@ Branch: `chore/typescript-6-upgrade`. Catalog edits live in `pnpm-workspace.yaml
 - [x] **Phase 0** — Branch setup
 - [x] **Phase 1** — Baseline pin & extension drift fix
 - [x] **Phase 2** — TS 6 recon (doc commit, no code change)
-- [ ] **Phase 3** — Pre-emptive type fixes on 5.9.3 (skip if Phase 2 shows zero errors)
+- [x] **Phase 3** — Pre-emptive type fixes on 5.9.3
 - [ ] **Phase 4** — Catalog bump to ~6.0.3
 - [ ] **Phase 5** — Peer-warning cleanup
 - [ ] **Phase 6** — Optional: retry zod 4.4.3
@@ -179,15 +179,25 @@ That's the entire TS 6 error surface — **two identical TS5101 deprecation erro
 - **Phase 5** has one expected warning-resolution event (`tsdown` peer satisfied); no new warnings to chase.
 - **Phase 6** (zod 4.4 retry) remains worthwhile but is now a clean A/B test against TS 6, isolated from any other change.
 
-### Phase 3 — Pre-emptive type fixes on 5.9.3
+### Phase 3 — Pre-emptive type fixes on 5.9.3 ✅ Done
 
-For each error category in Phase 2's inventory that is *also valid on 5.9.3*, land one focused commit per workspace. Patterns likely to surface:
-- Explicit return-type annotations on exported functions where TS 6's stricter inference now infers something different.
-- Narrowing `any`/`unknown` at oRPC handler boundaries (`packages/api/src/**`) before the envelope middleware sees them.
-- Removing now-unused `@ts-expect-error` (TS 6 reports these as errors; the 2 in `apps/native/drizzle/migrations.ts` are expected still-needed).
-- Tightening Drizzle insert/update value types where the catalog's `drizzle-orm ^0.45.2` infers more precisely under TS 6.
+Phase 2's inventory came back with a single error pattern across two files, so this phase collapsed to one combined commit removing `baseUrl: "."` from both tsconfigs (the original "one commit per workspace" rule was written for a heavier error surface):
 
-**Skip this phase entirely if Phase 2 shows zero errors.** Otherwise expect 0–6 small commits, one per workspace touched. Each commit must independently pass the full verification loop on TS 5.9.3.
+- `apps/server/tsconfig.json:6` — removed `"baseUrl": ".",`
+- `apps/web/tsconfig.json:13` — removed `"baseUrl": ".",`
+
+**Why this is the right fix (not `ignoreDeprecations`):** under `moduleResolution: "bundler"` (set in both tsconfigs), `paths` entries already resolve relative to the tsconfig file's directory, so `baseUrl: "."` is a no-op alias. TS 6's TS5101 deprecation message offers `"ignoreDeprecations": "6.0"` as an escape hatch, but that just kicks the can to TS 7. Removing the unused option is forward-compatible and shrinks the surface.
+
+`apps/web/tsconfig.json` is a standalone config (does not extend `@pengana/config/tsconfig.base.json`); the unrelated divergence is out of scope here.
+
+**Verification (on TS 5.9.3 — confirming backport):** all six checks green.
+- `pnpm check` — 767 files, no fixes.
+- `pnpm check-types` — 5/5 tasks (2 cached, 3 fresh including server's `tsc -b` after `apps/server/dist` + `tsconfig.tsbuildinfo` cleanup).
+- `pnpm test` — 7/7.
+- `pnpm build` — 3/3; web PWA 122 entries / 1456.30 KiB unchanged.
+- `pnpm e2e` — 83/83 in 1m20s (no flakies this run).
+
+The two TS5101 errors Phase 2 surfaced are now structurally impossible under TS 6 — Phase 4's catalog bump should be a pure version edit with no bundled type fixes needed.
 
 ### Phase 4 — Catalog bump to TS 6
 
