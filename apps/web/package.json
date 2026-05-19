@@ -34,7 +34,7 @@
 		"@tailwindcss/vite": "catalog:",
 		"@tanstack/react-form": "catalog:",
 		"@tanstack/react-query": "catalog:",
-		"@tanstack/react-router": "^1.169.2",
+		"@tanstack/react-router": "^1.170.4",
 		"dexie": "catalog:",
 		"dexie-react-hooks": "catalog:",
 		"dotenv": "catalog:",
