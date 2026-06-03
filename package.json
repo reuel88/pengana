@@ -41,12 +41,12 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.15",
+		"@biomejs/biome": "^2.4.16",
 		"@pengana/config": "workspace:*",
 		"@types/node": "catalog:",
 		"husky": "^9.1.7",
-		"lint-staged": "^17.0.4",
-		"turbo": "^2.9.12",
+		"lint-staged": "^17.0.7",
+		"turbo": "^2.9.16",
 		"typescript": "catalog:"
 	},
 	"lint-staged": {
